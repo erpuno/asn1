@@ -1,0 +1,19 @@
+List DEFINITIONS EXPLICIT TAGS ::= BEGIN
+
+  V ::= SEQUENCE {
+    a INTEGER (0..7),
+    b BOOLEAN,
+    c INTEGER (0..3),
+    d SEQUENCE { d1 BOOLEAN, d2 BOOLEAN } }
+
+  A ::= CHOICE { v [0] V, list-x [1] List }
+
+  List ::= SEQUENCE {
+    data OCTET STRING,
+    next CHOICE { linked-list List, end NULL } }
+
+  LDAPString ::= OCTET STRING
+
+  LDAPDN ::= LDAPString
+
+END
