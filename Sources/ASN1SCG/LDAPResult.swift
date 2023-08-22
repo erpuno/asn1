@@ -10,8 +10,8 @@ import Foundation
     @usableFromInline var resultCode: LDAPResult
     @usableFromInline var matchedDN: ASN1OctetString
     @usableFromInline var diagnosticMessage: ASN1OctetString
-    @usableFromInline var referral: Referral
-    @inlinable init(resultCode: LDAPResult, matchedDN: ASN1OctetString, diagnosticMessage: ASN1OctetString, referral: Referral) {
+    @usableFromInline var referral: [String]
+    @inlinable init(resultCode: LDAPResult, matchedDN: ASN1OctetString, diagnosticMessage: ASN1OctetString, referral: [String]) {
         self.resultCode = resultCode
         self.matchedDN = matchedDN
         self.diagnosticMessage = diagnosticMessage
@@ -23,7 +23,7 @@ import Foundation
             let resultCode = try LDAPResult(derEncoded: &nodes)
             let matchedDN = try ASN1OctetString(derEncoded: &nodes)
             let diagnosticMessage = try ASN1OctetString(derEncoded: &nodes)
-            let referral = try Referral(derEncoded: &nodes)
+            let referral = try DER.sequence(of: String.self, identifier: .sequence, nodes: &nodes)
             return LDAPResult(resultCode: resultCode, matchedDN: matchedDN, diagnosticMessage: diagnosticMessage, referral: referral)
         }
     }
@@ -33,7 +33,7 @@ import Foundation
             try coder.serialize(self.resultCode)
             try coder.serialize(self.matchedDN)
             try coder.serialize(self.diagnosticMessage)
-            try coder.serialize(self.referral)
+            try coder.serializeSequenceOf(referral)
         }
     }
 }

@@ -8,8 +8,8 @@ import Foundation
 @usableFromInline struct ModifyRequest: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var object: ASN1OctetString
-    @usableFromInline var changes: [SEQUENCE]
-    @inlinable init(object: ASN1OctetString, changes: [SEQUENCE]) {
+    @usableFromInline var changes: [ModifyRequest_changes_Sequence]
+    @inlinable init(object: ASN1OctetString, changes: [ModifyRequest_changes_Sequence]) {
         self.object = object
         self.changes = changes
     }
@@ -17,7 +17,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let object = try ASN1OctetString(derEncoded: &nodes)
-            let changes = try [SEQUENCE](derEncoded: &nodes)
+            let changes = try DER.sequence(of: ModifyRequest_changes_Sequence.self, identifier: .sequence, nodes: &nodes)
             return ModifyRequest(object: object, changes: changes)
         }
     }

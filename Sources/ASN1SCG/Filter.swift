@@ -18,25 +18,25 @@ import Foundation
     case extensibleMatch(MatchingRuleAssertion)
     @inlinable init(derEncoded rootNode: ASN1Node) throws {
         switch rootNode.identifier {
-            case Filter.defaultIdentifier:
+            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
                 self = .and(try Filter(derEncoded: rootNode))
-            case Filter.defaultIdentifier:
+            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
                 self = .or(try Filter(derEncoded: rootNode))
-            case Filter.defaultIdentifier:
+            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
                 self = .not(try Filter(derEncoded: rootNode))
-            case AttributeValueAssertion.defaultIdentifier:
+            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
                 self = .equalityMatch(try AttributeValueAssertion(derEncoded: rootNode))
-            case SubstringFilter.defaultIdentifier:
+            case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
                 self = .substrings(try SubstringFilter(derEncoded: rootNode))
-            case AttributeValueAssertion.defaultIdentifier:
+            case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
                 self = .greaterOrEqual(try AttributeValueAssertion(derEncoded: rootNode))
-            case AttributeValueAssertion.defaultIdentifier:
+            case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
                 self = .lessOrEqual(try AttributeValueAssertion(derEncoded: rootNode))
-            case AttributeDescription.defaultIdentifier:
-                self = .present(try AttributeDescription(derEncoded: rootNode))
-            case AttributeValueAssertion.defaultIdentifier:
+            case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
+                self = .present(try ASN1OctetString(derEncoded: rootNode))
+            case ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific):
                 self = .approxMatch(try AttributeValueAssertion(derEncoded: rootNode))
-            case MatchingRuleAssertion.defaultIdentifier:
+            case ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific):
                 self = .extensibleMatch(try MatchingRuleAssertion(derEncoded: rootNode))
 
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)

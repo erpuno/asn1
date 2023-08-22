@@ -10,9 +10,9 @@ import Foundation
     case list_x(List)
     @inlinable init(derEncoded rootNode: ASN1Node) throws {
         switch rootNode.identifier {
-            case V.defaultIdentifier:
+            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
                 self = .v(try V(derEncoded: rootNode))
-            case List.defaultIdentifier:
+            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
                 self = .list_x(try List(derEncoded: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }

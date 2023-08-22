@@ -10,9 +10,9 @@ import Foundation
     case sasl(SaslCredentials)
     @inlinable init(derEncoded rootNode: ASN1Node) throws {
         switch rootNode.identifier {
-            case ASN1OctetString.defaultIdentifier:
+            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
                 self = .simple(try ASN1OctetString(derEncoded: rootNode))
-            case SaslCredentials.defaultIdentifier:
+            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
                 self = .sasl(try SaslCredentials(derEncoded: rootNode))
 
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)

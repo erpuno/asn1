@@ -14,8 +14,8 @@ import Foundation
     @usableFromInline var timeLimit: ArraySlice<UInt8>
     @usableFromInline var typesOnly: Bool
     @usableFromInline var filter: Filter
-    @usableFromInline var attributes: AttributeSelection
-    @inlinable init(baseObject: ASN1OctetString, scope: SearchRequest, derefAliases: SearchRequest, sizeLimit: ArraySlice<UInt8>, timeLimit: ArraySlice<UInt8>, typesOnly: Bool, filter: Filter, attributes: AttributeSelection) {
+    @usableFromInline var attributes: [ASN1OctetString]
+    @inlinable init(baseObject: ASN1OctetString, scope: SearchRequest, derefAliases: SearchRequest, sizeLimit: ArraySlice<UInt8>, timeLimit: ArraySlice<UInt8>, typesOnly: Bool, filter: Filter, attributes: [ASN1OctetString]) {
         self.baseObject = baseObject
         self.scope = scope
         self.derefAliases = derefAliases
@@ -35,7 +35,7 @@ import Foundation
             let timeLimit = try ArraySlice<UInt8>(derEncoded: &nodes)
             let typesOnly = try Bool(derEncoded: &nodes)
             let filter = try Filter(derEncoded: &nodes)
-            let attributes = try AttributeSelection(derEncoded: &nodes)
+            let attributes = try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, nodes: &nodes)
             return SearchRequest(baseObject: baseObject, scope: scope, derefAliases: derefAliases, sizeLimit: sizeLimit, timeLimit: timeLimit, typesOnly: typesOnly, filter: filter, attributes: attributes)
         }
     }
@@ -49,7 +49,7 @@ import Foundation
             try coder.serialize(self.timeLimit)
             try coder.serialize(self.typesOnly)
             try coder.serialize(self.filter)
-            try coder.serialize(self.attributes)
+            try coder.serializeSequenceOf(attributes)
         }
     }
 }

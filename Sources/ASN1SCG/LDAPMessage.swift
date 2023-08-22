@@ -9,8 +9,8 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var messageID: ArraySlice<UInt8>
     @usableFromInline var protocolOp: LDAPMessage_protocolOp_Choice
-    @usableFromInline var controls: Controls
-    @inlinable init(messageID: ArraySlice<UInt8>, protocolOp: LDAPMessage_protocolOp_Choice, controls: Controls) {
+    @usableFromInline var controls: [Control]
+    @inlinable init(messageID: ArraySlice<UInt8>, protocolOp: LDAPMessage_protocolOp_Choice, controls: [Control]) {
         self.messageID = messageID
         self.protocolOp = protocolOp
         self.controls = controls
@@ -20,7 +20,7 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let messageID = try ArraySlice<UInt8>(derEncoded: &nodes)
             let protocolOp = try LDAPMessage_protocolOp_Choice(derEncoded: &nodes)
-            let controls = try Controls(derEncoded: &nodes)
+            let controls = try DER.sequence(of: Control.self, identifier: .sequence, nodes: &nodes)
             return LDAPMessage(messageID: messageID, protocolOp: protocolOp, controls: controls)
         }
     }
@@ -29,7 +29,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(self.messageID)
             try coder.serialize(self.protocolOp)
-            try coder.serialize(self.controls)
+            try coder.serializeSequenceOf(controls)
         }
     }
 }

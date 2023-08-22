@@ -12,7 +12,7 @@ import Foundation
     case searchRequest(SearchRequest)
     case searchResEntry(SearchResultEntry)
     case searchResDone(LDAPResult)
-    case searchResRef(SearchResultReference)
+    case searchResRef([ASN1OctetString])
     case modifyRequest(ModifyRequest)
     case modifyResponse(LDAPResult)
     case addRequest(AddRequest)
@@ -33,38 +33,38 @@ import Foundation
                 self = .bindRequest(try BindRequest(derEncoded: rootNode))
             case BindResponse.defaultIdentifier:
                 self = .bindResponse(try BindResponse(derEncoded: rootNode))
-            case UnbindRequest.defaultIdentifier:
-                self = .unbindRequest(try UnbindRequest(derEncoded: rootNode))
+            case ASN1Null.defaultIdentifier:
+                self = .unbindRequest(try ASN1Null(derEncoded: rootNode))
             case SearchRequest.defaultIdentifier:
                 self = .searchRequest(try SearchRequest(derEncoded: rootNode))
             case SearchResultEntry.defaultIdentifier:
                 self = .searchResEntry(try SearchResultEntry(derEncoded: rootNode))
-            case SearchResultDone.defaultIdentifier:
-                self = .searchResDone(try SearchResultDone(derEncoded: rootNode))
-            case SearchResultReference.defaultIdentifier:
-                self = .searchResRef(try SearchResultReference(derEncoded: rootNode))
+            case LDAPResult.defaultIdentifier:
+                self = .searchResDone(try LDAPResult(derEncoded: rootNode))
+            case [ASN1OctetString].defaultIdentifier:
+                self = .searchResRef(try [ASN1OctetString](derEncoded: rootNode))
             case ModifyRequest.defaultIdentifier:
                 self = .modifyRequest(try ModifyRequest(derEncoded: rootNode))
-            case ModifyResponse.defaultIdentifier:
-                self = .modifyResponse(try ModifyResponse(derEncoded: rootNode))
+            case LDAPResult.defaultIdentifier:
+                self = .modifyResponse(try LDAPResult(derEncoded: rootNode))
             case AddRequest.defaultIdentifier:
                 self = .addRequest(try AddRequest(derEncoded: rootNode))
-            case AddResponse.defaultIdentifier:
-                self = .addResponse(try AddResponse(derEncoded: rootNode))
-            case DelRequest.defaultIdentifier:
-                self = .delRequest(try DelRequest(derEncoded: rootNode))
-            case DelResponse.defaultIdentifier:
-                self = .delResponse(try DelResponse(derEncoded: rootNode))
+            case LDAPResult.defaultIdentifier:
+                self = .addResponse(try LDAPResult(derEncoded: rootNode))
+            case ASN1OctetString.defaultIdentifier:
+                self = .delRequest(try ASN1OctetString(derEncoded: rootNode))
+            case LDAPResult.defaultIdentifier:
+                self = .delResponse(try LDAPResult(derEncoded: rootNode))
             case ModifyDNRequest.defaultIdentifier:
                 self = .modDNRequest(try ModifyDNRequest(derEncoded: rootNode))
-            case ModifyDNResponse.defaultIdentifier:
-                self = .modDNResponse(try ModifyDNResponse(derEncoded: rootNode))
+            case LDAPResult.defaultIdentifier:
+                self = .modDNResponse(try LDAPResult(derEncoded: rootNode))
             case CompareRequest.defaultIdentifier:
                 self = .compareRequest(try CompareRequest(derEncoded: rootNode))
-            case CompareResponse.defaultIdentifier:
-                self = .compareResponse(try CompareResponse(derEncoded: rootNode))
-            case AbandonRequest.defaultIdentifier:
-                self = .abandonRequest(try AbandonRequest(derEncoded: rootNode))
+            case LDAPResult.defaultIdentifier:
+                self = .compareResponse(try LDAPResult(derEncoded: rootNode))
+            case ArraySlice<UInt8>.defaultIdentifier:
+                self = .abandonRequest(try ArraySlice<UInt8>(derEncoded: rootNode))
             case ExtendedRequest.defaultIdentifier:
                 self = .extendedReq(try ExtendedRequest(derEncoded: rootNode))
             case ExtendedResponse.defaultIdentifier:

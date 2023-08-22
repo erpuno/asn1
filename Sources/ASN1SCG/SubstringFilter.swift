@@ -8,8 +8,8 @@ import Foundation
 @usableFromInline struct SubstringFilter: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var type: ASN1OctetString
-    @usableFromInline var substrings: [CHOICE]
-    @inlinable init(type: ASN1OctetString, substrings: [CHOICE]) {
+    @usableFromInline var substrings: [SubstringFilter_substrings_Choice]
+    @inlinable init(type: ASN1OctetString, substrings: [SubstringFilter_substrings_Choice]) {
         self.type = type
         self.substrings = substrings
     }
@@ -17,7 +17,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let type = try ASN1OctetString(derEncoded: &nodes)
-            let substrings = try [CHOICE](derEncoded: &nodes)
+            let substrings = try DER.sequence(of: SubstringFilter_substrings_Choice.self, identifier: .sequence, nodes: &nodes)
             return SubstringFilter(type: type, substrings: substrings)
         }
     }

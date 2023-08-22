@@ -8,8 +8,8 @@ import Foundation
 @usableFromInline struct AddRequest: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var entry: ASN1OctetString
-    @usableFromInline var attributes: AttributeList
-    @inlinable init(entry: ASN1OctetString, attributes: AttributeList) {
+    @usableFromInline var attributes: [PartialAttribute]
+    @inlinable init(entry: ASN1OctetString, attributes: [PartialAttribute]) {
         self.entry = entry
         self.attributes = attributes
     }
@@ -17,7 +17,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let entry = try ASN1OctetString(derEncoded: &nodes)
-            let attributes = try AttributeList(derEncoded: &nodes)
+            let attributes = try DER.sequence(of: PartialAttribute.self, identifier: .sequence, nodes: &nodes)
             return AddRequest(entry: entry, attributes: attributes)
         }
     }
@@ -25,7 +25,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(self.entry)
-            try coder.serialize(self.attributes)
+            try coder.serializeSequenceOf(attributes)
         }
     }
 }
