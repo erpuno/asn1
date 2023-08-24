@@ -7,23 +7,36 @@ import Foundation
 
 @usableFromInline struct BindResponse: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
+    @usableFromInline var resultCode: LDAPResult_resultCode_Enum
+    @usableFromInline var matchedDN: ASN1OctetString
+    @usableFromInline var diagnosticMessage: ASN1OctetString
+    @usableFromInline var referral: [ASN1OctetString]
     @usableFromInline var serverSaslCreds: ASN1OctetString
-    @inlinable init(, serverSaslCreds: ASN1OctetString) {
-
+    @inlinable init(resultCode: LDAPResult_resultCode_Enum, matchedDN: ASN1OctetString, diagnosticMessage: ASN1OctetString, referral: [ASN1OctetString], serverSaslCreds: ASN1OctetString) {
+        self.resultCode = resultCode
+        self.matchedDN = matchedDN
+        self.diagnosticMessage = diagnosticMessage
+        self.referral = referral
         self.serverSaslCreds = serverSaslCreds
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-
+            let resultCode = try LDAPResult_resultCode_Enum(derEncoded: &nodes)
+            let matchedDN = try ASN1OctetString(derEncoded: &nodes)
+            let diagnosticMessage = try ASN1OctetString(derEncoded: &nodes)
+            let referral = try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, nodes: &nodes)
             let serverSaslCreds = try ASN1OctetString(derEncoded: &nodes)
-            return BindResponse(, serverSaslCreds: serverSaslCreds)
+            return BindResponse(resultCode: resultCode, matchedDN: matchedDN, diagnosticMessage: diagnosticMessage, referral: referral, serverSaslCreds: serverSaslCreds)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-
+            try coder.serialize(self.resultCode)
+            try coder.serialize(self.matchedDN)
+            try coder.serialize(self.diagnosticMessage)
+            try coder.serializeSequenceOf(referral)
             try coder.serialize(self.serverSaslCreds)
         }
     }

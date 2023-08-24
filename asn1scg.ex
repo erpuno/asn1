@@ -180,6 +180,9 @@ public struct #{name} {
 
   def emitFields(name, pad, fields, modname) when is_list(fields) do
       Enum.join(:lists.map(fn 
+        {:"COMPONENTS OF", {:type, _, {_,_,_,n}, _, _, :no}} -> 
+           inclusion = :application.get_env(:asn1scg, {:type,n}, [])
+           emitFields(n, pad, inclusion, modname)
         {:ComponentType,_,fieldName,{:type,_,fieldType,_elementSet,[],:no},_optional,_,_} ->
            field = fieldType(name, fieldName, fieldType)
            case fieldType do
@@ -205,6 +208,9 @@ public struct #{name} {
 
   def emitCtorBody(fields), do:
       Enum.join(:lists.map(fn 
+        {:"COMPONENTS OF", {:type, _, {_,_,_,n}, _, _, :no}} -> 
+           inclusion = :application.get_env(:asn1scg, {:type,n}, [])
+           emitCtorBody(inclusion)
         {:ComponentType,_,fieldName,{:type,_,_type,_elementSet,[],:no},_optional,_,_} ->
            String.duplicate(" ", 8) <> emitCtorBodyElement(fieldName(fieldName))
          _ -> ""
@@ -232,6 +238,9 @@ public struct #{name} {
 
   def emitSequenceEncoderBody(_name, fields), do:
       Enum.join(:lists.map(fn 
+        {:"COMPONENTS OF", {:type, _, {_,_,_,name}, _, _, :no}} -> 
+           inclusion = :application.get_env(:asn1scg, {:type,name}, [])
+           emitSequenceEncoderBody(name, inclusion)
         {:ComponentType,_,fieldName,{:type,_,{_,_,_,x},_elementSet,[],:no},_optional,_,_} ->
            body = case :binary.part(lookup(bin(x)),0,1) do
                 "[" -> emitSequenceEncoderBodyElementArray(fieldName(fieldName))
@@ -251,6 +260,9 @@ public struct #{name} {
 
   def emitSequenceDecoderBody(name,fields), do:
       Enum.join(:lists.map(fn 
+        {:"COMPONENTS OF", {:type, _, {_,_,_,n}, _, _, :no}} -> 
+           inclusion = :application.get_env(:asn1scg, {:type,n}, [])
+           emitSequenceDecoderBody(n, inclusion)
         {:ComponentType,_,fieldName,{:type,_,type,_elementSet,[],:no},_optional,_,_} ->
            case type do
                 {:"SEQUENCE OF", {:type, _, innerType, _, _, _}} ->
@@ -272,6 +284,9 @@ public struct #{name} {
 
   def emitParams(name,fields) when is_list(fields) do
       Enum.join(:lists.map(fn 
+        {:"COMPONENTS OF", {:type, _, {_,_,_,n}, _, _, :no}} -> 
+           inclusion = :application.get_env(:asn1scg, {:type,n}, [])
+           emitParams(n,inclusion)
         {:ComponentType,_,fieldName,{:type,_,type,_elementSet,[],:no},_optional,_,_} ->
            emitCtorParam(fieldName(fieldName),
               substituteType(lookup(fieldType(name,fieldName,type))))
@@ -281,6 +296,9 @@ public struct #{name} {
 
   def emitArgs(fields) when is_list(fields) do
       Enum.join(:lists.map(fn 
+        {:"COMPONENTS OF", {:type, _, {_,_,_,n}, _, _, :no}} -> 
+           inclusion = :application.get_env(:asn1scg, {:type,n}, [])
+           emitArgs(inclusion)
         {:ComponentType,_,fieldName,{:type,_,_type,_elementSet,[],:no},_optional,_,_} ->
            emitArg(fieldName(fieldName))
          _ ->  ""
@@ -303,6 +321,7 @@ public struct #{name} {
   def save(_, _, _, _), do: []
 
   def sequence(name, fields, modname, saveFlag) do
+      :application.set_env(:asn1scg, {:type,name}, fields)
       save(saveFlag, modname, name, emitSequenceDefinition(normalizeName(name),
           emitFields(name, 4, fields, modname), emitCtor(emitParams(name,fields), emitCtorBody(fields)),
           emitSequenceDecoder(emitSequenceDecoderBody(name, fields), name, emitArgs(fields)),
@@ -365,7 +384,7 @@ public struct #{name} {
            x -> lookup(x)
       end
   end
-           
+
   def bin(x) when is_atom(x), do: :erlang.atom_to_binary x
   def bin(x) when is_list(x), do: :erlang.list_to_binary x
   def bin(x), do: x
