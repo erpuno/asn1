@@ -3,6 +3,23 @@ SYNRC 💬 ASN.1
 
 ASN.1 Swift Code Generation Compiler.
 
+Features
+--------
+
+[x] Sequence
+[x] Choice
+[x] Enumerated
+[x] Integer Enumerated
+[x] String
+[x] Integer
+[x] Any
+[x] Identifier
+[_] Set
+[_] Optional
+[_] Set of
+[x] Sequence of
+[x] Components of
+
 Credits
 -------
 
