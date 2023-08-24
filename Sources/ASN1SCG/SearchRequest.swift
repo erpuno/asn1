@@ -8,14 +8,14 @@ import Foundation
 @usableFromInline struct SearchRequest: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var baseObject: ASN1OctetString
-    @usableFromInline var scope: SearchRequest
-    @usableFromInline var derefAliases: SearchRequest
+    @usableFromInline var scope: SearchRequest_scope_Enum
+    @usableFromInline var derefAliases: SearchRequest_derefAliases_Enum
     @usableFromInline var sizeLimit: ArraySlice<UInt8>
     @usableFromInline var timeLimit: ArraySlice<UInt8>
     @usableFromInline var typesOnly: Bool
     @usableFromInline var filter: Filter
     @usableFromInline var attributes: [ASN1OctetString]
-    @inlinable init(baseObject: ASN1OctetString, scope: SearchRequest, derefAliases: SearchRequest, sizeLimit: ArraySlice<UInt8>, timeLimit: ArraySlice<UInt8>, typesOnly: Bool, filter: Filter, attributes: [ASN1OctetString]) {
+    @inlinable init(baseObject: ASN1OctetString, scope: SearchRequest_scope_Enum, derefAliases: SearchRequest_derefAliases_Enum, sizeLimit: ArraySlice<UInt8>, timeLimit: ArraySlice<UInt8>, typesOnly: Bool, filter: Filter, attributes: [ASN1OctetString]) {
         self.baseObject = baseObject
         self.scope = scope
         self.derefAliases = derefAliases
@@ -29,8 +29,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let baseObject = try ASN1OctetString(derEncoded: &nodes)
-            let scope = try SearchRequest(derEncoded: &nodes)
-            let derefAliases = try SearchRequest(derEncoded: &nodes)
+            let scope = try SearchRequest_scope_Enum(derEncoded: &nodes)
+            let derefAliases = try SearchRequest_derefAliases_Enum(derEncoded: &nodes)
             let sizeLimit = try ArraySlice<UInt8>(derEncoded: &nodes)
             let timeLimit = try ArraySlice<UInt8>(derEncoded: &nodes)
             let typesOnly = try Bool(derEncoded: &nodes)

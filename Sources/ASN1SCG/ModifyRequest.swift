@@ -25,7 +25,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(self.object)
-            try coder.serialize(self.changes)
+            try coder.serializeSequenceOf(changes)
         }
     }
 }

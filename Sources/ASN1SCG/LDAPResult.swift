@@ -7,11 +7,11 @@ import Foundation
 
 @usableFromInline struct LDAPResult: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var resultCode: LDAPResult
+    @usableFromInline var resultCode: LDAPResult_resultCode_Enum
     @usableFromInline var matchedDN: ASN1OctetString
     @usableFromInline var diagnosticMessage: ASN1OctetString
-    @usableFromInline var referral: [String]
-    @inlinable init(resultCode: LDAPResult, matchedDN: ASN1OctetString, diagnosticMessage: ASN1OctetString, referral: [String]) {
+    @usableFromInline var referral: [ASN1OctetString]
+    @inlinable init(resultCode: LDAPResult_resultCode_Enum, matchedDN: ASN1OctetString, diagnosticMessage: ASN1OctetString, referral: [ASN1OctetString]) {
         self.resultCode = resultCode
         self.matchedDN = matchedDN
         self.diagnosticMessage = diagnosticMessage
@@ -20,10 +20,10 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let resultCode = try LDAPResult(derEncoded: &nodes)
+            let resultCode = try LDAPResult_resultCode_Enum(derEncoded: &nodes)
             let matchedDN = try ASN1OctetString(derEncoded: &nodes)
             let diagnosticMessage = try ASN1OctetString(derEncoded: &nodes)
-            let referral = try DER.sequence(of: String.self, identifier: .sequence, nodes: &nodes)
+            let referral = try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, nodes: &nodes)
             return LDAPResult(resultCode: resultCode, matchedDN: matchedDN, diagnosticMessage: diagnosticMessage, referral: referral)
         }
     }
