@@ -6,8 +6,8 @@ import Crypto
 import Foundation
 
 @usableFromInline indirect enum Filter: DERParseable, DERSerializable, Hashable, Sendable {
-    case and(Filter)
-    case or(Filter)
+    case and([Filter])
+    case or([Filter])
     case not(Filter)
     case equalityMatch(AttributeValueAssertion)
     case substrings(SubstringFilter)
@@ -19,9 +19,9 @@ import Foundation
     @inlinable init(derEncoded rootNode: ASN1Node) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .and(try Filter(derEncoded: rootNode))
+                self = .and(try [Filter](derEncoded: rootNode))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .or(try Filter(derEncoded: rootNode))
+                self = .or(try [Filter](derEncoded: rootNode))
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
                 self = .not(try Filter(derEncoded: rootNode))
             case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):

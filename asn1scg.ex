@@ -17,9 +17,7 @@ defmodule CHAT.ASN1 do
   def fieldType(_,_,{:ObjectClassFieldType,_,_,[{_,type}],_}), do: "#{type}"
   def fieldType(_,_,{:"BIT STRING", _}), do: "ASN1BitString"
   def fieldType(name,field,{:"SEQUENCE OF", type}), do: sequenceOf(name,field,type)
-  def fieldType(name,field,{:"SET OF",{:type,_,{:"SEQUENCE", _, _, _,types},_,_,_}}), do: 
-      Enum.join(:lists.map(fn x -> fieldType(name, field, x) end, types), "->")
-  def fieldType(name,field,{:"SET OF",{:type,_,external,_,_,_}}), do: fieldType(name, field, external)
+  def fieldType(name,field,{:"SET OF", type}), do: sequenceOf(name,field,type)
   def fieldType(_,_,type) when is_atom(type), do: "#{type}"
   def fieldType(name,_,_), do: "#{name}"
 
@@ -53,7 +51,10 @@ defmodule CHAT.ASN1 do
   def emitSequenceEncoderBodyElement(name), do: "try coder.serialize(self.#{name})"
   def emitSequenceEncoderBodyElementArray(name), do: "try coder.serializeSequenceOf(#{name})"
   def emitSequenceEncoderBodyElementArrayOptional(name), do: "if let #{name} = self.#{name} { try coder.serializeSequenceOf(#{name}) }"
+  def emitSequenceEncoderBodyElementSet(name), do: "try coder.serializeSetOf(#{name})"
+  def emitSequenceEncoderBodyElementSetOptional(name), do: "if let #{name} = self.#{name} { try coder.serializeSetOf(#{name}) }"
   def emitSequenceDecoderBodyElement(name, type), do: "let #{name} = try #{type}(derEncoded: &nodes)"
+  def emitSequenceDecoderBodyElementForSet(name, type), do: "let #{name} = try DER.set(of: #{type}.self, identifier: .set, nodes: &nodes)"
   def emitSequenceDecoderBodyElementForSequence(name, type), do: "let #{name} = try DER.sequence(of: #{type}.self, identifier: .sequence, nodes: &nodes)"
   def emitChoiceElement(name, type), do: "case #{name}(#{type})\n"
   def emitChoiceEncoderBodyElement(pad, name), do: String.duplicate(" ", pad) <> "case .#{name}(let #{name}): try coder.serialize(#{name})"
