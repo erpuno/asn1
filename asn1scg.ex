@@ -226,15 +226,18 @@ public struct #{name} {
          _ -> ""
       end, cases), "\n")
 
-  def emitSequenceEncoderBody(name, fields), do:
+  def emitSequenceEncoderBody(_name, fields), do:
       Enum.join(:lists.map(fn 
-        {:ComponentType,_,fieldName,{:type,_,{_,_,_,x}=type,_elementSet,[],:no},_optional,_,_} = y->
+        {:ComponentType,_,fieldName,{:type,_,{_,_,_,x},_elementSet,[],:no},_optional,_,_} ->
            body = case :binary.part(lookup(bin(x)),0,1) do
                 "[" -> emitSequenceEncoderBodyElementArray(fieldName(fieldName))
                 _ -> emitSequenceEncoderBodyElement(fieldName(fieldName))
            end
            String.duplicate(" ", 12) <> body
-        {:ComponentType,_,fieldName,{:type,_,_type,_elementSet,[],:no},_optional,_,_} = y->
+        {:ComponentType,_,fieldName,{:type,_,{:"SEQUENCE OF", {:type, [], {:CHOICE, _cases}, _, _, _}},_elementSet,[],:no},_optional,_,_} ->
+           body = emitSequenceEncoderBodyElementArray(fieldName(fieldName))
+           String.duplicate(" ", 12) <> body
+        {:ComponentType,_,fieldName,{:type,_,_type,_elementSet,[],:no},_optional,_,_} ->
            String.duplicate(" ", 12) <> emitSequenceEncoderBodyElement(fieldName(fieldName))
          _ -> ""
       end, fields), "\n")
@@ -289,7 +292,6 @@ public struct #{name} {
       :filelib.ensure_dir(dir)
       fileName = dir <> normalizeName(name) <> ".swift"
       :file.write_file(fileName,res)
-      #:io.format 'Compiled: ~ts~n', [fileName]
   end
   def save(_, _, _, _), do: []
 
@@ -377,7 +379,6 @@ public struct #{name} {
          {:valuedef, _, pos, name, type, value, mod} -> dumpValue(pos, name, type, value, mod)
       end, typeorval)
       dumpModule(pos, modname, defid, tagdefault, exports, imports)
-      :io.format 'lookup: ~p~n', [lookup("AssertionValue")]
   end
 
 end
