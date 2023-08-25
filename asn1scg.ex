@@ -76,7 +76,7 @@ defmodule CHAT.ASN1 do
   def emitSequenceDefinition(name,fields,ctor,decoder,encoder), do:
 """
 #{emitImprint()}
-import ASN1SCG\nimport SwiftASN1\nimport Crypto\nimport Foundation\n
+import SwiftASN1\nimport Crypto\nimport Foundation\n
 @usableFromInline struct #{name}: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }\n#{fields}#{ctor}#{decoder}#{encoder}}
 """
@@ -102,7 +102,7 @@ import SwiftASN1\nimport Crypto\nimport Foundation\n
 """
 #{emitImprint()}
 import SwiftASN1\nimport Crypto\nimport Foundation\n
-public struct #{name}: DERImplicitlyTaggable, Hashable, RawRepresentable {
+public struct #{name}: DERImplicitlyTaggable, Hashable, Sendable, RawRepresentable {
     public static var defaultIdentifier: ASN1Identifier { .enumerated }
     public var rawValue: Int
     public init(rawValue: Int) { self.rawValue = rawValue }

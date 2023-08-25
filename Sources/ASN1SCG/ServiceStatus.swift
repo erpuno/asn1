@@ -3,7 +3,7 @@ import SwiftASN1
 import Crypto
 import Foundation
 
-public struct ServiceStatus: DERImplicitlyTaggable, Hashable, RawRepresentable {
+public struct ServiceStatus: DERImplicitlyTaggable, Hashable, Sendable, RawRepresentable {
     public static var defaultIdentifier: ASN1Identifier { .enumerated }
     public var rawValue: Int
     public init(rawValue: Int) { self.rawValue = rawValue }
