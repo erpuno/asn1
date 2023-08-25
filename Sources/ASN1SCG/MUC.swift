@@ -4,27 +4,23 @@ import SwiftASN1
 import Crypto
 import Foundation
 
-@usableFromInline struct List: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct MUC: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var data: ASN1OctetString
-    @usableFromInline var next: List_next_Choice
-    @inlinable init(data: ASN1OctetString, next: List_next_Choice) {
-        self.data = data
-        self.next = next
+    @usableFromInline var room: ASN1OctetString
+    @inlinable init(room: ASN1OctetString) {
+        self.room = room
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let data = try ASN1OctetString(derEncoded: &nodes)
-            let next = try List_next_Choice(derEncoded: &nodes)
-            return List(data: data, next: next)
+            let room = try ASN1OctetString(derEncoded: &nodes)
+            return MUC(room: room)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(self.data)
-            try coder.serialize(self.next)
+            try coder.serialize(self.room)
         }
     }
 }

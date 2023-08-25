@@ -38,6 +38,7 @@ defmodule CHAT.ASN1 do
   def substituteType("OBJECT IDENTIFIER"), do: "ASN1Identifier"
   def substituteType("BOOLEAN"),           do: "Bool"
   def substituteType("pt"),                do: "ASN1Any"
+  def substituteType("ANY"),               do: "ASN1Any"
   def substituteType("NULL"),              do: "ASN1Null"
   def substituteType("URI"),               do: "ASN1OctetString"
   def substituteType(t),                   do: t
@@ -53,7 +54,7 @@ defmodule CHAT.ASN1 do
   def emitSequenceEncoderBodyElementArrayOptional(name), do: "if let #{name} = self.#{name} { try coder.serializeSequenceOf(#{name}) }"
   def emitSequenceEncoderBodyElementSet(name), do: "try coder.serializeSetOf(#{name})"
   def emitSequenceEncoderBodyElementSetOptional(name), do: "if let #{name} = self.#{name} { try coder.serializeSetOf(#{name}) }"
-  def emitSequenceDecoderBodyElement(name, type), do: "let #{name} = try #{type}(derEncoded: &nodes)"
+  def emitSequenceDecoderBodyElement(name, type), do: "let #{name} = try #{substituteType(normalizeName(type))}(derEncoded: &nodes)"
   def emitSequenceDecoderBodyElementForSet(name, type), do: "let #{name} = try DER.set(of: #{type}.self, identifier: .set, nodes: &nodes)"
   def emitSequenceDecoderBodyElementForSequence(name, type), do: "let #{name} = try DER.sequence(of: #{type}.self, identifier: .sequence, nodes: &nodes)"
   def emitChoiceElement(name, type), do: "case #{name}(#{type})\n"
@@ -83,7 +84,7 @@ import ASN1SCG\nimport SwiftASN1\nimport Crypto\nimport Foundation\n
   def emitSetDefinition(name,fields,ctor,decoder,encoder), do:
 """
 #{emitImprint()}
-import ASN1SCG\nimport SwiftASN1\nimport Crypto\nimport Foundation\n
+import SwiftASN1\nimport Crypto\nimport Foundation\n
 @usableFromInline struct #{name}: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }\n#{fields}#{ctor}#{decoder}#{encoder}}
 """
@@ -91,7 +92,7 @@ import ASN1SCG\nimport SwiftASN1\nimport Crypto\nimport Foundation\n
   def emitChoiceDefinition(name,cases,decoder,encoder), do:
 """
 #{emitImprint()}
-import ASN1SCG\nimport SwiftASN1\nimport Crypto\nimport Foundation\n
+import SwiftASN1\nimport Crypto\nimport Foundation\n
 @usableFromInline indirect enum #{name}: DERParseable, DERSerializable, Hashable, Sendable {
 #{cases}#{decoder}#{encoder}
 }
@@ -100,7 +101,7 @@ import ASN1SCG\nimport SwiftASN1\nimport Crypto\nimport Foundation\n
   def emitEnumerationDefinition(name,cases), do:
 """
 #{emitImprint()}
-import ASN1SCG\nimport SwiftASN1\nimport Crypto\nimport Foundation\n
+import SwiftASN1\nimport Crypto\nimport Foundation\n
 public struct #{name}: DERImplicitlyTaggable, Hashable, RawRepresentable {
     public static var defaultIdentifier: ASN1Identifier { .enumerated }
     public var rawValue: Int

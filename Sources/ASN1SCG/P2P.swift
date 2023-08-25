@@ -4,27 +4,27 @@ import SwiftASN1
 import Crypto
 import Foundation
 
-@usableFromInline struct List: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct P2P: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var data: ASN1OctetString
-    @usableFromInline var next: List_next_Choice
-    @inlinable init(data: ASN1OctetString, next: List_next_Choice) {
-        self.data = data
-        self.next = next
+    @usableFromInline var src: ASN1OctetString
+    @usableFromInline var dst: ASN1OctetString
+    @inlinable init(src: ASN1OctetString, dst: ASN1OctetString) {
+        self.src = src
+        self.dst = dst
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let data = try ASN1OctetString(derEncoded: &nodes)
-            let next = try List_next_Choice(derEncoded: &nodes)
-            return List(data: data, next: next)
+            let src = try ASN1OctetString(derEncoded: &nodes)
+            let dst = try ASN1OctetString(derEncoded: &nodes)
+            return P2P(src: src, dst: dst)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(self.data)
-            try coder.serialize(self.next)
+            try coder.serialize(self.src)
+            try coder.serialize(self.dst)
         }
     }
 }

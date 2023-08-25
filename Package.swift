@@ -6,9 +6,9 @@ import class Foundation.ProcessInfo
 let package = Package(
     name: "chat-asn1",
     platforms: [ .macOS(.v12), .iOS(.v13) ],
-    products: [ .executable(name: "chat-asn1", targets: ["ASN1SCG"]), ],
+    products: [ .library(name: "chat-asn1", targets: ["ASN1SCG"]), ],
     targets: [
-      .executableTarget(
+      .target(
          name: "ASN1SCG",
          dependencies: [
             .product(name: "Crypto", package: "swift-crypto"),

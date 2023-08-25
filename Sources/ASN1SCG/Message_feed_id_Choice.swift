@@ -3,28 +3,28 @@ import SwiftASN1
 import Crypto
 import Foundation
 
-@usableFromInline indirect enum A: DERParseable, DERSerializable, Hashable, Sendable {
-    case v(V)
-    case list_x(List)
+@usableFromInline indirect enum Message_feed_id_Choice: DERParseable, DERSerializable, Hashable, Sendable {
+    case p2p(P2P)
+    case muc(MUC)
     @inlinable init(derEncoded rootNode: ASN1Node) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .v(try V(derEncoded: rootNode))
+                self = .p2p(try P2P(derEncoded: rootNode))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .list_x(try List(derEncoded: rootNode))
+                self = .muc(try MUC(derEncoded: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer) throws {
         switch self {
-            case .v(let v):
+            case .p2p(let p2p):
                 try coder.appendConstructedNode(
                 identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific),
-                { coder in try coder.serialize(v) })
-            case .list_x(let list_x):
+                { coder in try coder.serialize(p2p) })
+            case .muc(let muc):
                 try coder.appendConstructedNode(
                 identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific),
-                { coder in try coder.serialize(list_x) })
+                { coder in try coder.serialize(muc) })
         }
     }
 
