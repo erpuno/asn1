@@ -1,5 +1,9 @@
 List DEFINITIONS EXPLICIT TAGS ::= BEGIN
 
+  X ::= SET {
+    a INTEGER,
+    b BOOLEAN }
+
   V ::= SEQUENCE {
     a INTEGER (0..7),
     b BOOLEAN,
@@ -11,6 +15,8 @@ List DEFINITIONS EXPLICIT TAGS ::= BEGIN
   List ::= SEQUENCE {
     data OCTET STRING,
     next CHOICE { linked-list List, end NULL } }
+
+  ArrayOfList ::= SEQUENCE OF List
 
   LDAPString ::= OCTET STRING
 
