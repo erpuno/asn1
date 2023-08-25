@@ -14,9 +14,9 @@ Features
 * [x] Integer
 * [x] Any
 * [x] Identifier
-* [ ] Set
+* [x] Set
 * [ ] Optional
-* [ ] Set of
+* [x] Set of
 * [x] Sequence of
 * [x] Components of
 
