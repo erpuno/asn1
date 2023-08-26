@@ -9,9 +9,9 @@ defmodule CHAT.ASN1 do
   def fieldType(name,field,{:"CHOICE",_}), do: bin(name) <> "_" <> bin(field) <> "_Choice"
   def fieldType(name,field,{:"ENUMERATED",_}), do: bin(name) <> "_" <> bin(field) <> "_Enum"
   def fieldType(name,field,{:"SEQUENCE OF", type}) do
-      bin = sequenceOf(name,field,type) ; setEnv({:array, bin}, {:sequence, :binary.part(bin, 1, :erlang.size(bin) - 2)}) ; bin end
+      bin = sequenceOf(name,field,type) ; setEnv({:array, bin}, {:sequence, part(bin, 1, :erlang.size(bin) - 2)}) ; bin end
   def fieldType(name,field,{:"SET OF", type}) do
-      bin = sequenceOf(name,field,type) ; setEnv({:array, bin}, {:sequence, :binary.part(bin, 1, :erlang.size(bin) - 2)}) ; bin end
+      bin = sequenceOf(name,field,type) ; setEnv({:array, bin}, {:sequence, part(bin, 1, :erlang.size(bin) - 2)}) ; bin end
   def fieldType(_,_,{:contentType, {:Externaltypereference,_,_,type}}), do: "#{type}"
   def fieldType(_,_,{:"BIT STRING", _}), do: "ASN1BitString"
   def fieldType(_,_,{:pt, {_,_,_,type}, _}) when is_atom(type), do: "#{type}"
@@ -332,7 +332,7 @@ public struct #{name} {
                 {:Externaltypereference,_,_,inner} ->
                     bin = lookup(fieldType(name,fieldName,inner))
                     body = case part(bin,0,1) do
-                       "[" -> emitSequenceDecoderBodyElementForSequence(fieldName(fieldName), :binary.part(bin,1,:erlang.size(bin)-2))
+                       "[" -> emitSequenceDecoderBodyElementForSequence(fieldName(fieldName), part(bin,1,:erlang.size(bin)-2))
                          _ -> emitSequenceDecoderBodyElement(fieldName(fieldName), substituteType(lookup(fieldType(name,fieldName,type))))
                     end
                     String.duplicate(" ", 12) <> body
