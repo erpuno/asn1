@@ -455,8 +455,9 @@ case System.argv() do
         :application.set_env(:asn1scg, :output, output)
         CHAT.ASN1.compile_all
      _ ->
-        :io.format('ISO/IETF X.680 ASN.1 DER Compiler version 0.9.1.~n')
+        :io.format('ISO/IETF 8824-1:2021 X.680-690 ASN.1 DER Compiler version 0.9.1.~n')
         :io.format('Copyright © 2023 Namdak Tonpa.~n')
-        :io.format('Usage: ./asn1scg.ex compile [input-dir] [output-dir]~n')
+        :io.format('Usage: ./asn1scg.ex compile [input-dir] [output-dir] | help~n')
+        :io.format('Default: ./asn1scg.ex compile priv/apple/ Sources/ASN1SCG/~n')
 end
 
