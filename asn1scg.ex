@@ -280,7 +280,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
         {:ComponentType,_,fieldName,{:type,_,_type,_elementSet,[],:no},_optional,_,_} ->
            trace(7)
            pad(8) <> emitCtorBodyElement(fieldName(fieldName))
-         _ -> ""
+        _ -> ""
       end, fields), "\n")
 
 
@@ -298,7 +298,6 @@ public struct #{name} : Hashable, Sendable, Comparable {
                  :application.get_env(:asn1scg, {:array, lookup(fieldType("",fieldName,type))}, [])} do
                 {"[", {:set, _}} -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SetOf")
                 {"[", {:sequence, _}} -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SequenceOf")
-                {"[", _} -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "")
                 _ -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "")
            end
          _ -> ""
