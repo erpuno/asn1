@@ -421,26 +421,33 @@ public struct #{name} : Hashable, Sendable, Comparable {
       end, fields), ", ")
   end
 
-# Top level declarations which invoke recursion descent:
-#         INTEGER, ENUMERATED, CHOICE, SEQUENCE, SET.
+# IMPLEMENTATION NOTES:
 #
-# Top level declarations which affect environment:
-#         SET OF, SEQUENCE OF, BIT STRING, NULL, OCTET STRING, OBJECT IDENTIFIER.
+# Top level declarations invoke recursion descent:
+#         INTEGER (ENUM), ENUMERATED, CHOICE, SEQUENCE, SET.
 #
-# ASN.1 compiler loops:
+# Top level declarations affect environment:
+#         ANY, BOOLEAN, INTEGER, SET OF, SEQUENCE OF, REAL,
+#         BIT STRING, NULL, OCTET STRING, OBJECT IDENTIFIER.
+#
+# 11 loops and 45 cases of ASN.1 compiler:
 #         cases  c -> loop c { ct | _ }
 #         ienum  c -> loop c { nn | _ }
 #         enum   c -> loop c { nn | _ }
-#         args   c -> loop c { compof/1 | ct | _ }
-#         ctor   f -> loop f { compof/1 | ct | _ }
-#         params f -> loop f { compof/1 | ct | _ }
+#         args   c -> loop c { comp | ct | _ }
+#         ctor   f -> loop f { comp | ct | _ }
+#         params f -> loop f { comp | ct | _ }
 #         sumEnc c -> loop c { ct/seqof | ct/setof | ct | _ }
 #         sumDec c -> loop c { ct/seqof | ct/setof | ct | _ }
-#         seqEnc f -> loop f { compof/1 | ct/seqof | ct/setof | ct/int | ct/ext | _ }
-#         seqEec f -> loop f { compof/1 | ct/seqof | ct/setof | ct/int | ct/ext | _ }
-#         fields f -> loop f { compof/1 | ct/seq | ct/sum | ct/int | ct/enum |
-#                              ct/seqof/seq | ct/seqof/sum | ct/setof/seq |
-#                              ct/setof/sum | _ }
+#         seqEnc f -> loop f { comp | ct/seqof | ct/setof | ct/int | ct/ext | _ }
+#         seqEec f -> loop f { comp | ct/seqof | ct/setof | ct/int | ct/ext | _ }
+#         fields f -> loop f { comp | ct/seqof/* | ct/seqof/+ | ct/int | ct/enu
+#                                   | ct/setof/* | ct/setof/+ | ct/+ | ct/* | _ }
+#
+#         Along with various string flavours, explicit tagging and optional wrappers
+#         it forms the ASN.1 X.680-690 compiler complete core logic. As long as we can
+#         prove back-and-forth consitency on those 45 branches it is enough to certify
+#         Apple fashioned ASN.1 compiler.
 # --
 #  Namdak Tonpa
 
