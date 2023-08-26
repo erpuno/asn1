@@ -6,12 +6,18 @@ import Foundation
 @usableFromInline indirect enum A: DERParseable, DERSerializable, Hashable, Sendable {
     case v(V)
     case list_x(List)
+    case o([ASN1OctetString])
+    case s([ASN1OctetString])
     @inlinable init(derEncoded rootNode: ASN1Node) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
                 self = .v(try V(derEncoded: rootNode))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
                 self = .list_x(try List(derEncoded: rootNode))
+            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+                self = .o(try DER.set(of: ASN1OctetString.self, identifier: .set, rootNode: rootNode))
+            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
+                self = .s(try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, rootNode: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
@@ -25,6 +31,14 @@ import Foundation
                 try coder.appendConstructedNode(
                 identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific),
                 { coder in try coder.serialize(list_x) })
+            case .o(let o):
+                try coder.appendConstructedNode(
+                identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific),
+                { coder in try coder.serializeSetOf(o) })
+            case .s(let s):
+                try coder.appendConstructedNode(
+                identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific),
+                { coder in try coder.serializeSequenceOf(s) })
         }
     }
 

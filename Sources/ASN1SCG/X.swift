@@ -6,24 +6,28 @@ import Foundation
 @usableFromInline struct X: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var a: ArraySlice<UInt8>
-    @usableFromInline var b: Bool
-    @inlinable init(a: ArraySlice<UInt8>, b: Bool) {
+    @usableFromInline var b: [ASN1OctetString]
+    @usableFromInline var d: Real
+    @inlinable init(a: ArraySlice<UInt8>, b: [ASN1OctetString], d: Real) {
         self.a = a
         self.b = b
+        self.d = d
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let a = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let b = try Bool(derEncoded: &nodes)
-            return X(a: a, b: b)
+            let b = try DER.set(of: ASN1OctetString.self, identifier: .set, nodes: &nodes)
+            let d = try Real(derEncoded: &nodes)
+            return X(a: a, b: b, d: d)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(self.a)
-            try coder.serialize(self.b)
+            try coder.serializeSetOf(b)
+            try coder.serialize(self.d)
         }
     }
 }

@@ -10,8 +10,8 @@ defmodule CHAT.ASN1 do
   def fieldType(name,field,{:"SEQUENCE", _, _, _, _}), do: bin(name) <> "_" <> bin(field) <> "_Sequence"
   def fieldType(name,field,{:"CHOICE",_}), do: bin(name) <> "_" <> bin(field) <> "_Choice"
   def fieldType(name,field,{:"ENUMERATED",_}), do: bin(name) <> "_" <> bin(field) <> "_Enum"
-  def fieldType(name,field,{:"SEQUENCE OF", type}), do: sequenceOf(name,field,type)
-  def fieldType(name,field,{:"SET OF", type}), do: sequenceOf(name,field,type)
+  def fieldType(name,field,{:"SEQUENCE OF", type}) do bin = sequenceOf(name,field,type) ; setEnv({:array, bin}, {:sequence, :binary.part(bin, 1, :erlang.size(bin) - 2)}) ; bin end
+  def fieldType(name,field,{:"SET OF", type}) do bin = sequenceOf(name,field,type) ; setEnv({:array, bin}, {:sequence, :binary.part(bin, 1, :erlang.size(bin) - 2)}) ; bin end
   def fieldType(_,_,{:contentType, {:Externaltypereference,_,_,type}}), do: "#{type}"
   def fieldType(_,_,{:"BIT STRING", _}), do: "ASN1BitString"
   def fieldType(_,_,{:pt, {_,_,_,type}, _}) when is_atom(type), do: "#{type}"
@@ -26,8 +26,8 @@ defmodule CHAT.ASN1 do
       choice(fieldType(name,field,sum), cases, [], true) ; "[" <> bin(name) <> "_" <> bin(field) <> "_Choice]" end
   def sequenceOf(name,field,{:type,_,{:SEQUENCE, _, _, _, fields} = product,_,_,_}) do
       sequence(fieldType(name,field,product), fields, [], true) ; "[" <> bin(name) <> "_" <> bin(field) <> "_Sequence]" end
-  def sequenceOf(name,field,{:type,_,type,_,_,_}), do: "[#{sequenceOf(name,field,type)}]"
-  def sequenceOf(_,_,{:Externaltypereference, _, _, name}), do: :application.get_env(:asn1scg, bin(name), bin(name))
+  def sequenceOf(name,field,{:type,_,type,_,_,_}) do "[#{sequenceOf(name,field,type)}]" end
+  def sequenceOf(_,_,{:Externaltypereference, _, _, name}) do :application.get_env(:asn1scg, bin(name), bin(name)) end
   def sequenceOf(_,_,x) when is_tuple(x), do: substituteType(bin(:erlang.element(1, x)))
   def sequenceOf(_,_,x) when is_atom(x), do: substituteType("#{lookup(x)}")
   def sequenceOf(_,_,x) when is_binary(x), do: substituteType("#{lookup(x)}")
@@ -58,18 +58,27 @@ defmodule CHAT.ASN1 do
   def emitSequenceDecoderBodyElementForSet(name, type), do: "let #{name} = try DER.set(of: #{type}.self, identifier: .set, nodes: &nodes)"
   def emitSequenceDecoderBodyElementForSequence(name, type), do: "let #{name} = try DER.sequence(of: #{type}.self, identifier: .sequence, nodes: &nodes)"
   def emitChoiceElement(name, type), do: "case #{name}(#{type})\n"
-  def emitChoiceEncoderBodyElement(pad, name), do: String.duplicate(" ", pad) <> "case .#{name}(let #{name}): try coder.serialize(#{name})"
-  def emitChoiceEncoderBodyElement(pad, no, name), do:
+  def emitChoiceEncoderBodyElement(pad, no, name, spec) when no == [], do: String.duplicate(" ", pad) <> "case .#{name}(let #{name}): try coder.serialize#{spec}(#{name})"
+  def emitChoiceEncoderBodyElement(pad, no, name, spec), do:
       String.duplicate(" ", pad) <> "case .#{name}(let #{name}):\n" <>
       String.duplicate(" ", pad+4) <> "try coder.appendConstructedNode(\n" <>
       String.duplicate(" ", pad+4) <> "identifier: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific),\n" <>
-      String.duplicate(" ", pad+4) <> "{ coder in try coder.serialize(#{name}) })"
-  def emitChoiceDecoderBodyElement(pad, name, type), do:
+      String.duplicate(" ", pad+4) <> "{ coder in try coder.serialize#{spec}(#{name}) })"
+  def emitChoiceDecoderBodyElement(pad, no, name, type) when no == [], do:
       String.duplicate(" ", pad) <> "case #{type}.defaultIdentifier:\n" <>
       String.duplicate(" ", pad+4) <> "self = .#{name}(try #{type}(derEncoded: rootNode))"
-  def emitChoiceDecoderBodyElement(pad, no,  name, type), do:
+  def emitChoiceDecoderBodyElement(pad, no, name, type), do:
       String.duplicate(" ", pad) <> "case ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific):\n" <>
       String.duplicate(" ", pad+4) <> "self = .#{name}(try #{type}(derEncoded: rootNode))"
+  def emitChoiceDecoderBodyElementForArray(pad, no, name, type, spec) when no == [], do:
+      String.duplicate(" ", pad) <> "case ASN1Identifier.#{spec}:\n" <>
+      String.duplicate(" ", pad+4) <> "self = .#{name}(try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: rootNode))"
+  def emitChoiceDecoderBodyElementForArray(pad, no,  name, type, spec) when spec == "", do:
+      String.duplicate(" ", pad) <> "case ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific):\n" <>
+      String.duplicate(" ", pad+4) <> "self = .#{name}(try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, nodes: &nodes))"
+  def emitChoiceDecoderBodyElementForArray(pad, no,  name, type, spec), do:
+      String.duplicate(" ", pad) <> "case ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific):\n" <>
+      String.duplicate(" ", pad+4) <> "self = .#{name}(try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: rootNode))"
   def emitEnumElement(type, field, value), do: "    static let #{field} = #{type}(rawValue: #{value})\n"
   def emitIntegerEnumElement(field, value), do: "    public static let #{field} = Self(rawValue: #{value})\n"
 
@@ -239,22 +248,38 @@ public struct #{name} {
          _ -> ""
       end, fields), "\n")
 
+
   def emitChoiceEncoderBody(cases), do:
       Enum.join(:lists.map(fn 
-        {:ComponentType,_,fieldName,{:type,tag,_type,_elementSet,[],:no},_optional,_,_} ->
-           case tag do
-                [] -> emitChoiceEncoderBodyElement(12, fieldName(fieldName))
-                [{:tag,:CONTEXT,no,_explicit,_}] -> emitChoiceEncoderBodyElement(12, no, fieldName(fieldName))
+        {:ComponentType,_,fieldName,{:type,tag,{:"SEQUENCE OF", {_,_,_type,_,_,_}},_,_,_},_,_,_} ->
+           emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SequenceOf")
+        {:ComponentType,_,fieldName,{:type,tag,{:"SET OF", {_,_,_type,_,_,_}},_,_,_},_,_,_} ->
+           emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SetOf")
+        {:ComponentType,_,fieldName,{:type,tag,type,_elementSet,[],:no},_optional,_,_} ->
+           case {:binary.part(lookup(fieldType("",fieldName,type)),0,1),
+                 :application.get_env(:asn1scg, {:array, lookup(fieldType("",fieldName,type))}, [])} do
+                {"[", {:set, _}} -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SetOf")
+                {"[", {:sequence, _}} -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SequenceOf")
+                {"[", _} -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "")
+                _ -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "")
            end
          _ -> ""
       end, cases), "\n")
 
   def emitChoiceDecoderBody(cases), do:
       Enum.join(:lists.map(fn 
+        {:ComponentType,_,fieldName,{:type,tag,{:"SEQUENCE OF", {_,_,type,_,_,_}},_,_,_},_,_,_} ->
+           emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName),
+               substituteType(lookup(fieldType("", fieldName, type))), "sequence")
+        {:ComponentType,_,fieldName,{:type,tag,{:"SET OF", {_,_,type,_,_,_}},_,_,_},_,_,_} ->
+           emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName),
+               substituteType(lookup(fieldType("", fieldName, type))), "set")
         {:ComponentType,_,fieldName,{:type,tag,type,_elementSet,[],:no},_optional,_,_} ->
-           case tag do
-                [] -> emitChoiceDecoderBodyElement(12, fieldName(fieldName), substituteType(lookup(fieldType("", fieldName, type))))
-                [{:tag,:CONTEXT,no,_explicit,_}] -> emitChoiceDecoderBodyElement(12, no, fieldName(fieldName), substituteType(lookup(fieldType("", fieldName, type))))
+           case {:binary.part(lookup(fieldType("",fieldName,type)),0,1),
+                 :application.get_env(:asn1scg, {:array, lookup(fieldType("",fieldName,type))}, [])} do
+                {"[", {:set, inner}} -> emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName), inner, "set")
+                {"[", {:sequence, inner}} -> emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName), inner, "sequence")
+                _ -> emitChoiceDecoderBodyElement(12, tagNo(tag), fieldName(fieldName), substituteType(lookup(fieldType("", fieldName, type))))
            end
          _ -> ""
       end, cases), "\n")
@@ -301,8 +326,8 @@ public struct #{name} {
                          _ -> emitSequenceDecoderBodyElement(fieldName(fieldName), substituteType(lookup(fieldType(name,fieldName,type))))
                     end
                     String.duplicate(" ", 12) <> body
-              _ ->  String.duplicate(" ", 12) <> emitSequenceDecoderBodyElement(fieldName(fieldName), substituteType(lookup(fieldType(name,fieldName,type))))
-
+              _ ->  String.duplicate(" ", 12) <> emitSequenceDecoderBodyElement(fieldName(fieldName),
+                       substituteType(lookup(fieldType(name,fieldName,type))))
           end
          _z -> ""
       end, fields), "\n")
@@ -329,6 +354,9 @@ public struct #{name} {
          _ ->  ""
       end, fields), ", ")
   end
+
+  def tagNo([]), do: []
+  def tagNo([{:tag,:CONTEXT,nox,_,_}]), do: nox
 
   def compile_all() do
       {:ok, files} = :file.list_dir dir()
@@ -387,8 +415,12 @@ public struct #{name} {
           {:type, _, {:"CHOICE", cases}, [], [], :no} -> choice(name, cases, modname, save)
           {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
           {:type, _, {:"SET", _, _, _, fields}, _, _, :no} -> set(name, fields, modname, save)
-          {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> setEnv(name, "[" <> substituteType(lookup(type)) <> "]")
-          {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> setEnv(name, "[" <> substituteType(lookup(type)) <> "]")
+          {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
+                     setEnv(name, "[" <> substituteType(lookup(type)) <> "]")
+                     setEnv({:array,substituteType(lookup(type))}, {:sequence, substituteType(lookup(type))})
+          {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
+                     setEnv(name, "[" <> substituteType(lookup(type)) <> "]")
+                     setEnv({:array,substituteType(lookup(type))}, {:set, substituteType(lookup(type))})
           {:type, _, {:"BIT STRING",_}, [], [], :no} -> setEnv(name, "BIT STRING")
           {:type, _, :'BIT STRING', [], [], :no} -> setEnv(name, "BIT STRING")
           {:type, _, :'INTEGER', _set, [], :no} -> setEnv(name, "INTEGER")
@@ -418,7 +450,9 @@ public struct #{name} {
       end
   end
 
-  def setEnv(x,y), do: :application.set_env(:asn1scg, bin(x), y)
+  def setEnv(x,y) do
+      :application.set_env(:asn1scg, bin(x), y)
+  end
 
   def bin(x) when is_atom(x), do: :erlang.atom_to_binary x
   def bin(x) when is_list(x), do: :erlang.list_to_binary x
@@ -455,9 +489,9 @@ case System.argv() do
         :application.set_env(:asn1scg, :output, output)
         CHAT.ASN1.compile_all
      _ ->
-        :io.format('ISO/IETF 8824-1:2021 X.680-690 ASN.1 DER Compiler version 0.9.1.~n')
         :io.format('Copyright © 2023 Namdak Tonpa.~n')
+        :io.format('ISO: 8824-1:2021; ITU/IETF: X.680-690.~n')
+        :io.format('SYNRC: ASN.1 DER Compiler, version 0.9.1.~n')
         :io.format('Usage: ./asn1scg.ex compile [input-dir] [output-dir] | help~n')
-        :io.format('Default: ./asn1scg.ex compile priv/apple/ Sources/ASN1SCG/~n')
 end
 

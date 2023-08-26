@@ -6,12 +6,15 @@ import Foundation
 @usableFromInline indirect enum List_next_Choice: DERParseable, DERSerializable, Hashable, Sendable {
     case linked_list(List)
     case end(ASN1Null)
+    case ss([ASN1OctetString])
     @inlinable init(derEncoded rootNode: ASN1Node) throws {
         switch rootNode.identifier {
             case List.defaultIdentifier:
                 self = .linked_list(try List(derEncoded: rootNode))
             case ASN1Null.defaultIdentifier:
                 self = .end(try ASN1Null(derEncoded: rootNode))
+            case ASN1Identifier.set:
+                self = .ss(try DER.set(of: ASN1OctetString.self, identifier: .set, rootNode: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
@@ -19,6 +22,7 @@ import Foundation
         switch self {
             case .linked_list(let linked_list): try coder.serialize(linked_list)
             case .end(let end): try coder.serialize(end)
+            case .ss(let ss): try coder.serializeSetOf(ss)
         }
     }
 
