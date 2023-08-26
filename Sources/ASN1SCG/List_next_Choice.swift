@@ -13,7 +13,7 @@ import Foundation
                 self = .linked_list(try List(derEncoded: rootNode))
             case ASN1Null.defaultIdentifier:
                 self = .end(try ASN1Null(derEncoded: rootNode))
-            case ASN1Identifier.set:
+            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
                 self = .ss(try DER.set(of: ASN1OctetString.self, identifier: .set, rootNode: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
@@ -22,7 +22,10 @@ import Foundation
         switch self {
             case .linked_list(let linked_list): try coder.serialize(linked_list)
             case .end(let end): try coder.serialize(end)
-            case .ss(let ss): try coder.serializeSetOf(ss)
+            case .ss(let ss):
+                try coder.appendConstructedNode(
+                identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific),
+                { coder in try coder.serializeSetOf(ss) })
         }
     }
 

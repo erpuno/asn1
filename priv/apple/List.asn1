@@ -28,6 +28,6 @@ List DEFINITIONS EXPLICIT TAGS ::= BEGIN
 
   List ::= SEQUENCE {
     data OCTET STRING,
-    next CHOICE { linked-list List, end NULL, ss SET OF OCTET STRING } }
+    next CHOICE { linked-list List, end NULL, ss [1] SET OF OCTET STRING } }
 
 END
