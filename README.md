@@ -33,8 +33,8 @@ Features
 * [x] Sequence of
 * [x] Components of
 
-Credits
--------
+Author
+------
 
 * Namdak Tonpa
 
