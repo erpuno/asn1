@@ -1,7 +1,10 @@
 SYNRC 💬 ASN.1
 ==============
 
-ASN.1 Swift Code Generation Compiler.
+ASN.1 Swift Code Generation DER Compiler.
+Minimal (normal), full, idiomatic,
+proven by construction, respects
+equality (section and retract).
 
 ```
 Copyright © 2023 Namdak Tonpa.
@@ -22,6 +25,8 @@ Features
 * [x] Identifier
 * [x] Set
 * [ ] Optional
+* [ ] Sequence/Set Tagging
+* [x] Choice Tagging
 * [x] Set of
 * [x] Sequence of
 * [x] Components of
