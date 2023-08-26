@@ -421,13 +421,14 @@ public struct #{name} : Hashable, Sendable, Comparable {
       {:ok, files} = :file.list_dir dir()
       :lists.map(fn file -> compile(false, dir() <> :erlang.list_to_binary(file))  end, files)
       :lists.map(fn file -> compile(true,  dir() <> :erlang.list_to_binary(file))  end, files)
-
-#      :io.format 'coverage (24 branches): ~p~n', [
-#          :lists.map(fn x -> :application.get_env(:asn1scg,
-#              {:trace, x}, []) end,:lists.seq(1,29))]
-
+      coverage()
       :ok
   end
+
+  def coverage(), do:
+      :io.format 'coverage (30 branches): ~p.~n', [
+          :lists.map(fn x -> :application.get_env(:asn1scg,
+              {:trace, x}, []) end,:lists.seq(1,30))]
 
   def compile(save, file) do
       tokens = :asn1ct_tok.file file
