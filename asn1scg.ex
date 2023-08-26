@@ -2,16 +2,16 @@
 
 defmodule CHAT.ASN1 do
 
-  def dir(), do: :application.get_env(:asn1scg, :input, "priv/apple/")
-
   def fieldName({:contentType, {:Externaltypereference,_,_mod, name}}), do: normalizeName("#{name}")
   def fieldName(name), do: normalizeName("#{name}")
   def fieldType(name,field,{:ComponentType,_,_,{:type,_,oc,_,[],:no},_opt,_,_}), do: fieldType(name, field, oc)
   def fieldType(name,field,{:"SEQUENCE", _, _, _, _}), do: bin(name) <> "_" <> bin(field) <> "_Sequence"
   def fieldType(name,field,{:"CHOICE",_}), do: bin(name) <> "_" <> bin(field) <> "_Choice"
   def fieldType(name,field,{:"ENUMERATED",_}), do: bin(name) <> "_" <> bin(field) <> "_Enum"
-  def fieldType(name,field,{:"SEQUENCE OF", type}) do bin = sequenceOf(name,field,type) ; setEnv({:array, bin}, {:sequence, :binary.part(bin, 1, :erlang.size(bin) - 2)}) ; bin end
-  def fieldType(name,field,{:"SET OF", type}) do bin = sequenceOf(name,field,type) ; setEnv({:array, bin}, {:sequence, :binary.part(bin, 1, :erlang.size(bin) - 2)}) ; bin end
+  def fieldType(name,field,{:"SEQUENCE OF", type}) do
+      bin = sequenceOf(name,field,type) ; setEnv({:array, bin}, {:sequence, :binary.part(bin, 1, :erlang.size(bin) - 2)}) ; bin end
+  def fieldType(name,field,{:"SET OF", type}) do
+      bin = sequenceOf(name,field,type) ; setEnv({:array, bin}, {:sequence, :binary.part(bin, 1, :erlang.size(bin) - 2)}) ; bin end
   def fieldType(_,_,{:contentType, {:Externaltypereference,_,_,type}}), do: "#{type}"
   def fieldType(_,_,{:"BIT STRING", _}), do: "ASN1BitString"
   def fieldType(_,_,{:pt, {_,_,_,type}, _}) when is_atom(type), do: "#{type}"
@@ -48,17 +48,27 @@ defmodule CHAT.ASN1 do
   def emitCtor(params,fields), do: "    @inlinable init(#{params}) {\n#{fields}\n    }\n"
   def emitCtorBodyElement(name), do: "self.#{name} = #{name}"
   def emitCtorParam(name, type), do: "#{name}: #{normalizeName(type)}"
-  def emitSequenceElement(name, type), do: "@usableFromInline var #{name}: #{normalizeName(type)}\n"
-  def emitSequenceEncoderBodyElement(name), do: "try coder.serialize(self.#{name})"
-  def emitSequenceEncoderBodyElementArray(name), do: "try coder.serializeSequenceOf(#{name})"
-  def emitSequenceEncoderBodyElementArrayOptional(name), do: "if let #{name} = self.#{name} { try coder.serializeSequenceOf(#{name}) }"
-  def emitSequenceEncoderBodyElementSet(name), do: "try coder.serializeSetOf(#{name})"
-  def emitSequenceEncoderBodyElementSetOptional(name), do: "if let #{name} = self.#{name} { try coder.serializeSetOf(#{name}) }"
-  def emitSequenceDecoderBodyElement(name, type), do: "let #{name} = try #{substituteType(normalizeName(type))}(derEncoded: &nodes)"
-  def emitSequenceDecoderBodyElementForSet(name, type), do: "let #{name} = try DER.set(of: #{type}.self, identifier: .set, nodes: &nodes)"
-  def emitSequenceDecoderBodyElementForSequence(name, type), do: "let #{name} = try DER.sequence(of: #{type}.self, identifier: .sequence, nodes: &nodes)"
+  def emitSequenceElement(name, type), do:
+      "@usableFromInline var #{name}: #{normalizeName(type)}\n"
+  def emitSequenceEncoderBodyElement(name), do:
+      "try coder.serialize(self.#{name})"
+  def emitSequenceEncoderBodyElementArray(name), do:
+      "try coder.serializeSequenceOf(#{name})"
+  def emitSequenceEncoderBodyElementArrayOptional(name), do:
+      "if let #{name} = self.#{name} { try coder.serializeSequenceOf(#{name}) }"
+  def emitSequenceEncoderBodyElementSet(name), do:
+      "try coder.serializeSetOf(#{name})"
+  def emitSequenceEncoderBodyElementSetOptional(name), do:
+      "if let #{name} = self.#{name} { try coder.serializeSetOf(#{name}) }"
+  def emitSequenceDecoderBodyElement(name, type), do:
+      "let #{name} = try #{substituteType(normalizeName(type))}(derEncoded: &nodes)"
+  def emitSequenceDecoderBodyElementForSet(name, type), do:
+      "let #{name} = try DER.set(of: #{type}.self, identifier: .set, nodes: &nodes)"
+  def emitSequenceDecoderBodyElementForSequence(name, type), do:
+      "let #{name} = try DER.sequence(of: #{type}.self, identifier: .sequence, nodes: &nodes)"
   def emitChoiceElement(name, type), do: "case #{name}(#{type})\n"
-  def emitChoiceEncoderBodyElement(pad, no, name, spec) when no == [], do: String.duplicate(" ", pad) <> "case .#{name}(let #{name}): try coder.serialize#{spec}(#{name})"
+  def emitChoiceEncoderBodyElement(pad, no, name, spec) when no == [], do:
+      String.duplicate(" ", pad) <> "case .#{name}(let #{name}): try coder.serialize#{spec}(#{name})"
   def emitChoiceEncoderBodyElement(pad, no, name, spec), do:
       String.duplicate(" ", pad) <> "case .#{name}(let #{name}):\n" <>
       String.duplicate(" ", pad+4) <> "try coder.appendConstructedNode(\n" <>
@@ -355,9 +365,6 @@ public struct #{name} {
       end, fields), ", ")
   end
 
-  def tagNo([]), do: []
-  def tagNo([{:tag,:CONTEXT,nox,_,_}]), do: nox
-
   def compile_all() do
       {:ok, files} = :file.list_dir dir()
       :lists.map(fn file -> compile(false, dir() <> :erlang.list_to_binary(file))  end, files)
@@ -365,13 +372,56 @@ public struct #{name} {
       :ok
   end
 
-  def save(true, _, name, res) do
-      dir = :application.get_env(:asn1scg, :output, "Sources/ASN1SCG/")
-      :filelib.ensure_dir(dir)
-      fileName = dir <> normalizeName(bin(name)) <> ".swift"
-      :file.write_file(fileName,res)
+  def compile(save, file) do
+      tokens = :asn1ct_tok.file file
+      {:ok, mod} = :asn1ct_parser2.parse file, tokens
+      {:module, pos, modname, defid, tagdefault, exports, imports, _, typeorval} = mod
+      :lists.map(fn
+         {:typedef,  _, pos, name, type} -> compileType(pos, name, type, modname, save)
+         {:ptypedef, _, pos, name, args, type} -> compilePType(pos, name, args, type)
+         {:classdef, _, pos, name, mod, type} -> compileClass(pos, name, mod, type)
+         {:valuedef, _, pos, name, type, value, mod} -> compileValue(pos, name, type, value, mod)
+      end, typeorval)
+      compileModule(pos, modname, defid, tagdefault, exports, imports)
   end
-  def save(_, _, _, _), do: []
+
+  def compileType(_, name, typeDefinition, modname, save \\ true) do
+      res = case typeDefinition do
+          {:type, _, {:"INTEGER", cases}, [], [], :no} -> integerEnum(name, cases, modname, save)
+          {:type, _, {:"ENUMERATED", cases}, [], [], :no} -> enumeration(name, cases, modname, save)
+          {:type, _, {:"CHOICE", cases}, [], [], :no} -> choice(name, cases, modname, save)
+          {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
+          {:type, _, {:"SET", _, _, _, fields}, _, _, :no} -> set(name, fields, modname, save)
+          {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
+                      inner = substituteType(lookup(type)) ; setEnv(name, "[" <> inner <> "]")
+                     setEnv({:array,inner}, {:sequence, inner})
+          {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
+                     inner = substituteType(lookup(type)) ; setEnv(name, "[" <> inner <> "]")
+                     setEnv({:array,inner}, {:set, inner})
+          {:type, _, {:"BIT STRING",_}, [], [], :no} -> setEnv(name, "BIT STRING")
+          {:type, _, :'BIT STRING', [], [], :no} -> setEnv(name, "BIT STRING")
+          {:type, _, :'INTEGER', _set, [], :no} -> setEnv(name, "INTEGER")
+          {:type, _, :'NULL', _set, [], :no} -> setEnv(name, "NULL")
+          {:type, _, :'OBJECT IDENTIFIER', _, _, :no} -> :ok
+          {:type, _, :'OCTET STRING', [], [], :no} -> setEnv(name, "OCTET STRING")
+          {:type, _, {:ObjectClassFieldType, _, _, _, _fields}, _, _, :no} -> :skip
+          {:type, _, {:Externaltypereference, _, _, ext}, _set, [], _} -> setEnv(name, ext)
+          {:type, _, {:pt, _, _}, [], [], _} -> :skip
+          {:Object, _, _val} -> :skip
+          {:Object, _, _, _} -> :ok
+          {:ObjectSet, _, _, _, _} -> :ok
+          _ -> :skip
+      end
+      case res do
+           :skip -> :io.format 'Unhandled type definition ~p: ~p~n', [name, typeDefinition]
+               _ -> :skip
+      end 
+  end
+
+  def compileValue(_pos, _name, _type, _value, _mod), do: []
+  def compileClass(_pos, _name, _mod, _type), do: []
+  def compilePType(_pos, _name, _args, _type), do: []
+  def compileModule(_pos, _name, _defid, _tagdefault, _exports, _imports), do: []
 
   def sequence(name, fields, modname, saveFlag) do
       :application.set_env(:asn1scg, {:type,name}, fields)
@@ -408,40 +458,20 @@ public struct #{name} {
            emitIntegerEnums(cases)))
   end
 
-  def compileType(_, name, typeDefinition, modname, save \\ true) do
-      res = case typeDefinition do
-          {:type, _, {:"INTEGER", cases}, [], [], :no} -> integerEnum(name, cases, modname, save)
-          {:type, _, {:"ENUMERATED", cases}, [], [], :no} -> enumeration(name, cases, modname, save)
-          {:type, _, {:"CHOICE", cases}, [], [], :no} -> choice(name, cases, modname, save)
-          {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
-          {:type, _, {:"SET", _, _, _, fields}, _, _, :no} -> set(name, fields, modname, save)
-          {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
-                     setEnv(name, "[" <> substituteType(lookup(type)) <> "]")
-                     setEnv({:array,substituteType(lookup(type))}, {:sequence, substituteType(lookup(type))})
-          {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
-                     setEnv(name, "[" <> substituteType(lookup(type)) <> "]")
-                     setEnv({:array,substituteType(lookup(type))}, {:set, substituteType(lookup(type))})
-          {:type, _, {:"BIT STRING",_}, [], [], :no} -> setEnv(name, "BIT STRING")
-          {:type, _, :'BIT STRING', [], [], :no} -> setEnv(name, "BIT STRING")
-          {:type, _, :'INTEGER', _set, [], :no} -> setEnv(name, "INTEGER")
-          {:type, _, :'NULL', _set, [], :no} -> setEnv(name, "NULL")
-          {:type, _, :'OBJECT IDENTIFIER', _, _, :no} -> :ok
-          {:type, _, :'OCTET STRING', [], [], :no} -> setEnv(name, "OCTET STRING")
-          {:type, _, {:ObjectClassFieldType, _, _, _, _fields}, _, _, :no} -> :skip
-          {:type, _, {:Externaltypereference, _, _, ext}, _set, [], _} -> setEnv(name, ext)
-          {:type, _, {:pt, _, _}, [], [], _} -> :skip
-          {:Object, _, _val} -> :skip
-          {:Object, _, _, _} -> :ok
-          {:ObjectSet, _, _, _, _} -> :ok
-          _ -> :skip
-      end
-      case res do
-           :skip -> :io.format 'Unhandled type definition ~p: ~p~n', [name, typeDefinition]
-               _ -> :skip
-      end 
+  def dir(), do: :application.get_env(:asn1scg, :input, "priv/apple/")
+
+  def save(true, _, name, res) do
+      dir = :application.get_env(:asn1scg, :output, "Sources/ASN1SCG/")
+      :filelib.ensure_dir(dir)
+      fileName = dir <> normalizeName(bin(name)) <> ".swift"
+      :file.write_file(fileName,res)
   end
 
-  def normalizeName(name), do: Enum.join(String.split("#{name}", "-"), "_")
+  def save(_, _, _, _), do: []
+
+  def normalizeName(name), do:
+      Enum.join(String.split("#{name}", "-"), "_")
+
   def lookup(name) do
       b = bin(name)
       case :application.get_env(:asn1scg, b, b) do
@@ -450,31 +480,15 @@ public struct #{name} {
       end
   end
 
-  def setEnv(x,y) do
+  def setEnv(x,y), do:
       :application.set_env(:asn1scg, bin(x), y)
-  end
 
   def bin(x) when is_atom(x), do: :erlang.atom_to_binary x
   def bin(x) when is_list(x), do: :erlang.list_to_binary x
   def bin(x), do: x
 
-  def dumpValue(_pos, _name, _type, _value, _mod), do: []
-  def dumpClass(_pos, _name, _mod, _type), do: []
-  def dumpPType(_pos, _name, _args, _type), do: []
-  def dumpModule(_pos, _name, _defid, _tagdefault, _exports, _imports), do: []
-
-  def compile(save, file) do
-      tokens = :asn1ct_tok.file file
-      {:ok, mod} = :asn1ct_parser2.parse file, tokens
-      {:module, pos, modname, defid, tagdefault, exports, imports, _, typeorval} = mod
-      :lists.map(fn
-         {:typedef,  _, pos, name, type} -> compileType(pos, name, type, modname, save)
-         {:ptypedef, _, pos, name, args, type} -> dumpPType(pos, name, args, type)
-         {:classdef, _, pos, name, mod, type} -> dumpClass(pos, name, mod, type)
-         {:valuedef, _, pos, name, type, value, mod} -> dumpValue(pos, name, type, value, mod)
-      end, typeorval)
-      dumpModule(pos, modname, defid, tagdefault, exports, imports)
-  end
+  def tagNo([]), do: []
+  def tagNo([{:tag,:CONTEXT,nox,_,_}]), do: nox
 
 end
 
