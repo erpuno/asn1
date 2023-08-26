@@ -334,22 +334,22 @@ public struct #{name} : Hashable, Sendable, Comparable {
         {:ComponentType,_,fieldName,{:type,_tag,type,_elementSet,[],:no},_optional,_,_} ->
            case type do
                 {:"SEQUENCE OF", {:type, _, _innerType, _, _, _}} ->
-                    trace(21)
+                    trace(15)
                     pad(12) <> emitSequenceEncoderBodyElementArray(fieldName(fieldName))
                 {:"SET OF", {:type, _, _innerType, _, _, _}} ->
-                    trace(22)
+                    trace(16)
                     pad(12) <> emitSequenceEncoderBodyElementSet(fieldName(fieldName))
                 {:"INTEGER", _} ->
-                    trace(23)
+                    trace(17)
                     pad(12) <> emitSequenceEncoderBodyElementIntEnum(fieldName(fieldName))
                 {:Externaltypereference,_,_,inner} ->
-                    trace(24)
+                    trace(18)
                     body = case part(lookup(bin(inner)),0,1) do
                        "[" -> emitSequenceEncoderBodyElementArray(fieldName(fieldName))
                          _ -> emitSequenceEncoderBodyElement(fieldName(fieldName))
                     end
                     pad(12) <> body
-              _ ->  trace(25)
+              _ ->  trace(19)
                     pad(12) <> emitSequenceEncoderBodyElement(fieldName(fieldName))
            end
          _ -> ""
@@ -387,7 +387,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
                     pad(12) <> emitSequenceDecoderBodyElement(fieldName(fieldName),
                        substituteType(lookup(fieldType(name,fieldName,type))))
           end
-         _z -> ""
+         _ -> ""
       end, fields), "\n")
 
   def emitParams(name,fields) when is_list(fields) do
