@@ -331,25 +331,27 @@ public struct #{name} : Hashable, Sendable, Comparable {
            trace(14)
            inclusion = :application.get_env(:asn1scg, {:type,name}, [])
            emitSequenceEncoderBody(name, inclusion)
-        {:ComponentType,_,fieldName,{:type,_,{_,_,_,x},_elementSet,[],:no},_optional,_,_} ->
-           trace(15)
-           body = case part(lookup(bin(x)),0,1) do
-                "[" -> emitSequenceEncoderBodyElementArray(fieldName(fieldName))
-                _ -> emitSequenceEncoderBodyElement(fieldName(fieldName))
+        {:ComponentType,_,fieldName,{:type,_tag,type,_elementSet,[],:no},_optional,_,_} ->
+           case type do
+                {:"SEQUENCE OF", {:type, _, _innerType, _, _, _}} ->
+                    trace(21)
+                    pad(12) <> emitSequenceEncoderBodyElementArray(fieldName(fieldName))
+                {:"SET OF", {:type, _, _innerType, _, _, _}} ->
+                    trace(22)
+                    pad(12) <> emitSequenceEncoderBodyElementSet(fieldName(fieldName))
+                {:"INTEGER", _} ->
+                    trace(23)
+                    pad(12) <> emitSequenceEncoderBodyElementIntEnum(fieldName(fieldName))
+                {:Externaltypereference,_,_,inner} ->
+                    trace(24)
+                    body = case part(lookup(bin(inner)),0,1) do
+                       "[" -> emitSequenceEncoderBodyElementArray(fieldName(fieldName))
+                         _ -> emitSequenceEncoderBodyElement(fieldName(fieldName))
+                    end
+                    pad(12) <> body
+              _ ->  trace(25)
+                    pad(12) <> emitSequenceEncoderBodyElement(fieldName(fieldName))
            end
-           pad(12) <> body
-        {:ComponentType,_,fieldName,{:type,_,{:"SEQUENCE OF", _},_,_,_},_,_,_} ->
-           trace(16)
-           pad(12) <> emitSequenceEncoderBodyElementArray(fieldName(fieldName))
-        {:ComponentType,_,fieldName,{:type,_,{:"SET OF", _},_,_,_},_,_,_} ->
-           trace(17)
-           pad(12) <> emitSequenceEncoderBodyElementSet(fieldName(fieldName))
-        {:ComponentType,_,fieldName,{:type,_,{:"INTEGER", _},_,_,_},_,_,_} ->
-           trace(18)
-           pad(12) <> emitSequenceEncoderBodyElementIntEnum(fieldName(fieldName))
-        {:ComponentType,_,fieldName,{:type,_,_type,_elementSet,[],:no},_optional,_,_} ->
-           trace(19)
-           pad(12) <> emitSequenceEncoderBodyElement(fieldName(fieldName))
          _ -> ""
       end, fields), "\n")
 
@@ -359,7 +361,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
            trace(20)
            inclusion = :application.get_env(:asn1scg, {:type,n}, [])
            emitSequenceDecoderBody(n, inclusion)
-        {:ComponentType,_,fieldName,{:type,_,type,_elementSet,[],:no},_optional,_,_} ->
+        {:ComponentType,_,fieldName,{:type,_tag,type,_elementSet,[],:no},_optional,_,_} ->
            case type do
                 {:"SEQUENCE OF", {:type, _, innerType, _, _, _}} ->
                     trace(21)
