@@ -266,7 +266,7 @@ public struct #{name} {
         {:ComponentType,_,fieldName,{:type,tag,{:"SET OF", {_,_,_type,_,_,_}},_,_,_},_,_,_} ->
            emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SetOf")
         {:ComponentType,_,fieldName,{:type,tag,type,_elementSet,[],:no},_optional,_,_} ->
-           case {:binary.part(lookup(fieldType("",fieldName,type)),0,1),
+           case {part(lookup(fieldType("",fieldName,type)),0,1),
                  :application.get_env(:asn1scg, {:array, lookup(fieldType("",fieldName,type))}, [])} do
                 {"[", {:set, _}} -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SetOf")
                 {"[", {:sequence, _}} -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SequenceOf")
@@ -285,7 +285,7 @@ public struct #{name} {
            emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName),
                substituteType(lookup(fieldType("", fieldName, type))), "set")
         {:ComponentType,_,fieldName,{:type,tag,type,_elementSet,[],:no},_optional,_,_} ->
-           case {:binary.part(lookup(fieldType("",fieldName,type)),0,1),
+           case {part(lookup(fieldType("",fieldName,type)),0,1),
                  :application.get_env(:asn1scg, {:array, lookup(fieldType("",fieldName,type))}, [])} do
                 {"[", {:set, inner}} -> emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName), inner, "set")
                 {"[", {:sequence, inner}} -> emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName), inner, "sequence")
@@ -300,7 +300,7 @@ public struct #{name} {
            inclusion = :application.get_env(:asn1scg, {:type,name}, [])
            emitSequenceEncoderBody(name, inclusion)
         {:ComponentType,_,fieldName,{:type,_,{_,_,_,x},_elementSet,[],:no},_optional,_,_} ->
-           body = case :binary.part(lookup(bin(x)),0,1) do
+           body = case part(lookup(bin(x)),0,1) do
                 "[" -> emitSequenceEncoderBodyElementArray(fieldName(fieldName))
                 _ -> emitSequenceEncoderBodyElement(fieldName(fieldName))
            end
@@ -331,7 +331,7 @@ public struct #{name} {
                        substituteType(lookup(fieldType(name,fieldName,innerType))))
                 {:Externaltypereference,_,_,inner} ->
                     bin = lookup(fieldType(name,fieldName,inner))
-                    body = case :binary.part(bin,0,1) do
+                    body = case part(bin,0,1) do
                        "[" -> emitSequenceDecoderBodyElementForSequence(fieldName(fieldName), :binary.part(bin,1,:erlang.size(bin)-2))
                          _ -> emitSequenceDecoderBodyElement(fieldName(fieldName), substituteType(lookup(fieldType(name,fieldName,type))))
                     end
@@ -489,6 +489,13 @@ public struct #{name} {
 
   def tagNo([]), do: []
   def tagNo([{:tag,:CONTEXT,nox,_,_}]), do: nox
+
+  def part(a, x, y) do
+      case :erlang.size(a) > y - x do
+           true -> :binary.part(a, x, y)
+              _ -> ""
+      end
+  end
 
 end
 
