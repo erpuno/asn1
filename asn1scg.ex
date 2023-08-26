@@ -1,6 +1,6 @@
 #!/usr/bin/env elixir
 
-defmodule CHAT.ASN1 do
+defmodule ASN1 do
 
   def fieldName({:contentType, {:Externaltypereference,_,_mod, name}}), do: normalizeName("#{name}")
   def fieldName(name), do: normalizeName("#{name}")
@@ -365,7 +365,7 @@ public struct #{name} {
       end, fields), ", ")
   end
 
-  def compile_all() do
+  def compile() do
       {:ok, files} = :file.list_dir dir()
       :lists.map(fn file -> compile(false, dir() <> :erlang.list_to_binary(file))  end, files)
       :lists.map(fn file -> compile(true,  dir() <> :erlang.list_to_binary(file))  end, files)
@@ -458,10 +458,10 @@ public struct #{name} {
            emitIntegerEnums(cases)))
   end
 
-  def dir(), do: :application.get_env(:asn1scg, :input, "priv/apple/")
+  def dir(), do: :application.get_env(:asn1scg, "input", "priv/apple/")
 
   def save(true, _, name, res) do
-      dir = :application.get_env(:asn1scg, :output, "Sources/ASN1SCG/")
+      dir = :application.get_env(:asn1scg, "output", "Sources/ASN1SCG/")
       :filelib.ensure_dir(dir)
       fileName = dir <> normalizeName(bin(name)) <> ".swift"
       :file.write_file(fileName,res)
@@ -499,19 +499,12 @@ public struct #{name} {
 
 end
 
+m = ASN1 # ASN1 module
 case System.argv() do
-     ["compile"] ->
-        CHAT.ASN1.compile_all
-     ["compile",input] ->
-        :application.set_env(:asn1scg, :input, input <> "/")
-        CHAT.ASN1.compile_all
-     ["compile",input,output] ->
-        :application.set_env(:asn1scg, :input, input <> "/")
-        :application.set_env(:asn1scg, :output, output)
-        CHAT.ASN1.compile_all
-     _ ->
-        :io.format('Copyright © 2023 Namdak Tonpa.~n')
-        :io.format('ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 0.9.1.~n')
-        :io.format('Usage: ./asn1scg.ex help | compile [input] [output]~n')
+  ["compile"]      -> m.compile
+  ["compile",i]    -> m.setEnv(:input, i <> "/") ; m.compile
+  ["compile",i,o]  -> m.setEnv(:input, i <> "/") ; m.setEnv(:output, o <> "/") ; m.compile
+  _ -> :io.format('Copyright © 2023 Namdak Tonpa.~n')
+       :io.format('ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 0.9.1.~n')
+       :io.format('Usage: ./asn1scg.ex help | compile [input] [output]~n')
 end
-
