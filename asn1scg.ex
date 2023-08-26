@@ -229,6 +229,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
       end, cases), "")
   end
 
+
   def emitCases(name, w, cases) when is_list(cases) do
       Enum.join(:lists.map(fn 
         {:ComponentType,_,fieldName,{:type,_,fieldType,_elementSet,[],:no},_optional,_,_} ->
@@ -238,6 +239,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
          _ -> ""
       end, cases), "")
   end
+
 
   def emitFields(name, w, fields, modname) when is_list(fields) do
       Enum.join(:lists.map(fn 
@@ -325,6 +327,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
          _ -> ""
       end, cases), "\n")
 
+
   def emitSequenceEncoderBody(_name, fields), do:
       Enum.join(:lists.map(fn 
         {:"COMPONENTS OF", {:type, _, {_,_,_,name}, _, _, :no}} -> 
@@ -390,6 +393,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
          _ -> ""
       end, fields), "\n")
 
+
   def emitParams(name,fields) when is_list(fields) do
       Enum.join(:lists.map(fn 
         {:"COMPONENTS OF", {:type, _, {_,_,_,n}, _, _, :no}} -> 
@@ -417,6 +421,29 @@ public struct #{name} : Hashable, Sendable, Comparable {
       end, fields), ", ")
   end
 
+# Top level declarations which invoke recursion descent:
+#         INTEGER, ENUMERATED, CHOICE, SEQUENCE, SET.
+#
+# Top level declarations which affect environment:
+#         SET OF, SEQUENCE OF, BIT STRING, NULL, OCTET STRING, OBJECT IDENTIFIER.
+#
+# ASN.1 compiler loops:
+#         cases  c -> loop c { ct | _ }
+#         ienum  c -> loop c { nn | _ }
+#         enum   c -> loop c { nn | _ }
+#         args   c -> loop c { compof/1 | ct | _ }
+#         ctor   f -> loop f { compof/1 | ct | _ }
+#         params f -> loop f { compof/1 | ct | _ }
+#         sumEnc c -> loop c { ct/seqof | ct/setof | ct | _ }
+#         sumDec c -> loop c { ct/seqof | ct/setof | ct | _ }
+#         seqEnc f -> loop f { compof/1 | ct/seqof | ct/setof | ct/int | ct/ext | _ }
+#         seqEec f -> loop f { compof/1 | ct/seqof | ct/setof | ct/int | ct/ext | _ }
+#         fields f -> loop f { compof/1 | ct/seq | ct/sum | ct/int | ct/enum |
+#                              ct/seqof/seq | ct/seqof/sum | ct/setof/seq |
+#                              ct/setof/sum | _ }
+# --
+#  Namdak Tonpa
+
   def compile() do
       {:ok, files} = :file.list_dir dir()
       :lists.map(fn file -> compile(false, dir() <> :erlang.list_to_binary(file))  end, files)
@@ -433,13 +460,13 @@ public struct #{name} : Hashable, Sendable, Comparable {
   def compile(save, file) do
       tokens = :asn1ct_tok.file file
       {:ok, mod} = :asn1ct_parser2.parse file, tokens
-      {:module, pos, modname, defid, tagdefault, exports, imports, _, typeorval} = mod
+      {:module, pos, modname, defid, tagdefault, exports, imports, _, declarations} = mod
       :lists.map(fn
          {:typedef,  _, pos, name, type} -> compileType(pos, name, type, modname, save)
          {:ptypedef, _, pos, name, args, type} -> compilePType(pos, name, args, type)
          {:classdef, _, pos, name, mod, type} -> compileClass(pos, name, mod, type)
          {:valuedef, _, pos, name, type, value, mod} -> compileValue(pos, name, type, value, mod)
-      end, typeorval)
+      end, declarations)
       compileModule(pos, modname, defid, tagdefault, exports, imports)
   end
 
