@@ -512,7 +512,7 @@ case System.argv() do
      _ ->
         :io.format('Copyright © 2023 Namdak Tonpa.~n')
         :io.format('ISO: 8824-1:2021; ITU/IETF: X.680-690.~n')
-        :io.format('SYNRC: ASN.1 DER Compiler, version 0.9.1.~n')
+        :io.format('SYNRC: ERP/1 ASN.1 DER Compiler, version 0.9.1.~n')
         :io.format('Usage: ./asn1scg.ex compile [input-dir] [output-dir] | help~n')
 end
 
