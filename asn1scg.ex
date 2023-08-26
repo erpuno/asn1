@@ -222,20 +222,20 @@ public struct #{name} {
       end, cases), "")
   end
 
-  def emitCases(name, pad, cases) when is_list(cases) do
+  def emitCases(name, w, cases) when is_list(cases) do
       Enum.join(:lists.map(fn 
         {:ComponentType,_,fieldName,{:type,_,fieldType,_elementSet,[],:no},_optional,_,_} ->
            field = fieldType(name, fieldName, fieldType)
-           String.duplicate(" ", pad) <> emitChoiceElement(fieldName(fieldName), substituteType(lookup(field)))
+           pad(w) <> emitChoiceElement(fieldName(fieldName), substituteType(lookup(field)))
          _ -> ""
       end, cases), "")
   end
 
-  def emitFields(name, pad, fields, modname) when is_list(fields) do
+  def emitFields(name, w, fields, modname) when is_list(fields) do
       Enum.join(:lists.map(fn 
         {:"COMPONENTS OF", {:type, _, {_,_,_,n}, _, _, :no}} -> 
            inclusion = :application.get_env(:asn1scg, {:type,n}, [])
-           emitFields(n, pad, inclusion, modname)
+           emitFields(n, w, inclusion, modname)
         {:ComponentType,_,fieldName,{:type,_,fieldType,_elementSet,[],:no},_optional,_,_} ->
            field = fieldType(name, fieldName, fieldType)
            case fieldType do
@@ -255,10 +255,10 @@ public struct #{name} {
                  choice(fieldType(name,fieldName,sum), cases, [], true)
               _ -> :skip
            end
-           String.duplicate(" ", pad) <> emitSequenceElement(fieldName(fieldName), substituteType(lookup(field)))
+           pad(w) <> emitSequenceElement(fieldName(fieldName), substituteType(lookup(field)))
         {:ComponentType,_,fieldName,fieldType,_optional,_,_} when is_binary(fieldType) or is_atom(fieldType) ->
            field = fieldType(name, fieldName, bin(fieldType))
-           String.duplicate(" ", pad) <> emitSequenceElement(fieldName(fieldName), substituteType(lookup(field)))
+           pad(w) <> emitSequenceElement(fieldName(fieldName), substituteType(lookup(field)))
          _ -> ""
       end, fields), "")
   end
@@ -269,7 +269,7 @@ public struct #{name} {
            inclusion = :application.get_env(:asn1scg, {:type,n}, [])
            emitCtorBody(inclusion)
         {:ComponentType,_,fieldName,{:type,_,_type,_elementSet,[],:no},_optional,_,_} ->
-           String.duplicate(" ", 8) <> emitCtorBodyElement(fieldName(fieldName))
+           pad(8) <> emitCtorBodyElement(fieldName(fieldName))
          _ -> ""
       end, fields), "\n")
 
@@ -319,13 +319,13 @@ public struct #{name} {
                 "[" -> emitSequenceEncoderBodyElementArray(fieldName(fieldName))
                 _ -> emitSequenceEncoderBodyElement(fieldName(fieldName))
            end
-           String.duplicate(" ", 12) <> body
+           pad(12) <> body
         {:ComponentType,_,fieldName,{:type,_,{:"SEQUENCE OF", _},_,_,_},_,_,_} ->
-           String.duplicate(" ", 12) <> emitSequenceEncoderBodyElementArray(fieldName(fieldName))
+           pad(12) <> emitSequenceEncoderBodyElementArray(fieldName(fieldName))
         {:ComponentType,_,fieldName,{:type,_,{:"SET OF", _},_,_,_},_,_,_} ->
-           String.duplicate(" ", 12) <> emitSequenceEncoderBodyElementSet(fieldName(fieldName))
+           pad(12) <> emitSequenceEncoderBodyElementSet(fieldName(fieldName))
         {:ComponentType,_,fieldName,{:type,_,_type,_elementSet,[],:no},_optional,_,_} ->
-           String.duplicate(" ", 12) <> emitSequenceEncoderBodyElement(fieldName(fieldName))
+           pad(12) <> emitSequenceEncoderBodyElement(fieldName(fieldName))
          _ -> ""
       end, fields), "\n")
 
@@ -337,12 +337,10 @@ public struct #{name} {
         {:ComponentType,_,fieldName,{:type,_,type,_elementSet,[],:no},_optional,_,_} ->
            case type do
                 {:"SEQUENCE OF", {:type, _, innerType, _, _, _}} ->
-                    String.duplicate(" ", 12) <>
-                    emitSequenceDecoderBodyElementForSequence(fieldName(fieldName),
+                    pad(12) <> emitSequenceDecoderBodyElementForSequence(fieldName(fieldName),
                        substituteType(lookup(fieldType(name,fieldName,innerType))))
                 {:"SET OF", {:type, _, innerType, _, _, _}} ->
-                    String.duplicate(" ", 12) <>
-                    emitSequenceDecoderBodyElementForSet(fieldName(fieldName),
+                    pad(12) <> emitSequenceDecoderBodyElementForSet(fieldName(fieldName),
                        substituteType(lookup(fieldType(name,fieldName,innerType))))
                 {:Externaltypereference,_,_,inner} ->
                     bin = lookup(fieldType(name,fieldName,inner))
@@ -350,8 +348,8 @@ public struct #{name} {
                        "[" -> emitSequenceDecoderBodyElementForSequence(fieldName(fieldName), part(bin,1,:erlang.size(bin)-2))
                          _ -> emitSequenceDecoderBodyElement(fieldName(fieldName), substituteType(lookup(fieldType(name,fieldName,type))))
                     end
-                    String.duplicate(" ", 12) <> body
-              _ ->  String.duplicate(" ", 12) <> emitSequenceDecoderBodyElement(fieldName(fieldName),
+                    pad(12) <> body
+              _ ->  pad(12) <> emitSequenceDecoderBodyElement(fieldName(fieldName),
                        substituteType(lookup(fieldType(name,fieldName,type))))
           end
          _z -> ""
@@ -516,11 +514,10 @@ public struct #{name} {
 
 end
 
-m = ASN1 # ASN1 module
 case System.argv() do
-  ["compile"]      -> m.compile
-  ["compile",i]    -> m.setEnv(:input, i <> "/") ; m.compile
-  ["compile",i,o]  -> m.setEnv(:input, i <> "/") ; m.setEnv(:output, o <> "/") ; m.compile
+  ["compile"]      -> ASN1.compile
+  ["compile",i]    -> ASN1.setEnv(:input, i <> "/") ; ASN1.compile
+  ["compile",i,o]  -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.compile
   _ -> :io.format('Copyright © 2023 Namdak Tonpa.~n')
        :io.format('ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 0.9.1.~n')
        :io.format('Usage: ./asn1scg.ex help | compile [input] [output]~n')
