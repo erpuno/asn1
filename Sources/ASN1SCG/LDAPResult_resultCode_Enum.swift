@@ -52,5 +52,4 @@ public struct LDAPResult_resultCode_Enum: DERImplicitlyTaggable, Hashable, Senda
     static let objectClassModsProhibited = LDAPResult_resultCode_Enum(rawValue: 69)
     static let affectsMultipleDSAs = LDAPResult_resultCode_Enum(rawValue: 71)
     static let other = LDAPResult_resultCode_Enum(rawValue: 80)
-
 }

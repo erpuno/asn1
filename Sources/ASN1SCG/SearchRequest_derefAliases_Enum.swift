@@ -17,5 +17,4 @@ public struct SearchRequest_derefAliases_Enum: DERImplicitlyTaggable, Hashable, 
     static let derefInSearching = SearchRequest_derefAliases_Enum(rawValue: 1)
     static let derefFindingBaseObj = SearchRequest_derefAliases_Enum(rawValue: 2)
     static let derefAlways = SearchRequest_derefAliases_Enum(rawValue: 3)
-
 }

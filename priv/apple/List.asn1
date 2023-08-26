@@ -14,6 +14,7 @@ List DEFINITIONS EXPLICIT TAGS ::= BEGIN
   V ::= SEQUENCE {
     a INTEGER (0..7),
     b BOOLEAN,
+    version INTEGER { v1(1) },
     c INTEGER (0..3),
     d SEQUENCE { d1 BOOLEAN, d2 BOOLEAN } }
 

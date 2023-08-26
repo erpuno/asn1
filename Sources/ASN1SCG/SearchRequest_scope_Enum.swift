@@ -16,5 +16,4 @@ public struct SearchRequest_scope_Enum: DERImplicitlyTaggable, Hashable, Sendabl
     static let baseObject = SearchRequest_scope_Enum(rawValue: 0)
     static let singleLevel = SearchRequest_scope_Enum(rawValue: 1)
     static let wholeSubtree = SearchRequest_scope_Enum(rawValue: 2)
-
 }

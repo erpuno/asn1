@@ -16,5 +16,4 @@ public struct ModifyRequest_changes_Sequence_operation_Enum: DERImplicitlyTaggab
     static let add = ModifyRequest_changes_Sequence_operation_Enum(rawValue: 0)
     static let delete = ModifyRequest_changes_Sequence_operation_Enum(rawValue: 1)
     static let replace = ModifyRequest_changes_Sequence_operation_Enum(rawValue: 2)
-
 }
