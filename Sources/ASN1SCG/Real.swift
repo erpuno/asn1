@@ -16,9 +16,9 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let mantissa = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let base = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let exponent = try ArraySlice<UInt8>(derEncoded: &nodes)
+            let mantissa: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+            let base: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+            let exponent: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             return Real(mantissa: mantissa, base: base, exponent: exponent)
         }
     }

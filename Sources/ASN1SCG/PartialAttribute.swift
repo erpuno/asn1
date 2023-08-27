@@ -14,8 +14,8 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let type = try ASN1OctetString(derEncoded: &nodes)
-            let vals = try DER.set(of: ASN1OctetString.self, identifier: .set, nodes: &nodes)
+            let type: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let vals: [ASN1OctetString] = try DER.set(of: ASN1OctetString.self, identifier: .set, nodes: &nodes)
             return PartialAttribute(type: type, vals: vals)
         }
     }
@@ -23,7 +23,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(type)
-            try coder.serializeSetOf(vals)
+            try coder.appendConstructedNode(identifier: .set) { codec in for x in vals { try codec.serialize(x) } }
         }
     }
 }

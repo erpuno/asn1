@@ -16,9 +16,9 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let controlType = try ASN1OctetString(derEncoded: &nodes)
-            let criticality = try Bool(derEncoded: &nodes)
-            let controlValue = try ASN1OctetString(derEncoded: &nodes)
+            let controlType: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let criticality: Bool = try Bool(derEncoded: &nodes)
+            let controlValue: ASN1OctetString? = try ASN1OctetString(derEncoded: &nodes)
             return Control(controlType: controlType, criticality: criticality, controlValue: controlValue)
         }
     }

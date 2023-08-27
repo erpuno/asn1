@@ -14,16 +14,16 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let responseName = try ASN1OctetString(derEncoded: &nodes)
-            let responseValue = try ASN1OctetString(derEncoded: &nodes)
+            let responseName: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+            let responseValue: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             return IntermediateResponse(responseName: responseName, responseValue: responseValue)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let responseName = self.responseName { try coder.serialize(responseName, explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) }
-            if let responseValue = self.responseValue { try coder.serialize(responseValue, explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) }
+            if let responseName = self.responseName { try coder.serializeOptionalImplicitlyTagged(responseName, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let responseValue = self.responseValue { try coder.serializeOptionalImplicitlyTagged(responseValue, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
         }
     }
 }

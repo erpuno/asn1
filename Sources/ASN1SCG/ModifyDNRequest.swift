@@ -18,10 +18,10 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let entry = try ASN1OctetString(derEncoded: &nodes)
-            let newrdn = try ASN1OctetString(derEncoded: &nodes)
-            let deleteoldrdn = try Bool(derEncoded: &nodes)
-            let newSuperior = try ASN1OctetString(derEncoded: &nodes)
+            let entry: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let newrdn: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let deleteoldrdn: Bool = try Bool(derEncoded: &nodes)
+            let newSuperior: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             return ModifyDNRequest(entry: entry, newrdn: newrdn, deleteoldrdn: deleteoldrdn, newSuperior: newSuperior)
         }
     }
@@ -31,7 +31,7 @@ import Foundation
             try coder.serialize(entry)
             try coder.serialize(newrdn)
             try coder.serialize(deleteoldrdn)
-            if let newSuperior = self.newSuperior { try coder.serialize(newSuperior, explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) }
+            if let newSuperior = self.newSuperior { try coder.serializeOptionalImplicitlyTagged(newSuperior, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
         }
     }
 }

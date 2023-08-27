@@ -16,9 +16,9 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let version = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let name = try ASN1OctetString(derEncoded: &nodes)
-            let authentication = try AuthenticationChoice(derEncoded: &nodes)
+            let version: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+            let name: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let authentication: AuthenticationChoice = try AuthenticationChoice(derEncoded: &nodes)
             return BindRequest(version: version, name: name, authentication: authentication)
         }
     }

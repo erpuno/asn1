@@ -14,8 +14,8 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let object = try ASN1OctetString(derEncoded: &nodes)
-            let changes = try DER.sequence(of: ModifyRequest_changes_Sequence.self, identifier: .sequence, nodes: &nodes)
+            let object: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let changes: [ModifyRequest_changes_Sequence] = try DER.sequence(of: ModifyRequest_changes_Sequence.self, identifier: .sequence, nodes: &nodes)
             return ModifyRequest(object: object, changes: changes)
         }
     }
@@ -23,7 +23,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(object)
-            try coder.serializeSequenceOf(changes)
+            try coder.appendConstructedNode(identifier: .sequence) { codec in for x in changes { try codec.serialize(x) } }
         }
     }
 }

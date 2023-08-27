@@ -14,8 +14,8 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let mechanism = try ASN1OctetString(derEncoded: &nodes)
-            let credentials = try ASN1OctetString(derEncoded: &nodes)
+            let mechanism: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let credentials: ASN1OctetString? = try ASN1OctetString(derEncoded: &nodes)
             return SaslCredentials(mechanism: mechanism, credentials: credentials)
         }
     }

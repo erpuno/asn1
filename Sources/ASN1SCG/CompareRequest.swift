@@ -14,8 +14,8 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let entry = try ASN1OctetString(derEncoded: &nodes)
-            let ava = try AttributeValueAssertion(derEncoded: &nodes)
+            let entry: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let ava: AttributeValueAssertion = try AttributeValueAssertion(derEncoded: &nodes)
             return CompareRequest(entry: entry, ava: ava)
         }
     }

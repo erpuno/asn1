@@ -20,11 +20,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let resultCode = try LDAPResult_resultCode_Enum(derEncoded: &nodes)
-            let matchedDN = try ASN1OctetString(derEncoded: &nodes)
-            let diagnosticMessage = try ASN1OctetString(derEncoded: &nodes)
-            let referral = try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, nodes: &nodes)
-            let serverSaslCreds = try ASN1OctetString(derEncoded: &nodes)
+            let resultCode: LDAPResult_resultCode_Enum = try LDAPResult_resultCode_Enum(derEncoded: &nodes)
+            let matchedDN: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let diagnosticMessage: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let referral: [ASN1OctetString]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, rootNode: node) }
+            let serverSaslCreds: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific))
             return BindResponse(resultCode: resultCode, matchedDN: matchedDN, diagnosticMessage: diagnosticMessage, referral: referral, serverSaslCreds: serverSaslCreds)
         }
     }
@@ -34,10 +34,8 @@ import Foundation
             try coder.serialize(resultCode)
             try coder.serialize(matchedDN)
             try coder.serialize(diagnosticMessage)
-            if let referral = self.referral { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { coder in
-    try coder.serializeSequenceOf(referral)
-    } }
-            if let serverSaslCreds = self.serverSaslCreds { try coder.serialize(serverSaslCreds, explicitlyTaggedWithTagNumber: 7, tagClass: .contextSpecific) }
+            if let referral = self.referral { try coder.appendConstructedNode(identifier: .sequence) { codec in for x in referral { try codec.serialize(x) } } }
+            if let serverSaslCreds = self.serverSaslCreds { try coder.serializeOptionalImplicitlyTagged(serverSaslCreds, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) }
         }
     }
 }

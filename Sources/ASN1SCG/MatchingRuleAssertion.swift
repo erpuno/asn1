@@ -18,20 +18,20 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let matchingRule = try ASN1OctetString(derEncoded: &nodes)
-            let type = try ASN1OctetString(derEncoded: &nodes)
-            let matchValue = try ASN1OctetString(derEncoded: &nodes)
-            let dnAttributes = try Bool(derEncoded: &nodes)
+            let matchingRule: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+            let type: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+            let matchValue: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let dnAttributes: Bool = try Bool(derEncoded: &nodes)
             return MatchingRuleAssertion(matchingRule: matchingRule, type: type, matchValue: matchValue, dnAttributes: dnAttributes)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let matchingRule = self.matchingRule { try coder.serialize(matchingRule, explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) }
-            if let type = self.type { try coder.serialize(type, explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) }
-            try coder.serialize(matchValue, explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific)
-            try coder.serialize(dnAttributes, explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific)
+            if let matchingRule = self.matchingRule { try coder.serializeOptionalImplicitlyTagged(matchingRule, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let type = self.type { try coder.serializeOptionalImplicitlyTagged(type, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            try coder.serializeOptionalImplicitlyTagged(matchValue, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+            try coder.serializeOptionalImplicitlyTagged(dnAttributes, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
         }
     }
 }

@@ -26,14 +26,14 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let baseObject = try ASN1OctetString(derEncoded: &nodes)
-            let scope = try SearchRequest_scope_Enum(derEncoded: &nodes)
-            let derefAliases = try SearchRequest_derefAliases_Enum(derEncoded: &nodes)
-            let sizeLimit = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let timeLimit = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let typesOnly = try Bool(derEncoded: &nodes)
-            let filter = try Filter(derEncoded: &nodes)
-            let attributes = try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, nodes: &nodes)
+            let baseObject: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let scope: SearchRequest_scope_Enum = try SearchRequest_scope_Enum(derEncoded: &nodes)
+            let derefAliases: SearchRequest_derefAliases_Enum = try SearchRequest_derefAliases_Enum(derEncoded: &nodes)
+            let sizeLimit: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+            let timeLimit: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+            let typesOnly: Bool = try Bool(derEncoded: &nodes)
+            let filter: Filter = try Filter(derEncoded: &nodes)
+            let attributes: [ASN1OctetString] = try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, nodes: &nodes)
             return SearchRequest(baseObject: baseObject, scope: scope, derefAliases: derefAliases, sizeLimit: sizeLimit, timeLimit: timeLimit, typesOnly: typesOnly, filter: filter, attributes: attributes)
         }
     }
@@ -47,7 +47,7 @@ import Foundation
             try coder.serialize(timeLimit)
             try coder.serialize(typesOnly)
             try coder.serialize(filter)
-            try coder.serializeSequenceOf(attributes)
+            try coder.appendConstructedNode(identifier: .sequence) { codec in for x in attributes { try codec.serialize(x) } }
         }
     }
 }

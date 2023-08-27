@@ -14,8 +14,8 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let data = try ASN1OctetString(derEncoded: &nodes)
-            let next = try List_next_Choice(derEncoded: &nodes)
+            let data: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let next: List_next_Choice = try List_next_Choice(derEncoded: &nodes)
             return List(data: data, next: next)
         }
     }

@@ -16,9 +16,9 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let a = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let b = try DER.set(of: ASN1OctetString.self, identifier: .set, nodes: &nodes)
-            let d = try Real(derEncoded: &nodes)
+            let a: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+            let b: [ASN1OctetString] = try DER.set(of: ASN1OctetString.self, identifier: .set, nodes: &nodes)
+            let d: Real = try Real(derEncoded: &nodes)
             return X(a: a, b: b, d: d)
         }
     }
@@ -26,7 +26,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(a)
-            try coder.serializeSetOf(b)
+            try coder.appendConstructedNode(identifier: .set) { codec in for x in b { try codec.serialize(x) } }
             try coder.serialize(d)
         }
     }

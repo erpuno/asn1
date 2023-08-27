@@ -14,8 +14,8 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let operation = try ModifyRequest_changes_Sequence_operation_Enum(derEncoded: &nodes)
-            let modification = try PartialAttribute(derEncoded: &nodes)
+            let operation: ModifyRequest_changes_Sequence_operation_Enum = try ModifyRequest_changes_Sequence_operation_Enum(derEncoded: &nodes)
+            let modification: PartialAttribute = try PartialAttribute(derEncoded: &nodes)
             return ModifyRequest_changes_Sequence(operation: operation, modification: modification)
         }
     }

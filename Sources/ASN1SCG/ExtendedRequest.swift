@@ -14,16 +14,16 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let requestName = try ASN1OctetString(derEncoded: &nodes)
-            let requestValue = try ASN1OctetString(derEncoded: &nodes)
+            let requestName: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let requestValue: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             return ExtendedRequest(requestName: requestName, requestValue: requestValue)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(requestName, explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific)
-            if let requestValue = self.requestValue { try coder.serialize(requestValue, explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) }
+            try coder.serializeOptionalImplicitlyTagged(requestName, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+            if let requestValue = self.requestValue { try coder.serializeOptionalImplicitlyTagged(requestValue, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
         }
     }
 }

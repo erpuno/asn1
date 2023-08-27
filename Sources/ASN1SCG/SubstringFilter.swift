@@ -14,8 +14,8 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let type = try ASN1OctetString(derEncoded: &nodes)
-            let substrings = try DER.sequence(of: SubstringFilter_substrings_Choice.self, identifier: .sequence, nodes: &nodes)
+            let type: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let substrings: [SubstringFilter_substrings_Choice] = try DER.sequence(of: SubstringFilter_substrings_Choice.self, identifier: .sequence, nodes: &nodes)
             return SubstringFilter(type: type, substrings: substrings)
         }
     }
@@ -23,7 +23,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(type)
-            try coder.serializeSequenceOf(substrings)
+            try coder.appendConstructedNode(identifier: .sequence) { codec in for x in substrings { try codec.serialize(x) } }
         }
     }
 }
