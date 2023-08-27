@@ -6,8 +6,8 @@ import Foundation
 @usableFromInline struct ExtendedRequest: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var requestName: ASN1OctetString
-    @usableFromInline var requestValue: ASN1OctetString
-    @inlinable init(requestName: ASN1OctetString, requestValue: ASN1OctetString) {
+    @usableFromInline var requestValue: ASN1OctetString?
+    @inlinable init(requestName: ASN1OctetString, requestValue: ASN1OctetString?) {
         self.requestName = requestName
         self.requestValue = requestValue
     }
@@ -22,8 +22,8 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(self.requestName)
-            try coder.serialize(self.requestValue)
+            try coder.serialize(requestName, explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific)
+            if let requestValue = self.requestValue { try coder.serialize(requestValue, explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) }
         }
     }
 }

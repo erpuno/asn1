@@ -40,13 +40,13 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(self.baseObject)
-            try coder.serialize(self.scope)
-            try coder.serialize(self.derefAliases)
-            try coder.serialize(self.sizeLimit)
-            try coder.serialize(self.timeLimit)
-            try coder.serialize(self.typesOnly)
-            try coder.serialize(self.filter)
+            try coder.serialize(baseObject)
+            try coder.serialize(scope)
+            try coder.serialize(derefAliases)
+            try coder.serialize(sizeLimit)
+            try coder.serialize(timeLimit)
+            try coder.serialize(typesOnly)
+            try coder.serialize(filter)
             try coder.serializeSequenceOf(attributes)
         }
     }

@@ -7,8 +7,8 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var controlType: ASN1OctetString
     @usableFromInline var criticality: Bool
-    @usableFromInline var controlValue: ASN1OctetString
-    @inlinable init(controlType: ASN1OctetString, criticality: Bool, controlValue: ASN1OctetString) {
+    @usableFromInline var controlValue: ASN1OctetString?
+    @inlinable init(controlType: ASN1OctetString, criticality: Bool, controlValue: ASN1OctetString?) {
         self.controlType = controlType
         self.criticality = criticality
         self.controlValue = controlValue
@@ -25,9 +25,9 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(self.controlType)
-            try coder.serialize(self.criticality)
-            try coder.serialize(self.controlValue)
+            try coder.serialize(controlType)
+            try coder.serialize(criticality)
+            if let controlValue = self.controlValue { try coder.serialize(controlValue) }
         }
     }
 }

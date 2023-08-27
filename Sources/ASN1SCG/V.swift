@@ -5,37 +5,41 @@ import Foundation
 
 @usableFromInline struct V: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var a: ArraySlice<UInt8>
+    @usableFromInline var a: ArraySlice<UInt8>?
     @usableFromInline var b: Bool
+    @usableFromInline var d: Bool?
     @usableFromInline var version: V_version_IntEnum
-    @usableFromInline var c: ArraySlice<UInt8>
-    @usableFromInline var d: V_d_Sequence
-    @inlinable init(a: ArraySlice<UInt8>, b: Bool, version: V_version_IntEnum, c: ArraySlice<UInt8>, d: V_d_Sequence) {
+    @usableFromInline var x: ArraySlice<UInt8>
+    @usableFromInline var y: V_y_Sequence
+    @inlinable init(a: ArraySlice<UInt8>?, b: Bool, d: Bool?, version: V_version_IntEnum, x: ArraySlice<UInt8>, y: V_y_Sequence) {
         self.a = a
         self.b = b
-        self.version = version
-        self.c = c
         self.d = d
+        self.version = version
+        self.x = x
+        self.y = y
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let a = try ArraySlice<UInt8>(derEncoded: &nodes)
             let b = try Bool(derEncoded: &nodes)
+            let d = try Bool(derEncoded: &nodes)
             let version = try V_version_IntEnum(rawValue: Int(derEncoded: &nodes))
-            let c = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let d = try V_d_Sequence(derEncoded: &nodes)
-            return V(a: a, b: b, version: version, c: c, d: d)
+            let x = try ArraySlice<UInt8>(derEncoded: &nodes)
+            let y = try V_y_Sequence(derEncoded: &nodes)
+            return V(a: a, b: b, d: d, version: version, x: x, y: y)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(self.a)
-            try coder.serialize(self.b)
-            try coder.serialize(self.version.rawValue)
-            try coder.serialize(self.c)
-            try coder.serialize(self.d)
+            if let a = self.a { try coder.serialize(a, explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) }
+            try coder.serialize(b, explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific)
+            if let d = self.d { try coder.serialize(d) }
+            try coder.serialize(version.rawValue)
+            try coder.serialize(x)
+            try coder.serialize(y)
         }
     }
 }

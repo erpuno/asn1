@@ -5,11 +5,11 @@ import Foundation
 
 @usableFromInline struct MatchingRuleAssertion: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var matchingRule: ASN1OctetString
-    @usableFromInline var type: ASN1OctetString
+    @usableFromInline var matchingRule: ASN1OctetString?
+    @usableFromInline var type: ASN1OctetString?
     @usableFromInline var matchValue: ASN1OctetString
     @usableFromInline var dnAttributes: Bool
-    @inlinable init(matchingRule: ASN1OctetString, type: ASN1OctetString, matchValue: ASN1OctetString, dnAttributes: Bool) {
+    @inlinable init(matchingRule: ASN1OctetString?, type: ASN1OctetString?, matchValue: ASN1OctetString, dnAttributes: Bool) {
         self.matchingRule = matchingRule
         self.type = type
         self.matchValue = matchValue
@@ -28,10 +28,10 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(self.matchingRule)
-            try coder.serialize(self.type)
-            try coder.serialize(self.matchValue)
-            try coder.serialize(self.dnAttributes)
+            if let matchingRule = self.matchingRule { try coder.serialize(matchingRule, explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) }
+            if let type = self.type { try coder.serialize(type, explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) }
+            try coder.serialize(matchValue, explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific)
+            try coder.serialize(dnAttributes, explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific)
         }
     }
 }

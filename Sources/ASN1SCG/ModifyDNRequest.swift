@@ -8,8 +8,8 @@ import Foundation
     @usableFromInline var entry: ASN1OctetString
     @usableFromInline var newrdn: ASN1OctetString
     @usableFromInline var deleteoldrdn: Bool
-    @usableFromInline var newSuperior: ASN1OctetString
-    @inlinable init(entry: ASN1OctetString, newrdn: ASN1OctetString, deleteoldrdn: Bool, newSuperior: ASN1OctetString) {
+    @usableFromInline var newSuperior: ASN1OctetString?
+    @inlinable init(entry: ASN1OctetString, newrdn: ASN1OctetString, deleteoldrdn: Bool, newSuperior: ASN1OctetString?) {
         self.entry = entry
         self.newrdn = newrdn
         self.deleteoldrdn = deleteoldrdn
@@ -28,10 +28,10 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(self.entry)
-            try coder.serialize(self.newrdn)
-            try coder.serialize(self.deleteoldrdn)
-            try coder.serialize(self.newSuperior)
+            try coder.serialize(entry)
+            try coder.serialize(newrdn)
+            try coder.serialize(deleteoldrdn)
+            if let newSuperior = self.newSuperior { try coder.serialize(newSuperior, explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) }
         }
     }
 }

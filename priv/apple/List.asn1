@@ -12,11 +12,13 @@ List DEFINITIONS EXPLICIT TAGS ::= BEGIN
   }
 
   V ::= SEQUENCE {
-    a [1] INTEGER (0..7),
+    a [1] IMPLICIT INTEGER (0..7) OPTIONAL,
     b [2] BOOLEAN,
+--    c [3] EXPLICIT INTEGER (0..7) OPTIONAL,
+    d BOOLEAN OPTIONAL,
     version INTEGER { v1(1) },
-    c INTEGER (0..3),
-    d SEQUENCE { d1 BOOLEAN, d2 BOOLEAN } }
+    x INTEGER (0..3),
+    y SEQUENCE { d1 BOOLEAN, d2 BOOLEAN, d3 INTEGER, d4 INTEGER } }
 
   Versioning ::= INTEGER {  v1(0) }
 

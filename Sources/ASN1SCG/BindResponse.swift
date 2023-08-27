@@ -8,9 +8,9 @@ import Foundation
     @usableFromInline var resultCode: LDAPResult_resultCode_Enum
     @usableFromInline var matchedDN: ASN1OctetString
     @usableFromInline var diagnosticMessage: ASN1OctetString
-    @usableFromInline var referral: [ASN1OctetString]
-    @usableFromInline var serverSaslCreds: ASN1OctetString
-    @inlinable init(resultCode: LDAPResult_resultCode_Enum, matchedDN: ASN1OctetString, diagnosticMessage: ASN1OctetString, referral: [ASN1OctetString], serverSaslCreds: ASN1OctetString) {
+    @usableFromInline var referral: [ASN1OctetString]?
+    @usableFromInline var serverSaslCreds: ASN1OctetString?
+    @inlinable init(resultCode: LDAPResult_resultCode_Enum, matchedDN: ASN1OctetString, diagnosticMessage: ASN1OctetString, referral: [ASN1OctetString]?, serverSaslCreds: ASN1OctetString?) {
         self.resultCode = resultCode
         self.matchedDN = matchedDN
         self.diagnosticMessage = diagnosticMessage
@@ -31,11 +31,13 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(self.resultCode)
-            try coder.serialize(self.matchedDN)
-            try coder.serialize(self.diagnosticMessage)
-            try coder.serializeSequenceOf(referral)
-            try coder.serialize(self.serverSaslCreds)
+            try coder.serialize(resultCode)
+            try coder.serialize(matchedDN)
+            try coder.serialize(diagnosticMessage)
+            if let referral = self.referral { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { coder in
+    try coder.serializeSequenceOf(referral)
+    } }
+            if let serverSaslCreds = self.serverSaslCreds { try coder.serialize(serverSaslCreds, explicitlyTaggedWithTagNumber: 7, tagClass: .contextSpecific) }
         }
     }
 }

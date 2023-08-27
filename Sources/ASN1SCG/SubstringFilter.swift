@@ -22,7 +22,7 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(self.type)
+            try coder.serialize(type)
             try coder.serializeSequenceOf(substrings)
         }
     }

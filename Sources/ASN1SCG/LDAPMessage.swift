@@ -7,8 +7,8 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var messageID: ArraySlice<UInt8>
     @usableFromInline var protocolOp: LDAPMessage_protocolOp_Choice
-    @usableFromInline var controls: [Control]
-    @inlinable init(messageID: ArraySlice<UInt8>, protocolOp: LDAPMessage_protocolOp_Choice, controls: [Control]) {
+    @usableFromInline var controls: [Control]?
+    @inlinable init(messageID: ArraySlice<UInt8>, protocolOp: LDAPMessage_protocolOp_Choice, controls: [Control]?) {
         self.messageID = messageID
         self.protocolOp = protocolOp
         self.controls = controls
@@ -25,9 +25,11 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(self.messageID)
-            try coder.serialize(self.protocolOp)
-            try coder.serializeSequenceOf(controls)
+            try coder.serialize(messageID)
+            try coder.serialize(protocolOp)
+            if let controls = self.controls { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { coder in
+    try coder.serializeSequenceOf(controls)
+    } }
         }
     }
 }

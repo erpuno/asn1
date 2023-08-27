@@ -6,8 +6,8 @@ import Foundation
 @usableFromInline struct SaslCredentials: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var mechanism: ASN1OctetString
-    @usableFromInline var credentials: ASN1OctetString
-    @inlinable init(mechanism: ASN1OctetString, credentials: ASN1OctetString) {
+    @usableFromInline var credentials: ASN1OctetString?
+    @inlinable init(mechanism: ASN1OctetString, credentials: ASN1OctetString?) {
         self.mechanism = mechanism
         self.credentials = credentials
     }
@@ -22,8 +22,8 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(self.mechanism)
-            try coder.serialize(self.credentials)
+            try coder.serialize(mechanism)
+            if let credentials = self.credentials { try coder.serialize(credentials) }
         }
     }
 }

@@ -25,9 +25,9 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(self.version)
-            try coder.serialize(self.name)
-            try coder.serialize(self.authentication)
+            try coder.serialize(version)
+            try coder.serialize(name)
+            try coder.serialize(authentication)
         }
     }
 }

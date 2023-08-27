@@ -5,9 +5,9 @@ import Foundation
 
 @usableFromInline struct IntermediateResponse: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var responseName: ASN1OctetString
-    @usableFromInline var responseValue: ASN1OctetString
-    @inlinable init(responseName: ASN1OctetString, responseValue: ASN1OctetString) {
+    @usableFromInline var responseName: ASN1OctetString?
+    @usableFromInline var responseValue: ASN1OctetString?
+    @inlinable init(responseName: ASN1OctetString?, responseValue: ASN1OctetString?) {
         self.responseName = responseName
         self.responseValue = responseValue
     }
@@ -22,8 +22,8 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(self.responseName)
-            try coder.serialize(self.responseValue)
+            if let responseName = self.responseName { try coder.serialize(responseName, explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) }
+            if let responseValue = self.responseValue { try coder.serialize(responseValue, explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) }
         }
     }
 }
