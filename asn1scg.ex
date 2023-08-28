@@ -67,10 +67,17 @@ defmodule ASN1 do
 
   def emitSequenceDecoderBodyElement(:OPTIONAL, plicit, no, name, type) when plicit == "Implicit" or plicit == "Explicit", do:
       "let #{name}: #{type}? = try DER.optional#{plicit}lyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific))"
+  def emitSequenceDecoderBodyElement(_, plicit, no, name, type) when plicit == "Explicit", do:
+      "let #{name}: #{type} = try DER.explicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in try #{type}(derEncoded: node) }"
   def emitSequenceDecoderBodyElement(optional, _, _, name, type), do:
       "let #{name}: #{type}#{opt(optional)} = try #{type}(derEncoded: &nodes)#{unopt(optional, type)}"
-  def emitSequenceDecoderBodyElementArray(optional, plicit, no, name, type, spec) when plicit == "Implicit" or plicit == "Explicit", do:
-      "let #{name}: [#{type}]#{opt(optional)} = try DER.optional#{plicit}lyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in return try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: node) }"
+
+  def emitSequenceDecoderBodyElementArray(:OPTIONAL, plicit, no, name, type, spec) when plicit == "Implicit" or plicit == "Explicit", do:
+      "let #{name}: [#{type}]? = try DER.optional#{plicit}lyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in return try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: node) }"
+  def emitSequenceDecoderBodyElementArray(_, plicit, no, name, type, spec) when plicit == "Implicit" or plicit == "Explicit", do:
+      "let #{name}: [#{type}] = (try DER.optional#{plicit}lyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in return try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: node) })!"
+  def emitSequenceDecoderBodyElementArray(_, plicit, no, name, type, _spec) when plicit == "Explicit", do:
+      "let #{name}: [#{type}] = try DER.explicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in try #{type}(derEncoded: node) }"
   def emitSequenceDecoderBodyElementArray(optional, _plicit, _no, name, type, spec), do:
       "let #{name}: [#{type}]#{opt(optional)} = try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, nodes: &nodes)"
   def emitSequenceDecoderBodyElementIntEnum(name, type), do:
@@ -462,8 +469,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
           {:type, _, {:"SET", _, _, _, fields}, _, _, :no} -> set(name, fields, modname, save)
           {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
-#                      :io.format 'top-level SEQ OF ~p/~p: [~p]~n', [name, type, lookup(type)]
-                      inner = substituteType(lookup(type)) ; setEnv(name, "[" <> inner <> "]")
+                     inner = substituteType(lookup(type)) ; setEnv(name, "[" <> inner <> "]")
                      setEnv({:array,bin(name)}, {:sequence, inner})
           {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
                      inner = substituteType(lookup(type)) ; setEnv(name, "[" <> inner <> "]")

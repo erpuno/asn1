@@ -249,12 +249,9 @@ TBSCertificate  ::=  SEQUENCE  {
      validity             Validity,
      subject              Name,
      subjectPublicKeyInfo SubjectPublicKeyInfo,
-     issuerUniqueID  [1]  IMPLICIT UniqueIdentifier OPTIONAL,
-                          -- If present, version MUST be v2 or v3
-     subjectUniqueID [2]  IMPLICIT UniqueIdentifier OPTIONAL,
-                          -- If present, version MUST be v2 or v3
-     extensions      [3]  Extensions OPTIONAL
-                          -- If present, version MUST be v3 --  }
+     issuerUniqueID  [1]  IMPLICIT UniqueIdentifier OPTIONAL, -- If present, version MUST be v2 or v3
+     subjectUniqueID [2]  IMPLICIT UniqueIdentifier OPTIONAL, -- If present, version MUST be v2 or v3
+     extensions      [3]  Extensions OPTIONAL                 -- If present, version MUST be v3 --  }
 
 Version  ::=  INTEGER  {  v1(0), v2(1), v3(2)  }
 
