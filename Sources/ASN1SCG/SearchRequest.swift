@@ -47,7 +47,7 @@ import Foundation
             try coder.serialize(timeLimit)
             try coder.serialize(typesOnly)
             try coder.serialize(filter)
-            try coder.appendConstructedNode(identifier: .sequence) { codec in for x in attributes { try codec.serialize(x) } }
+            try coder.serializeSequenceOf(attributes)
         }
     }
 }

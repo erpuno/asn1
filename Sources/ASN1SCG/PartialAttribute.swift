@@ -23,7 +23,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(type)
-            try coder.appendConstructedNode(identifier: .set) { codec in for x in vals { try codec.serialize(x) } }
+            try coder.serializeSetOf(vals)
         }
     }
 }

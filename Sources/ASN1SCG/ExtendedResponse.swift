@@ -25,9 +25,9 @@ import Foundation
             let resultCode: LDAPResult_resultCode_Enum = try LDAPResult_resultCode_Enum(derEncoded: &nodes)
             let matchedDN: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let diagnosticMessage: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
-            let referral: [ASN1OctetString]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, rootNode: node) }
-            let responseName: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
-            let responseValue: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific))
+            let referral: [ASN1OctetString]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, rootNode: node) }
+            let responseName: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 10, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
+            let responseValue: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 11, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
             return ExtendedResponse(resultCode: resultCode, matchedDN: matchedDN, diagnosticMessage: diagnosticMessage, referral: referral, responseName: responseName, responseValue: responseValue)
         }
     }
@@ -37,7 +37,7 @@ import Foundation
             try coder.serialize(resultCode)
             try coder.serialize(matchedDN)
             try coder.serialize(diagnosticMessage)
-            if let referral = self.referral { try coder.appendConstructedNode(identifier: .sequence) { codec in for x in referral { try codec.serialize(x) } } }
+            if let referral = self.referral { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(referral) } }
             if let responseName = self.responseName { try coder.serializeOptionalImplicitlyTagged(responseName, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) }
             if let responseValue = self.responseValue { try coder.serializeOptionalImplicitlyTagged(responseValue, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) }
         }

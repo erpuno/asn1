@@ -21,7 +21,7 @@ import Foundation
             let resultCode: LDAPResult_resultCode_Enum = try LDAPResult_resultCode_Enum(derEncoded: &nodes)
             let matchedDN: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let diagnosticMessage: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
-            let referral: [ASN1OctetString]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, rootNode: node) }
+            let referral: [ASN1OctetString]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, rootNode: node) }
             return LDAPResult(resultCode: resultCode, matchedDN: matchedDN, diagnosticMessage: diagnosticMessage, referral: referral)
         }
     }
@@ -31,7 +31,7 @@ import Foundation
             try coder.serialize(resultCode)
             try coder.serialize(matchedDN)
             try coder.serialize(diagnosticMessage)
-            if let referral = self.referral { try coder.appendConstructedNode(identifier: .sequence) { codec in for x in referral { try codec.serialize(x) } } }
+            if let referral = self.referral { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(referral) } }
         }
     }
 }

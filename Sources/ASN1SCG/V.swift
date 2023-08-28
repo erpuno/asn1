@@ -3,23 +3,6 @@ import SwiftASN1
 import Crypto
 import Foundation
 
-/*
-  V ::= SEQUENCE {
-    a [1] IMPLICIT SET OF INTEGER (0..7),
-    b [2] EXPLICIT SET OF INTEGER (0..7),
-    c [3] IMPLICIT INTEGER (0..7),
-    d [4] EXPLICIT INTEGER (0..7),
-    e [5] IMPLICIT BOOLEAN,
-    f [6] EXPLICIT BOOLEAN,
-    g [7] EXPLICIT SET OF INTEGER (0..7) OPTIONAL,
-    h [8] IMPLICIT SET OF INTEGER (0..7) OPTIONAL,
-    i [9] IMPLICIT INTEGER (0..7) OPTIONAL,
-    j [0] EXPLICIT INTEGER (0..7) OPTIONAL,
-    k OCTET STRING OPTIONAL,
-    l BOOLEAN OPTIONAL
-  }
-*/
-
 @usableFromInline struct V: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var a: [ArraySlice<UInt8>]
@@ -51,16 +34,16 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let a: [ArraySlice<UInt8>] = (try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) })!
-            let b: [ArraySlice<UInt8>] = (try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) })!
+            let a: [ArraySlice<UInt8>] = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) }
+            let b: [ArraySlice<UInt8>] = try DER.explicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) }
             let c: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let d: ArraySlice<UInt8> = try DER.explicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in try ArraySlice<UInt8>(derEncoded: node) }
+            let d: ArraySlice<UInt8> = try DER.explicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
             let e: Bool = try Bool(derEncoded: &nodes)
-            let f: Bool = try DER.explicitlyTagged(&nodes, tagNumber: 6, tagClass: .contextSpecific) { node in try Bool(derEncoded: node) }
-            let g: [ArraySlice<UInt8>]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 7, tagClass: .contextSpecific) { node in return try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) }
-            let h: [ArraySlice<UInt8>]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 8, tagClass: .contextSpecific) { node in return try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) }
-            let i: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
-            let j: ArraySlice<UInt8>? = try DER.optionalExplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+            let f: Bool = try DER.explicitlyTagged(&nodes, tagNumber: 6, tagClass: .contextSpecific) { node in return try Bool(derEncoded: node) }
+            let g: [ArraySlice<UInt8>]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 7, tagClass: .contextSpecific) { node in try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) }
+            let h: [ArraySlice<UInt8>]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 8, tagClass: .contextSpecific) { node in try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) }
+            let i: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 9, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
+            let j: ArraySlice<UInt8>? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
             let k: ASN1OctetString? = try ASN1OctetString(derEncoded: &nodes)
             let l: Bool? = try Bool(derEncoded: &nodes)
             return V(a: a, b: b, c: c, d: d, e: e, f: f, g: g, h: h, i: i, j: j, k: k, l: l)
@@ -69,16 +52,16 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.appendConstructedNode(identifier: .set) { codec in for x in a { try codec.serialize(x) } }
-            try coder.appendConstructedNode(identifier: .set) { codec in for x in b { try codec.serialize(x) } }
+            try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(a) }
+            try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(b) }
             try coder.serializeOptionalImplicitlyTagged(c, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
-            try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { coder in try coder.serialize(d) }
+            try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(d) }
             try coder.serializeOptionalImplicitlyTagged(e, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
-            try coder.serialize(explicitlyTaggedWithTagNumber: 6, tagClass: .contextSpecific) { coder in try coder.serialize(f) }
-            if let g = self.g { try coder.appendConstructedNode(identifier: .set) { codec in for x in g { try codec.serialize(x) } } }
-            if let h = self.h { try coder.appendConstructedNode(identifier: .set) { codec in for x in h { try codec.serialize(x) } } }
+            try coder.serialize(explicitlyTaggedWithTagNumber: 6, tagClass: .contextSpecific) { codec in try codec.serialize(f) }
+            if let g = self.g { try coder.serialize(explicitlyTaggedWithTagNumber: 7, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(g) } }
+            if let h = self.h { try coder.serialize(explicitlyTaggedWithTagNumber: 8, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(h) } }
             if let i = self.i { try coder.serializeOptionalImplicitlyTagged(i, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) }
-            if let j = self.j { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { coder in try coder.serialize(j) } }
+            if let j = self.j { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(j) } }
             if let k = self.k { try coder.serialize(k) }
             if let l = self.l { try coder.serialize(l) }
         }

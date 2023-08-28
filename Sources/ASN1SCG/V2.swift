@@ -49,13 +49,13 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.appendConstructedNode(identifier: .set) { codec in for x in a { try codec.serialize(x) } }
-            try coder.appendConstructedNode(identifier: .set) { codec in for x in b { try codec.serialize(x) } }
+            try coder.serializeSetOf(a)
+            try coder.serializeSetOf(b)
             try coder.serialize(c)
             try coder.serialize(d)
             try coder.serialize(e)
             try coder.serialize(f)
-            if let g = self.g { try coder.appendConstructedNode(identifier: .set) { codec in for x in g { try codec.serialize(x) } } }
+            if let g = self.g { try coder.serializeSetOf(g) }
             try coder.serialize(h)
             try coder.serialize(i)
             if let j = self.j { try coder.serialize(j) }

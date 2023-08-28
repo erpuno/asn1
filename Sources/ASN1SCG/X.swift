@@ -26,7 +26,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(a)
-            try coder.appendConstructedNode(identifier: .set) { codec in for x in b { try codec.serialize(x) } }
+            try coder.serializeSetOf(b)
             try coder.serialize(d)
         }
     }
