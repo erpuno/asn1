@@ -469,9 +469,9 @@ public struct #{name} : Hashable, Sendable, Comparable {
 
   def compileType(_, name, typeDefinition, modname, save \\ true) do
       res = case typeDefinition do
-          {:type, _, {:"INTEGER", cases}, [], [], :no} -> integerEnum(name, cases, modname, save)
-          {:type, _, {:"ENUMERATED", cases}, [], [], :no} -> enumeration(name, cases, modname, save)
-          {:type, _, {:"CHOICE", cases}, [], [], :no} -> choice(name, cases, modname, save)
+          {:type, _, {:"INTEGER", cases}, _, [], :no} -> integerEnum(name, cases, modname, save)
+          {:type, _, {:"ENUMERATED", cases}, _, [], :no} -> enumeration(name, cases, modname, save)
+          {:type, _, {:"CHOICE", cases}, _, [], :no} -> choice(name, cases, modname, save)
           {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
           {:type, _, {:"SET", _, _, _, fields}, _, _, :no} -> set(name, fields, modname, save)
           {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
@@ -480,15 +480,15 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
                      inner = substituteType(lookup(type)) ; setEnv(name, "[" <> inner <> "]")
                      setEnv({:array,bin(normalizeName(name))}, {:set, inner})
-          {:type, _, {:"BIT STRING",_}, [], [], :no} -> setEnv(name, "BIT STRING")
-          {:type, _, :'BIT STRING', [], [], :no} -> setEnv(name, "BIT STRING")
+          {:type, _, {:"BIT STRING",_}, _, [], :no} -> setEnv(name, "BIT STRING")
+          {:type, _, :'BIT STRING', _, [], :no} -> setEnv(name, "BIT STRING")
           {:type, _, :'INTEGER', _set, [], :no} -> setEnv(name, "INTEGER")
           {:type, _, :'NULL', _set, [], :no} -> setEnv(name, "NULL")
           {:type, _, :'OBJECT IDENTIFIER', _, _, :no} -> :ok
           {:type, _, :'OCTET STRING', [], [], :no} -> setEnv(name, "OCTET STRING")
           {:type, _, {:ObjectClassFieldType, _, _, _, _fields}, _, _, :no} -> :skip
           {:type, _, {:Externaltypereference, _, _, ext}, _set, [], _} -> setEnv(name, ext)
-          {:type, _, {:pt, _, _}, [], [], _} -> :skip
+          {:type, _, {:pt, _, _}, _, [], _} -> :skip
           {:Object, _, _val} -> :skip
           {:Object, _, _, _} -> :ok
           {:ObjectSet, _, _, _, _} -> :ok
