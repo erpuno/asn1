@@ -613,5 +613,5 @@ case System.argv() do
   ["compile",i,o]  -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.compile
   _ -> :io.format('Copyright © 2023 Namdak Tonpa.~n')
        :io.format('ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 0.9.1.~n')
-       :io.format('Usage: ./asn1scg.ex help | compile [input] [output]~n')
+       :io.format('Usage: ./asn1.ex help | compile [input] [output]~n')
 end
