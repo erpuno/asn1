@@ -2,7 +2,7 @@ SYNRC 💬 ASN.1
 ==============
 
 ASN.1 Swift Code Generation DER Compiler.
-Minimal (normal), full, idiomatic, orrect by construction, respects equality.
+Minimal (normal), full, idiomatic, correct by construction, respects equality.
 
 ```
 Copyright © 2023 Namdak Tonpa.
