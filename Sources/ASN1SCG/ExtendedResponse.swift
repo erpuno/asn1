@@ -26,8 +26,8 @@ import Foundation
             let matchedDN: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let diagnosticMessage: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let referral: [ASN1OctetString]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, rootNode: node) }
-            let responseName: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 10, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
-            let responseValue: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 11, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
+            let responseName: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
+            let responseValue: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific))
             return ExtendedResponse(resultCode: resultCode, matchedDN: matchedDN, diagnosticMessage: diagnosticMessage, referral: referral, responseName: responseName, responseValue: responseValue)
         }
     }

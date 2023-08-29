@@ -21,7 +21,7 @@ import Foundation
             let entry: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let newrdn: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let deleteoldrdn: Bool = try Bool(derEncoded: &nodes)
-            let newSuperior: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
+            let newSuperior: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             return ModifyDNRequest(entry: entry, newrdn: newrdn, deleteoldrdn: deleteoldrdn, newSuperior: newSuperior)
         }
     }

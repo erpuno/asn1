@@ -36,13 +36,13 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let a: [ArraySlice<UInt8>] = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) }
             let b: [ArraySlice<UInt8>] = try DER.explicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) }
-            let c: ArraySlice<UInt8> = (try DER.optionalImplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) })!
+            let c: ArraySlice<UInt8> = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)))!
             let d: ArraySlice<UInt8> = try DER.explicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
-            let e: Bool = (try DER.optionalImplicitlyTagged(&nodes, tagNumber: 5, tagClass: .contextSpecific) { node in return try Bool(derEncoded: node) })!
+            let e: Bool = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)))!
             let f: Bool = try DER.explicitlyTagged(&nodes, tagNumber: 6, tagClass: .contextSpecific) { node in return try Bool(derEncoded: node) }
             let g: [ArraySlice<UInt8>]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 7, tagClass: .contextSpecific) { node in try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) }
             let h: [ArraySlice<UInt8>]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 8, tagClass: .contextSpecific) { node in try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) }
-            let i: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 9, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
+            let i: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
             let j: ArraySlice<UInt8>? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
             let k: ASN1OctetString? = try ASN1OctetString(derEncoded: &nodes)
             let l: Bool? = try Bool(derEncoded: &nodes)

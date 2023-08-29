@@ -24,7 +24,7 @@ import Foundation
             let matchedDN: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let diagnosticMessage: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let referral: [ASN1OctetString]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, rootNode: node) }
-            let serverSaslCreds: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 7, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
+            let serverSaslCreds: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific))
             return BindResponse(resultCode: resultCode, matchedDN: matchedDN, diagnosticMessage: diagnosticMessage, referral: referral, serverSaslCreds: serverSaslCreds)
         }
     }

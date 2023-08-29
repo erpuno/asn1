@@ -18,10 +18,10 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let matchingRule: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
-            let type: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
-            let matchValue: ASN1OctetString = (try DER.optionalImplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) })!
-            let dnAttributes: Bool = (try DER.optionalImplicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in return try Bool(derEncoded: node) })!
+            let matchingRule: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+            let type: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+            let matchValue: ASN1OctetString = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)))!
+            let dnAttributes: Bool = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)))!
             return MatchingRuleAssertion(matchingRule: matchingRule, type: type, matchValue: matchValue, dnAttributes: dnAttributes)
         }
     }
