@@ -40,6 +40,13 @@ defmodule ASN1 do
   def sequenceOf(_,_,x) when is_atom(x), do: substituteType("#{lookup(x)}")
   def sequenceOf(_,_,x) when is_binary(x), do: substituteType("#{lookup(x)}")
 
+  def substituteType("TeletexString"),     do: "ASN1TeletexString"
+  def substituteType("UniversalString"),   do: "ASN1UniversalString"
+  def substituteType("IA5String"),         do: "ASN1IA5String"
+  def substituteType("UTF8String"),        do: "ASN1UTF8String"
+  def substituteType("PrintableString"),   do: "ASN1PrintableString"
+  def substituteType("NumericString"),     do: "ASN1PrintableString"
+  def substituteType("BMPString"),         do: "ASN1BMPString"
   def substituteType("INTEGER"),           do: "ArraySlice<UInt8>"
   def substituteType("OCTET STRING"),      do: "ASN1OctetString"
   def substituteType("BIT STRING"),        do: "ASN1BitString"
