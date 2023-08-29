@@ -25,7 +25,7 @@ import Foundation
             let resultCode: LDAPResult_resultCode_Enum = try LDAPResult_resultCode_Enum(derEncoded: &nodes)
             let matchedDN: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let diagnosticMessage: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
-            let referral: [ArraySlice<UInt8>] = try DER.sequence(of: ASN1OctetString.self, identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific), nodes: &nodes)
+            let referral: [ASN1OctetString] = try DER.sequence(of: ASN1OctetString.self, identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific), nodes: &nodes)
             let responseName: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
             let responseValue: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific))
             return ExtendedResponse(resultCode: resultCode, matchedDN: matchedDN, diagnosticMessage: diagnosticMessage, referral: referral, responseName: responseName, responseValue: responseValue)

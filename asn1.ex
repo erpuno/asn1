@@ -86,8 +86,7 @@ defmodule ASN1 do
   def emitSequenceDecoderBodyElementArray(:OPTIONAL, plicit, no, name, type, spec) when plicit == "Explicit" and no != [] and (spec == "set" or spec == "sequence"), do:
       "let #{name}: [#{type}]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: node) }"
   def emitSequenceDecoderBodyElementArray(_, plicit, no, name, type, spec) when plicit == "Implicit" and no != [] and (spec == "set" or spec == "sequence"), do:
-      "let #{name}: [ArraySlice<UInt8>] = try DER.#{spec}(of: #{type}.self, identifier: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific), nodes: &nodes)"
-#      "let #{name}: [#{type}]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: node) }"
+      "let #{name}: [#{type}] = try DER.#{spec}(of: #{type}.self, identifier: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific), nodes: &nodes)"
   def emitSequenceDecoderBodyElementArray(_, _, no, name, type, spec) when no != [] and (spec == "set" or spec == "sequence"), do:
       "let #{name}: [#{type}] = try DER.explicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: node) }"
   def emitSequenceDecoderBodyElementArray(optional, _, no, name, type, spec) when no == [], do:
@@ -382,8 +381,8 @@ public struct #{name} : Hashable, Sendable, Comparable {
                 {:Externaltypereference,_,_,inner} ->
                     trace(18)
                     case :application.get_env(:asn1scg, {:array, bin(inner)}, []) do
-                       {:sequence, _} -> emitSequenceDecoderBodyElementArray(optional, plicit(tag), tagNo(tag), fieldName(fieldName), part(look,1,:erlang.size(look)-2), "sequence")
-                       {:set, _} -> emitSequenceDecoderBodyElementArray(optional, plicit(tag), tagNo(tag), fieldName(fieldName), part(look,1,:erlang.size(look)-2), "set")
+                       {:sequence, _} -> emitSequenceDecoderBodyElementArray(optional, plicit(tag), tagNo(tag), fieldName(fieldName), substituteType(part(look,1,:erlang.size(look)-2)), "sequence")
+                       {:set, _} -> emitSequenceDecoderBodyElementArray(optional, plicit(tag), tagNo(tag), fieldName(fieldName), substituteType(part(look,1,:erlang.size(look)-2)), "set")
                         _ -> emitSequenceDecoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), look)
                     end
               _ ->  trace(19)
