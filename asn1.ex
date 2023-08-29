@@ -478,7 +478,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
 
   def compileType(_, name, typeDefinition, modname, save \\ true) do
       res = case typeDefinition do
-          {:type, _, {:"INTEGER", cases}, _, [], :no} -> integerEnum(name, cases, modname, save)
+          {:type, _, {:"INTEGER", cases}, _, [], :no} ->  setEnv(name, "Int") ; integerEnum(name, cases, modname, save)
           {:type, _, {:"ENUMERATED", cases}, _, [], :no} -> enumeration(name, cases, modname, save)
           {:type, _, {:"CHOICE", cases}, _, [], :no} -> choice(name, cases, modname, save)
           {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
