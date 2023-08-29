@@ -18,7 +18,7 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let messageID: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let protocolOp: LDAPMessage_protocolOp_Choice = try LDAPMessage_protocolOp_Choice(derEncoded: &nodes)
-            let controls: [Control]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in try DER.sequence(of: Control.self, identifier: .sequence, rootNode: node) }
+            let controls: [ArraySlice<UInt8>] = try DER.sequence(of: Control.self, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific), nodes: &nodes)
             return LDAPMessage(messageID: messageID, protocolOp: protocolOp, controls: controls)
         }
     }
@@ -27,7 +27,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(messageID)
             try coder.serialize(protocolOp)
-            if let controls = self.controls { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(controls) } }
+            if let controls = self.controls { try coder.serializeSequenceOf(controls, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
         }
     }
 }

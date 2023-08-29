@@ -83,8 +83,11 @@ defmodule ASN1 do
   def emitSequenceDecoderBodyElement(optional, _, _, name, type), do:
       "let #{name}: #{type}#{opt(optional)} = try #{type}(derEncoded: &nodes)"
 
-  def emitSequenceDecoderBodyElementArray(:OPTIONAL, _, no, name, type, spec) when no != [] and (spec == "set" or spec == "sequence"), do:
+  def emitSequenceDecoderBodyElementArray(:OPTIONAL, plicit, no, name, type, spec) when plicit == "Explicit" and no != [] and (spec == "set" or spec == "sequence"), do:
       "let #{name}: [#{type}]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: node) }"
+  def emitSequenceDecoderBodyElementArray(_, plicit, no, name, type, spec) when plicit == "Implicit" and no != [] and (spec == "set" or spec == "sequence"), do:
+      "let #{name}: [ArraySlice<UInt8>] = try DER.#{spec}(of: #{type}.self, identifier: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific), nodes: &nodes)"
+#      "let #{name}: [#{type}]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: node) }"
   def emitSequenceDecoderBodyElementArray(_, _, no, name, type, spec) when no != [] and (spec == "set" or spec == "sequence"), do:
       "let #{name}: [#{type}] = try DER.explicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: node) }"
   def emitSequenceDecoderBodyElementArray(optional, _, no, name, type, spec) when no == [], do:
@@ -94,8 +97,10 @@ defmodule ASN1 do
 
   # Vector Encoder
 
-  def emitSequenceEncoderBodyElement(_, _, no, name, s) when no != [] and (s == "set" or s == "sequence"), do:
+  def emitSequenceEncoderBodyElement(_, plicit, no, name, s) when plicit == "Explicit" and no != [] and (s == "set" or s == "sequence"), do:
       "try coder.serialize(explicitlyTaggedWithTagNumber: #{no}, tagClass: .contextSpecific) { codec in try codec.serialize#{spec(s)}(#{name}) }"
+  def emitSequenceEncoderBodyElement(_, plicit, no, name, s) when plicit == "Implicit" and no != [] and (s == "set" or s == "sequence"), do:
+      "try coder.serialize#{spec(s)}(#{name}, identifier: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific))"
   def emitSequenceEncoderBodyElement(_, plicit, no, name, _) when no != [] and plicit == "Implicit", do:
       "try coder.serializeOptionalImplicitlyTagged(#{name}, withIdentifier: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific))"
   def emitSequenceEncoderBodyElement(_, plicit, no, name, _) when no != [] and plicit == "Explicit", do:
@@ -446,7 +451,8 @@ public struct #{name} : Hashable, Sendable, Comparable {
   end
 
   def compile() do
-      {:ok, files} = :file.list_dir dir()
+      {:ok, f} = :file.list_dir dir()
+      files = :lists.filter(fn x -> [_,y] = :string.tokens(x, '.') ; y == 'asn1' end, f)
       :lists.map(fn file -> compile(false, dir() <> :erlang.list_to_binary(file))  end, files)
       :lists.map(fn file -> compile(true,  dir() <> :erlang.list_to_binary(file))  end, files)
       coverage()
