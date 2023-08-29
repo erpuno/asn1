@@ -67,8 +67,8 @@ defmodule ASN1 do
   def emitIntegerEnumElement(field, value), do: pad(4) <> "public static let #{field} = Self(rawValue: #{value})\n"
   def emitOptional(:OPTIONAL, name, body), do: "if let #{name} = self.#{name} { #{body} }"
   def emitOptional(_, _, body), do: "#{body}"
-  def emitSequenceElement(name, type), do: "@usableFromInline var #{name}: #{normalizeName(type)}\n"
-  def emitSequenceElementOptional(name, type, opt \\ ""), do: "@usableFromInline var #{name}: #{normalizeName(type)}#{opt}\n"
+  def emitSequenceElement(name, type), do: "@usableFromInline var #{name}: #{lookup(normalizeName(type))}\n"
+  def emitSequenceElementOptional(name, type, opt \\ ""), do: "@usableFromInline var #{name}: #{lookup(normalizeName(type))}#{opt}\n"
 
   # Vector Decoder
 
@@ -238,7 +238,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
       Enum.join(:lists.map(fn
         {:NamedNumber, fieldName, fieldValue} ->
            trace(1)
-           emitIntegerEnumElement(fieldName, fieldValue)
+           emitIntegerEnumElement(fieldName(fieldName), fieldValue)
          _ -> ""
       end, cases), "")
   end
@@ -484,7 +484,13 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, :'BIT STRING', _, [], :no} -> setEnv(name, "BIT STRING")
           {:type, _, :'INTEGER', _set, [], :no} -> setEnv(name, "INTEGER")
           {:type, _, :'NULL', _set, [], :no} -> setEnv(name, "NULL")
-          {:type, _, :'OBJECT IDENTIFIER', _, _, :no} -> :ok
+          {:type, _, :'ANY', _set, [], :no} -> setEnv(name, "ANY")
+          {:type, _, :'PrintableString', _set, [], :no} -> setEnv(name, "PrintableString")
+          {:type, _, :'NumericString', _set, [], :no} -> setEnv(name, "PrintableString")
+          {:type, _, :'IA5String', _set, [], :no} -> setEnv(name, "IA5String")
+          {:type, _, :'TeletexString', _set, [], :no} -> setEnv(name, "TeletexString")
+          {:type, _, :'UniversalString', _set, [], :no} -> setEnv(name, "UniversalString")
+          {:type, _, :'OBJECT IDENTIFIER', _, _, :no} -> setEnv(name, "OBJECT IDENTIFIER")
           {:type, _, :'OCTET STRING', [], [], :no} -> setEnv(name, "OCTET STRING")
           {:type, _, {:ObjectClassFieldType, _, _, _, _fields}, _, _, :no} -> :skip
           {:type, _, {:Externaltypereference, _, _, ext}, _set, [], _} -> setEnv(name, ext)
