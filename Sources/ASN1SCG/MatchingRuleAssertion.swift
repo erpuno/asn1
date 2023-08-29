@@ -20,8 +20,8 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let matchingRule: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
             let type: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
-            let matchValue: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
-            let dnAttributes: Bool = try Bool(derEncoded: &nodes)
+            let matchValue: ASN1OctetString = (try DER.optionalImplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) })!
+            let dnAttributes: Bool = (try DER.optionalImplicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in return try Bool(derEncoded: node) })!
             return MatchingRuleAssertion(matchingRule: matchingRule, type: type, matchValue: matchValue, dnAttributes: dnAttributes)
         }
     }

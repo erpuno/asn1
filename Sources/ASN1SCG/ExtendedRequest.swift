@@ -14,7 +14,7 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let requestName: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let requestName: ASN1OctetString = (try DER.optionalImplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) })!
             let requestValue: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
             return ExtendedRequest(requestName: requestName, requestValue: requestValue)
         }

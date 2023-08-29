@@ -36,9 +36,9 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let a: [ArraySlice<UInt8>] = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) }
             let b: [ArraySlice<UInt8>] = try DER.explicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) }
-            let c: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+            let c: ArraySlice<UInt8> = (try DER.optionalImplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) })!
             let d: ArraySlice<UInt8> = try DER.explicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
-            let e: Bool = try Bool(derEncoded: &nodes)
+            let e: Bool = (try DER.optionalImplicitlyTagged(&nodes, tagNumber: 5, tagClass: .contextSpecific) { node in return try Bool(derEncoded: node) })!
             let f: Bool = try DER.explicitlyTagged(&nodes, tagNumber: 6, tagClass: .contextSpecific) { node in return try Bool(derEncoded: node) }
             let g: [ArraySlice<UInt8>]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 7, tagClass: .contextSpecific) { node in try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) }
             let h: [ArraySlice<UInt8>]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 8, tagClass: .contextSpecific) { node in try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) }
