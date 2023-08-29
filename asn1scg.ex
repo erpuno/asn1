@@ -322,7 +322,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
         {:ComponentType,_,fieldName,{:type,tag,type,_elementSet,[],:no},_optional,_,_} ->
            trace(10)
            case {part(lookup(fieldType("",fieldName,type)),0,1),
-                 :application.get_env(:asn1scg, {:array, lookup(fieldType("",fieldName,type))}, [])} do
+                 :application.get_env(:asn1scg, {:array, lookup(fieldType("",fieldName(fieldName),type))}, [])} do
                 {"[", {:set, _}} -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SetOf")
                 {"[", {:sequence, _}} -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SequenceOf")
                 _ -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "")
@@ -335,18 +335,19 @@ public struct #{name} : Hashable, Sendable, Comparable {
         {:ComponentType,_,fieldName,{:type,tag,{:"SEQUENCE OF", {_,_,type,_,_,_}},_,_,_},_,_,_} ->
            trace(11)
            emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName),
-               substituteType(lookup(fieldType("", fieldName, type))), "sequence")
+               substituteType(lookup(fieldType("", fieldName(fieldName), type))), "sequence")
         {:ComponentType,_,fieldName,{:type,tag,{:"SET OF", {_,_,type,_,_,_}},_,_,_},_,_,_} ->
            trace(12)
            emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName),
-               substituteType(lookup(fieldType("", fieldName, type))), "set")
+               substituteType(lookup(fieldType("", fieldName(fieldName), type))), "set")
         {:ComponentType,_,fieldName,{:type,tag,type,_elementSet,[],:no},_optional,_,_} ->
            trace(13)
            case {part(lookup(fieldType("",fieldName,type)),0,1),
-                 :application.get_env(:asn1scg, {:array, lookup(fieldType("",fieldName,type))}, [])} do
+                 :application.get_env(:asn1scg, {:array, lookup(fieldType("",fieldName(fieldName),type))}, [])} do
                 {"[", {:set, inner}} -> emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName), inner, "set")
                 {"[", {:sequence, inner}} -> emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName), inner, "sequence")
-                _ -> emitChoiceDecoderBodyElement(12, tagNo(tag), fieldName(fieldName), substituteType(lookup(fieldType("", fieldName, type))))
+                _ -> emitChoiceDecoderBodyElement(12, tagNo(tag), fieldName(fieldName),
+                        substituteType(lookup(fieldType("", fieldName(fieldName), type))))
            end
          _ -> ""
       end, cases), "\n")
@@ -368,7 +369,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
                     emitSequenceDecoderBodyElementArray(optional, plicit(tag), tagNo(tag), fieldName(fieldName), substituteType(lookup(fieldType(name,fieldName,inner))), "set")
                 {:"INTEGER", _} ->
                     trace(17)
-                    emitSequenceDecoderBodyElementIntEnum(fieldName(fieldName), substituteType(lookup(fieldType(name,fieldName,type))))
+                    emitSequenceDecoderBodyElementIntEnum(fieldName(fieldName), substituteType(lookup(fieldType(name,fieldName(fieldName),type))))
                 {:Externaltypereference,_,_,inner} ->
                     trace(18)
                     case :application.get_env(:asn1scg, {:array, bin(inner)}, []) do
@@ -410,7 +411,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
               _ ->  trace(25)
                     emitSequenceEncoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), "")
            end
-           pad(12) <> emitOptional(optional, fieldName, res)
+           pad(12) <> emitOptional(optional, fieldName(fieldName), res)
          _ -> ""
       end, fields), "\n")
 
@@ -475,10 +476,10 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, {:"SET", _, _, _, fields}, _, _, :no} -> set(name, fields, modname, save)
           {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
                      inner = substituteType(lookup(type)) ; setEnv(name, "[" <> inner <> "]")
-                     setEnv({:array,bin(name)}, {:sequence, inner})
+                     setEnv({:array,bin(normalizeName(name))}, {:sequence, inner})
           {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
                      inner = substituteType(lookup(type)) ; setEnv(name, "[" <> inner <> "]")
-                     setEnv({:array,bin(name)}, {:set, inner})
+                     setEnv({:array,bin(normalizeName(name))}, {:set, inner})
           {:type, _, {:"BIT STRING",_}, [], [], :no} -> setEnv(name, "BIT STRING")
           {:type, _, :'BIT STRING', [], [], :no} -> setEnv(name, "BIT STRING")
           {:type, _, :'INTEGER', _set, [], :no} -> setEnv(name, "INTEGER")

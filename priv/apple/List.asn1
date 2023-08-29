@@ -3,7 +3,8 @@ List DEFINITIONS IMPLICIT TAGS ::= BEGIN
   Real ::= SEQUENCE {
     mantissa INTEGER,
     base INTEGER (2|10),
-    exponent INTEGER }
+    exponent INTEGER
+  }
 
   X ::= SET {
     a INTEGER,
@@ -43,7 +44,7 @@ List DEFINITIONS IMPLICIT TAGS ::= BEGIN
   K ::= SEQUENCE {
     version INTEGER { v1(1) },
     x INTEGER (0..3),
-    y SEQUENCE { d1 BOOLEAN, d2 BOOLEAN, d3 INTEGER, d4 INTEGER } 
+    y SEQUENCE { d1 BOOLEAN, d2 BOOLEAN, d3 INTEGER, d4 INTEGER }
   }
 
   Versioning ::= INTEGER {  v1(0) }
@@ -52,10 +53,14 @@ List DEFINITIONS IMPLICIT TAGS ::= BEGIN
     v [0] V,
     list-x [1] List,
     o [2] SET OF OCTET STRING,
-    s [3] SEQUENCE OF OCTET STRING }
+    s [3] SEQUENCE OF OCTET STRING
+  }
 
   List ::= SEQUENCE {
     data OCTET STRING,
-    next CHOICE { linked-list List, end NULL, ss [1] SET OF OCTET STRING } }
+    next CHOICE { linked-list List,
+                  end NULL,
+                  ss [1] SET OF OCTET STRING }
+  }
 
 END
