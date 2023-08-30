@@ -189,8 +189,7 @@ DomainComponent ::=     IA5String
 
 -- Legacy attributes
 
-pkcs-9 OBJECT IDENTIFIER ::=
-       { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) 9 }
+pkcs-9 OBJECT IDENTIFIER ::= { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) 9 }
 
 id-emailAddress          AttributeType ::= { pkcs-9 1 }
 
@@ -203,10 +202,9 @@ Name ::= CHOICE { -- only one possibility for now --
 
 RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
 
-DistinguishedName ::=   RDNSequence
+DistinguishedName ::= RDNSequence
 
-RelativeDistinguishedName  ::=
-                    SET SIZE (1 .. MAX) OF AttributeTypeAndValue
+RelativeDistinguishedName ::= SET SIZE (1 .. MAX) OF AttributeTypeAndValue
 
 -- Directory string type --
 
@@ -298,8 +296,7 @@ AlgorithmIdentifier  ::=  SEQUENCE  {
 
 ORAddress ::= SEQUENCE {
    built-in-standard-attributes BuiltInStandardAttributes,
-   built-in-domain-defined-attributes
-                   BuiltInDomainDefinedAttributes OPTIONAL,
+   built-in-domain-defined-attributes BuiltInDomainDefinedAttributes OPTIONAL,
    -- see also teletex-domain-defined-attributes
    extension-attributes ExtensionAttributes OPTIONAL }
 
@@ -339,27 +336,20 @@ PrivateDomainName ::= CHOICE {
    numeric   NumericString   (SIZE (1..ub-domain-name-length)),
    printable PrintableString (SIZE (1..ub-domain-name-length)) }
 
-OrganizationName ::= PrintableString
-                            (SIZE (1..ub-organization-name-length))
+OrganizationName ::= PrintableString (SIZE (1..ub-organization-name-length))
   -- see also teletex-organization-name
 
-NumericUserIdentifier ::= NumericString
-                            (SIZE (1..ub-numeric-user-id-length))
+NumericUserIdentifier ::= NumericString (SIZE (1..ub-numeric-user-id-length))
 
 PersonalName ::= SET {
-   surname     [0] IMPLICIT PrintableString
-                    (SIZE (1..ub-surname-length)),
-   given-name  [1] IMPLICIT PrintableString
-                    (SIZE (1..ub-given-name-length)) OPTIONAL,
-   initials    [2] IMPLICIT PrintableString
-                    (SIZE (1..ub-initials-length)) OPTIONAL,
-   generation-qualifier [3] IMPLICIT PrintableString
-                    (SIZE (1..ub-generation-qualifier-length))
-                    OPTIONAL }
+   surname     [0] IMPLICIT PrintableString  (SIZE (1..ub-surname-length)),
+   given-name  [1] IMPLICIT PrintableString  (SIZE (1..ub-given-name-length)) OPTIONAL,
+   initials    [2] IMPLICIT PrintableString  (SIZE (1..ub-initials-length)) OPTIONAL,
+   generation-qualifier [3] IMPLICIT PrintableString  (SIZE (1..ub-generation-qualifier-length)) OPTIONAL }
   -- see also teletex-personal-name
 
 OrganizationalUnitNames ::= SEQUENCE SIZE (1..ub-organizational-units)
-                             OF OrganizationalUnitName
+                            OF OrganizationalUnitName
   -- see also teletex-organizational-unit-names
 
 OrganizationalUnitName ::= PrintableString (SIZE
@@ -367,26 +357,20 @@ OrganizationalUnitName ::= PrintableString (SIZE
 
 -- Built-in Domain-defined Attributes
 
-BuiltInDomainDefinedAttributes ::= SEQUENCE SIZE
-                    (1..ub-domain-defined-attributes) OF
-                    BuiltInDomainDefinedAttribute
+BuiltInDomainDefinedAttributes ::= SEQUENCE SIZE (1..ub-domain-defined-attributes)
+                                   OF BuiltInDomainDefinedAttribute
 
 BuiltInDomainDefinedAttribute ::= SEQUENCE {
-   type PrintableString (SIZE
-                   (1..ub-domain-defined-attribute-type-length)),
-   value PrintableString (SIZE
-                   (1..ub-domain-defined-attribute-value-length)) }
+   type PrintableString (SIZE (1..ub-domain-defined-attribute-type-length)),
+   value PrintableString (SIZE (1..ub-domain-defined-attribute-value-length)) }
 
 -- Extension Attributes
 
-ExtensionAttributes ::= SET SIZE (1..ub-extension-attributes) OF
-               ExtensionAttribute
+ExtensionAttributes ::= SET SIZE (1..ub-extension-attributes) OF ExtensionAttribute
 
 ExtensionAttribute ::=  SEQUENCE {
-   extension-attribute-type [0] IMPLICIT INTEGER
-                   (0..ub-extension-attributes),
-   extension-attribute-value [1]
-                   ANY DEFINED BY extension-attribute-type }
+   extension-attribute-type [0] IMPLICIT INTEGER (0..ub-extension-attributes),
+   extension-attribute-value [1] ANY DEFINED BY extension-attribute-type }
 
 -- Extension types and attribute values
 
@@ -463,10 +447,8 @@ unformatted-postal-address INTEGER ::= 16
 
 UnformattedPostalAddress ::= SET {
    printable-address SEQUENCE SIZE (1..ub-pds-physical-address-lines)
-         OF PrintableString (SIZE (1..ub-pds-parameter-length))
-         OPTIONAL,
-   teletex-string TeletexString
-         (SIZE (1..ub-unformatted-address-length)) OPTIONAL }
+                     OF PrintableString (SIZE (1..ub-pds-parameter-length)) OPTIONAL,
+   teletex-string TeletexString (SIZE (1..ub-unformatted-address-length)) OPTIONAL }
 
 street-address INTEGER ::= 17
 
@@ -520,8 +502,8 @@ TerminalType ::= INTEGER {
 
 teletex-domain-defined-attributes INTEGER ::= 6
 
-TeletexDomainDefinedAttributes ::= SEQUENCE SIZE
-   (1..ub-domain-defined-attributes) OF TeletexDomainDefinedAttribute
+TeletexDomainDefinedAttributes ::= SEQUENCE SIZE (1..ub-domain-defined-attributes)
+                                   OF TeletexDomainDefinedAttribute
 
 TeletexDomainDefinedAttribute ::= SEQUENCE {
    type TeletexString   (SIZE (1..ub-domain-defined-attribute-type-length)),
