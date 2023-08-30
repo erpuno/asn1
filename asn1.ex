@@ -450,15 +450,16 @@ public struct #{name} : Hashable, Sendable, Comparable {
   end
 
   def compile() do
-      {:ok, f} = :file.list_dir dir()
+      {:ok, f} = :file.list_dir inputDir()
       files = :lists.filter(fn x -> [_,y] = :string.tokens(x, '.') ; y == 'asn1' end, f)
-      :lists.map(fn file -> compile(false, dir() <> :erlang.list_to_binary(file))  end, files)
-      :lists.map(fn file -> compile(true,  dir() <> :erlang.list_to_binary(file))  end, files)
-      coverage()
+      :lists.map(fn file -> compile(false, inputDir() <> :erlang.list_to_binary(file))  end, files)
+      :lists.map(fn file -> compile(true,  inputDir() <> :erlang.list_to_binary(file))  end, files)
+      :io.format 'inputDir: ~ts~n', [inputDir()]
+      :io.format 'outputDir: ~ts~n', [outputDir()]
       :ok
   end
 
-  def coverage() do
+  def _coverage() do
       :io.format 'coverage (30 branches): ~p.~n',
          [:lists.map(fn x -> :application.get_env(:asn1scg,
               {:trace, x}, []) end,:lists.seq(1,30))] end
@@ -555,13 +556,16 @@ public struct #{name} : Hashable, Sendable, Comparable {
            emitIntegerEnums(cases)))
   end
 
-  def dir(), do: :application.get_env(:asn1scg, "input", "priv/apple/")
+  def inputDir(), do: :application.get_env(:asn1scg, "input", "priv/apple/")
+  def outputDir(), do: :application.get_env(:asn1scg, "output", "Sources/ASN1SCG/")
 
   def save(true, _, name, res) do
-      dir = :application.get_env(:asn1scg, "output", "Sources/ASN1SCG/")
+      dir = outputDir()
       :filelib.ensure_dir(dir)
-      fileName = dir <> normalizeName(bin(name)) <> ".swift"
-      :file.write_file(fileName,res)
+      norm = normalizeName(bin(name))
+      fileName = dir <> norm <> ".swift"
+      :ok = :file.write_file(fileName,res)
+      :io.format 'compiled: ~ts.swift~n', [norm]
   end
 
   def save(_, _, _, _), do: []

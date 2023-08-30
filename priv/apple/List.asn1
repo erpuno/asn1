@@ -44,7 +44,14 @@ List DEFINITIONS IMPLICIT TAGS ::= BEGIN
   K ::= SEQUENCE {
     version INTEGER { v1(1) },
     x INTEGER (0..3),
-    y SEQUENCE { d1 BOOLEAN, d2 BOOLEAN, d3 INTEGER, d4 INTEGER }
+    y SEQUENCE { d1 BOOLEAN,
+                 d2 BOOLEAN,
+                 d3 INTEGER,
+                 d4 INTEGER },
+    w SET OF SEQUENCE OF
+      SET OF SEQUENCE OF
+      SET OF SEQUENCE OF
+      SET OF SEQUENCE OF INTEGER
   }
 
   Versioning ::= INTEGER {  v1(0) }

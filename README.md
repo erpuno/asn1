@@ -27,6 +27,7 @@ Features
 * [x] Set of
 * [x] Sequence of
 * [x] Components of
+* [ ] Tensors
 
 Author
 ------

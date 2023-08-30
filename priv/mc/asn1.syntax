@@ -1,0 +1,88 @@
+# syntax highlighting for cobol.
+# the author is Wuerl, see https://midnight-commander.org/ticket/1987
+# adapted to use in mcedit version 4.8.24 by alex bodnaru <alexbodn@gmail.com>
+
+caseinsensitive
+
+context default
+    keyword .. white
+    keyword ; white
+    keyword { white
+    keyword } white
+    keyword ( white
+    keyword ) white
+    keyword [ white
+    keyword ] white
+
+wholechars abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._
+
+    keyword whole IA5String yellow
+    keyword whole UniversalString yellow
+    keyword whole PrintableString yellow
+    keyword whole TeletexString yellow
+    keyword whole UTF8String yellow
+    keyword whole BMPString yellow
+    keyword whole OCTET yellow
+    keyword whole REAL yellow
+    keyword whole URI yellow
+    keyword whole STRING yellow
+    keyword whole BIT yellow
+    keyword whole INTEGER yellow
+    keyword whole BOOLEAN yellow
+
+    keyword whole FALSE white
+    keyword whole TRUE white
+
+    keyword whole DEFAULT cyan
+    keyword whole OPTIONAL cyan
+    keyword whole DEFINITIONS cyan
+    keyword whole BEGIN cyan
+    keyword whole END cyan
+    keyword whole TAGS cyan
+    keyword whole OF cyan
+    keyword whole SIZE cyan
+    keyword MAX cyan
+    keyword whole EXPLICIT cyan
+    keyword whole IMPLICIT cyan
+    keyword whole SEQUENCE  cyan
+    keyword whole SET cyan
+    keyword whole CHOICE cyan
+    keyword whole ENUM cyan
+
+wholechars abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_
+
+context exclusive \-\- \n 	gray
+    spellcheck
+
+context exclusive whole <<\[\s\]\[-\]\[\s\]\[\\\]EOF EOF green
+context exclusive whole <<\[\s\]\[-\]\[\s\]\[\\\]END END green
+
+context ' ' green
+
+context " " green
+    keyword -- brightgreen
+    keyword wholeright $\[0123456789\] brightred
+
+    keyword wholeright $+ brightgreen
+
+    keyword $ brightgreen
+
+context exclusive ` ` lightgray black
+    keyword '*' green
+    keyword " green
+    keyword \\` green
+    keyword ; brightcyan
+    keyword $(*) brightgreen
+    keyword ${*} brightgreen
+    keyword { brightcyan
+    keyword } brightcyan
+
+context linestart # \n brightred
+    keyword \\\n yellow
+    keyword /\**\*/ brown
+    keyword //*\n brown
+    keyword "+" red
+    keyword <+> red
+
+wholechars abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._
+
