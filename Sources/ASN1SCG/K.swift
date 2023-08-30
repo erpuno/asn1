@@ -21,9 +21,9 @@ import Foundation
             let version = try K_version_IntEnum(rawValue: Int(derEncoded: &nodes))
             let x: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let y: K_y_Sequence = try K_y_Sequence(derEncoded: &nodes)
-            let w: [[ArraySlice<UInt8>]] = try DER.set<[[ArraySlice<UInt8>]]>(root, identifier: .set) { nodes in
+            let w: [[ArraySlice<UInt8>]] = try DER.set<[[ArraySlice<UInt8>]]>(nodes.next()!, identifier: .set) { nodes1 in
                    var wAcc: [[ArraySlice<UInt8>]] = []
-                   while let wInner = nodes.next() {
+                   while let wInner = nodes1.next() {
                        wAcc.append(try DER.sequence(of: ArraySlice<UInt8>.self, identifier: .sequence, rootNode: wInner))
                    }
                    return wAcc
@@ -36,8 +36,8 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(version.rawValue)
             try coder.serialize(x)
-            try coder.appendConstructedNode(identifier: ASN1Identifier.set) { codec in for element in w { try codec.serializeSequenceOf(element) } }
             try coder.serialize(y)
+            try coder.appendConstructedNode(identifier: ASN1Identifier.set) { codec in for element in w { try codec.serializeSequenceOf(element) } }
         }
     }
 }
