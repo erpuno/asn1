@@ -50,7 +50,7 @@ defmodule ASN1 do
   def substituteType("INTEGER"),           do: "ArraySlice<UInt8>"
   def substituteType("OCTET STRING"),      do: "ASN1OctetString"
   def substituteType("BIT STRING"),        do: "ASN1BitString"
-  def substituteType("OBJECT IDENTIFIER"), do: "ASN1Identifier"
+  def substituteType("OBJECT IDENTIFIER"), do: "ASN1ObjectIdentifier"
   def substituteType("BOOLEAN"),           do: "Bool"
   def substituteType("pt"),                do: "ASN1Any"
   def substituteType("ANY"),               do: "ASN1Any"

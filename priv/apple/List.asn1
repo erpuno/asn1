@@ -49,9 +49,11 @@ List DEFINITIONS IMPLICIT TAGS ::= BEGIN
                  d3 INTEGER,
                  d4 INTEGER },
     w SET OF SEQUENCE OF
-      SET OF SEQUENCE OF
-      SET OF SEQUENCE OF
       SET OF SEQUENCE OF INTEGER
+
+--      SEQUENCE OF
+--      SET OF SEQUENCE OF
+--      SET OF SEQUENCE OF INTEGER
   }
 
   Versioning ::= INTEGER {  v1(0) }
