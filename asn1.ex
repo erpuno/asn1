@@ -10,16 +10,8 @@ defmodule ASN1 do
   def fieldType(name,field,{:"CHOICE",_}), do: bin(name) <> "_" <> bin(field) <> "_Choice"
   def fieldType(name,field,{:"ENUMERATED",_}), do: bin(name) <> "_" <> bin(field) <> "_Enum"
   def fieldType(name,field,{:"INTEGER",_}), do: bin(name) <> "_" <> bin(field) <> "_IntEnum"
-  def fieldType(name,field,{:"SEQUENCE OF", type}) do
-      bin = sequenceOf(name,field,type)
-      setEnv({:array, bin}, {:sequence, part(bin, 1, :erlang.size(bin) - 2)})
-      bin
-  end
-  def fieldType(name,field,{:"SET OF", type}) do
-      bin = sequenceOf(name,field,type)
-      setEnv({:array, bin}, {:sequence, part(bin, 1, :erlang.size(bin) - 2)})
-      bin
-  end
+  def fieldType(name,field,{:"SEQUENCE OF", type}) do bin = sequenceOf(name,field,type) ; array(bin, partArray(bin), :sequence) end
+  def fieldType(name,field,{:"SET OF", type}) do bin = sequenceOf(name,field,type) ; array(bin, partArray(bin), :set) end
   def fieldType(_,_,{:contentType, {:Externaltypereference,_,_,type}}), do: "#{type}"
   def fieldType(_,_,{:"BIT STRING", _}), do: "ASN1BitString"
   def fieldType(_,_,{:pt, {_,_,_,type}, _}) when is_atom(type), do: "#{type}"
@@ -117,7 +109,7 @@ defmodule ASN1 do
 
   # Scalar Sum Component
 
-  def emitChoiceElement(name, type), do: "case #{name}(#{type})\n"
+  def emitChoiceElement(name, type), do: "case #{name}(#{lookup(bin(type))})\n"
   def emitChoiceEncoderBodyElement(w, no, name, spec) when no == [], do:
       pad(w) <> "case .#{name}(let #{name}): try coder.serialize#{spec}(#{name})"
   def emitChoiceEncoderBodyElement(w, no, name, spec), do:
@@ -329,6 +321,8 @@ public struct #{name} : Hashable, Sendable, Comparable {
            emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SetOf")
         {:ComponentType,_,fieldName,{:type,tag,type,_elementSet,[],:no},_optional,_,_} ->
            trace(10)
+#           :io.format 'tensor 1: ~p~n', [{fieldName, :application.get_env({:array, lookup(fieldType("",fieldName(fieldName),type)) })}]
+#           :io.format 'choice-en: ~p~n', [{fieldName,substituteType(lookup(fieldType("",fieldName,type)))}]
            case {part(lookup(fieldType("",fieldName,type)),0,1),
                  :application.get_env(:asn1scg, {:array, lookup(fieldType("",fieldName(fieldName),type))}, [])} do
                 {"[", {:set, _}} -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SetOf")
@@ -350,6 +344,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
                substituteType(lookup(fieldType("", fieldName(fieldName), type))), "set")
         {:ComponentType,_,fieldName,{:type,tag,type,_elementSet,[],:no},_optional,_,_} ->
            trace(13)
+#           :io.format 'choice-de: ~p~n', [{fieldName, substituteType(lookup(fieldType("",fieldName,type)))}]
            case {part(lookup(fieldType("",fieldName,type)),0,1),
                  :application.get_env(:asn1scg, {:array, lookup(fieldType("",fieldName(fieldName),type))}, [])} do
                 {"[", {:set, inner}} -> emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName), inner, "set")
@@ -380,6 +375,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
                     emitSequenceDecoderBodyElementIntEnum(fieldName(fieldName), substituteType(lookup(fieldType(name,fieldName(fieldName),type))))
                 {:Externaltypereference,_,_,inner} ->
                     trace(18)
+  #                  :io.format 'seq-de: ~p~n', [:application.get_env(:asn1scg, {:array, bin(inner)}, [])]
                     case :application.get_env(:asn1scg, {:array, bin(inner)}, []) do
                        {:sequence, _} -> emitSequenceDecoderBodyElementArray(optional, plicit(tag), tagNo(tag), fieldName(fieldName), substituteType(part(look,1,:erlang.size(look)-2)), "sequence")
                        {:set, _} -> emitSequenceDecoderBodyElementArray(optional, plicit(tag), tagNo(tag), fieldName(fieldName), substituteType(part(look,1,:erlang.size(look)-2)), "set")
@@ -411,6 +407,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
                     emitSequenceEncoderBodyElementIntEnum(tagNo(tag), fieldName(fieldName))
                 {:Externaltypereference,_,_,inner} ->
                     trace(24)
+ #                   :io.format 'seq-en: ~p~n', [:application.get_env(:asn1scg, {:array, bin(inner)}, [])]
                     case :application.get_env(:asn1scg, {:array, bin(inner)}, []) do
                        {:sequence, _} -> emitSequenceEncoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), "sequence")
                        {:set, _} -> emitSequenceEncoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), "set")
@@ -456,6 +453,11 @@ public struct #{name} : Hashable, Sendable, Comparable {
       :lists.map(fn file -> compile(true,  inputDir() <> :erlang.list_to_binary(file))  end, files)
       :io.format 'inputDir: ~ts~n', [inputDir()]
       :io.format 'outputDir: ~ts~n', [outputDir()]
+      :lists.foldl(fn {{:array,x},{tag,y}}, acc -> :io.format 'env array: ~ts = [~ts] ~tp ~n', [x,y,tag]
+                      {x,y}, _  when is_binary(x) -> :io.format 'env alias: ~ts = ~ts ~n', [x,y] 
+                      {{:type,x},y}, _ -> :io.format 'env type: ~ts = ... ~n', [x] 
+                      _, _ -> :ok
+      end, [], :application.get_all_env(:asn1scg))
       :ok
   end
 
@@ -477,6 +479,16 @@ public struct #{name} : Hashable, Sendable, Comparable {
       compileModule(pos, modname, defid, tagdefault, exports, imports)
   end
 
+  def array(name,type,tag) when tag == :sequence or tag == :set do
+      name1 = bin(normalizeName(name))
+      type1 = bin(type)
+      :io.format 'set array: ~ts = [~ts] ~n', [name1, type1]
+      setEnv(name1, "[#{type1}]")
+      setEnv("[#{name1}]", "[[#{type1}]]")
+      setEnv({:array, name1}, {tag, type1})
+      name1
+  end
+
   def compileType(_, name, typeDefinition, modname, save \\ true) do
       res = case typeDefinition do
           {:type, _, {:"INTEGER", cases}, _, [], :no} ->  setEnv(name, "Int") ; integerEnum(name, cases, modname, save)
@@ -484,12 +496,8 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, {:"CHOICE", cases}, _, [], :no} -> choice(name, cases, modname, save)
           {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
           {:type, _, {:"SET", _, _, _, fields}, _, _, :no} -> set(name, fields, modname, save)
-          {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
-                     inner = substituteType(lookup(type)) ; setEnv(name, "[" <> inner <> "]")
-                     setEnv({:array,bin(normalizeName(name))}, {:sequence, inner})
-          {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
-                     inner = substituteType(lookup(type)) ; setEnv(name, "[" <> inner <> "]")
-                     setEnv({:array,bin(normalizeName(name))}, {:set, inner})
+          {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> array(name,substituteType(lookup(type)),:sequence)
+          {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> array(name,substituteType(lookup(type)),:set)
           {:type, _, {:"BIT STRING",_}, _, [], :no} -> setEnv(name, "BIT STRING")
           {:type, _, :'BIT STRING', _, [], :no} -> setEnv(name, "BIT STRING")
           {:type, _, :'INTEGER', _set, [], :no} -> setEnv(name, "INTEGER")
@@ -503,7 +511,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, :'OBJECT IDENTIFIER', _, _, :no} -> setEnv(name, "OBJECT IDENTIFIER")
           {:type, _, :'OCTET STRING', [], [], :no} -> setEnv(name, "OCTET STRING")
           {:type, _, {:ObjectClassFieldType, _, _, _, _fields}, _, _, :no} -> :skip
-          {:type, _, {:Externaltypereference, _, _, ext}, _set, [], _} -> setEnv(name, ext)
+          {:type, _, {:Externaltypereference, _, _, ext}, _set, [], _} ->  setEnv(name, ext)
           {:type, _, {:pt, _, _}, _, [], _} -> :skip
           {:Object, _, _val} -> :skip
           {:Object, _, _, _} -> :ok
@@ -570,30 +578,13 @@ public struct #{name} : Hashable, Sendable, Comparable {
 
   def save(_, _, _, _), do: []
 
-  def normalizeName(name), do:
-      Enum.join(String.split("#{name}", "-"), "_")
-
-  def opt(:OPTIONAL), do: "?"
-  def opt(_), do: ""
-
-  def spec("sequence"), do: "SequenceOf"
-  def spec("set"), do: "SetOf"
-  def spec(_), do: ""
-
   def lookup(name) do
       b = bin(name)
       case :application.get_env(:asn1scg, b, b) do
-           a when a == b -> bin(b)
+           a when a == b -> bin(a)
            x -> lookup(x)
       end
   end
-
-  def setEnv(x,y), do:
-      :application.set_env(:asn1scg, bin(x), y)
-
-  def bin(x) when is_atom(x), do: :erlang.atom_to_binary x
-  def bin(x) when is_list(x), do: :erlang.list_to_binary x
-  def bin(x), do: x
 
   def plicit([]), do: ""
   def plicit([{:tag,:CONTEXT,_,{:default,:IMPLICIT},_}]), do: "Implicit"
@@ -602,20 +593,26 @@ public struct #{name} : Hashable, Sendable, Comparable {
   def plicit([{:tag,:CONTEXT,_,:EXPLICIT,_}]), do: "Explicit"
   def plicit(_), do: ""
 
+  def opt(:OPTIONAL), do: "?"
+  def opt(_), do: ""
+  def spec("sequence"), do: "SequenceOf"
+  def spec("set"), do: "SetOf"
+  def spec(_), do: ""
+  def trace(x), do: setEnv({:trace, x}, x)
+  def normalizeName(name), do: Enum.join(String.split("#{name}", "-"), "_")
+  def setEnv(x,y), do: :application.set_env(:asn1scg, bin(x), y)
+  def bin(x) when is_atom(x), do: :erlang.atom_to_binary x
+  def bin(x) when is_list(x), do: :erlang.list_to_binary x
+  def bin(x), do: x
   def tagNo([]), do: []
   def tagNo([{:tag,:CONTEXT,nox,_,_}]) do nox end
-
   def pad(x), do: String.duplicate(" ", x)
-
+  def partArray(bin), do: part(bin, 1, :erlang.size(bin) - 2)
   def part(a, x, y) do
       case :erlang.size(a) > y - x do
            true -> :binary.part(a, x, y)
               _ -> ""
       end
-  end
-
-  def trace(x) do
-      setEnv({:trace, x}, x)
   end
 
 end
