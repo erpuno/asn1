@@ -293,21 +293,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
                  :io.format 'seq: ~p : ~p~n', [fieldName,type]
                  array("[#{type}]", type, :sequence)
                  choice(fieldType(name,fieldName,sum), cases, [], true)
-#              {:"SEQUENCE OF", {:type, [], {:SET, _, _, _, fields} = product, _, _, _}} ->
-#                 :io.format 'seq: ~p : ~p~n', [fieldName,fieldType(name,fieldName,product)]
-#                 set(fieldType(name,fieldName,product), fields, [], true)
-#              {:"SET OF", {:type, [], {:SEQUENCE, _, _, _, fields} = product, _, _, _}} ->
-#                 sequence(fieldType(name,fieldName,product), fields, [], true)
-#              {:"SET OF", {:type, [], {:SET, _, _, _, fields} = product, _, _, _}} ->
-#                 set(fieldType(name,fieldName,product), fields, [], true)
-#              {:"SET OF", {:type, [], {:CHOICE, cases}, _, _, _} = sum} ->
-#                 choice(fieldType(name,fieldName,sum), cases, [], true)
-#              {:"SEQUENCE OF", {:type, [], {:"SET OF", _}, _, _, _}} ->
-#                 :io.format 'SEQUENCE OF SET ~p : ~p~n', [name,fieldType(name,fieldName,fieldType)]
-#              {:"SET OF", {:type, [], {:"SEQUENCE OF", _}, _, _, _}} ->
-#                 :io.format 'SET OF SEQUENCE ~p : ~p~n', [name,fieldType(name,fieldName,fieldType)]
               _ ->
-
                  :skip
            end
            :io.format 'field: ~p ~p ~n', [fieldName(fieldName), field]
