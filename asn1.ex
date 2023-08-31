@@ -2,6 +2,25 @@
 
 defmodule ASN1 do
 
+  def print(format, params) do
+      case :application.get_env(:asn1scg, "save", true) and :application.get_env(:asn1scg, "verbose", false) do
+           true -> :io.format(format, params)
+              _ -> []
+      end
+  end
+
+  def array(name,type,tag,level \\ "") when tag == :sequence or tag == :set do
+      name1 = bin(normalizeName(name))
+      type1 = bin(type)
+      case level do
+           "" -> []
+            _ -> print 'array: #{level} : ~ts = [~ts] ~p ~n', [name1, type1, tag]
+      end
+      setEnv(name1, "[#{type1}]")
+      setEnv({:array, name1}, {tag, type1})
+      name1
+  end
+
   def fieldName({:contentType, {:Externaltypereference,_,_mod, name}}), do: normalizeName("#{name}")
   def fieldName(name), do: normalizeName("#{name}")
 
@@ -10,8 +29,8 @@ defmodule ASN1 do
   def fieldType(name,field,{:"CHOICE",_}), do: bin(name) <> "_" <> bin(field) <> "_Choice"
   def fieldType(name,field,{:"ENUMERATED",_}), do: bin(name) <> "_" <> bin(field) <> "_Enum"
   def fieldType(name,field,{:"INTEGER",_}), do: bin(name) <> "_" <> bin(field) <> "_IntEnum"
-  def fieldType(name,field,{:"SEQUENCE OF", type}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set)  end
-  def fieldType(name,field,{:"SET OF", type}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set)  end
+  def fieldType(name,field,{:"SEQUENCE OF", type}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :sequence, "pro #{name}.#{field}")  end
+  def fieldType(name,field,{:"SET OF", type}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set, "pro #{name}.#{field}")  end
   def fieldType(_,_,{:contentType, {:Externaltypereference,_,_,type}}), do: "#{type}"
   def fieldType(_,_,{:"BIT STRING", _}), do: "ASN1BitString"
   def fieldType(_,_,{:pt, {_,_,_,type}, _}) when is_atom(type), do: "#{type}"
@@ -22,8 +41,8 @@ defmodule ASN1 do
   def fieldType(name,_,_), do: "#{name}"
 
   def sequenceOf(name,field,{:type,_,{:Externaltypereference,_,_,type},_,_,_}), do: "#{sequenceOf(name,field,type)}"
-  def sequenceOf(name,field,{:type,_,{:"SET OF", type} = sum,_,_,_}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set)  end
-  def sequenceOf(name,field,{:type,_,{:"SEQUENCE OF", type} = sum,_,_,_}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :sequence) end
+  def sequenceOf(name,field,{:type,_,{:"SET OF", type},_,_,_}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set, "arr #{name}.#{field}")  end
+  def sequenceOf(name,field,{:type,_,{:"SEQUENCE OF", type},_,_,_}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :sequence, "arr #{name}.#{field}") end
   def sequenceOf(name,field,{:type,_,{:CHOICE, cases} = sum,_,_,_}) do
       choice(fieldType(name,field,sum), cases, [], true) ; bin(name) <> "_" <> bin(field) <> "_Choice" end
   def sequenceOf(name,field,{:type,_,{:SEQUENCE, _, _, _, fields} = product,_,_,_}) do
@@ -283,20 +302,10 @@ public struct #{name} : Hashable, Sendable, Comparable {
                  integerEnum(fieldType(name,fieldName,fieldType), cases, modname, true)
               {:ENUMERATED, cases} ->
                  enumeration(fieldType(name,fieldName,fieldType), cases, modname, true)
-              {:"SEQUENCE OF", {:type, [], {:SEQUENCE, _, _, _, fields} = product, _, _, _}} ->
-                 type = fieldType(name,fieldName,product)
-                 :io.format 'seq: ~p : ~p~n', [fieldName,type]
-                 array("[#{type}]", type, :sequence)
-                 sequence(fieldType(name,fieldName,product), fields, [], true)
-              {:"SEQUENCE OF", {:type, [], {:CHOICE, cases}, _, _, _} = sum} ->
-                 type = fieldType(name,fieldName,sum)
-                 :io.format 'seq: ~p : ~p~n', [fieldName,type]
-                 array("[#{type}]", type, :sequence)
-                 choice(fieldType(name,fieldName,sum), cases, [], true)
               _ ->
                  :skip
            end
-           :io.format 'field: ~p ~p ~n', [fieldName(fieldName), field]
+           print 'field: ~ts.~ts : ~ts ~n', [name,fieldName(fieldName), substituteType(lookup(field))]
            pad(w) <> 
                 emitSequenceElementOptional(fieldName(fieldName), substituteType(lookup(field)), opt(optional))
          _ -> ""
@@ -450,22 +459,22 @@ public struct #{name} : Hashable, Sendable, Comparable {
   def compile() do
       {:ok, f} = :file.list_dir inputDir()
       files = :lists.filter(fn x -> [_,y] = :string.tokens(x, '.') ; y == 'asn1' end, f)
-      :lists.map(fn file -> compile(false, inputDir() <> :erlang.list_to_binary(file))  end, files)
-      :lists.map(fn file -> compile(true,  inputDir() <> :erlang.list_to_binary(file))  end, files)
-      :io.format 'inputDir: ~ts~n', [inputDir()]
-      :io.format 'outputDir: ~ts~n', [outputDir()]
-      :lists.foldl(fn {{:array,x},{tag,y}}, acc -> :io.format 'env array: ~ts = [~ts] ~tp ~n', [x,y,tag]
-                      {x,y}, _  when is_binary(x) -> :io.format 'env alias: ~ts = ~ts ~n', [x,y] 
-                      {{:type,x},y}, _ -> :io.format 'env type: ~ts = ... ~n', [x] 
+      setEnv(:save, false) ; :lists.map(fn file -> compile(false, inputDir() <> :erlang.list_to_binary(file))  end, files)
+      setEnv(:save, true)  ; :lists.map(fn file -> compile(true,  inputDir() <> :erlang.list_to_binary(file))  end, files)
+      print 'inputDir: ~ts~n', [inputDir()]
+      print 'outputDir: ~ts~n', [outputDir()]
+      print 'coverage: ~tp~n', [coverage()]
+      :lists.foldl(fn {{:array,x},{tag,y}}, _ -> print 'env array: ~ts = [~ts] ~tp ~n', [x,y,tag]
+                      {x,y}, _  when is_binary(x) -> print 'env alias: ~ts = ~ts ~n', [x,y] 
+                      {{:type,x},_}, _ -> print 'env type: ~ts = ... ~n', [x] 
                       _, _ -> :ok
-      end, [], :application.get_all_env(:asn1scg))
+      end, [], :lists.sort(:application.get_all_env(:asn1scg)))
       :ok
   end
 
-  def _coverage() do
-      :io.format 'coverage (30 branches): ~p.~n',
-         [:lists.map(fn x -> :application.get_env(:asn1scg,
-              {:trace, x}, []) end,:lists.seq(1,30))] end
+  def coverage() do
+         :lists.map(fn x -> :application.get_env(:asn1scg,
+              {:trace, x}, []) end,:lists.seq(1,30)) end
 
   def compile(save, file) do
       tokens = :asn1ct_tok.file file
@@ -480,16 +489,6 @@ public struct #{name} : Hashable, Sendable, Comparable {
       compileModule(pos, modname, defid, tagdefault, exports, imports)
   end
 
-  def array(name,type,tag) when tag == :sequence or tag == :set do
-      name1 = bin(normalizeName(name))
-      type1 = bin(type)
-      :io.format 'set array: ~ts = [~ts] ~p ~n', [name1, type1, tag]
-      setEnv(name1, "[#{type1}]")
-      setEnv("[#{name1}]", "[[#{type1}]]")
-      setEnv({:array, name1}, {tag, type1})
-      name1
-  end
-
   def compileType(_, name, typeDefinition, modname, save \\ true) do
       res = case typeDefinition do
           {:type, _, {:"INTEGER", cases}, _, [], :no} ->  setEnv(name, "Int") ; integerEnum(name, cases, modname, save)
@@ -497,8 +496,8 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, {:"CHOICE", cases}, _, [], :no} -> choice(name, cases, modname, save)
           {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
           {:type, _, {:"SET", _, _, _, fields}, _, _, :no} -> set(name, fields, modname, save)
-          {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> array(name,substituteType(lookup(type)),:sequence)
-          {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> array(name,substituteType(lookup(type)),:set)
+          {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> array(name,substituteType(lookup(type)),:sequence,"top")
+          {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> array(name,substituteType(lookup(type)),:set,"top")
           {:type, _, {:"BIT STRING",_}, _, [], :no} -> setEnv(name, "BIT STRING")
           {:type, _, :'BIT STRING', _, [], :no} -> setEnv(name, "BIT STRING")
           {:type, _, :'INTEGER', _set, [], :no} -> setEnv(name, "INTEGER")
@@ -520,7 +519,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
           _ -> :skip
       end
       case res do
-           :skip -> :io.format 'Unhandled type definition ~p: ~p~n', [name, typeDefinition]
+           :skip -> print 'Unhandled type definition ~p: ~p~n', [name, typeDefinition]
                _ -> :skip
       end
   end
@@ -574,7 +573,8 @@ public struct #{name} : Hashable, Sendable, Comparable {
       norm = normalizeName(bin(name))
       fileName = dir <> norm <> ".swift"
       :ok = :file.write_file(fileName,res)
-      :io.format 'compiled: ~ts.swift~n', [norm]
+      verbose = getEnv(:verbose, false) ; setEnv(:verbose, true)
+      print 'compiled: ~ts.swift~n', [norm] ; setEnv(:verbose, verbose)
   end
 
   def save(_, _, _, _), do: []
@@ -602,6 +602,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
   def trace(x), do: setEnv({:trace, x}, x)
   def normalizeName(name), do: Enum.join(String.split("#{name}", "-"), "_")
   def setEnv(x,y), do: :application.set_env(:asn1scg, bin(x), y)
+  def getEnv(x,y), do: :application.get_env(:asn1scg, bin(x), y)
   def bin(x) when is_atom(x), do: :erlang.atom_to_binary x
   def bin(x) when is_list(x), do: :erlang.list_to_binary x
   def bin(x), do: x
@@ -619,10 +620,13 @@ public struct #{name} : Hashable, Sendable, Comparable {
 end
 
 case System.argv() do
-  ["compile"]      -> ASN1.compile
-  ["compile",i]    -> ASN1.setEnv(:input, i <> "/") ; ASN1.compile
-  ["compile",i,o]  -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.compile
+  ["compile"]          -> ASN1.compile
+  ["compile","-v"]     -> ASN1.setEnv(:verbose, true) ; ASN1.compile
+  ["compile",i]        -> ASN1.setEnv(:input, i <> "/") ; ASN1.compile
+  ["compile","-v",i]   -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:verbose, true) ; ASN1.compile
+  ["compile",i,o]      -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.compile
+  ["compile","-v",i,o] -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.setEnv(:verbose, true) ; ASN1.compile
   _ -> :io.format('Copyright © 2023 Namdak Tonpa.~n')
        :io.format('ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 0.9.1.~n')
-       :io.format('Usage: ./asn1.ex help | compile [input] [output]~n')
+       :io.format('Usage: ./asn1.ex help | compile [-v] [input [output]]~n')
 end
