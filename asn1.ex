@@ -10,8 +10,8 @@ defmodule ASN1 do
   def fieldType(name,field,{:"CHOICE",_}), do: bin(name) <> "_" <> bin(field) <> "_Choice"
   def fieldType(name,field,{:"ENUMERATED",_}), do: bin(name) <> "_" <> bin(field) <> "_Enum"
   def fieldType(name,field,{:"INTEGER",_}), do: bin(name) <> "_" <> bin(field) <> "_IntEnum"
-  def fieldType(name,field,{:"SEQUENCE OF", type}) do bin = sequenceOf(name,field,type) ; array(bin, partArray(bin), :sequence) end
-  def fieldType(name,field,{:"SET OF", type}) do bin = sequenceOf(name,field,type) ; array(bin, partArray(bin), :set) end
+  def fieldType(name,field,{:"SEQUENCE OF", type}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set)  end
+  def fieldType(name,field,{:"SET OF", type}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set)  end
   def fieldType(_,_,{:contentType, {:Externaltypereference,_,_,type}}), do: "#{type}"
   def fieldType(_,_,{:"BIT STRING", _}), do: "ASN1BitString"
   def fieldType(_,_,{:pt, {_,_,_,type}, _}) when is_atom(type), do: "#{type}"
@@ -21,14 +21,16 @@ defmodule ASN1 do
   def fieldType(_,_,type) when is_atom(type), do: "#{type}"
   def fieldType(name,_,_), do: "#{name}"
 
-  def sequenceOf(name,field,{:type,_,{:Externaltypereference,_,_,type},_,_,_}), do: "[#{sequenceOf(name,field,type)}]"
+  def sequenceOf(name,field,{:type,_,{:Externaltypereference,_,_,type},_,_,_}), do: "#{sequenceOf(name,field,type)}"
+  def sequenceOf(name,field,{:type,_,{:"SET OF", type} = sum,_,_,_}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set)  end
+  def sequenceOf(name,field,{:type,_,{:"SEQUENCE OF", type} = sum,_,_,_}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :sequence) end
   def sequenceOf(name,field,{:type,_,{:CHOICE, cases} = sum,_,_,_}) do
-      choice(fieldType(name,field,sum), cases, [], true) ; "[" <> bin(name) <> "_" <> bin(field) <> "_Choice]" end
+      choice(fieldType(name,field,sum), cases, [], true) ; bin(name) <> "_" <> bin(field) <> "_Choice" end
   def sequenceOf(name,field,{:type,_,{:SEQUENCE, _, _, _, fields} = product,_,_,_}) do
-      sequence(fieldType(name,field,product), fields, [], true) ; "[" <> bin(name) <> "_" <> bin(field) <> "_Sequence]" end
-  def sequenceOf(name,field,{:type,_,type,_,_,_}) do "[#{sequenceOf(name,field,type)}]" end
+      sequence(fieldType(name,field,product), fields, [], true) ; bin(name) <> "_" <> bin(field) <> "_Sequence" end
+  def sequenceOf(name,field,{:type,_,type,_,_,_}) do "#{sequenceOf(name,field,type)}" end
   def sequenceOf(_,_,{:Externaltypereference, _, _, name}) do :application.get_env(:asn1scg, bin(name), bin(name)) end
-  def sequenceOf(_,_,x) when is_tuple(x), do: substituteType(bin(:erlang.element(1, x)))
+  def sequenceOf(_,_,x) when is_tuple(x), do: substituteType("#{bin(:erlang.element(1, x))}")
   def sequenceOf(_,_,x) when is_atom(x), do: substituteType("#{lookup(x)}")
   def sequenceOf(_,_,x) when is_binary(x), do: substituteType("#{lookup(x)}")
 
@@ -59,7 +61,6 @@ defmodule ASN1 do
   def emitIntegerEnumElement(field, value), do: pad(4) <> "public static let #{field} = Self(rawValue: #{value})\n"
   def emitOptional(:OPTIONAL, name, body), do: "if let #{name} = self.#{name} { #{body} }"
   def emitOptional(_, _, body), do: "#{body}"
-  def emitSequenceElement(name, type), do: "@usableFromInline var #{name}: #{lookup(normalizeName(type))}\n"
   def emitSequenceElementOptional(name, type, opt \\ ""), do: "@usableFromInline var #{name}: #{lookup(normalizeName(type))}#{opt}\n"
 
   # Vector Decoder
@@ -283,16 +284,35 @@ public struct #{name} : Hashable, Sendable, Comparable {
               {:ENUMERATED, cases} ->
                  enumeration(fieldType(name,fieldName,fieldType), cases, modname, true)
               {:"SEQUENCE OF", {:type, [], {:SEQUENCE, _, _, _, fields} = product, _, _, _}} ->
+                 type = fieldType(name,fieldName,product)
+                 :io.format 'seq: ~p : ~p~n', [fieldName,type]
+                 array("[#{type}]", type, :sequence)
                  sequence(fieldType(name,fieldName,product), fields, [], true)
               {:"SEQUENCE OF", {:type, [], {:CHOICE, cases}, _, _, _} = sum} ->
+                 type = fieldType(name,fieldName,sum)
+                 :io.format 'seq: ~p : ~p~n', [fieldName,type]
+                 array("[#{type}]", type, :sequence)
                  choice(fieldType(name,fieldName,sum), cases, [], true)
-              {:"SET OF", {:type, [], {:SEQUENCE, _, _, _, fields} = product, _, _, _}} ->
-                 sequence(fieldType(name,fieldName,product), fields, [], true)
-              {:"SET OF", {:type, [], {:CHOICE, cases}, _, _, _} = sum} ->
-                 choice(fieldType(name,fieldName,sum), cases, [], true)
-              _ -> :skip
+#              {:"SEQUENCE OF", {:type, [], {:SET, _, _, _, fields} = product, _, _, _}} ->
+#                 :io.format 'seq: ~p : ~p~n', [fieldName,fieldType(name,fieldName,product)]
+#                 set(fieldType(name,fieldName,product), fields, [], true)
+#              {:"SET OF", {:type, [], {:SEQUENCE, _, _, _, fields} = product, _, _, _}} ->
+#                 sequence(fieldType(name,fieldName,product), fields, [], true)
+#              {:"SET OF", {:type, [], {:SET, _, _, _, fields} = product, _, _, _}} ->
+#                 set(fieldType(name,fieldName,product), fields, [], true)
+#              {:"SET OF", {:type, [], {:CHOICE, cases}, _, _, _} = sum} ->
+#                 choice(fieldType(name,fieldName,sum), cases, [], true)
+#              {:"SEQUENCE OF", {:type, [], {:"SET OF", _}, _, _, _}} ->
+#                 :io.format 'SEQUENCE OF SET ~p : ~p~n', [name,fieldType(name,fieldName,fieldType)]
+#              {:"SET OF", {:type, [], {:"SEQUENCE OF", _}, _, _, _}} ->
+#                 :io.format 'SET OF SEQUENCE ~p : ~p~n', [name,fieldType(name,fieldName,fieldType)]
+              _ ->
+
+                 :skip
            end
-           pad(w) <> emitSequenceElementOptional(fieldName(fieldName), substituteType(lookup(field)), opt(optional))
+           :io.format 'field: ~p ~p ~n', [fieldName(fieldName), field]
+           pad(w) <> 
+                emitSequenceElementOptional(fieldName(fieldName), substituteType(lookup(field)), opt(optional))
          _ -> ""
       end, fields), "")
   end
@@ -321,8 +341,6 @@ public struct #{name} : Hashable, Sendable, Comparable {
            emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SetOf")
         {:ComponentType,_,fieldName,{:type,tag,type,_elementSet,[],:no},_optional,_,_} ->
            trace(10)
-#           :io.format 'tensor 1: ~p~n', [{fieldName, :application.get_env({:array, lookup(fieldType("",fieldName(fieldName),type)) })}]
-#           :io.format 'choice-en: ~p~n', [{fieldName,substituteType(lookup(fieldType("",fieldName,type)))}]
            case {part(lookup(fieldType("",fieldName,type)),0,1),
                  :application.get_env(:asn1scg, {:array, lookup(fieldType("",fieldName(fieldName),type))}, [])} do
                 {"[", {:set, _}} -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SetOf")
@@ -344,7 +362,6 @@ public struct #{name} : Hashable, Sendable, Comparable {
                substituteType(lookup(fieldType("", fieldName(fieldName), type))), "set")
         {:ComponentType,_,fieldName,{:type,tag,type,_elementSet,[],:no},_optional,_,_} ->
            trace(13)
-#           :io.format 'choice-de: ~p~n', [{fieldName, substituteType(lookup(fieldType("",fieldName,type)))}]
            case {part(lookup(fieldType("",fieldName,type)),0,1),
                  :application.get_env(:asn1scg, {:array, lookup(fieldType("",fieldName(fieldName),type))}, [])} do
                 {"[", {:set, inner}} -> emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName), inner, "set")
@@ -375,7 +392,6 @@ public struct #{name} : Hashable, Sendable, Comparable {
                     emitSequenceDecoderBodyElementIntEnum(fieldName(fieldName), substituteType(lookup(fieldType(name,fieldName(fieldName),type))))
                 {:Externaltypereference,_,_,inner} ->
                     trace(18)
-  #                  :io.format 'seq-de: ~p~n', [:application.get_env(:asn1scg, {:array, bin(inner)}, [])]
                     case :application.get_env(:asn1scg, {:array, bin(inner)}, []) do
                        {:sequence, _} -> emitSequenceDecoderBodyElementArray(optional, plicit(tag), tagNo(tag), fieldName(fieldName), substituteType(part(look,1,:erlang.size(look)-2)), "sequence")
                        {:set, _} -> emitSequenceDecoderBodyElementArray(optional, plicit(tag), tagNo(tag), fieldName(fieldName), substituteType(part(look,1,:erlang.size(look)-2)), "set")
@@ -407,7 +423,6 @@ public struct #{name} : Hashable, Sendable, Comparable {
                     emitSequenceEncoderBodyElementIntEnum(tagNo(tag), fieldName(fieldName))
                 {:Externaltypereference,_,_,inner} ->
                     trace(24)
- #                   :io.format 'seq-en: ~p~n', [:application.get_env(:asn1scg, {:array, bin(inner)}, [])]
                     case :application.get_env(:asn1scg, {:array, bin(inner)}, []) do
                        {:sequence, _} -> emitSequenceEncoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), "sequence")
                        {:set, _} -> emitSequenceEncoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), "set")
@@ -482,7 +497,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
   def array(name,type,tag) when tag == :sequence or tag == :set do
       name1 = bin(normalizeName(name))
       type1 = bin(type)
-      :io.format 'set array: ~ts = [~ts] ~n', [name1, type1]
+      :io.format 'set array: ~ts = [~ts] ~p ~n', [name1, type1, tag]
       setEnv(name1, "[#{type1}]")
       setEnv("[#{name1}]", "[[#{type1}]]")
       setEnv({:array, name1}, {tag, type1})
@@ -511,7 +526,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, :'OBJECT IDENTIFIER', _, _, :no} -> setEnv(name, "OBJECT IDENTIFIER")
           {:type, _, :'OCTET STRING', [], [], :no} -> setEnv(name, "OCTET STRING")
           {:type, _, {:ObjectClassFieldType, _, _, _, _fields}, _, _, :no} -> :skip
-          {:type, _, {:Externaltypereference, _, _, ext}, _set, [], _} ->  setEnv(name, ext)
+          {:type, _, {:Externaltypereference, _, _, ext}, _set, [], _} -> setEnv(name, ext)
           {:type, _, {:pt, _, _}, _, [], _} -> :skip
           {:Object, _, _val} -> :skip
           {:Object, _, _, _} -> :ok
