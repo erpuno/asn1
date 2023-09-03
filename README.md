@@ -29,6 +29,12 @@ Features
 * [x] Components of
 * [ ] Tensors
 
+Publications
+------------
+
+[1]. <a href="https://tonpa.guru/stream/2023/2023-08-08 ASN.1 Компілятор.htm">2023-08-08 ASN.1 Компілятор</a><br>
+[2]. <a href="https://tonpa.guru/stream/2023/2023-09-01 ASN1.EX X.680.htm">2023-09-01 ASN1.EX X.680</a><br>
+
 Author
 ------
 
