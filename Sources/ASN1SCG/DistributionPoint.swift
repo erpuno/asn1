@@ -27,7 +27,6 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             if let distributionPoint = self.distributionPoint { 
-//       try coder.serializeOptionalImplicitlyTagged(distributionPoint, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
                 try coder.appendConstructedNode(
                 identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific),
                 { coder in try coder.serialize(distributionPoint) })
