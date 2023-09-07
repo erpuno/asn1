@@ -351,10 +351,10 @@ PersonalName ::= SET {
 
 OrganizationalUnitNames ::= SEQUENCE SIZE (1..ub-organizational-units)
                             OF OrganizationalUnitName
-  -- see also teletex-organizational-unit-names
 
 OrganizationalUnitName ::= PrintableString (SIZE
                     (1..ub-organizational-unit-name-length))
+  -- see also teletex-organizational-unit-names
 
 -- Built-in Domain-defined Attributes
 

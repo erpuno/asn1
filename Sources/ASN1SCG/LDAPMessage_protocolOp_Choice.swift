@@ -39,8 +39,8 @@ import Foundation
                 self = .searchResEntry(try SearchResultEntry(derEncoded: rootNode))
             case LDAPResult.defaultIdentifier:
                 self = .searchResDone(try LDAPResult(derEncoded: rootNode))
-            case ASN1Identifier.set:
-                self = .searchResRef(try DER.set(of: ASN1OctetString.self, identifier: .set, rootNode: rootNode))
+            case ASN1Identifier.sequence:
+                self = .searchResRef(try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, rootNode: rootNode))
             case ModifyRequest.defaultIdentifier:
                 self = .modifyRequest(try ModifyRequest(derEncoded: rootNode))
             case LDAPResult.defaultIdentifier:
@@ -81,7 +81,7 @@ import Foundation
             case .searchRequest(let searchRequest): try coder.serialize(searchRequest)
             case .searchResEntry(let searchResEntry): try coder.serialize(searchResEntry)
             case .searchResDone(let searchResDone): try coder.serialize(searchResDone)
-            case .searchResRef(let searchResRef): try coder.serializeSetOf(searchResRef)
+            case .searchResRef(let searchResRef): try coder.serializeSequenceOf(searchResRef)
             case .modifyRequest(let modifyRequest): try coder.serialize(modifyRequest)
             case .modifyResponse(let modifyResponse): try coder.serialize(modifyResponse)
             case .addRequest(let addRequest): try coder.serialize(addRequest)
