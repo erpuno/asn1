@@ -36,11 +36,11 @@ defmodule ASN1 do
   def fieldType(_,_,{:"BIT STRING", _}), do: "ASN1BitString"
   def fieldType(_,_,{:pt, {_,_,_,type}, _}) when is_atom(type), do: "#{type}"
   def fieldType(_,_,{:ANY_DEFINED_BY, type}) when is_atom(type), do: "ASN1Any"
-  def fieldType(name,field,{:Externaltypereference,_,_,type}) when type == :OrganizationalUnitNames do
+  def fieldType(_name,_field,{:Externaltypereference,_,_,type}) when type == :OrganizationalUnitNames do
 #      :io.format 'seqof:1: ~p.~p ~ts~n', [name, field, type ] #lookup(bin(type)) ]
       "#{substituteType(lookup(bin(type)))}"
   end
-  def fieldType(name,field,{:Externaltypereference,_,_,type}) do
+  def fieldType(_name,_field,{:Externaltypereference,_,_,type}) do
 #      :io.format 'seqof:2: ~p.~p ~ts~n', [name, field, :io_lib.format('~p',[type]) ]
        "#{substituteType(lookup(bin(type)))}"
   end
