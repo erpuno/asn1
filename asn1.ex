@@ -49,7 +49,7 @@ defmodule ASN1 do
   def fieldType(name,_,_), do: "#{name}"
 
   def sequenceOf(name,field,type) do
-      :io.format 'seqof:3: ~p.~p~n', [name, field]
+#      :io.format 'seqof:3: ~p.~p~n', [name, field]
       sequenceOf2(name,field,type)
   end
 
@@ -288,13 +288,25 @@ public struct #{name} : Hashable, Sendable, Comparable {
   end
 
 
-  def emitCases(name, w, cases) when is_list(cases) do
+  def emitCases(name, w, cases, modname) when is_list(cases) do
       Enum.join(:lists.map(fn
         {:ComponentType,_,fieldName,{:type,_,fieldType,_elementSet,[],:no},_optional,_,_} ->
            trace(3)
            field = fieldType(name, fieldName, fieldType)
+           case fieldType do
+              {:SEQUENCE, _, _, _, fields} ->
+                 sequence(fieldType(name,fieldName,fieldType), fields, modname, true)
+              {:CHOICE, cases} ->
+                 choice(fieldType(name,fieldName,fieldType), cases, modname, true)
+              {:INTEGER, cases} ->
+                 integerEnum(fieldType(name,fieldName,fieldType), cases, modname, true)
+              {:ENUMERATED, cases} ->
+                 enumeration(fieldType(name,fieldName,fieldType), cases, modname, true)
+              _ ->
+                 :skip
+           end
            pad(w) <> emitChoiceElement(fieldName(fieldName), substituteType(lookup(field)))
-         _ -> ""
+          _ -> ""
       end, cases), "")
   end
 
@@ -570,7 +582,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
 
   def choice(name, cases, modname, saveFlag) do
       save(saveFlag, modname, name, emitChoiceDefinition(normalizeName(name),
-          emitCases(name, 4, cases),
+          emitCases(name, 4, cases, modname),
           emitChoiceDecoder(emitChoiceDecoderBody(name,cases)),
           emitChoiceEncoder(emitChoiceEncoderBody(name,cases))))
   end
