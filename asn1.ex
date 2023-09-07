@@ -543,14 +543,14 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, :'IA5String', _set, [], :no} -> setEnv(name, "IA5String")
           {:type, _, :'TeletexString', _set, [], :no} -> setEnv(name, "TeletexString")
           {:type, _, :'UniversalString', _set, [], :no} -> setEnv(name, "UniversalString")
-          {:type, _, :'OBJECT IDENTIFIER', _, _, :no} -> setEnv(name, "OBJECT IDENTIFIER")
+          {:type, _, :'OBJECT IDENTIFIER', _, _, :no} -> setEnv(name, "OBJECT IDENTIFIER") ; :skip
           {:type, _, :'OCTET STRING', [], [], :no} -> setEnv(name, "OCTET STRING")
-          {:type, _, {:ObjectClassFieldType, _, _, _, _fields}, _, _, :no} -> :skip
           {:type, _, {:Externaltypereference, _, _, ext}, _set, [], _} -> setEnv(name, ext)
           {:type, _, {:pt, _, _}, _, [], _} -> :skip
+          {:type, _, {:ObjectClassFieldType, _, _, _, _fields}, _, _, :no} -> :skip
           {:Object, _, _val} -> :skip
-          {:Object, _, _, _} -> :ok
-          {:ObjectSet, _, _, _, _} -> :ok
+          {:Object, _, _, _} -> :skip
+          {:ObjectSet, _, _, _, _} -> :skip
           _ -> :skip
       end
       case res do
@@ -559,9 +559,9 @@ public struct #{name} : Hashable, Sendable, Comparable {
       end
   end
 
-  def compileValue(_pos, _name, _type, _value, _mod), do: []
-  def compileClass(_pos, _name, _mod, _type), do: []
-  def compilePType(_pos, _name, _args, _type), do: []
+  def compileValue(_pos, _name, _type, _value, _mod), do: print 'Unhandled value definition ~p : ~p = ~p ~n', [_name, _type, _value] ; []
+  def compileClass(_pos, _name, _mod, _type), do: print 'Unhandled class definition ~p : ~p~n', [_name, _type] ; []
+  def compilePType(_pos, _name, _args, _type), do: print 'Unhandled PType definition ~p : ~p(~p)~n', [_name, _type, _args] ; []
   def compileModule(_pos, _name, _defid, _tagdefault, _exports, _imports), do: []
 
   def sequence(name, fields, modname, saveFlag) do
