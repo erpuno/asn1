@@ -559,9 +559,9 @@ public struct #{name} : Hashable, Sendable, Comparable {
       end
   end
 
-  def compileValue(_pos, _name, _type, _value, _mod), do: print 'Unhandled value definition ~p : ~p = ~p ~n', [_name, _type, _value] ; []
-  def compileClass(_pos, _name, _mod, _type), do: print 'Unhandled class definition ~p : ~p~n', [_name, _type] ; []
-  def compilePType(_pos, _name, _args, _type), do: print 'Unhandled PType definition ~p : ~p(~p)~n', [_name, _type, _args] ; []
+  def compileValue(_pos, name, type, value, _mod), do: print 'Unhandled value definition ~p : ~p = ~p ~n', [name, type, value] ; []
+  def compileClass(_pos, name, _mod, type), do: print 'Unhandled class definition ~p : ~p~n', [name, type] ; []
+  def compilePType(_pos, name, args, type), do: print 'Unhandled PType definition ~p : ~p(~p)~n', [name, type, args] ; []
   def compileModule(_pos, _name, _defid, _tagdefault, _exports, _imports), do: []
 
   def sequence(name, fields, modname, saveFlag) do
