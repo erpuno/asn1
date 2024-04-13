@@ -5,17 +5,17 @@ import Foundation
 
 @usableFromInline struct OtherRevocationInfoFormat: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var otherRevInfoFormat: ASN1ObjectIdentifier
-    @usableFromInline var otherRevInfo: ASN1Any
-    @inlinable init(otherRevInfoFormat: ASN1ObjectIdentifier, otherRevInfo: ASN1Any) {
+    @usableFromInline var otherRevInfoFormat: id
+    @usableFromInline var otherRevInfo: Type
+    @inlinable init(otherRevInfoFormat: id, otherRevInfo: Type) {
         self.otherRevInfoFormat = otherRevInfoFormat
         self.otherRevInfo = otherRevInfo
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let otherRevInfoFormat: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let otherRevInfo: ASN1Any = try ASN1Any(derEncoded: &nodes)
+            let otherRevInfoFormat: id = try id(derEncoded: &nodes)
+            let otherRevInfo: Type = try Type(derEncoded: &nodes)
             return OtherRevocationInfoFormat(otherRevInfoFormat: otherRevInfoFormat, otherRevInfo: otherRevInfo)
         }
     }

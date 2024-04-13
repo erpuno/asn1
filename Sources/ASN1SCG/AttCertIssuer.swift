@@ -8,8 +8,8 @@ import Foundation
     case v2Form(V2Form)
     @inlinable init(derEncoded rootNode: ASN1Node) throws {
         switch rootNode.identifier {
-            case ASN1Identifier.sequence:
-                self = .v1Form(try DER.sequence(of: GeneralName.self, identifier: rootNode.identifier, rootNode: rootNode))
+            case [GeneralName].defaultIdentifier:
+                self = .v1Form(try [GeneralName](derEncoded: rootNode))
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
                 self = .v2Form(try V2Form(derEncoded: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
@@ -17,7 +17,7 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer) throws {
         switch self {
-            case .v1Form(let v1Form): try coder.serializeSequenceOf(v1Form)
+            case .v1Form(let v1Form): try coder.serialize(v1Form)
             case .v2Form(let v2Form):
                 try coder.appendConstructedNode(
                 identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific),

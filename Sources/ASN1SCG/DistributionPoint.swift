@@ -16,8 +16,7 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            nodes.next()
-            let distributionPoint: DistributionPointName? = try DistributionPointName(derEncoded: &nodes)
+            let distributionPoint: DistributionPointName? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let reasons: ASN1BitString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let cRLIssuer: [GeneralName] = try DER.sequence(of: GeneralName.self, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific), nodes: &nodes)
             return DistributionPoint(distributionPoint: distributionPoint, reasons: reasons, cRLIssuer: cRLIssuer)
@@ -26,11 +25,7 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let distributionPoint = self.distributionPoint { 
-                try coder.appendConstructedNode(
-                identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific),
-                { coder in try coder.serialize(distributionPoint) })
-            }
+            if let distributionPoint = self.distributionPoint { try coder.serializeOptionalImplicitlyTagged(distributionPoint, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
             if let reasons = self.reasons { try coder.serializeOptionalImplicitlyTagged(reasons, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
             if let cRLIssuer = self.cRLIssuer { try coder.serializeSequenceOf(cRLIssuer, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
         }

@@ -47,11 +47,13 @@ List DEFINITIONS IMPLICIT TAGS ::= BEGIN
     y SEQUENCE { d1 BOOLEAN,
                  d2 BOOLEAN,
                  d3 INTEGER,
-                 d4 INTEGER },
-    w SET OF
-      SEQUENCE OF
-      SET OF
-      SEQUENCE OF INTEGER -- [[[[Int]]]]
+                 d4 INTEGER }
+
+--    w SET OF
+--      SEQUENCE OF
+--      SET OF
+--      SEQUENCE OF INTEGER
+-- 
 
 --      SEQUENCE OF
 --      SET OF SEQUENCE OF

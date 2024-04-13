@@ -5,16 +5,17 @@ import Foundation
 
 @usableFromInline struct ContentInfo: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var contentType: ASN1ObjectIdentifier
-    @usableFromInline var content: ASN1Any
-    @inlinable init(contentType: ASN1ObjectIdentifier, content: ASN1Any) {
+    @usableFromInline var contentType: id
+    @usableFromInline var content: Type
+    @inlinable init(contentType: id, content: Type) {
         self.contentType = contentType
         self.content = content
     }
-    @inlinable init(derEncoded root: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
+    @inlinable init(derEncoded root: ASN1Node,
+        withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let contentType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let content: ASN1Any = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ASN1Any(derEncoded: node) }
+            let contentType: id = try id(derEncoded: &nodes)
+            let content: Type = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try Type(derEncoded: node) }
             return ContentInfo(contentType: contentType, content: content)
         }
     }

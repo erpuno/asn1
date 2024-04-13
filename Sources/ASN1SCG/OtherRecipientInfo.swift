@@ -5,17 +5,17 @@ import Foundation
 
 @usableFromInline struct OtherRecipientInfo: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var oriType: ASN1ObjectIdentifier
-    @usableFromInline var oriValue: ASN1Any
-    @inlinable init(oriType: ASN1ObjectIdentifier, oriValue: ASN1Any) {
+    @usableFromInline var oriType: id
+    @usableFromInline var oriValue: Type
+    @inlinable init(oriType: id, oriValue: Type) {
         self.oriType = oriType
         self.oriValue = oriValue
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let oriType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let oriValue: ASN1Any = try ASN1Any(derEncoded: &nodes)
+            let oriType: id = try id(derEncoded: &nodes)
+            let oriValue: Type = try Type(derEncoded: &nodes)
             return OtherRecipientInfo(oriType: oriType, oriValue: oriValue)
         }
     }

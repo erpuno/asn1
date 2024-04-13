@@ -9,9 +9,9 @@ import Foundation
     @inlinable init(derEncoded rootNode: ASN1Node) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .fullName(try DER.sequence(of: GeneralName.self, identifier: rootNode.identifier, rootNode: rootNode))
+                self = .fullName(try [GeneralName](derEncoded: rootNode))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .nameRelativeToCRLIssuer(try DER.sequence(of: AttributeTypeAndValue.self, identifier: rootNode.identifier, rootNode: rootNode))
+                self = .nameRelativeToCRLIssuer(try [AttributeTypeAndValue](derEncoded: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
@@ -20,11 +20,11 @@ import Foundation
             case .fullName(let fullName):
                 try coder.appendConstructedNode(
                 identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific),
-                { coder in try coder.serializeSequenceOf(fullName) })
+                { coder in try coder.serialize(fullName) })
             case .nameRelativeToCRLIssuer(let nameRelativeToCRLIssuer):
                 try coder.appendConstructedNode(
                 identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific),
-                { coder in try coder.serializeSequenceOf(nameRelativeToCRLIssuer) })
+                { coder in try coder.serialize(nameRelativeToCRLIssuer) })
         }
     }
 

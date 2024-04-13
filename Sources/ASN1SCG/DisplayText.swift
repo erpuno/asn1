@@ -5,15 +5,15 @@ import Foundation
 
 @usableFromInline indirect enum DisplayText: DERParseable, DERSerializable, Hashable, Sendable {
     case ia5String(ASN1IA5String)
-    case visibleString(ASN1UTF8String)
+    case visibleString(VisibleString)
     case bmpString(ASN1BMPString)
     case utf8String(ASN1UTF8String)
     @inlinable init(derEncoded rootNode: ASN1Node) throws {
         switch rootNode.identifier {
             case ASN1IA5String.defaultIdentifier:
                 self = .ia5String(try ASN1IA5String(derEncoded: rootNode))
-            case ASN1Identifier.visibleString:
-                self = .visibleString(try ASN1UTF8String(derEncoded: rootNode))
+            case VisibleString.defaultIdentifier:
+                self = .visibleString(try VisibleString(derEncoded: rootNode))
             case ASN1BMPString.defaultIdentifier:
                 self = .bmpString(try ASN1BMPString(derEncoded: rootNode))
             case ASN1UTF8String.defaultIdentifier:

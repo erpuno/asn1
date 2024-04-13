@@ -5,17 +5,17 @@ import Foundation
 
 @usableFromInline struct OtherKeyAttribute: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var keyAttrId: ASN1ObjectIdentifier
-    @usableFromInline var keyAttr: ASN1Any
-    @inlinable init(keyAttrId: ASN1ObjectIdentifier, keyAttr: ASN1Any) {
+    @usableFromInline var keyAttrId: id
+    @usableFromInline var keyAttr: Type
+    @inlinable init(keyAttrId: id, keyAttr: Type) {
         self.keyAttrId = keyAttrId
         self.keyAttr = keyAttr
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let keyAttrId: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let keyAttr: ASN1Any = try ASN1Any(derEncoded: &nodes)
+            let keyAttrId: id = try id(derEncoded: &nodes)
+            let keyAttr: Type = try Type(derEncoded: &nodes)
             return OtherKeyAttribute(keyAttrId: keyAttrId, keyAttr: keyAttr)
         }
     }

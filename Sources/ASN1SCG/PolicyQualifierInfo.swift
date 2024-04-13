@@ -5,17 +5,17 @@ import Foundation
 
 @usableFromInline struct PolicyQualifierInfo: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var policyQualifierId: ASN1ObjectIdentifier
-    @usableFromInline var qualifier: ASN1Any
-    @inlinable init(policyQualifierId: ASN1ObjectIdentifier, qualifier: ASN1Any) {
+    @usableFromInline var policyQualifierId: id
+    @usableFromInline var qualifier: Type
+    @inlinable init(policyQualifierId: id, qualifier: Type) {
         self.policyQualifierId = policyQualifierId
         self.qualifier = qualifier
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let policyQualifierId: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let qualifier: ASN1Any = try ASN1Any(derEncoded: &nodes)
+            let policyQualifierId: id = try id(derEncoded: &nodes)
+            let qualifier: Type = try Type(derEncoded: &nodes)
             return PolicyQualifierInfo(policyQualifierId: policyQualifierId, qualifier: qualifier)
         }
     }
