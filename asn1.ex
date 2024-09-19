@@ -1,6 +1,120 @@
 #!/usr/bin/env elixir
+  defmodule ASN1SwiftCodeGenerator do
+
+    def var_decl(index) do
+        """
+        var w#{index} : #{variable_type(index)} = []
+        """
+    end
+    def generate_swift_code(identifiers, default) do
+      variable_names = Enum.reverse(identifiers)
+      if length(identifiers) < 2 do
+        default
+      else
+      ser = generate_serialize_code(tl(identifiers))
+      methods = generate_method(length(identifiers), identifiers, length(variable_names))
+      """
+      @inlinable init(derEncoded root: ASN1Node,
+      withIdentifier identifier: ASN1Identifier) throws {
+    let res = #{methods}
+
+    self.w = res
+      }
+    #{ser}
+    """
+    end
+    end
+
+    def generate_method(len, identifiers, level) do
+        if level == 0 do
+         """
+            contentsOf: try DER.sequence(of: ArraySlice<UInt8>.self, identifier: .sequence, rootNode: node0)
+        """
+        else
+        dd =hd(identifiers)
+        winner =  if( len == length(identifiers), do:  "root", else: "node#{level}")
+        case dd do
+            ".sequence" -> """
+            try DER.sequence(#{winner }, identifier: .sequence) { nodes#{level} in \n
+             #{var_decl(level)}
+              while let node#{level-1} = nodes#{level}.next() {
+               w#{level}.append(
+                #{generate_method(len, tl(identifiers), level - 1)}
+               )
+            }
+            return w#{level}\n
+              }
+            """
+            ".set" -> """
+            try DER.set(#{winner}, identifier: .set) { nodes#{level} in \n
+            #{var_decl(level)}
+            while let node#{level-1} = nodes#{level}.next() {
+            w#{level}.append(
+            #{generate_method(len, tl(identifiers), level - 1)}
+            )
+            }\n
+            return w#{level}
+            }\n
+            """
+          _ -> "try DER.sequence(root, identifier: .sequence, rootNode: nodes)"
+        end
+        # dd =
+        end
+    end
+
+    def variable_type(level) do
+      String.duplicate("[",  level) <> "ArraySlice<UInt8>" <> String.duplicate("]", level)
+    end
+
+    defp generate_serialize_code(variable_names) do
+      serialize_body = generate_serialize_body(tl(variable_names), "codec1", "element")
+
+      """
+      @inlinable func serialize(into coder: inout DER.Serializer,
+          withIdentifier identifier: ASN1Identifier) throws {
+          try coder.appendConstructedNode(identifier: identifier) {coder_ in
+          try coder_.appendConstructedNode(identifier: #{hd(variable_names)}) {
+           codec1 in for element in w {
+              #{serialize_body}
+          }}
+          }
+      }
+      """
+    end
+
+    defp generate_serialize_body([current | rest], variable_name, element) do
+      next_variable_name = "#{variable_name}_1"
+      next_element = "#{element}_1"
+      """
+      try #{variable_name}.appendConstructedNode(identifier: #{current}) {
+      #{next_variable_name} in for #{next_element} in #{element} {
+              #{generate_serialize_body(rest, next_variable_name, next_element)}
+          }
+      }
+      """
+    end
+
+    defp generate_serialize_body([], variable_name, element) do
+      """
+      try #{variable_name}.serializeSequenceOf(#{element})
+      """
+    end
+end
+
+
 
 defmodule ASN1 do
+  def get_sequence_and_set_of({:type, _, inner_type, _, _, _} = node, acc) do
+    IO.inspect(inner_type)
+      case inner_type do
+        {:"SEQUENCE OF", res } -> get_sequence_and_set_of(res, [".sequence" | acc])
+        {:"SET OF",res } -> get_sequence_and_set_of(res , [".set" | acc])
+        _ -> acc
+    end
+  end
+
+
+
 
   def print(format, params) do
       case :application.get_env(:asn1scg, "save", true) and :application.get_env(:asn1scg, "verbose", false) do
@@ -171,12 +285,14 @@ defmodule ASN1 do
       pad(w) <> "case ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific):\n" <>
       pad(w+4) <> "self = .#{name}(try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: rootNode))"
 
-  def emitSequenceDefinition(name,fields,ctor,decoder,encoder), do:
+  def emitSequenceDefinition(name,fields,ctor,decoder,encoder, kek), do:
 """
 #{emitImprint()}
 import SwiftASN1\nimport Crypto\nimport Foundation\n
 @usableFromInline struct #{name}: DERImplicitlyTaggable, Hashable, Sendable {
-    @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }\n#{fields}#{ctor}#{decoder}#{encoder}}
+    @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }\n#{fields}#{ctor}
+     #{kek};\n
+     }
 """
 
   def emitSetDefinition(name,fields,ctor,decoder,encoder), do:
@@ -526,25 +642,32 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, {:"INTEGER", cases}, _, [], :no} ->  setEnv(name, "Int") ; integerEnum(name, cases, modname, save)
           {:type, _, {:"ENUMERATED", cases}, _, [], :no} -> enumeration(name, cases, modname, save)
           {:type, _, {:"CHOICE", cases}, _, [], :no} -> choice(name, cases, modname, save)
-          {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
-          {:type, _, {:"SET", _, _, _, fields}, _, _, :no} -> set(name, fields, modname, save)
+        #   {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
+          {:type, _, {:"SET", _, _, _, fields}, _, _, :no} ->
+            :io.format ~c'seqof:548: ~p ~p ~n', [name, name]
+            set(name, fields, modname, save)
           {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
+              :io.format ~c'seqof:548: ~p ~p ~n', [name, type]
                array(name,substituteType(lookup(bin(type))),:sequence,"top")
           {:type, [], {:"SEQUENCE OF", {_, _, {_, _, _, _,_type}, _, _, _}}, _, _, _} ->
               :io.format ~c'seqof:536: ~p ~n', [name]
           {:type, [], {:"SEQUENCE OF", {_, _, {_, _, _, _, _,type}, _, _, _}}, _, _, _} ->
+              :io.format ~c'seqof:548: ~p ~p ~n', [name, type]
                array(name,substituteType(lookup(bin(type))),:sequence,"top")
           {:type, [], {:"SEQUENCE OF", {_, _, {_,{_,_, type, _},_} , _, _, _}}, _, _, _} ->
+              :io.format ~c'seqof:548: ~p ~p ~n', [name, type]
                array(name,substituteType(lookup(bin(type))),:sequence,"top")
           {:type, [], {:"SEQUENCE OF", {_, _, :"OBJECT IDENTIFIER" , _, _, _}}, _, _, _} ->
             :skip
           {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
+              :io.format ~c'seqof:548: ~p ~p ~n', [name, type]
                array(name,substituteType(lookup(bin(type))),:set,"top")
           {:type, [], {:"SET OF", {_, _, {_, _, _, _, type}, _, _, _}}, _, _, _} ->
+              :io.format ~c'seqof:548: ~p ~p ~n', [name, type]
                array(name,substituteType(lookup(bin(type))),:set,"top")
           {:type, [], {:"SET OF", {_, _, {_, {_, _, type, _}, _}, _, _, _}}, _, _, _} ->
             #    array(name,substituteType(lookup(bin(type))),:set,"top")
-            #   :io.format ~c'seqof:548: ~p ~p ~n', [name, type]
+              :io.format ~c'seqof:548: ~p ~p ~n', [name, type]
               array(name,substituteType(lookup(bin(type))),:set,"top")
             #   exit(1)
           {:type, _, {:"BIT STRING",_}, _, [], :no} -> setEnv(name, "BIT STRING")
@@ -566,6 +689,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:Object, _, _val} -> :skip
           {:Object, _, _, _} -> :skip
           {:ObjectSet, _, _, _, _} -> :skip
+          _ -> :skip
       end
       case res do
            :skip -> print ~c'Unhandled type definition ~p: ~p~n', [name, typeDefinition]
@@ -580,10 +704,16 @@ public struct #{name} : Hashable, Sendable, Comparable {
 
   def sequence(name, fields, modname, saveFlag) do
       :application.set_env(:asn1scg, {:type,name}, fields)
+      res = Enum.at(fields, 0)
+      {_, _ , _ ,ff, _, _ , _} = res
+      kek =  get_sequence_and_set_of(ff, [])
+      decoder = emitSequenceDecoder(emitSequenceDecoderBody(name, fields), name, emitArgs(fields))
+      encoder = emitSequenceEncoder(emitSequenceEncoderBody(name, fields))
+      default = "#{decoder} #{encoder}"
+      lol =  ASN1SwiftCodeGenerator.generate_swift_code(kek, default)
       save(saveFlag, modname, name, emitSequenceDefinition(normalizeName(name),
           emitFields(name, 4, fields, modname), emitCtor(emitParams(name,fields), emitCtorBody(fields)),
-          emitSequenceDecoder(emitSequenceDecoderBody(name, fields), name, emitArgs(fields)),
-          emitSequenceEncoder(emitSequenceEncoderBody(name, fields))))
+          decoder, encoder, lol))
   end
 
   def set(name, fields, modname, saveFlag) do
