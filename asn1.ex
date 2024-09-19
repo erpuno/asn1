@@ -1,18 +1,19 @@
 #!/usr/bin/env elixir
   defmodule ASN1SwiftCodeGenerator do
 
-    def var_decl(index) do
+    def var_decl(index, type) do
         """
-        var w#{index} : #{variable_type(index)} = []
+        var w#{index} : #{variable_type(index, type)} = []
         """
     end
-    def generate_swift_code(identifiers, default) do
+    def generate_swift_code(identifiers, default, type) do
       variable_names = Enum.reverse(identifiers)
       if length(identifiers) < 2 do
         default
       else
       ser = generate_serialize_code(tl(identifiers))
-      methods = generate_method(length(identifiers), identifiers, length(variable_names))
+      IO.inspect(type)
+      methods = generate_method(length(identifiers), identifiers, length(variable_names), type)
       """
       @inlinable init(derEncoded root: ASN1Node,
       withIdentifier identifier: ASN1Identifier) throws {
@@ -25,10 +26,10 @@
     end
     end
 
-    def generate_method(len, identifiers, level) do
+    def generate_method(len, identifiers, level, type) do
         if level == 0 do
          """
-            contentsOf: try DER.sequence(of: ArraySlice<UInt8>.self, identifier: .sequence, rootNode: node0)
+            contentsOf: try DER.sequence(of: #{type}.self, identifier: .sequence, rootNode: node0)
         """
         else
         dd =hd(identifiers)
@@ -36,10 +37,10 @@
         case dd do
             ".sequence" -> """
             try DER.sequence(#{winner }, identifier: .sequence) { nodes#{level} in \n
-             #{var_decl(level)}
+             #{var_decl(level, type)}
               while let node#{level-1} = nodes#{level}.next() {
                w#{level}.append(
-                #{generate_method(len, tl(identifiers), level - 1)}
+                #{generate_method(len, tl(identifiers), level - 1, type )}
                )
             }
             return w#{level}\n
@@ -47,10 +48,10 @@
             """
             ".set" -> """
             try DER.set(#{winner}, identifier: .set) { nodes#{level} in \n
-            #{var_decl(level)}
+            #{var_decl(level, type)}
             while let node#{level-1} = nodes#{level}.next() {
             w#{level}.append(
-            #{generate_method(len, tl(identifiers), level - 1)}
+            #{generate_method(len, tl(identifiers), level - 1, type)}
             )
             }\n
             return w#{level}
@@ -62,8 +63,9 @@
         end
     end
 
-    def variable_type(level) do
-      String.duplicate("[",  level) <> "ArraySlice<UInt8>" <> String.duplicate("]", level)
+    def variable_type(level, type) do
+        IO.inspect(type)
+      String.duplicate("[",  level) <> type <> String.duplicate("]", level)
     end
 
     defp generate_serialize_code(variable_names) do
@@ -105,11 +107,10 @@ end
 
 defmodule ASN1 do
   def get_sequence_and_set_of({:type, _, inner_type, _, _, _} = node, acc) do
-    IO.inspect(inner_type)
       case inner_type do
         {:"SEQUENCE OF", res } -> get_sequence_and_set_of(res, [".sequence" | acc])
         {:"SET OF",res } -> get_sequence_and_set_of(res , [".set" | acc])
-        _ -> acc
+        _ -> {acc, inner_type}
     end
   end
 
@@ -705,11 +706,11 @@ public struct #{name} : Hashable, Sendable, Comparable {
       :application.set_env(:asn1scg, {:type,name}, fields)
       res = Enum.at(fields, 0)
       {_, _ , _ ,ff, _, _ , _} = res
-      kek =  get_sequence_and_set_of(ff, [])
+      {kek, type } =  get_sequence_and_set_of(ff, [])
       decoder = emitSequenceDecoder(emitSequenceDecoderBody(name, fields), name, emitArgs(fields))
       encoder = emitSequenceEncoder(emitSequenceEncoderBody(name, fields))
       default = "#{decoder} #{encoder}"
-      lol =  ASN1SwiftCodeGenerator.generate_swift_code(kek, default)
+      lol =  ASN1SwiftCodeGenerator.generate_swift_code(kek, default, substituteType(lookup(bin(type))))
       save(saveFlag, modname, name, emitSequenceDefinition(normalizeName(name),
           emitFields(name, 4, fields, modname), emitCtor(emitParams(name,fields), emitCtorBody(fields)),
           decoder, encoder, lol))

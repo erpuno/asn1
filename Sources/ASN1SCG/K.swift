@@ -5,8 +5,8 @@ import SwiftASN1
 
 @usableFromInline struct K: DERImplicitlyTaggable, Hashable, Sendable {
   @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-  @usableFromInline var w: [[[[[[[[[[[[ArraySlice<UInt8>]]]]]]]]]]]]
-  @inlinable init(w: [[[[[[[[[[[[ArraySlice<UInt8>]]]]]]]]]]]]) {
+  @usableFromInline var w: [[[Bool]]]
+  @inlinable init(w: [[[Bool]]]) {
     self.w = w
   }
 
@@ -14,165 +14,42 @@ import SwiftASN1
     derEncoded root: ASN1Node,
     withIdentifier identifier: ASN1Identifier
   ) throws {
-    let res = try DER.sequence(root, identifier: .sequence) { nodes12 in
+    let res = try DER.sequence(root, identifier: .sequence) { nodes3 in
 
-      var w12: [[[[[[[[[[[[ArraySlice<UInt8>]]]]]]]]]]]] = []
+      var w3: [[[Bool]]] = []
 
-      while let node11 = nodes12.next() {
-        w12.append(
-          try DER.set(node11, identifier: .set) { nodes11 in
+      while let node2 = nodes3.next() {
+        w3.append(
+          try DER.sequence(node2, identifier: .sequence) { nodes2 in
 
-            var w11: [[[[[[[[[[[ArraySlice<UInt8>]]]]]]]]]]] = []
+            var w2: [[Bool]] = []
 
-            while let node10 = nodes11.next() {
-              w11.append(
-                try DER.sequence(node10, identifier: .sequence) { nodes10 in
+            while let node1 = nodes2.next() {
+              w2.append(
+                try DER.set(node1, identifier: .set) { nodes1 in
 
-                  var w10: [[[[[[[[[[ArraySlice<UInt8>]]]]]]]]]] = []
+                  var w1: [Bool] = []
 
-                  while let node9 = nodes10.next() {
-                    w10.append(
-                      try DER.set(node9, identifier: .set) { nodes9 in
-
-                        var w9: [[[[[[[[[ArraySlice<UInt8>]]]]]]]]] = []
-
-                        while let node8 = nodes9.next() {
-                          w9.append(
-                            try DER.sequence(node8, identifier: .sequence) { nodes8 in
-
-                              var w8: [[[[[[[[ArraySlice<UInt8>]]]]]]]] = []
-
-                              while let node7 = nodes8.next() {
-                                w8.append(
-                                  try DER.set(node7, identifier: .set) { nodes7 in
-
-                                    var w7: [[[[[[[ArraySlice<UInt8>]]]]]]] = []
-
-                                    while let node6 = nodes7.next() {
-                                      w7.append(
-                                        try DER.sequence(node6, identifier: .sequence) { nodes6 in
-
-                                          var w6: [[[[[[ArraySlice<UInt8>]]]]]] = []
-
-                                          while let node5 = nodes6.next() {
-                                            w6.append(
-                                              try DER.set(node5, identifier: .set) { nodes5 in
-
-                                                var w5: [[[[[ArraySlice<UInt8>]]]]] = []
-
-                                                while let node4 = nodes5.next() {
-                                                  w5.append(
-                                                    try DER.sequence(node4, identifier: .sequence) {
-                                                      nodes4 in
-
-                                                      var w4: [[[[ArraySlice<UInt8>]]]] = []
-
-                                                      while let node3 = nodes4.next() {
-                                                        w4.append(
-                                                          try DER.set(node3, identifier: .set) {
-                                                            nodes3 in
-
-                                                            var w3: [[[ArraySlice<UInt8>]]] = []
-
-                                                            while let node2 = nodes3.next() {
-                                                              w3.append(
-                                                                try DER.sequence(
-                                                                  node2, identifier: .sequence
-                                                                ) { nodes2 in
-
-                                                                  var w2: [[ArraySlice<UInt8>]] = []
-
-                                                                  while let node1 = nodes2.next() {
-                                                                    w2.append(
-                                                                      try DER.set(
-                                                                        node1, identifier: .set
-                                                                      ) { nodes1 in
-
-                                                                        var w1:
-                                                                          [ArraySlice<UInt8>] = []
-
-                                                                        while let node0 =
-                                                                          nodes1.next()
-                                                                        {
-                                                                          w1.append(
-                                                                            contentsOf:
-                                                                              try DER.sequence(
-                                                                                of: ArraySlice<
-                                                                                  UInt8
-                                                                                >.self,
-                                                                                identifier:
-                                                                                  .sequence,
-                                                                                rootNode: node0)
-
-                                                                          )
-                                                                        }
-
-                                                                        return w1
-                                                                      }
-
-                                                                    )
-                                                                  }
-                                                                  return w2
-
-                                                                }
-
-                                                              )
-                                                            }
-
-                                                            return w3
-                                                          }
-
-                                                        )
-                                                      }
-                                                      return w4
-
-                                                    }
-
-                                                  )
-                                                }
-
-                                                return w5
-                                              }
-
-                                            )
-                                          }
-                                          return w6
-
-                                        }
-
-                                      )
-                                    }
-
-                                    return w7
-                                  }
-
-                                )
-                              }
-                              return w8
-
-                            }
-
-                          )
-                        }
-
-                        return w9
-                      }
+                  while let node0 = nodes1.next() {
+                    w1.append(
+                      contentsOf: try DER.sequence(
+                        of: Bool.self, identifier: .sequence, rootNode: node0)
 
                     )
                   }
-                  return w10
 
+                  return w1
                 }
 
               )
             }
+            return w2
 
-            return w11
           }
 
         )
       }
-      return w12
+      return w3
 
     }
 
@@ -183,79 +60,13 @@ import SwiftASN1
     withIdentifier identifier: ASN1Identifier
   ) throws {
     try coder.appendConstructedNode(identifier: identifier) { coder_ in
-      try coder_.appendConstructedNode(identifier: .set) {
+      try coder_.appendConstructedNode(identifier: .sequence) {
         codec1 in
         for element in w {
-          try codec1.appendConstructedNode(identifier: .sequence) {
+          try codec1.appendConstructedNode(identifier: .set) {
             codec1_1 in
             for element_1 in element {
-              try codec1_1.appendConstructedNode(identifier: .set) {
-                codec1_1_1 in
-                for element_1_1 in element_1 {
-                  try codec1_1_1.appendConstructedNode(identifier: .sequence) {
-                    codec1_1_1_1 in
-                    for element_1_1_1 in element_1_1 {
-                      try codec1_1_1_1.appendConstructedNode(identifier: .set) {
-                        codec1_1_1_1_1 in
-                        for element_1_1_1_1 in element_1_1_1 {
-                          try codec1_1_1_1_1.appendConstructedNode(identifier: .sequence) {
-                            codec1_1_1_1_1_1 in
-                            for element_1_1_1_1_1 in element_1_1_1_1 {
-                              try codec1_1_1_1_1_1.appendConstructedNode(identifier: .set) {
-                                codec1_1_1_1_1_1_1 in
-                                for element_1_1_1_1_1_1 in element_1_1_1_1_1 {
-                                  try codec1_1_1_1_1_1_1.appendConstructedNode(
-                                    identifier: .sequence
-                                  ) {
-                                    codec1_1_1_1_1_1_1_1 in
-                                    for element_1_1_1_1_1_1_1 in element_1_1_1_1_1_1 {
-                                      try codec1_1_1_1_1_1_1_1.appendConstructedNode(
-                                        identifier: .set
-                                      ) {
-                                        codec1_1_1_1_1_1_1_1_1 in
-                                        for element_1_1_1_1_1_1_1_1 in element_1_1_1_1_1_1_1 {
-                                          try codec1_1_1_1_1_1_1_1_1.appendConstructedNode(
-                                            identifier: .sequence
-                                          ) {
-                                            codec1_1_1_1_1_1_1_1_1_1 in
-                                            for element_1_1_1_1_1_1_1_1_1 in element_1_1_1_1_1_1_1_1
-                                            {
-                                              try codec1_1_1_1_1_1_1_1_1_1.appendConstructedNode(
-                                                identifier: .set
-                                              ) {
-                                                codec1_1_1_1_1_1_1_1_1_1_1 in
-                                                for element_1_1_1_1_1_1_1_1_1_1
-                                                  in element_1_1_1_1_1_1_1_1_1
-                                                {
-                                                  try codec1_1_1_1_1_1_1_1_1_1_1.serializeSequenceOf(
-                                                    element_1_1_1_1_1_1_1_1_1_1)
-
-                                                }
-                                              }
-
-                                            }
-                                          }
-
-                                        }
-                                      }
-
-                                    }
-                                  }
-
-                                }
-                              }
-
-                            }
-                          }
-
-                        }
-                      }
-
-                    }
-                  }
-
-                }
-              }
+              try codec1_1.serializeSequenceOf(element_1)
 
             }
           }

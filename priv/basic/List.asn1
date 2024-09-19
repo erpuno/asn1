@@ -6,16 +6,7 @@ List DEFINITIONS IMPLICIT TAGS ::= BEGIN
 
     w SET OF
       SEQUENCE OF
-      SET OF
-      SEQUENCE OF
-      SET OF
-      SEQUENCE OF
-      SET OF
-      SEQUENCE OF
-      SET OF
-      SEQUENCE OF
-      SET OF
-      SEQUENCE OF INTEGER
+      SEQUENCE OF BOOLEAN 
   }
 
 END
