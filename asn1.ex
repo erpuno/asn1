@@ -1,6 +1,121 @@
 #!/usr/bin/env elixir
+  defmodule ASN1SwiftCodeGenerator do
+
+    def var_decl(index, type) do
+        """
+        var w#{index} : #{variable_type(index, type)} = []
+        """
+    end
+    def generate_swift_code(identifiers, default, type) do
+      variable_names = Enum.reverse(identifiers)
+      if length(identifiers) < 2 do
+        default
+      else
+      ser = generate_serialize_code(tl(identifiers))
+      IO.inspect(type)
+      methods = generate_method(length(identifiers), identifiers, length(variable_names), type)
+      """
+      @inlinable init(derEncoded root: ASN1Node,
+      withIdentifier identifier: ASN1Identifier) throws {
+    let res = #{methods}
+
+    self.w = res
+      }
+    #{ser}
+    """
+    end
+    end
+
+    def generate_method(len, identifiers, level, type) do
+        if level == 0 do
+         """
+            contentsOf: try DER.sequence(of: #{type}.self, identifier: .sequence, rootNode: node0)
+        """
+        else
+        dd =hd(identifiers)
+        winner =  if( len == length(identifiers), do:  "root", else: "node#{level}")
+        case dd do
+            ".sequence" -> """
+            try DER.sequence(#{winner }, identifier: .sequence) { nodes#{level} in \n
+             #{var_decl(level, type)}
+              while let node#{level-1} = nodes#{level}.next() {
+               w#{level}.append(
+                #{generate_method(len, tl(identifiers), level - 1, type )}
+               )
+            }
+            return w#{level}\n
+              }
+            """
+            ".set" -> """
+            try DER.set(#{winner}, identifier: .set) { nodes#{level} in \n
+            #{var_decl(level, type)}
+            while let node#{level-1} = nodes#{level}.next() {
+            w#{level}.append(
+            #{generate_method(len, tl(identifiers), level - 1, type)}
+            )
+            }\n
+            return w#{level}
+            }\n
+            """
+          _ -> "try DER.sequence(root, identifier: .sequence, rootNode: nodes)"
+        end
+        # dd =
+        end
+    end
+
+    def variable_type(level, type) do
+        IO.inspect(type)
+      String.duplicate("[",  level) <> type <> String.duplicate("]", level)
+    end
+
+    defp generate_serialize_code(variable_names) do
+      serialize_body = generate_serialize_body(tl(variable_names), "codec1", "element")
+
+      """
+      @inlinable func serialize(into coder: inout DER.Serializer,
+          withIdentifier identifier: ASN1Identifier) throws {
+          try coder.appendConstructedNode(identifier: identifier) {coder_ in
+          try coder_.appendConstructedNode(identifier: #{hd(variable_names)}) {
+           codec1 in for element in w {
+              #{serialize_body}
+          }}
+          }
+      }
+      """
+    end
+
+    defp generate_serialize_body([current | rest], variable_name, element) do
+      next_variable_name = "#{variable_name}_1"
+      next_element = "#{element}_1"
+      """
+      try #{variable_name}.appendConstructedNode(identifier: #{current}) {
+      #{next_variable_name} in for #{next_element} in #{element} {
+              #{generate_serialize_body(rest, next_variable_name, next_element)}
+          }
+      }
+      """
+    end
+
+    defp generate_serialize_body([], variable_name, element) do
+      """
+      try #{variable_name}.serializeSequenceOf(#{element})
+      """
+    end
+end
+
+
 
 defmodule ASN1 do
+  def get_sequence_and_set_of({:type, _, inner_type, _, _, _} = node, acc) do
+      case inner_type do
+        {:"SEQUENCE OF", res } -> get_sequence_and_set_of(res, [".sequence" | acc])
+        {:"SET OF",res } -> get_sequence_and_set_of(res , [".set" | acc])
+        _ -> {acc, inner_type}
+    end
+  end
+
+
+
 
   def print(format, params) do
       case :application.get_env(:asn1scg, "save", true) and :application.get_env(:asn1scg, "verbose", false) do
@@ -14,9 +129,9 @@ defmodule ASN1 do
       type1 = bin(type)
       case level do
            "" -> []
-            _ -> print 'array: #{level} : ~ts = [~ts] ~p ~n', [name1, type1, tag]
+            _ -> print ~c'array: #{level} : ~ts = [~ts] ~p ~n', [name1, type1, tag]
       end
-#      :io.format 'seqof:8: ~p [~ts]~n', [name1, lookup(bin(type1)) ]
+     :io.format ~c'seqof:8: ~p [~ts]~n', [name1, lookup(bin(type1)) ]
       setEnv(name1, "[#{type1}]")
       setEnv({:array, name1}, {tag, type1})
       name1
@@ -36,8 +151,8 @@ defmodule ASN1 do
   def fieldType(_,_,{:"BIT STRING", _}), do: "ASN1BitString"
   def fieldType(_,_,{:pt, {_,_,_,type}, _}) when is_atom(type), do: "#{type}"
   def fieldType(_,_,{:ANY_DEFINED_BY, type}) when is_atom(type), do: "ASN1Any"
-  def fieldType(_name,_field,{:Externaltypereference,_,_,type}) when type == :OrganizationalUnitNames do
-#      :io.format 'seqof:1: ~p.~p ~ts~n', [name, field, type ] #lookup(bin(type)) ]
+  def fieldType(name,field,{:Externaltypereference,_,_,type}) when type == :OrganizationalUnitNames do
+     :io.format ~c'seqof:1: ~p.~p ~ts~n', [name, field, type ] #lookup(bin(type)) ]
       "#{substituteType(lookup(bin(type)))}"
   end
   def fieldType(_name,_field,{:Externaltypereference,_,_,type}) do
@@ -61,7 +176,7 @@ defmodule ASN1 do
   def sequenceOf2(name,field,{:type,_,{:SEQUENCE, _, _, _, fields} = product,_,_,_}) do
       sequence(fieldType(name,field,product), fields, [], true) ; bin(name) <> "_" <> bin(field) <> "_Sequence" end
   def sequenceOf2(name,field,{:type,_,type,_,_,_}) do "#{sequenceOf(name,field,type)}" end
-  def sequenceOf2(name,_,{:Externaltypereference, _, _, type}) do 
+  def sequenceOf2(name,_,{:Externaltypereference, _, _, type}) do
 #      :io.format 'seqof:4: ~p.~p~n', [name, type]
       :application.get_env(:asn1scg, bin(name), bin(type)) end
   def sequenceOf2(_,_,x) when is_tuple(x), do: substituteType("#{bin(:erlang.element(1, x))}")
@@ -171,12 +286,14 @@ defmodule ASN1 do
       pad(w) <> "case ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific):\n" <>
       pad(w+4) <> "self = .#{name}(try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: rootNode))"
 
-  def emitSequenceDefinition(name,fields,ctor,decoder,encoder), do:
+  def emitSequenceDefinition(name,fields,ctor,decoder,encoder, kek), do:
 """
 #{emitImprint()}
 import SwiftASN1\nimport Crypto\nimport Foundation\n
 @usableFromInline struct #{name}: DERImplicitlyTaggable, Hashable, Sendable {
-    @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }\n#{fields}#{ctor}#{decoder}#{encoder}}
+    @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }\n#{fields}#{ctor}
+     #{kek};\n
+     }
 """
 
   def emitSetDefinition(name,fields,ctor,decoder,encoder), do:
@@ -332,8 +449,8 @@ public struct #{name} : Hashable, Sendable, Comparable {
               _ ->
                  :skip
            end
-           print 'field: ~ts.~ts : ~ts ~n', [name,fieldName(fieldName), substituteType(lookup(field))]
-           pad(w) <> 
+           print ~c'field: ~ts.~ts : ~ts ~n', [name,fieldName(fieldName), substituteType(lookup(field))]
+           pad(w) <>
                 emitSequenceElementOptional(fieldName(fieldName), substituteType(lookup(field)), opt(optional))
          _ -> ""
       end, fields), "")
@@ -484,22 +601,22 @@ public struct #{name} : Hashable, Sendable, Comparable {
   end
 
   def dump() do
-      :lists.foldl(fn {{:array,x},{tag,y}}, _ -> print 'env array: ~ts = [~ts] ~tp ~n', [x,y,tag]
-                      {x,y}, _  when is_binary(x) -> print 'env alias: ~ts = ~ts ~n', [x,y] 
-                      {{:type,x},_}, _ -> print 'env type: ~ts = ... ~n', [x] 
+      :lists.foldl(fn {{:array,x},{tag,y}}, _ -> print ~c'env array: ~ts = [~ts] ~tp ~n', [x,y,tag]
+                      {x,y}, _  when is_binary(x) -> print ~c'env alias: ~ts = ~ts ~n', [x,y]
+                      {{:type,x},_}, _ -> print ~c'env type: ~ts = ... ~n', [x]
                       _, _ -> :ok
       end, [], :lists.sort(:application.get_all_env(:asn1scg)))
   end
 
   def compile() do
       {:ok, f} = :file.list_dir inputDir()
-      files = :lists.filter(fn x -> [_,y] = :string.tokens(x, '.') ; y == 'asn1' end, f)
+      files = :lists.filter(fn x -> [_,y] = :string.tokens(x, ~c'.') ; y == ~c'asn1' end, f)
       setEnv(:save, false) ; :lists.map(fn file -> compile(false, inputDir() <> :erlang.list_to_binary(file))  end, files)
       setEnv(:save, false) ; :lists.map(fn file -> compile(false, inputDir() <> :erlang.list_to_binary(file))  end, files)
       setEnv(:save, true)  ; :lists.map(fn file -> compile(true,  inputDir() <> :erlang.list_to_binary(file))  end, files)
-      print 'inputDir: ~ts~n', [inputDir()]
-      print 'outputDir: ~ts~n', [outputDir()]
-      print 'coverage: ~tp~n', [coverage()]
+      print ~c'inputDir: ~ts~n', [inputDir()]
+      print ~c'outputDir: ~ts~n', [outputDir()]
+      print ~c'coverage: ~tp~n', [coverage()]
       dump()
       :ok
   end
@@ -527,12 +644,33 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, {:"ENUMERATED", cases}, _, [], :no} -> enumeration(name, cases, modname, save)
           {:type, _, {:"CHOICE", cases}, _, [], :no} -> choice(name, cases, modname, save)
           {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
-          {:type, _, {:"SET", _, _, _, fields}, _, _, :no} -> set(name, fields, modname, save)
+          {:type, _, {:"SET", _, _, _, fields}, _, _, :no} ->
+            :io.format ~c'seqof:548: ~p ~p ~n', [name, name]
+            set(name, fields, modname, save)
           {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
- #              :io.format 'seqof:7: ~p [~ts]~n', [name, substituteType(lookup(bin(type))) ]
+              :io.format ~c'seqof:548: ~p ~p ~n', [name, type]
                array(name,substituteType(lookup(bin(type))),:sequence,"top")
+          {:type, [], {:"SEQUENCE OF", {_, _, {_, _, _, _,_type}, _, _, _}}, _, _, _} ->
+              :io.format ~c'seqof:536: ~p ~n', [name]
+          {:type, [], {:"SEQUENCE OF", {_, _, {_, _, _, _, _,type}, _, _, _}}, _, _, _} ->
+              :io.format ~c'seqof:548: ~p ~p ~n', [name, type]
+               array(name,substituteType(lookup(bin(type))),:sequence,"top")
+          {:type, [], {:"SEQUENCE OF", {_, _, {_,{_,_, type, _},_} , _, _, _}}, _, _, _} ->
+              :io.format ~c'seqof:548: ~p ~p ~n', [name, type]
+               array(name,substituteType(lookup(bin(type))),:sequence,"top")
+          {:type, [], {:"SEQUENCE OF", {_, _, :"OBJECT IDENTIFIER" , _, _, _}}, _, _, _} ->
+            :skip
           {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
+              :io.format ~c'seqof:548: ~p ~p ~n', [name, type]
                array(name,substituteType(lookup(bin(type))),:set,"top")
+          {:type, [], {:"SET OF", {_, _, {_, _, _, _, type}, _, _, _}}, _, _, _} ->
+              :io.format ~c'seqof:548: ~p ~p ~n', [name, type]
+               array(name,substituteType(lookup(bin(type))),:set,"top")
+          {:type, [], {:"SET OF", {_, _, {_, {_, _, type, _}, _}, _, _, _}}, _, _, _} ->
+            #    array(name,substituteType(lookup(bin(type))),:set,"top")
+              :io.format ~c'seqof:548: ~p ~p ~n', [name, type]
+              array(name,substituteType(lookup(bin(type))),:set,"top")
+            #   exit(1)
           {:type, _, {:"BIT STRING",_}, _, [], :no} -> setEnv(name, "BIT STRING")
           {:type, _, :'BIT STRING', _, [], :no} -> setEnv(name, "BIT STRING")
           {:type, _, :'INTEGER', _set, [], :no} -> setEnv(name, "INTEGER")
@@ -548,28 +686,34 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, {:Externaltypereference, _, _, ext}, _set, [], _} -> setEnv(name, ext)
           {:type, _, {:pt, _, _}, _, [], _} -> :skip
           {:type, _, {:ObjectClassFieldType, _, _, _, _fields}, _, _, :no} -> :skip
+          {:type, _, {:SEQUENCE, _, _, _, _fields}, _, _, :no} -> :skip
           {:Object, _, _val} -> :skip
           {:Object, _, _, _} -> :skip
           {:ObjectSet, _, _, _, _} -> :skip
-          _ -> :skip
       end
       case res do
-           :skip -> print 'Unhandled type definition ~p: ~p~n', [name, typeDefinition]
+           :skip -> print ~c'Unhandled type definition ~p: ~p~n', [name, typeDefinition]
                _ -> :skip
       end
   end
 
-  def compileValue(_pos, name, type, value, _mod), do: print 'Unhandled value definition ~p : ~p = ~p ~n', [name, type, value] ; []
-  def compileClass(_pos, name, _mod, type), do: print 'Unhandled class definition ~p : ~p~n', [name, type] ; []
-  def compilePType(_pos, name, args, type), do: print 'Unhandled PType definition ~p : ~p(~p)~n', [name, type, args] ; []
+  def compileValue(_pos, name, type, value, _mod), do: (print ~c'Unhandled value definition ~p : ~p = ~p ~n', [name, type, value] ; [])
+  def compileClass(_pos, name, _mod, type), do: (print ~c'Unhandled class definition ~p : ~p~n', [name, type] ; [])
+  def compilePType(_pos, name, args, type), do: (print ~c'Unhandled PType definition ~p : ~p(~p)~n', [name, type, args] ; [])
   def compileModule(_pos, _name, _defid, _tagdefault, _exports, _imports), do: []
 
   def sequence(name, fields, modname, saveFlag) do
       :application.set_env(:asn1scg, {:type,name}, fields)
+      res = Enum.at(fields, 0)
+      {_, _ , _ ,ff, _, _ , _} = res
+      {kek, type } =  get_sequence_and_set_of(ff, [])
+      decoder = emitSequenceDecoder(emitSequenceDecoderBody(name, fields), name, emitArgs(fields))
+      encoder = emitSequenceEncoder(emitSequenceEncoderBody(name, fields))
+      default = "#{decoder} #{encoder}"
+      lol =  ASN1SwiftCodeGenerator.generate_swift_code(kek, default, substituteType(lookup(bin(type))))
       save(saveFlag, modname, name, emitSequenceDefinition(normalizeName(name),
           emitFields(name, 4, fields, modname), emitCtor(emitParams(name,fields), emitCtorBody(fields)),
-          emitSequenceDecoder(emitSequenceDecoderBody(name, fields), name, emitArgs(fields)),
-          emitSequenceEncoder(emitSequenceEncoderBody(name, fields))))
+          decoder, encoder, lol))
   end
 
   def set(name, fields, modname, saveFlag) do
@@ -609,7 +753,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
       fileName = dir <> norm <> ".swift"
       :ok = :file.write_file(fileName,res)
       verbose = getEnv(:verbose, false) ; setEnv(:verbose, true)
-      print 'compiled: ~ts.swift~n', [norm] ; setEnv(:verbose, verbose)
+      print ~c'compiled: ~ts.swift~n', [norm] ; setEnv(:verbose, verbose)
   end
 
   def save(_, _, _, _), do: []
@@ -627,7 +771,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
   def plicit([{:tag,:CONTEXT,_,{:default,:EXPLICIT},_}]), do: "Explicit"
   def plicit([{:tag,:CONTEXT,_,:IMPLICIT,_}]), do: "Implicit"
   def plicit([{:tag,:CONTEXT,_,:EXPLICIT,_}]), do: "Explicit"
-  def plicit(_), do: ""
+#   def plicit(_), do: ""
 
   def opt(:OPTIONAL), do: "?"
   def opt(_), do: ""
@@ -661,7 +805,7 @@ case System.argv() do
   ["compile","-v",i]   -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:verbose, true) ; ASN1.compile
   ["compile",i,o]      -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.compile
   ["compile","-v",i,o] -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.setEnv(:verbose, true) ; ASN1.compile
-  _ -> :io.format('Copyright © 2023 Namdak Tonpa.~n')
-       :io.format('ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 0.9.1.~n')
-       :io.format('Usage: ./asn1.ex help | compile [-v] [input [output]]~n')
+  _ -> :io.format(~c'Copyright © 2023 Namdak Tonpa.~n')
+       :io.format(~c'ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 0.9.1.~n')
+       :io.format(~c'Usage: ./asn1.ex help | compile [-v] [input [output]]~n')
 end
