@@ -642,7 +642,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, {:"INTEGER", cases}, _, [], :no} ->  setEnv(name, "Int") ; integerEnum(name, cases, modname, save)
           {:type, _, {:"ENUMERATED", cases}, _, [], :no} -> enumeration(name, cases, modname, save)
           {:type, _, {:"CHOICE", cases}, _, [], :no} -> choice(name, cases, modname, save)
-        #   {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
+          {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
           {:type, _, {:"SET", _, _, _, fields}, _, _, :no} ->
             :io.format ~c'seqof:548: ~p ~p ~n', [name, name]
             set(name, fields, modname, save)
@@ -689,7 +689,6 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:Object, _, _val} -> :skip
           {:Object, _, _, _} -> :skip
           {:ObjectSet, _, _, _, _} -> :skip
-          _ -> :skip
       end
       case res do
            :skip -> print ~c'Unhandled type definition ~p: ~p~n', [name, typeDefinition]

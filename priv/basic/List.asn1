@@ -1,79 +1,21 @@
 List DEFINITIONS IMPLICIT TAGS ::= BEGIN
 
-  Real ::= SEQUENCE {
-    mantissa INTEGER,
-    base INTEGER (2|10),
-    exponent INTEGER
-  }
 
-  X ::= SET {
-    a INTEGER,
-    b SET OF OCTET STRING,
-    d Real
-  }
-
-  V ::= SEQUENCE {
-    a [1] IMPLICIT SET OF INTEGER (0..7),
-    b [2] EXPLICIT SET OF INTEGER (0..7),
-    c [3] IMPLICIT INTEGER (0..7),
-    d [4] EXPLICIT INTEGER (0..7),
-    e [5] IMPLICIT BOOLEAN,
-    f [6] EXPLICIT BOOLEAN,
-    g [7] IMPLICIT SET OF INTEGER (0..7) OPTIONAL,
-    h [8] EXPLICIT SET OF INTEGER (0..7) OPTIONAL,
-    i [9] IMPLICIT INTEGER (0..7) OPTIONAL,
-    j [0] EXPLICIT INTEGER (0..7) OPTIONAL,
-    k OCTET STRING OPTIONAL,
-    l BOOLEAN OPTIONAL
-  }
-
-  V2 ::= SEQUENCE {
-    a SET OF INTEGER (0..7),
-    b SET OF INTEGER (0..7),
-    c INTEGER (0..7),
-    d INTEGER (0..7),
-    e BOOLEAN,
-    f BOOLEAN,
-    g SET OF INTEGER (0..7) OPTIONAL,
-    h INTEGER (0..7),
-    i INTEGER (0..7),
-    j OCTET STRING OPTIONAL,
-    k BOOLEAN OPTIONAL
-  }
 
   K ::= SEQUENCE {
-    version INTEGER { v1(1) },
-    x INTEGER (0..3),
-    y SEQUENCE { d1 BOOLEAN,
-                 d2 BOOLEAN,
-                 d3 INTEGER,
-                 d4 INTEGER }
 
---    w SET OF
---      SEQUENCE OF
---      SET OF
---      SEQUENCE OF INTEGER
--- 
-
---      SEQUENCE OF
---      SET OF SEQUENCE OF
---      SET OF SEQUENCE OF INTEGER
-  }
-
-  Versioning ::= INTEGER {  v1(0) }
-
-  A ::= CHOICE {
-    v [0] V,
-    list-x [1] List,
-    o [2] SET OF OCTET STRING,
-    s [3] SEQUENCE OF OCTET STRING
-  }
-
-  List ::= SEQUENCE {
-    data OCTET STRING,
-    next CHOICE { linked-list List,
-                  end NULL,
-                  ss [1] SET OF OCTET STRING }
+    w SET OF
+      SEQUENCE OF
+      SET OF
+      SEQUENCE OF
+      SET OF
+      SEQUENCE OF
+      SET OF
+      SEQUENCE OF
+      SET OF
+      SEQUENCE OF
+      SET OF
+      SEQUENCE OF INTEGER
   }
 
 END
