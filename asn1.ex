@@ -16,7 +16,6 @@ defmodule ASN1 do
            "" -> []
             _ -> print 'array: #{level} : ~ts = [~ts] ~p ~n', [name1, type1, tag]
       end
-#      :io.format 'seqof:8: ~p [~ts]~n', [name1, lookup(bin(type1)) ]
       setEnv(name1, "[#{type1}]")
       setEnv({:array, name1}, {tag, type1})
       name1
@@ -36,20 +35,13 @@ defmodule ASN1 do
   def fieldType(_,_,{:"BIT STRING", _}), do: "ASN1BitString"
   def fieldType(_,_,{:pt, {_,_,_,type}, _}) when is_atom(type), do: "#{type}"
   def fieldType(_,_,{:ANY_DEFINED_BY, type}) when is_atom(type), do: "ASN1Any"
-  def fieldType(_name,_field,{:Externaltypereference,_,_,type}) when type == :OrganizationalUnitNames do
-#      :io.format 'seqof:1: ~p.~p ~ts~n', [name, field, type ] #lookup(bin(type)) ]
-      "#{substituteType(lookup(bin(type)))}"
-  end
-  def fieldType(_name,_field,{:Externaltypereference,_,_,type}) do
-#      :io.format 'seqof:2: ~p.~p ~ts~n', [name, field, :io_lib.format('~p',[type]) ]
-       "#{substituteType(lookup(bin(type)))}"
-  end
+  def fieldType(_name,_field,{:Externaltypereference,_,_,type}) when type == :OrganizationalUnitNames, do: "#{substituteType(lookup(bin(type)))}"
+  def fieldType(_name,_field,{:Externaltypereference,_,_,type}), do: "#{substituteType(lookup(bin(type)))}"
   def fieldType(_,_,{:ObjectClassFieldType,_,_,[{_,type}],_}), do: "#{type}"
   def fieldType(_,_,type) when is_atom(type), do: "#{type}"
   def fieldType(name,_,_), do: "#{name}"
 
   def sequenceOf(name,field,type) do
-#      :io.format 'seqof:3: ~p.~p~n', [name, field]
       sequenceOf2(name,field,type)
   end
 
@@ -107,7 +99,11 @@ defmodule ASN1 do
   def emitSequenceDecoderBodyElement(_, plicit, no, name, type) when plicit == "Explicit", do:
       "let #{name}: #{type} = try DER.explicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in return try #{type}(derEncoded: node) }"
   def emitSequenceDecoderBodyElement(_, plicit, no, name, type) when plicit == "Implicit", do:
-      "let #{name}: #{type} = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific))"
+      "let #{name}: #{type} = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific)))!"
+  def emitSequenceDecoderBodyElement(:OPTIONAL, _, _, name, "ASN1Any"), do:
+      "let #{name}: ASN1Any? = nodes.next().map { ASN1Any(derEncoded: $0) }"
+  def emitSequenceDecoderBodyElement(_, _, _, name, "Bool"), do:
+      "let #{name}: Bool = try DER.decodeDefault(&nodes, defaultValue: false)"
   def emitSequenceDecoderBodyElement(optional, _, _, name, type), do:
       "let #{name}: #{type}#{opt(optional)} = try #{type}(derEncoded: &nodes)"
 

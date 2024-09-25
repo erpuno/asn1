@@ -16,7 +16,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let extnID: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let critical: Bool = try Bool(derEncoded: &nodes)
+            let critical: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
             let extnvalue: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             return Extension(extnID: extnID, critical: critical, extnvalue: extnvalue)
         }

@@ -5,8 +5,8 @@ import Foundation
 @usableFromInline struct Attribute: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var attrType: ASN1ObjectIdentifier
-    @usableFromInline var attrValues: [ASN1Any]
-    @inlinable init(attrType: ASN1ObjectIdentifier, attrValues: [ASN1Any]) {
+    @usableFromInline var attrValues: [ASN1OctetString]
+    @inlinable init(attrType: ASN1ObjectIdentifier, attrValues: [ASN1OctetString]) {
         self.attrType = attrType
         self.attrValues = attrValues
     }
@@ -14,7 +14,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let attrType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let attrValues: [ASN1Any] = try DER.set(of: ASN1Any.self, identifier: .set, nodes: &nodes)
+            let attrValues: [ASN1OctetString] = try DER.set(of: ASN1OctetString.self, identifier: .set, nodes: &nodes)
             return Attribute(attrType: attrType, attrValues: attrValues)
         }
     }

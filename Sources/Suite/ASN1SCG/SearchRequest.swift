@@ -30,7 +30,7 @@ import Foundation
             let derefAliases: SearchRequest_derefAliases_Enum = try SearchRequest_derefAliases_Enum(derEncoded: &nodes)
             let sizeLimit: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let timeLimit: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let typesOnly: Bool = try Bool(derEncoded: &nodes)
+            let typesOnly: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
             let filter: Filter = try Filter(derEncoded: &nodes)
             let attributes: [ASN1OctetString] = try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, nodes: &nodes)
             return SearchRequest(baseObject: baseObject, scope: scope, derefAliases: derefAliases, sizeLimit: sizeLimit, timeLimit: timeLimit, typesOnly: typesOnly, filter: filter, attributes: attributes)

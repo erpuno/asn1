@@ -19,7 +19,7 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let entry: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let newrdn: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
-            let deleteoldrdn: Bool = try Bool(derEncoded: &nodes)
+            let deleteoldrdn: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
             let newSuperior: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             return ModifyDNRequest(entry: entry, newrdn: newrdn, deleteoldrdn: deleteoldrdn, newSuperior: newSuperior)
         }

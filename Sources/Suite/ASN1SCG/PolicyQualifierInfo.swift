@@ -14,7 +14,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let policyQualifierId: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let qualifier: ASN1Any? = try ASN1Any(derEncoded: &nodes)
+            let qualifier: ASN1Any? = nodes.next().map { ASN1Any(derEncoded: $0) }
             return PolicyQualifierInfo(policyQualifierId: policyQualifierId, qualifier: qualifier)
         }
     }

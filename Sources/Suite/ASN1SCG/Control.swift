@@ -16,7 +16,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let controlType: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
-            let criticality: Bool = try Bool(derEncoded: &nodes)
+            let criticality: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
             let controlValue: ASN1OctetString? = try ASN1OctetString(derEncoded: &nodes)
             return Control(controlType: controlType, criticality: criticality, controlValue: controlValue)
         }

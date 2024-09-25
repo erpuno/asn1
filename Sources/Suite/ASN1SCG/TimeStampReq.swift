@@ -25,7 +25,7 @@ import Foundation
             let messageImprint: MessageImprint = try MessageImprint(derEncoded: &nodes)
             let reqPolicy: ASN1ObjectIdentifier? = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let nonce: ArraySlice<UInt8>? = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let certReq: Bool = try Bool(derEncoded: &nodes)
+            let certReq: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
             let extensions: [Extension] = try DER.sequence(of: Extension.self, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific), nodes: &nodes)
             return TimeStampReq(version: version, messageImprint: messageImprint, reqPolicy: reqPolicy, nonce: nonce, certReq: certReq, extensions: extensions)
         }
