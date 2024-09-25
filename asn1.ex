@@ -529,12 +529,10 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, {:"CHOICE", cases}, _, [], :no} -> choice(name, cases, modname, save)
           {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
           {:type, _, {:"SET", _, _, _, fields}, _, _, :no} -> set(name, fields, modname, save)
-          {:type, _, {:"SEQUENCE OF", {:type, _, type, _, _, :no}}, _, _, _} when is_atom(type) ->
-               array(name,substituteType(lookup(bin(type))),:sequence,"top")
-          {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
-               array(name,substituteType(lookup(bin(type))),:sequence,"top")
-          {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
-               array(name,substituteType(lookup(bin(type))),:set,"top")
+          {:type, _, {:"SEQUENCE OF", {:type, _, type, _, _, :no}}, _, _, _} when is_atom(type) -> array(name,substituteType(lookup(bin(type))),:sequence,"top")
+          {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> array(name,substituteType(lookup(bin(type))),:sequence,"top")
+          {:type, _, {:"SET OF", {:type, _, type, _, _, :no}}, _, _, _} when is_atom(type) -> array(name,substituteType(lookup(bin(type))),:set,"top")
+          {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> array(name,substituteType(lookup(bin(type))),:set,"top")
           {:type, _, {:"BIT STRING",_}, _, [], :no} -> setEnv(name, "BIT STRING")
           {:type, _, :'BIT STRING', _, [], :no} -> setEnv(name, "BIT STRING")
           {:type, _, :'INTEGER', _set, [], :no} -> setEnv(name, "INTEGER")
@@ -546,7 +544,6 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, :'TeletexString', _set, [], :no} -> setEnv(name, "TeletexString")
           {:type, _, :'UniversalString', _set, [], :no} -> setEnv(name, "UniversalString")
           {:type, _, :'OBJECT IDENTIFIER', _, _, :no} -> setEnv(name, "OBJECT IDENTIFIER")
-          {:type, _,  'OBJECT IDENTIFIER', _, _, :no} -> setEnv(name, "OBJECT IDENTIFIER")
           {:type, _, :'OCTET STRING', [], [], :no} -> setEnv(name, "OCTET STRING")
           {:type, _, {:Externaltypereference, _, _, ext}, _set, [], _} -> setEnv(name, ext)
           {:type, _, {:pt, _, _}, _, [], _} -> :skip
