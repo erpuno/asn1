@@ -13,5 +13,5 @@ let package = Package(
 
 if ProcessInfo.processInfo.environment["SWIFTCI_USE_LOCAL_DEPS"] == nil {
     package.dependencies += [
-       .package(url: "https://github.com/apple/swift-asn1.git", from: "0.8.0"), ]
+       .package(url: "https://github.com/apple/swift-asn1.git", from: "1.2.0"), ]
 }
