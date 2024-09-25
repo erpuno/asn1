@@ -1,0 +1,53 @@
+SUITE-AUTOMATIC DEFINITIONS AUTOMATIC TAGS ::= BEGIN
+
+  Real ::= SEQUENCE {
+    mantissa INTEGER,
+    base INTEGER (2|10),
+    exponent INTEGER
+  }
+
+  AtomicOpt ::= SET {
+    int INTEGER,
+    octetSet SET OF OCTET STRING,
+    octetOpt OCTET STRING OPTIONAL,
+    octetSetOpt SET OF OCTET STRING OPTIONAL,
+    boolOpt BOOLEAN OPTIONAL,
+    real Real
+  }
+
+  ImpExp ::= SEQUENCE {
+    intSetImp [1] IMPLICIT SET OF INTEGER (0..7),
+    intSetExp [2] EXPLICIT SET OF INTEGER (0..7),
+    intImp [3] IMPLICIT INTEGER (0..7),
+    intExp [4] EXPLICIT INTEGER (0..7),
+    boolImp [5] IMPLICIT BOOLEAN,
+    boolExp [6] EXPLICIT BOOLEAN,
+    intSetImpOpt [7] IMPLICIT SET OF INTEGER (0..7) OPTIONAL,
+    intSetExpOpt [8] EXPLICIT SET OF INTEGER (0..7) OPTIONAL,
+    intImpOpt [9] IMPLICIT INTEGER (0..7) OPTIONAL,
+    intExpOpt [0] EXPLICIT INTEGER (0..7) OPTIONAL
+  }
+
+  NoTags ::= SEQUENCE {
+    intSet1 SET OF INTEGER (0..7),
+    intSet2 SET OF INTEGER (0..7),
+    seqSet1 SEQUENCE OF INTEGER (0..7),
+    seqSet2 SEQUENCE OF INTEGER (0..7),
+    int1 INTEGER (0..7),
+    int2 INTEGER (0..7),
+    bool1 BOOLEAN,
+    bool2 BOOLEAN,
+    intSetOpt1 SET OF INTEGER (0..7) OPTIONAL,
+    intSetOpt2 SET OF INTEGER (0..7) OPTIONAL,
+    intOpt1 INTEGER (0..7) OPTIONAL,
+    intOpt2 INTEGER (0..7) OPTIONAL
+  }
+
+  Versioning ::= INTEGER {  v1(0) }
+
+  List ::= SEQUENCE {
+    data OCTET STRING,
+    next CHOICE { list List, end NULL }
+  }
+
+END
