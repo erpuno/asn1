@@ -71,6 +71,7 @@ defmodule ASN1 do
   def substituteType("TeletexString"),     do: "ASN1TeletexString"
   def substituteType("UniversalString"),   do: "ASN1UniversalString"
   def substituteType("IA5String"),         do: "ASN1IA5String"
+  def substituteType("VisibleString"),     do: "ASN1UTF8String"
   def substituteType("UTF8String"),        do: "ASN1UTF8String"
   def substituteType("PrintableString"),   do: "ASN1PrintableString"
   def substituteType("NumericString"),     do: "ASN1PrintableString"
@@ -174,7 +175,7 @@ defmodule ASN1 do
   def emitSequenceDefinition(name,fields,ctor,decoder,encoder), do:
 """
 #{emitImprint()}
-import SwiftASN1\nimport Crypto\nimport Foundation\n
+import SwiftASN1\nimport Foundation\n
 @usableFromInline struct #{name}: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }\n#{fields}#{ctor}#{decoder}#{encoder}}
 """
@@ -182,7 +183,7 @@ import SwiftASN1\nimport Crypto\nimport Foundation\n
   def emitSetDefinition(name,fields,ctor,decoder,encoder), do:
 """
 #{emitImprint()}
-import SwiftASN1\nimport Crypto\nimport Foundation\n
+import SwiftASN1\nimport Foundation\n
 @usableFromInline struct #{name}: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }\n#{fields}#{ctor}#{decoder}#{encoder}}
 """
@@ -190,16 +191,16 @@ import SwiftASN1\nimport Crypto\nimport Foundation\n
   def emitChoiceDefinition(name,cases,decoder,encoder), do:
 """
 #{emitImprint()}
-import SwiftASN1\nimport Crypto\nimport Foundation\n
-@usableFromInline indirect enum #{name}: DERParseable, DERSerializable, Hashable, Sendable {
-#{cases}#{decoder}#{encoder}
+import SwiftASN1\nimport Foundation\n
+@usableFromInline indirect enum #{name}: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+    @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }\n#{cases}#{decoder}#{encoder}
 }
 """
 
   def emitEnumerationDefinition(name,cases), do:
 """
 #{emitImprint()}
-import SwiftASN1\nimport Crypto\nimport Foundation\n
+import SwiftASN1\nimport Foundation\n
 public struct #{name}: DERImplicitlyTaggable, Hashable, Sendable, RawRepresentable {
     public static var defaultIdentifier: ASN1Identifier { .enumerated }
     public var rawValue: Int
@@ -225,7 +226,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
 
   def emitChoiceDecoder(cases), do:
 """
-    @inlinable init(derEncoded rootNode: ASN1Node) throws {
+    @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier: ASN1Identifier) throws {
         switch rootNode.identifier {\n#{cases}
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
@@ -234,7 +235,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
 
   def emitChoiceEncoder(cases), do:
 """
-    @inlinable func serialize(into coder: inout DER.Serializer) throws {
+    @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier: ASN1Identifier) throws {
         switch self {\n#{cases}
         }
     }
@@ -528,8 +529,9 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, {:"CHOICE", cases}, _, [], :no} -> choice(name, cases, modname, save)
           {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
           {:type, _, {:"SET", _, _, _, fields}, _, _, :no} -> set(name, fields, modname, save)
+          {:type, _, {:"SEQUENCE OF", {:type, _, type, _, _, :no}}, _, _, _} when is_atom(type) ->
+               array(name,substituteType(lookup(bin(type))),:sequence,"top")
           {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
- #              :io.format 'seqof:7: ~p [~ts]~n', [name, substituteType(lookup(bin(type))) ]
                array(name,substituteType(lookup(bin(type))),:sequence,"top")
           {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} ->
                array(name,substituteType(lookup(bin(type))),:set,"top")
@@ -543,7 +545,8 @@ public struct #{name} : Hashable, Sendable, Comparable {
           {:type, _, :'IA5String', _set, [], :no} -> setEnv(name, "IA5String")
           {:type, _, :'TeletexString', _set, [], :no} -> setEnv(name, "TeletexString")
           {:type, _, :'UniversalString', _set, [], :no} -> setEnv(name, "UniversalString")
-          {:type, _, :'OBJECT IDENTIFIER', _, _, :no} -> setEnv(name, "OBJECT IDENTIFIER") ; :skip
+          {:type, _, :'OBJECT IDENTIFIER', _, _, :no} -> setEnv(name, "OBJECT IDENTIFIER")
+          {:type, _,  'OBJECT IDENTIFIER', _, _, :no} -> setEnv(name, "OBJECT IDENTIFIER")
           {:type, _, :'OCTET STRING', [], [], :no} -> setEnv(name, "OCTET STRING")
           {:type, _, {:Externaltypereference, _, _, ext}, _set, [], _} -> setEnv(name, ext)
           {:type, _, {:pt, _, _}, _, [], _} -> :skip
@@ -559,9 +562,9 @@ public struct #{name} : Hashable, Sendable, Comparable {
       end
   end
 
-  def compileValue(_pos, name, type, value, _mod), do: print 'Unhandled value definition ~p : ~p = ~p ~n', [name, type, value] ; []
-  def compileClass(_pos, name, _mod, type), do: print 'Unhandled class definition ~p : ~p~n', [name, type] ; []
-  def compilePType(_pos, name, args, type), do: print 'Unhandled PType definition ~p : ~p(~p)~n', [name, type, args] ; []
+  def compileValue(_pos, name, type, value, _mod), do: (print 'Unhandled value definition ~p : ~p = ~p ~n', [name, type, value] ; [])
+  def compileClass(_pos, name, _mod, type), do: (print 'Unhandled class definition ~p : ~p~n', [name, type] ; [])
+  def compilePType(_pos, name, args, type), do: (print 'Unhandled PType definition ~p : ~p(~p)~n', [name, type, args] ; [])
   def compileModule(_pos, _name, _defid, _tagdefault, _exports, _imports), do: []
 
   def sequence(name, fields, modname, saveFlag) do

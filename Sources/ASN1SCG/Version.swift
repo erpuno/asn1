@@ -3,7 +3,5 @@ public struct Version : Hashable, Sendable, Comparable {
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: Version, rhs: Version) -> Bool { lhs.rawValue < rhs.rawValue }
     @inlinable init(rawValue: Int) { self.rawValue = rawValue }
-    public static let v1 = Self(rawValue: 0)
-    public static let v2 = Self(rawValue: 1)
     public static let v3 = Self(rawValue: 2)
 }

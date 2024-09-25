@@ -1,3 +1,27 @@
+import SwiftASN1
+import Foundation
+
+@usableFromInline public struct ASN1VisibleString: DERImplicitlyTaggable, BERImplicitlyTaggable {
+
+    @inlinable
+    public static var defaultIdentifier: ASN1Identifier {
+        .visibleString
+    }
+
+    @inlinable
+    public init(derEncoded node: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
+        guard node.identifier == identifier else {
+            throw ASN1Error.unexpectedFieldType(node.identifier)
+        }
+
+        guard case .primitive(let content) = node.content else {
+            preconditionFailure("ASN.1 parser generated primitive node with constructed content")
+        }
+
+        self.bytes = content
+    }
+
+}
 
 extension ASN1Identifier {
     public static let boolean            = ASN1Identifier(shortIdentifier: 0x01)
