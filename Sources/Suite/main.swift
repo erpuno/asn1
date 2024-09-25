@@ -15,8 +15,8 @@ public class Console {
      print(": DER.name \(serializer.serializedBytes)")
   }
 
-  public static func showCertificate(name: String) throws {
-     let url = URL(fileURLWithPath: name)
+  public static func showCertificate(file: String) throws {
+     let url = URL(fileURLWithPath: file)
      if (!Console.exists(f: url.path)) { print(": CERT file not found.") } else {
          let data = try Data(contentsOf: url)
          let cert = try Certificate(derEncoded: Array(data))
@@ -26,7 +26,7 @@ public class Console {
 
   public static func loop() throws {
      try showName(data: [48,13,49,11,48,9,6,3,85,4,6,19,2,85,65])
-     try showCertificate(name: "ca.crt")
+     try showCertificate(file: "ca.crt")
      print(": PASSED")
   }
 
