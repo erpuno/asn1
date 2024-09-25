@@ -107,7 +107,7 @@ defmodule ASN1 do
   def emitSequenceDecoderBodyElement(_, plicit, no, name, type) when plicit == "Explicit", do:
       "let #{name}: #{type} = try DER.explicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in return try #{type}(derEncoded: node) }"
   def emitSequenceDecoderBodyElement(_, plicit, no, name, type) when plicit == "Implicit", do:
-      "let #{name}: #{type} = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific)))!"
+      "let #{name}: #{type} = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific))"
   def emitSequenceDecoderBodyElement(optional, _, _, name, type), do:
       "let #{name}: #{type}#{opt(optional)} = try #{type}(derEncoded: &nodes)"
 

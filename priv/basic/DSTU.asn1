@@ -9,7 +9,7 @@ Certificate ::= SEQUENCE {
  signatureValue BIT STRING }
 
 TBSCertificate ::= SEQUENCE {
- version [0] Version,
+ version [0] EXPLICIT Version DEFAULT 0,
  serialNumber CertificateSerialNumber,
  signature AlgorithmIdentifier,
  issuer Name,

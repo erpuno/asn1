@@ -3,32 +3,19 @@ import SwiftASN1
 import Foundation
 
 @usableFromInline indirect enum Name: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+    @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
     case rdnSequence([[AttributeTypeAndValue]])
-    @inlinable
-    public static var defaultIdentifier: ASN1Identifier {
-        .set
-    }
-    @inlinable init(derEncoded root: ASN1Node, withIdentifier: ASN1Identifier) throws {
-        switch root.identifier {
-            case .sequence:
-                self = .rdnSequence(try DER.sequence<[[AttributeTypeAndValue]]>(root, identifier: .sequence) { nodes in
-                    var rdnSequenceAcc: [[AttributeTypeAndValue]] = []
-                    while let rdnSequenceInner = nodes.next() {
-                        rdnSequenceAcc.append(try DER.sequence(of: AttributeTypeAndValue.self, identifier: .sequence, rootNode: rdnSequenceInner))
-                    }
-                    return rdnSequenceAcc
-                })
-            default: throw ASN1Error.unexpectedFieldType(root.identifier)
+    @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier: ASN1Identifier) throws {
+        switch rootNode.identifier {
+            case [[AttributeTypeAndValue]].defaultIdentifier:
+                self = .rdnSequence(try [[AttributeTypeAndValue]](derEncoded: rootNode))
+            default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier: ASN1Identifier) throws {
         switch self {
-            case .rdnSequence(let rdnSequence):
-            try coder.appendConstructedNode(identifier: ASN1Identifier.sequence) { codec in
-                for element in rdnSequence {
-                    try codec.serializeSequenceOf(element)
-                }
-            }
+            case .rdnSequence(let rdnSequence): try coder.serialize(rdnSequence)
         }
     }
+
 }

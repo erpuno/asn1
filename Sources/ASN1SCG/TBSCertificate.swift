@@ -29,7 +29,7 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let version: Int = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
+            let version: Int = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try Int(derEncoded: node) }
             let serialNumber: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let signature: AlgorithmIdentifier = try AlgorithmIdentifier(derEncoded: &nodes)
             let issuer: Name = try Name(derEncoded: &nodes)
@@ -45,7 +45,7 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serializeOptionalImplicitlyTagged(version, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+            try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) }
             try coder.serialize(serialNumber)
             try coder.serialize(signature)
             try coder.serialize(issuer)
