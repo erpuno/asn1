@@ -12,6 +12,7 @@ public class Console {
      if let name { print(": Name \(name)") }
      var serializer = DER.Serializer()
      try name!.serialize(into: &serializer)
+     print(": Name.DER \(data)")
      print(": DER.Name \(serializer.serializedBytes)")
   }
 
@@ -20,6 +21,7 @@ public class Console {
      if let ds { print(": DirectoryString \(ds)") }
      var serializer = DER.Serializer()
      try ds!.serialize(into: &serializer)
+     print(": DirectoryString.DER \(data)")
      print(": DER.DirectoryString \(serializer.serializedBytes)")
   }
 
@@ -28,6 +30,7 @@ public class Console {
      if let msg { print(": LDAPMessage \(msg)") }
      var serializer = DER.Serializer()
      try msg!.serialize(into: &serializer)
+     print(": LDAPMessage.DER \(data)")
      print(": DER.LDAPMessage \(serializer.serializedBytes)")
   }
 
