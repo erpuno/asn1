@@ -48,14 +48,10 @@ defmodule ASN1 do
   def sequenceOf2(name,field,{:type,_,{:Externaltypereference,_,_,type},_,_,_}), do: "#{sequenceOf(name,field,type)}"
   def sequenceOf2(name,field,{:type,_,{:"SET OF", type},_,_,_}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set, "arr #{name}.#{field}")  end
   def sequenceOf2(name,field,{:type,_,{:"SEQUENCE OF", type},_,_,_}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :sequence, "arr #{name}.#{field}") end
-  def sequenceOf2(name,field,{:type,_,{:CHOICE, cases} = sum,_,_,_}) do
-      choice(fieldType(name,field,sum), cases, [], true) ; bin(name) <> "_" <> bin(field) <> "_Choice" end
-  def sequenceOf2(name,field,{:type,_,{:SEQUENCE, _, _, _, fields} = product,_,_,_}) do
-      sequence(fieldType(name,field,product), fields, [], true) ; bin(name) <> "_" <> bin(field) <> "_Sequence" end
+  def sequenceOf2(name,field,{:type,_,{:CHOICE, cases} = sum,_,_,_}) do choice(fieldType(name,field,sum), cases, [], true) ; bin(name) <> "_" <> bin(field) <> "_Choice" end
+  def sequenceOf2(name,field,{:type,_,{:SEQUENCE, _, _, _, fields} = product,_,_,_}) do sequence(fieldType(name,field,product), fields, [], true) ; bin(name) <> "_" <> bin(field) <> "_Sequence" end
   def sequenceOf2(name,field,{:type,_,type,_,_,_}) do "#{sequenceOf(name,field,type)}" end
-  def sequenceOf2(name,_,{:Externaltypereference, _, _, type}) do 
-#      :io.format 'seqof:4: ~p.~p~n', [name, type]
-      :application.get_env(:asn1scg, bin(name), bin(type)) end
+  def sequenceOf2(name,_,{:Externaltypereference, _, _, type}) do :application.get_env(:asn1scg, bin(name), bin(type)) end
   def sequenceOf2(_,_,x) when is_tuple(x), do: substituteType("#{bin(:erlang.element(1, x))}")
   def sequenceOf2(_,_,x) when is_atom(x), do: substituteType("#{lookup(x)}")
   def sequenceOf2(_,_,x) when is_binary(x), do: substituteType("#{lookup(x)}")
@@ -284,7 +280,6 @@ public struct #{name} : Hashable, Sendable, Comparable {
       end, cases), "")
   end
 
-
   def emitCases(name, w, cases, modname) when is_list(cases) do
       Enum.join(:lists.map(fn
         {:ComponentType,_,fieldName,{:type,_,fieldType,_elementSet,[],:no},_optional,_,_} ->
@@ -306,7 +301,6 @@ public struct #{name} : Hashable, Sendable, Comparable {
           _ -> ""
       end, cases), "")
   end
-
 
   def emitFields(name, w, fields, modname) when is_list(fields) do
       Enum.join(:lists.map(fn
@@ -556,8 +550,8 @@ public struct #{name} : Hashable, Sendable, Comparable {
   end
 
   def compileValue(_pos, name, type, value, _mod), do: (print 'Unhandled value definition ~p : ~p = ~p ~n', [name, type, value] ; [])
-  def compileClass(_pos, name, _mod, type), do: (print 'Unhandled class definition ~p : ~p~n', [name, type] ; [])
-  def compilePType(_pos, name, args, type), do: (print 'Unhandled PType definition ~p : ~p(~p)~n', [name, type, args] ; [])
+  def compileClass(_pos, name, _mod, type),        do: (print 'Unhandled class definition ~p : ~p~n', [name, type] ; [])
+  def compilePType(_pos, name, args, type),        do: (print 'Unhandled PType definition ~p : ~p(~p)~n', [name, type, args] ; [])
   def compileModule(_pos, _name, _defid, _tagdefault, _exports, _imports), do: []
 
   def sequence(name, fields, modname, saveFlag) do
@@ -605,7 +599,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
       fileName = dir <> norm <> ".swift"
       :ok = :file.write_file(fileName,res)
       verbose = getEnv(:verbose, false) ; setEnv(:verbose, true)
-      print 'compiled: ~ts.swift~n', [norm] ; setEnv(:verbose, verbose)
+      print 'compiled: ~ts.swift~n', [fileName] ; setEnv(:verbose, verbose)
   end
 
   def save(_, _, _, _), do: []
@@ -657,7 +651,7 @@ case System.argv() do
   ["compile","-v",i]   -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:verbose, true) ; ASN1.compile
   ["compile",i,o]      -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.compile
   ["compile","-v",i,o] -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.setEnv(:verbose, true) ; ASN1.compile
-  _ -> :io.format('Copyright © 2023 Namdak Tonpa.~n')
-       :io.format('ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 0.9.1.~n')
+  _ -> :io.format('Copyright © 2023—2024 Namdak Tönpa.~n')
+       :io.format('ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 1.9.27.~n')
        :io.format('Usage: ./asn1.ex help | compile [-v] [input [output]]~n')
 end
