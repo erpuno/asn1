@@ -148,12 +148,9 @@ defmodule ASN1 do
   def emitChoiceDecoderBodyElement(w, no, name, type) when no == [], do:
       pad(w) <> "case #{type}.defaultIdentifier:\n" <>
       pad(w+4) <> "self = .#{name}(try #{type}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
-  def emitChoiceDecoderBodyElement(w, no, name, type) do
+  def emitChoiceDecoderBodyElement(w, no, name, type), do:
       pad(w) <> "case ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}):\n" <>
-      pad(w+4) <> case tagClass(no) == ".contextSpecific" do
-                    true -> "self = .#{name}(try #{type}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
-                    false -> "self = .#{name}(try #{type}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
-                  end end
+      pad(w+4) <> "self = .#{name}(try #{type}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
 
   # Vector Sum Component
 
