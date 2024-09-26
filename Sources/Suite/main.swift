@@ -1,7 +1,7 @@
 import SwiftASN1
 import Foundation
 
-try Console.loop()
+exit(try Console.suite())
 
 public class Console {
 
@@ -12,7 +12,7 @@ public class Console {
      if let name { print(": Name \(name)") }
      var serializer = DER.Serializer()
      try name!.serialize(into: &serializer)
-     print(": DER.name \(serializer.serializedBytes)")
+     print(": DER.Name \(serializer.serializedBytes)")
   }
 
   public static func showDirectoryString(data: Array<UInt8>) throws {
@@ -20,7 +20,15 @@ public class Console {
      if let ds { print(": DirectoryString \(ds)") }
      var serializer = DER.Serializer()
      try ds!.serialize(into: &serializer)
-     print(": DER.name \(serializer.serializedBytes)")
+     print(": DER.DirectoryString \(serializer.serializedBytes)")
+  }
+
+  public static func showLDAPMessage(data: Array<UInt8>) throws {
+     let msg: LDAPMessage? = try LDAPMessage(derEncoded: data)
+     if let msg { print(": LDAPMessage \(msg)") }
+     var serializer = DER.Serializer()
+     try msg!.serialize(into: &serializer)
+     print(": DER.LDAPMessage \(serializer.serializedBytes)")
   }
 
   public static func showCertificate(file: String) throws {
@@ -32,11 +40,19 @@ public class Console {
      }
   }
 
-  public static func loop() throws {
-     try showName(data: [48,13,49,11,48,9,6,3,85,4,6,19,2,85,65])
-     try showDirectoryString(data: [19,3,49,50,51])
-     try showCertificate(file: "ca.crt")
-     print(": PASSED")
+  public static func suite() throws -> Int32 {
+     do {
+       try showName(data: [48,13,49,11,48,9,6,3,85,4,6,19,2,85,65])
+       try showDirectoryString(data: [19,3,49,50,51])
+//       try showLDAPMessage(data: [48,16,2,1,1,96,9,2,1,1,4,0,128,2,49,50,160,0])
+       try showCertificate(file: "ca.crt")
+       print(": PASSED")
+       return 0
+     } catch {
+       print(": EXCEPTION \(error)")
+       print(": FAILED")
+       return -1
+     }
   }
 
 }
