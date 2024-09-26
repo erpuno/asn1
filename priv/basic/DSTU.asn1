@@ -64,11 +64,6 @@ SubjectPublicKeyInfo ::= SEQUENCE {
  algorithm AlgorithmIdentifier,
  subjectPublicKey BIT STRING }
 
-AlgorithmIdentifier ::= SEQUENCE {
- algorithm OBJECT IDENTIFIER,
- parameters ANY OPTIONAL }
--- DEFINED BY algorithm OPTIONAL
-
 DSTU4145Params::= SEQUENCE {
  definition CHOICE { ecbinary ECBinary, namedCurve OBJECT IDENTIFIER },
  dke OCTET STRING OPTIONAL }
