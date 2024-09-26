@@ -5,9 +5,10 @@ ASN.1 Swift Code Generation DER Compiler.
 Minimal (normal), full, idiomatic, correct by construction, respects equality.
 
 ```
-Copyright © 2023 Namdak Tonpa.
-ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 0.9.1.
-Usage: ./asn1scg.ex help | compile [input] [output]
+% ./asn1.ex
+Copyright © 2023—2024 Namdak Tönpa.
+ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 1.9.27.
+Usage: ./asn1.ex help | compile [-v] [input [output]]
 ```
 
 Features
