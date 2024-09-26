@@ -589,8 +589,8 @@ public struct #{name} : Hashable, Sendable, Comparable {
            emitIntegerEnums(cases)))
   end
 
-  def inputDir(), do: :application.get_env(:asn1scg, "input", "priv/apple/")
-  def outputDir(), do: :application.get_env(:asn1scg, "output", "Sources/ASN1SCG/Suite/")
+  def inputDir(),   do: :application.get_env(:asn1scg, "input", "priv/apple/")
+  def outputDir(),  do: :application.get_env(:asn1scg, "output", "Sources/ASN1SCG/Suite/")
   def exceptions(), do: :application.get_env(:asn1scg, "exceptions", ["Name"])
 
   def save(true, _, name, res) do

@@ -1,41 +1,6 @@
 import SwiftASN1
 import Foundation
 
-public struct ASN1VisibleString: DERImplicitlyTaggable {
-
-    @inlinable
-    public static var defaultIdentifier: ASN1Identifier {
-        .visibleString
-    }
-
-    public var bytes: ArraySlice<UInt8>
-
-    @inlinable
-    public init(contentBytes: ArraySlice<UInt8>) {
-        self.bytes = contentBytes
-    }
-
-    @inlinable
-    public init(derEncoded node: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
-        guard node.identifier == identifier else {
-            throw ASN1Error.unexpectedFieldType(node.identifier)
-        }
-
-        guard case .primitive(let content) = node.content else {
-            preconditionFailure("ASN.1 parser generated primitive node with constructed content")
-        }
-
-        self.bytes = content
-    }
-
-    @inlinable
-    public func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
-        let octet = ASN1OctetString(contentBytes: self.bytes)
-        try octet.serialize(into: &coder, withIdentifier: identifier)
-    }
-
-}
-
 extension ASN1Identifier {
     public static let sequenceOf         = ASN1Identifier(tagWithNumber: 0x10, tagClass: ASN1Identifier.TagClass.universal)
     public static let setOf              = ASN1Identifier(tagWithNumber: 0x11, tagClass: ASN1Identifier.TagClass.universal)
