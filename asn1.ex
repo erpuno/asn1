@@ -653,8 +653,10 @@ public struct #{name} : Hashable, Sendable, Comparable {
   def tagNo([]), do: []
   def tagNo([{:tag,_,nox,x,y}]) do nox end
   def tagClass([]), do: []
-  def tagClass([{:tag,:CONTEXT,_,_,_}]) do ".contextSpecific" end
-  def tagClass([{:tag,:APPLICATION,_,_,_}]) do ".application" end
+  def tagClass([{:tag,:CONTEXT,_,_,_}]), do: ".contextSpecific" # https://github.com/erlang/otp/blob/master/lib/asn1/src/asn1ct_parser2.erl#L2011-L2018
+  def tagClass([{:tag,:APPLICATION,_,_,_}]), do: ".application"
+  def tagClass([{:tag,:PRIVATE,_,_,_}]), do: ".private"
+  def tagClass([{:tag,:UNIVERSAL,_,_,_}]), do: ".universal"
   def pad(x), do: String.duplicate(" ", x)
   def partArray(bin), do: part(bin, 1, :erlang.size(bin) - 2)
   def part(a, x, y) do
