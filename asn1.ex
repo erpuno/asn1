@@ -319,9 +319,9 @@ public struct #{name} : Hashable, Sendable, Comparable {
                  casesTagged = :lists.flatten(:lists.map(fn {line,newNo} ->
                   case line do
                    {:'ComponentType',l,name,{:type,tag,ref,x,y,no},opt,z,w} ->
-                      tagNew = case tag do [] -> [{:tag,:APPLICATION,newNo,{:default,:'IMPLICIT'},32}] ; x -> x end
-                     :io.format 'line: ~p~n', [{line,tagNew}]
-                     {:'ComponentType',l,name,{:type,tagNew,ref,x,y,no},opt,z,w}
+                        tagNew = case tag do [] -> [{:tag,:APPLICATION,newNo,:'IMPLICIT',32}] ; x -> x end
+                        :io.format 'line: ~p~n', [{line,tagNew}]
+                        {:'ComponentType',l,name,{:type,tagNew,ref,x,y,no},opt,z,w}
                    _ -> []
                    end
                  end, zip))
