@@ -45,9 +45,4 @@ SUITE-AUTOMATIC DEFINITIONS AUTOMATIC TAGS ::= BEGIN
 
   Versioning ::= INTEGER {  v1(0) }
 
-  List ::= SEQUENCE {
-    data OCTET STRING,
-    next CHOICE { list List, end NULL }
-  }
-
 END

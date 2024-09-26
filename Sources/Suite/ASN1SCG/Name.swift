@@ -6,9 +6,10 @@ import Foundation
 // {ok,<<48,13,49,11,48,9,6,3,85,4,6,19,2,85,65>>}
 // DER.name [48,13,49,11,48,9,6,3,85,4,6,19,2,85,65]
 
-@usableFromInline indirect enum Name: DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Name: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+    @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
     case rdnSequence([[AttributeTypeAndValue]])
-    @inlinable init(derEncoded root: ASN1Node) throws {
+    @inlinable init(derEncoded root: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch root.identifier {
             case ASN1Identifier.sequenceOf:
                 var w: [[AttributeTypeAndValue]] = []
@@ -25,7 +26,7 @@ import Foundation
         }
 
     }
-    @inlinable func serialize(into coder: inout DER.Serializer) throws {
+    @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
             case .rdnSequence(let w):
                 try coder.appendConstructedNode(identifier: ASN1Identifier.sequence) { codec1 in

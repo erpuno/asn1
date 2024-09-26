@@ -45,9 +45,32 @@ SUITE-IMPLICIT DEFINITIONS IMPLICIT TAGS ::= BEGIN
 
   Versioning ::= INTEGER {  v1(0) }
 
+-- > 'List':decode('List',<<48,4,4,0,5,0>>).
+-- {ok,{'List',<<>>,{'end','NULL'}}}
+
   List ::= SEQUENCE {
     data OCTET STRING,
-    next CHOICE { list List, end NULL }
+    next CHOICE {
+         list List,
+         end NULL
+    }
+  }
+
+-- > 'List':decode('Tensor',<<48,9,49,7,48,5,48,3,2,1,1>>).
+-- {ok,{'Tensor',[[[1]]]}}
+
+  Tensor ::= SEQUENCE {
+    body SET OF
+         SEQUENCE OF
+         SEQUENCE OF INTEGER
+  }
+
+-- > 'List':decode('ListOrTensor',<<161,4,4,0,5,0>>).
+-- {ok,{list,{'List',<<>>,{'end','NULL'}}}}
+
+  ListOrTensor ::= CHOICE {
+    list [1] List,
+    tensor [2] Tensor
   }
 
 END

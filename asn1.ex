@@ -143,14 +143,17 @@ defmodule ASN1 do
   def emitChoiceEncoderBodyElement(w, no, name, spec), do:
       pad(w) <> "case .#{name}(let #{name}):\n" <>
       pad(w+4) <> "try coder.appendConstructedNode(\n" <>
-      pad(w+4) <> "identifier: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific),\n" <>
+      pad(w+4) <> "identifier: ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}),\n" <>
       pad(w+4) <> "{ coder in try coder.serialize#{spec}(#{name}) })"
   def emitChoiceDecoderBodyElement(w, no, name, type) when no == [], do:
       pad(w) <> "case #{type}.defaultIdentifier:\n" <>
-      pad(w+4) <> "self = .#{name}(try #{type}(derEncoded: rootNode))"
-  def emitChoiceDecoderBodyElement(w, no, name, type), do:
-      pad(w) <> "case ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific):\n" <>
-      pad(w+4) <> "self = .#{name}(try #{type}(derEncoded: rootNode))"
+      pad(w+4) <> "self = .#{name}(try #{type}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
+  def emitChoiceDecoderBodyElement(w, no, name, type) do
+      pad(w) <> "case ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}):\n" <>
+      pad(w+4) <> case tagClass(no) == ".contextSpecific" do
+                    true -> "self = .#{name}(try #{type}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
+                    false -> "self = .#{name}(try #{type}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
+                  end end
 
   # Vector Sum Component
 
@@ -158,10 +161,10 @@ defmodule ASN1 do
       pad(w) <> "case ASN1Identifier.#{spec}:\n" <>
       pad(w+4) <> "self = .#{name}(try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: rootNode))"
   def emitChoiceDecoderBodyElementForArray(w, no,  name, type, spec) when spec == "", do:
-      pad(w) <> "case ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific):\n" <>
+      pad(w) <> "case ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}):\n" <>
       pad(w+4) <> "self = .#{name}(try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, nodes: &nodes))"
   def emitChoiceDecoderBodyElementForArray(w, no,  name, type, spec), do:
-      pad(w) <> "case ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific):\n" <>
+      pad(w) <> "case ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}):\n" <>
       pad(w+4) <> "self = .#{name}(try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: rootNode))"
 
   def emitSequenceDefinition(name,fields,ctor,decoder,encoder), do:
@@ -315,7 +318,18 @@ public struct #{name} : Hashable, Sendable, Comparable {
               {:SEQUENCE, _, _, _, fields} ->
                  sequence(fieldType(name,fieldName,fieldType), fields, modname, true)
               {:CHOICE, cases} ->
-                 choice(fieldType(name,fieldName,fieldType), cases, modname, true)
+                 zip = :lists.zip(cases, :lists.seq(0, :erlang.length(cases)-1))
+                 casesTagged = :lists.flatten(:lists.map(fn {line,newNo} ->
+                  case line do
+                   {:'ComponentType',l,name,{:type,tag,ref,x,y,no},opt,z,w} ->
+                      tagNew = case tag do [] -> [{:tag,:APPLICATION,newNo,{:default,:'IMPLICIT'},32}] ; x -> x end
+                     :io.format 'line: ~p~n', [{line,tagNew}]
+                     {:'ComponentType',l,name,{:type,tagNew,ref,x,y,no},opt,z,w}
+                   _ -> []
+                   end
+                 end, zip))
+                 :io.format 'casesTagged: ~p~n', [casesTagged]
+                 choice(fieldType(name,fieldName,fieldType), casesTagged, modname, true)
               {:INTEGER, cases} ->
                  integerEnum(fieldType(name,fieldName,fieldType), cases, modname, true)
               {:ENUMERATED, cases} ->
@@ -348,17 +362,17 @@ public struct #{name} : Hashable, Sendable, Comparable {
       Enum.join(:lists.map(fn
         {:ComponentType,_,fieldName,{:type,tag,{:"SEQUENCE OF", {_,_,_type,_,_,_}},_,_,_},_,_,_} ->
            trace(8)
-           emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SequenceOf")
+           emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), "SequenceOf")
         {:ComponentType,_,fieldName,{:type,tag,{:"SET OF", {_,_,_type,_,_,_}},_,_,_},_,_,_} ->
            trace(9)
-           emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SetOf")
+           emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), "SetOf")
         {:ComponentType,_,fieldName,{:type,tag,type,_elementSet,[],:no},_optional,_,_} ->
            trace(10)
            case {part(lookup(fieldType(name,fieldName,type)),0,1),
                  :application.get_env(:asn1scg, {:array, lookup(fieldType(name,fieldName(fieldName),type))}, [])} do
-                {"[", {:set, _}} -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SetOf")
-                {"[", {:sequence, _}} -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "SequenceOf")
-                _ -> emitChoiceEncoderBodyElement(12, tagNo(tag), fieldName(fieldName), "")
+                {"[", {:set, _}} -> emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), "SetOf")
+                {"[", {:sequence, _}} -> emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), "SequenceOf")
+                _ -> emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), "")
            end
          _ -> ""
       end, cases), "\n")
@@ -367,19 +381,23 @@ public struct #{name} : Hashable, Sendable, Comparable {
       Enum.join(:lists.map(fn
         {:ComponentType,_,fieldName,{:type,tag,{:"SEQUENCE OF", {_,_,type,_,_,_}},_,_,_},_,_,_} ->
            trace(11)
-           emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName),
+           emitChoiceDecoderBodyElementForArray(12, tag, fieldName(fieldName),
                substituteType(lookup(fieldType(name, fieldName(fieldName), type))), "sequence")
         {:ComponentType,_,fieldName,{:type,tag,{:"SET OF", {_,_,type,_,_,_}},_,_,_},_,_,_} ->
            trace(12)
-           emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName),
+           emitChoiceDecoderBodyElementForArray(12, tag, fieldName(fieldName),
                substituteType(lookup(fieldType(name, fieldName(fieldName), type))), "set")
-        {:ComponentType,_,fieldName,{:type,tag,type,_elementSet,[],:no},_optional,_,_} ->
+        {:ComponentType,_,fieldName,{:type,tag,type,_elementSet,[],:no},_optional,_x,_y} ->
            trace(13)
            case {part(lookup(fieldType(name,fieldName,type)),0,1),
                  :application.get_env(:asn1scg, {:array, lookup(fieldType(name,fieldName(fieldName),type))}, [])} do
-                {"[", {:set, inner}} -> emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName), inner, "set")
-                {"[", {:sequence, inner}} -> emitChoiceDecoderBodyElementForArray(12, tagNo(tag), fieldName(fieldName), inner, "sequence")
-                _ -> emitChoiceDecoderBodyElement(12, tagNo(tag), fieldName(fieldName),
+                {"[", {:set, inner}} -> emitChoiceDecoderBodyElementForArray(12, tag, fieldName(fieldName), inner, "set")
+                {"[", {:sequence, inner}} -> emitChoiceDecoderBodyElementForArray(12, tag, fieldName(fieldName), inner, "sequence")
+                _ -> case name == "LDAPMessage_protocolOp_Choice" do 
+                 true -> :io.format 'TRACE: ~p~n', [{tag,name,_elementSet,_optional,_x,_y}]
+                    _ -> :io
+                 end
+                      emitChoiceDecoderBodyElement(12, tag, fieldName(fieldName),
                         substituteType(lookup(fieldType(name, fieldName(fieldName), type))))
            end
          _ -> ""
@@ -484,6 +502,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
 
   def compile() do
       {:ok, f} = :file.list_dir inputDir()
+      :io.format 'F: ~p~n', [f]
       files = :lists.filter(fn x -> [_,y] = :string.tokens(x, '.') ; y == 'asn1' end, f)
       setEnv(:save, false) ; :lists.map(fn file -> compile(false, inputDir() <> :erlang.list_to_binary(file))  end, files)
       setEnv(:save, false) ; :lists.map(fn file -> compile(false, inputDir() <> :erlang.list_to_binary(file))  end, files)
@@ -598,10 +617,10 @@ public struct #{name} : Hashable, Sendable, Comparable {
       :filelib.ensure_dir(dir)
       norm = normalizeName(bin(name))
       fileName = dir <> norm <> ".swift"
+      verbose = getEnv(:verbose, false)
       case :lists.member(norm,exceptions()) do
            true ->  print 'skipping: ~ts.swift~n', [fileName] ; setEnv(:verbose, verbose)
-           false -> :ok = :file.write_file(fileName,res)
-                    verbose = getEnv(:verbose, false) ; setEnv(:verbose, true)
+           false -> :ok = :file.write_file(fileName,res)      ; setEnv(:verbose, true)
                     print 'compiled: ~ts.swift~n', [fileName] ; setEnv(:verbose, verbose) end
   end
 
@@ -635,7 +654,10 @@ public struct #{name} : Hashable, Sendable, Comparable {
   def bin(x) when is_list(x), do: :erlang.list_to_binary x
   def bin(x), do: x
   def tagNo([]), do: []
-  def tagNo([{:tag,:CONTEXT,nox,_,_}]) do nox end
+  def tagNo([{:tag,_,nox,x,y}]) do nox end
+  def tagClass([]), do: []
+  def tagClass([{:tag,:CONTEXT,_,_,_}]) do ".contextSpecific" end
+  def tagClass([{:tag,:APPLICATION,_,_,_}]) do ".application" end
   def pad(x), do: String.duplicate(" ", x)
   def partArray(bin), do: part(bin, 1, :erlang.size(bin) - 2)
   def part(a, x, y) do
