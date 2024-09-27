@@ -19,9 +19,15 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier: ASN1Identifier) throws {
         switch self {
             case .simple(let simple):
-                try coder.appendConstructedNode(
-                identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific),
-                { coder in try coder.serialize(simple) })
+                try coder.appendPrimitiveNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { bytes in
+                   bytes.append(contentsOf: simple.bytes)
+                }
+
+//                try coder.serialize(simple)
+//                try coder.serialize(simple, explicitlyTaggedWithIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+//                try coder.appendConstructedNode(
+//                identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific),
+//                { coder in try coder.serialize(simple) })
             case .sasl(let sasl):
                 try coder.appendConstructedNode(
                 identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific),

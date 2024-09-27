@@ -75,9 +75,10 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier: ASN1Identifier) throws {
         switch self {
             case .bindRequest(let bindRequest):
-                try coder.appendConstructedNode(
-                identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .application),
-                { coder in try coder.serialize(bindRequest) })
+                try coder.serialize(bindRequest)
+                // coder.appendConstructedNode(
+                //identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .application),
+                //{ coder in try coder.serialize(bindRequest) })
             case .bindResponse(let bindResponse):
                 try coder.appendConstructedNode(
                 identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .application),

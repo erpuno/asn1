@@ -19,6 +19,8 @@ extension ASN1Identifier {
     public static let utf8String         = ASN1Identifier(tagWithNumber: 0x0c, tagClass: ASN1Identifier.TagClass.universal)
     public static let relativeIdentifier = ASN1Identifier(tagWithNumber: 0x0d, tagClass: ASN1Identifier.TagClass.universal)
     public static let time               = ASN1Identifier(tagWithNumber: 0x0e, tagClass: ASN1Identifier.TagClass.universal)
+    public static let sequenceOf         = ASN1Identifier(tagWithNumber: 0x10, tagClass: ASN1Identifier.TagClass.universal)
+    public static let setOf              = ASN1Identifier(tagWithNumber: 0x11, tagClass: ASN1Identifier.TagClass.universal)
     public static let numericString      = ASN1Identifier(tagWithNumber: 0x12, tagClass: ASN1Identifier.TagClass.universal)
     public static let printableString    = ASN1Identifier(tagWithNumber: 0x13, tagClass: ASN1Identifier.TagClass.universal)
     public static let teletexString      = ASN1Identifier(tagWithNumber: 0x14, tagClass: ASN1Identifier.TagClass.universal)

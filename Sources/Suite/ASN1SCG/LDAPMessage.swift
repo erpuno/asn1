@@ -23,7 +23,8 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
-        try coder.appendConstructedNode(identifier: identifier) { coder in
+        try coder.appendConstructedNode(identifier: ASN1Identifier.sequence) { coder in
+            print(": identifier \(identifier)")
             try coder.serialize(messageID)
             try coder.serialize(protocolOp)
             if let controls = self.controls { try coder.serializeSequenceOf(controls, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }

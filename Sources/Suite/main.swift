@@ -47,7 +47,7 @@ public class Console {
      do {
        try showName(data: [48,13,49,11,48,9,6,3,85,4,6,19,2,85,65])
        try showDirectoryString(data: [19,3,49,50,51])
-       try showLDAPMessage(data: [48,16,2,1,1,96,9, 2,1,1,4,0,128,2,49,50,160,0])
+       try showLDAPMessage(data: [48,16,2,1,1,96,9,2,1,1,4,0,128,2,49,50,160,0])
        try showCertificate(file: "ca.crt")
        print(": PASSED")
        return 0
