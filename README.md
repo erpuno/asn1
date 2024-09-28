@@ -6,8 +6,8 @@ Minimal (normal), full, idiomatic, correct by construction, respects equality.
 
 ```
 % ./asn1.ex
-Copyright © 2023—2024 Namdak Tönpa.
-ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 1.9.27.
+Copyright © 1994—2024 Namdak Tönpa.
+ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 30.9.27.
 Usage: ./asn1.ex help | compile [-v] [input [output]]
 ```
 
