@@ -390,11 +390,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
                  :application.get_env(:asn1scg, {:array, lookup(fieldType(name,fieldName(fieldName),type))}, [])} do
                 {"[", {:set, inner}} -> emitChoiceDecoderBodyElementForArray(12, tag, fieldName(fieldName), inner, "set")
                 {"[", {:sequence, inner}} -> emitChoiceDecoderBodyElementForArray(12, tag, fieldName(fieldName), inner, "sequence")
-                _ -> case name == "LDAPMessage_protocolOp_Choice" do 
-                 true -> :io.format 'TRACE: ~p~n', [{tag,name,_elementSet,_optional,_x,_y}]
-                    _ -> :io
-                 end
-                      emitChoiceDecoderBodyElement(12, tag, fieldName(fieldName),
+                _ -> emitChoiceDecoderBodyElement(12, tag, fieldName(fieldName),
                         substituteType(lookup(fieldType(name, fieldName(fieldName), type))))
            end
          _ -> ""
@@ -651,7 +647,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
   def bin(x) when is_list(x), do: :erlang.list_to_binary x
   def bin(x), do: x
   def tagNo([]), do: []
-  def tagNo([{:tag,_,nox,x,y}]) do nox end
+  def tagNo([{:tag,_,nox,_,_}]) do nox end
   def tagClass([]), do: []
   def tagClass([{:tag,:CONTEXT,_,_,_}]),     do: ".contextSpecific" # https://github.com/erlang/otp/blob/master/lib/asn1/src/asn1ct_parser2.erl#L2011
   def tagClass([{:tag,:APPLICATION,_,_,_}]), do: ".application"
@@ -675,7 +671,7 @@ case System.argv() do
   ["compile","-v",i]   -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:verbose, true) ; ASN1.compile
   ["compile",i,o]      -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.compile
   ["compile","-v",i,o] -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.setEnv(:verbose, true) ; ASN1.compile
-  _ -> :io.format('Copyright © 2023—2024 Namdak Tönpa.~n')
-       :io.format('ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 1.9.27.~n')
+  _ -> :io.format('Copyright © 1994—2024 Namdak Tönpa.~n')
+       :io.format('ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 30.9.27.~n')
        :io.format('Usage: ./asn1.ex help | compile [-v] [input [output]]~n')
 end
