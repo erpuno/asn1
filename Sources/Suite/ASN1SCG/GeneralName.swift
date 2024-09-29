@@ -20,9 +20,12 @@ import Foundation
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
                 self = .dNSName(try ASN1IA5String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                self = .directoryName(try Name(derEncoded: rootNode, withIdentifier: withIdentifier))
+                guard case .constructed(let nodes) = rootNode.content else { preconditionFailure("Explicit tags are always constructed") }
+                var i = nodes.makeIterator()
+                guard let child = i.next() else { throw ASN1Error.invalidASN1Object(reason: "Empty child") }
+                self = .directoryName(try Name(derEncoded: child))
             case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
-                self = .uniformResourceIdentifier(try ASN1IA5String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .uniformResourceIdentifier(try ASN1IA5String(derEncoded: rootNode))
             case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
                 self = .iPAddress(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific):
@@ -45,14 +48,9 @@ import Foundation
                 identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific),
                 { coder in try coder.serialize(dNSName) })
             case .directoryName(let directoryName):
-//                try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) { codec in
-//                   try codec.serialize(directoryName)
-                   //bytes.append(contentsOf: simple.bytes)
-//                }
-
                 try coder.appendConstructedNode(
                 identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific),
-                { coder in try coder.serialize(directoryName) })
+                { coder in try coder.serialize(directoryName)})
             case .uniformResourceIdentifier(let uniformResourceIdentifier):
                 try coder.appendConstructedNode(
                 identifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific),

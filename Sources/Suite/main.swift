@@ -68,12 +68,13 @@ public class Console {
 
   public static func suite() throws -> Int32 {
      do {
-       try showName(data: [48,13,49,11,48,9,6,3,85,4,6,19,2,85,65])
-//       try showGeneralName(data: [164,2,48,0])
-       try showDirectoryString(data: [19,3,49,50,51])
-       try showLDAPMessage(data: [48,16,2,1,1,96,9,2,1,1,4,0,128,2,49,50,160,0])
        try showCertificate(file: "ca.crt")
        try showContentInfo(file: "data.bin")
+       try showDirectoryString(data: [19,3,49,50,51])
+       try showLDAPMessage(data: [48,16,2,1,1,96,9,2,1,1,4,0,128,2,49,50,160,0])
+       try showName(data: [48,13,49,11,48,9,6,3,85,4,6,19,2,85,65])
+       try showName(data: [48,0])
+       try showGeneralName(data: [164,2,48,0])
        print(": PASSED")
        return 0
      } catch {
