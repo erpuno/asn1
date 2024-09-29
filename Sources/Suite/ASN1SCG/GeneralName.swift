@@ -20,7 +20,7 @@ import Foundation
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
                 self = .dNSName(try ASN1IA5String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                self = .directoryName(try Name(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .directoryName(try Name(derEncoded: rootNode, withIdentifier: withIdentifier))
             case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
                 self = .uniformResourceIdentifier(try ASN1IA5String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
@@ -45,6 +45,11 @@ import Foundation
                 identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific),
                 { coder in try coder.serialize(dNSName) })
             case .directoryName(let directoryName):
+//                try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) { codec in
+//                   try codec.serialize(directoryName)
+                   //bytes.append(contentsOf: simple.bytes)
+//                }
+
                 try coder.appendConstructedNode(
                 identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific),
                 { coder in try coder.serialize(directoryName) })

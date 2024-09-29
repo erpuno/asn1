@@ -24,8 +24,10 @@ import Foundation
             let version: Int = try Int(derEncoded: &nodes)
             let digestAlgorithms: [AlgorithmIdentifier] = try DER.set(of: AlgorithmIdentifier.self, identifier: .set, nodes: &nodes)
             let encapContentInfo: EncapsulatedContentInfo = try EncapsulatedContentInfo(derEncoded: &nodes)
-            let certificates: [Certificate] = try DER.set(of: Certificate.self, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific), nodes: &nodes)
-            let crls: [CertificateList] = try DER.set(of: CertificateList.self, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific), nodes: &nodes)
+            nodes.next() ; let certificates: [Certificate]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific,
+               { node in return try DER.set(of: Certificate.self, identifier: .set, rootNode: node) })
+            let crls: [CertificateList]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific)
+               { node in return try DER.set(of: CertificateList.self, identifier: .set, rootNode: node) }
             let signerInfos: [SignerInfo] = try DER.set(of: SignerInfo.self, identifier: .set, nodes: &nodes)
             return SignedData(version: version, digestAlgorithms: digestAlgorithms, encapContentInfo: encapContentInfo, certificates: certificates, crls: crls, signerInfos: signerInfos)
         }

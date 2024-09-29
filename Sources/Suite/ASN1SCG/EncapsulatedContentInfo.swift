@@ -15,6 +15,7 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let eContentType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let eContent: ASN1OctetString? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
+            nodes.next()
             return EncapsulatedContentInfo(eContentType: eContentType, eContent: eContent)
         }
     }

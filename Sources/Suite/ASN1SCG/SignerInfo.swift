@@ -26,10 +26,12 @@ import Foundation
             let version: Int = try Int(derEncoded: &nodes)
             let sid: SignerIdentifier = try SignerIdentifier(derEncoded: &nodes)
             let digestAlgorithm: AlgorithmIdentifier = try AlgorithmIdentifier(derEncoded: &nodes)
-            let signedAttrs: [PartialAttribute] = try DER.set(of: PartialAttribute.self, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific), nodes: &nodes)
+            nodes.next() ; let signedAttrs: [PartialAttribute]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific)
+               { node in return try DER.set(of: PartialAttribute.self, identifier: .set, rootNode: node) }
             let signatureAlgorithm: AlgorithmIdentifier = try AlgorithmIdentifier(derEncoded: &nodes)
             let signature: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
-            let unsignedAttrs: [PartialAttribute] = try DER.set(of: PartialAttribute.self, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific), nodes: &nodes)
+            nodes.next() ; let unsignedAttrs: [PartialAttribute]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific)
+               { node in return try DER.set(of: PartialAttribute.self, identifier: .set, rootNode: node) }
             return SignerInfo(version: version, sid: sid, digestAlgorithm: digestAlgorithm, signedAttrs: signedAttrs, signatureAlgorithm: signatureAlgorithm, signature: signature, unsignedAttrs: unsignedAttrs)
         }
     }
