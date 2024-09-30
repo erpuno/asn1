@@ -57,9 +57,10 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier: ASN1Identifier) throws {
         switch self {
             case .register(let register):
-                try coder.appendConstructedNode(
-                identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific),
-                { coder in try coder.serialize(register) })
+                try coder.serializeOptionalImplicitlyTagged(register, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+                //try coder.appendConstructedNode(
+                //identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific),
+                //{ coder in try coder.serialize(register, explicitlyTaggedWithIdentifier: withIdentifier) })
             case .auth(let auth):
                 try coder.appendConstructedNode(
                 identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific),

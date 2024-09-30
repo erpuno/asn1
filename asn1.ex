@@ -672,6 +672,6 @@ case System.argv() do
   ["compile",i,o]      -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.compile
   ["compile","-v",i,o] -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.setEnv(:verbose, true) ; ASN1.compile
   _ -> :io.format('Copyright © 1994—2024 Namdak Tönpa.~n')
-       :io.format('ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 30.9.27.~n')
+       :io.format('ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 30.10.1.~n')
        :io.format('Usage: ./asn1.ex help | compile [-v] [input [output]]~n')
 end
