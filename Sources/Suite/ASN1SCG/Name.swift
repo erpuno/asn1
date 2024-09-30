@@ -16,8 +16,7 @@ import Foundation
                 try DER.sequence(root, identifier: .sequence) { nodes in
                      var w1: [AttributeTypeAndValue] = []
                      while let node = nodes.next() {
-                       w1.append(contentsOf:
-                          try DER.set(of: AttributeTypeAndValue.self, identifier: .set, rootNode: node))
+                       w1.append(contentsOf: try DER.set(of: AttributeTypeAndValue.self, identifier: .set, rootNode: node))
                      }
                      if (w1 != []) { w.append(w1) }
                 }
