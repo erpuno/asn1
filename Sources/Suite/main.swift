@@ -1,7 +1,7 @@
 import SwiftASN1
 import Foundation
 
-exit(try Console.suite())
+exit(Console.suite())
 
 public class Console {
 
@@ -66,7 +66,7 @@ public class Console {
      }
   }
 
-  public static func suite() throws -> Int32 {
+  public static func suite() -> Int32 {
      do {
        try showCertificate(file: "ca.crt")
        try showContentInfo(file: "data.bin")

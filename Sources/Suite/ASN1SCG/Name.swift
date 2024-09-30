@@ -19,7 +19,7 @@ import Foundation
                        w1.append(contentsOf:
                           try DER.set(of: AttributeTypeAndValue.self, identifier: .set, rootNode: node))
                      }
-                     w.append(w1)
+                     if (w1 != []) { w.append(w1) }
                 }
                 self = Name.rdnSequence(w)
             default: throw ASN1Error.unexpectedFieldType(root.identifier)
