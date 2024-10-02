@@ -8,14 +8,14 @@ SUITE-IMPLICIT DEFINITIONS IMPLICIT TAGS ::= BEGIN
 
   AtomicOpt ::= SET {
     int INTEGER,
-    octetSet SET OF OCTET STRING,
+    octetSet [1] SET OF OCTET STRING,
     octetOpt OCTET STRING OPTIONAL,
-    octetSetOpt SET OF OCTET STRING OPTIONAL,
+    octetSetOpt [2] SET OF OCTET STRING OPTIONAL,
     boolOpt BOOLEAN OPTIONAL,
     real Real
   }
 
-  ImpExp ::= SEQUENCE {
+  ImpExpProd ::= SEQUENCE {
     intSetImp [1] IMPLICIT SET OF INTEGER (0..7),
     intSetExp [2] EXPLICIT SET OF INTEGER (0..7),
     intImp [3] IMPLICIT INTEGER (0..7),
@@ -28,7 +28,16 @@ SUITE-IMPLICIT DEFINITIONS IMPLICIT TAGS ::= BEGIN
     intExpOpt [0] EXPLICIT INTEGER (0..7) OPTIONAL
   }
 
-  NoTags ::= SEQUENCE {
+  ImpExpSum ::= CHOICE {
+    intSetImp [1] IMPLICIT SET OF INTEGER (0..7),
+    intSetExp [2] EXPLICIT SET OF INTEGER (0..7),
+    intImp [3] IMPLICIT INTEGER (0..7),
+    intExp [4] EXPLICIT INTEGER (0..7),
+    boolImp [5] IMPLICIT BOOLEAN,
+    boolExp [6] EXPLICIT BOOLEAN
+  }
+
+  NoTagsTagsMix ::= SEQUENCE {
     intSet1 SET OF INTEGER (0..7),
     intSet2 SET OF INTEGER (0..7),
     seqSet1 SEQUENCE OF INTEGER (0..7),
@@ -37,15 +46,15 @@ SUITE-IMPLICIT DEFINITIONS IMPLICIT TAGS ::= BEGIN
     int2 INTEGER (0..7),
     bool1 BOOLEAN,
     bool2 BOOLEAN,
-    intSetOpt1 SET OF INTEGER (0..7) OPTIONAL,
-    intSetOpt2 SET OF INTEGER (0..7) OPTIONAL,
-    intOpt1 INTEGER (0..7) OPTIONAL,
-    intOpt2 INTEGER (0..7) OPTIONAL
+    intSetOpt1 [1] SET OF INTEGER (0..7) OPTIONAL,
+    intSetOpt2 [2] SET OF INTEGER (0..7) OPTIONAL,
+    intOpt1 [3] INTEGER (0..7) OPTIONAL,
+    intOpt2 [4] INTEGER (0..7) OPTIONAL
   }
 
   Versioning ::= INTEGER {  v1(0) }
 
--- > 'List':decode('List',<<48,4,4,0,5,0>>).
+-- > 'SUITE-IMPLICIT':decode('List',<<48,4,4,0,5,0>>).
 -- {ok,{'List',<<>>,{'end','NULL'}}}
 
   List ::= SEQUENCE {
@@ -56,7 +65,7 @@ SUITE-IMPLICIT DEFINITIONS IMPLICIT TAGS ::= BEGIN
     }
   }
 
--- > 'List':decode('Tensor',<<48,9,49,7,48,5,48,3,2,1,1>>).
+-- > 'SUITE-IMPLICIT':decode('Tensor',<<48,9,49,7,48,5,48,3,2,1,1>>).
 -- {ok,{'Tensor',[[[1]]]}}
 
   Tensor ::= SEQUENCE {
@@ -65,12 +74,33 @@ SUITE-IMPLICIT DEFINITIONS IMPLICIT TAGS ::= BEGIN
          SEQUENCE OF INTEGER
   }
 
--- > 'List':decode('ListOrTensor',<<161,4,4,0,5,0>>).
+-- > 'SUITE-IMPLICIT':decode('ListOrTensorRaw',<<161,4,4,0,5,0>>).
 -- {ok,{list,{'List',<<>>,{'end','NULL'}}}}
 
-  ListOrTensor ::= CHOICE {
+  ListOrTensorRaw ::= CHOICE {
     list [1] List,
     tensor [2] Tensor
+  }
+
+  ListOrTensorTags ::= CHOICE {
+    list1 [1] List,
+    list2 [2] IMPLICIT List,
+    list3 [3] EXPLICIT List,
+    tensor1 [4] Tensor,
+    tensor2 [5] IMPLICIT Tensor,
+    tensor3 [6] EXPLICIT Tensor
+  }
+
+-- > 'SUITE-IMPLICIT':encode('Msg',{protocolOp,{seq,{'Seq',{oct,"3"}}}}).
+-- {ok,<<48,5,96,3,129,1,51>>}
+
+  Msg ::= SEQUENCE { protocolOp CHOICE { seq Seq } }
+  Seq ::= [APPLICATION 0] SEQUENCE { listOrTensor  ListOrTensorApp }
+  ListOrTensorApp ::= CHOICE {
+    oct [1] OCTET STRING,
+    tensor [2] Tensor,
+    list [3] List,
+    ...
   }
 
 END
