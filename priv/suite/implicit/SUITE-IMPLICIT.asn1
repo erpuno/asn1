@@ -25,7 +25,9 @@ SUITE-IMPLICIT DEFINITIONS IMPLICIT TAGS ::= BEGIN
     intSetImpOpt [7] IMPLICIT SET OF INTEGER (0..7) OPTIONAL,
     intSetExpOpt [8] EXPLICIT SET OF INTEGER (0..7) OPTIONAL,
     intImpOpt [9] IMPLICIT INTEGER (0..7) OPTIONAL,
-    intExpOpt [0] EXPLICIT INTEGER (0..7) OPTIONAL
+    intExpOpt [10] EXPLICIT INTEGER (0..7) OPTIONAL,
+    realSetImp [11] IMPLICIT SET OF Real,
+    realSetExp [12] EXPLICIT SET OF Real
   }
 
   ImpExpSum ::= CHOICE {
@@ -34,7 +36,9 @@ SUITE-IMPLICIT DEFINITIONS IMPLICIT TAGS ::= BEGIN
     intImp [3] IMPLICIT INTEGER (0..7),
     intExp [4] EXPLICIT INTEGER (0..7),
     boolImp [5] IMPLICIT BOOLEAN,
-    boolExp [6] EXPLICIT BOOLEAN
+    boolExp [6] EXPLICIT BOOLEAN,
+    realSetImp [7] IMPLICIT SET OF Real,
+    realSetExp [8] EXPLICIT SET OF Real
   }
 
   NoTagsTagsMix ::= SEQUENCE {
@@ -52,17 +56,14 @@ SUITE-IMPLICIT DEFINITIONS IMPLICIT TAGS ::= BEGIN
     intOpt2 [4] INTEGER (0..7) OPTIONAL
   }
 
-  Versioning ::= INTEGER {  v1(0) }
+  Versioning ::= INTEGER { v1(0) }
 
 -- > 'SUITE-IMPLICIT':decode('List',<<48,4,4,0,5,0>>).
 -- {ok,{'List',<<>>,{'end','NULL'}}}
 
   List ::= SEQUENCE {
     data OCTET STRING,
-    next CHOICE {
-         list List,
-         end NULL
-    }
+    next CHOICE { list List, end NULL }
   }
 
 -- > 'SUITE-IMPLICIT':decode('Tensor',<<48,9,49,7,48,5,48,3,2,1,1>>).
@@ -79,7 +80,10 @@ SUITE-IMPLICIT DEFINITIONS IMPLICIT TAGS ::= BEGIN
 
   ListOrTensorRaw ::= CHOICE {
     list [1] List,
-    tensor [2] Tensor
+    tensor [2] Tensor,
+    int [3] INTEGER,
+    oct [4] OCTET STRING,
+    bool [5] BOOLEAN
   }
 
   ListOrTensorTags ::= CHOICE {
@@ -88,7 +92,10 @@ SUITE-IMPLICIT DEFINITIONS IMPLICIT TAGS ::= BEGIN
     list3 [3] EXPLICIT List,
     tensor1 [4] Tensor,
     tensor2 [5] IMPLICIT Tensor,
-    tensor3 [6] EXPLICIT Tensor
+    tensor3 [6] EXPLICIT Tensor,
+    int [7] INTEGER,
+    oct [8] OCTET STRING,
+    bool [9] BOOLEAN
   }
 
 -- > 'SUITE-IMPLICIT':encode('Msg',{protocolOp,{seq,{'Seq',{oct,"3"}}}}).
@@ -97,9 +104,21 @@ SUITE-IMPLICIT DEFINITIONS IMPLICIT TAGS ::= BEGIN
   Msg ::= SEQUENCE { protocolOp CHOICE { seq Seq } }
   Seq ::= [APPLICATION 0] SEQUENCE { listOrTensor  ListOrTensorApp }
   ListOrTensorApp ::= CHOICE {
-    oct [1] OCTET STRING,
-    tensor [2] Tensor,
-    list [3] List,
+    int [1] INTEGER,
+    oct [2] OCTET STRING,
+    bool [3] BOOLEAN,
+    ts [4] TeletexString,
+    us [5] UniversalString,
+    ias [6] IA5String,
+    vs [7] VisibleString,
+    utf8 [8] UTF8String,
+    ps [9] PrintableString,
+    ns [10] NumericString,
+    bpm [11] BMPString,
+    bs [12] BIT STRING,
+    io [13] OBJECT IDENTIFIER,
+    tensor [100] Tensor,
+    list [101] List,
     ...
   }
 

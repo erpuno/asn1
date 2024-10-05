@@ -20,9 +20,14 @@ wholechars abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._
     keyword whole UniversalString yellow
     keyword whole PrintableString yellow
     keyword whole TeletexString yellow
+    keyword whole VisibleString yellow
+    keyword whole NumericString yellow
     keyword whole UTF8String yellow
     keyword whole BMPString yellow
     keyword whole OCTET yellow
+    keyword whole NULL yellow
+    keyword whole OBJECT yellow
+    keyword whole IDENTIFIER yellow
     keyword whole REAL yellow
     keyword whole URI yellow
     keyword whole STRING yellow
@@ -34,20 +39,28 @@ wholechars abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._
     keyword whole TRUE white
 
     keyword whole DEFAULT cyan
+    keyword whole IMPORTS cyan
     keyword whole OPTIONAL cyan
     keyword whole DEFINITIONS cyan
     keyword whole BEGIN cyan
     keyword whole END cyan
     keyword whole TAGS cyan
     keyword whole OF cyan
+    keyword whole BY cyan
     keyword whole SIZE cyan
+    keyword whole FROM cyan
     keyword MAX cyan
     keyword whole EXPLICIT cyan
     keyword whole IMPLICIT cyan
-    keyword whole SEQUENCE  cyan
+    keyword whole SEQUENCE cyan
+    keyword whole CLASS cyan
+    keyword whole WITH cyan
+    keyword whole SYNTAX cyan
     keyword whole SET cyan
     keyword whole CHOICE cyan
-    keyword whole ENUM cyan
+    keyword whole UNIQUE cyan
+    keyword whole IDENTIFIED cyan
+    keyword whole ENUMERATED cyan
 
 wholechars abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_
 
