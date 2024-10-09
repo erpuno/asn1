@@ -138,17 +138,17 @@ defmodule ASN1 do
   # Scalar Sum Component
 
   def emitChoiceElement(name, type), do: "case #{name}(#{lookup(bin(normalizeName(type)))})\n"
-  def emitChoiceEncoderBodyElement(w, no, name, spec) when no == [], do:
+  def emitChoiceEncoderBodyElement(w, no, name, _type, spec) when no == [], do:
       pad(w) <> "case .#{name}(let #{name}): try coder.serialize#{spec}(#{name})"
-  def emitChoiceEncoderBodyElement(w, no, name, spec), do:
+  def emitChoiceEncoderBodyElement(w, no, name, _type, spec), do:
       pad(w) <> "case .#{name}(let #{name}):\n" <>
       pad(w+4) <> "try coder.appendConstructedNode(\n" <>
       pad(w+4) <> "identifier: ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}),\n" <>
       pad(w+4) <> "{ coder in try coder.serialize#{spec}(#{name}) })"
-  def emitChoiceDecoderBodyElement(w, no, name, type) when no == [], do:
+  def emitChoiceDecoderBodyElement(w, no, name, type, _spec) when no == [], do:
       pad(w) <> "case #{type}.defaultIdentifier:\n" <>
       pad(w+4) <> "self = .#{name}(try #{type}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
-  def emitChoiceDecoderBodyElement(w, no, name, type), do:
+  def emitChoiceDecoderBodyElement(w, no, name, type, _spec), do:
       pad(w) <> "case ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}):\n" <>
       pad(w+4) <> "self = .#{name}(try #{type}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
 
@@ -357,19 +357,19 @@ public struct #{name} : Hashable, Sendable, Comparable {
 
   def emitChoiceEncoderBody(name,cases), do:
       Enum.join(:lists.map(fn
-        {:ComponentType,_,fieldName,{:type,tag,{:"SEQUENCE OF", {_,_,_type,_,_,_}},_,_,_},_,_,_} ->
+        {:ComponentType,_,fieldName,{:type,tag,{:"SEQUENCE OF", {_,_,type,_,_,_}},_,_,_},_,_,_} ->
            trace(8)
-           emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), "SequenceOf")
-        {:ComponentType,_,fieldName,{:type,tag,{:"SET OF", {_,_,_type,_,_,_}},_,_,_},_,_,_} ->
+           emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), type, "SequenceOf")
+        {:ComponentType,_,fieldName,{:type,tag,{:"SET OF", {_,_,type,_,_,_}},_,_,_},_,_,_} ->
            trace(9)
-           emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), "SetOf")
+           emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), type, "SetOf")
         {:ComponentType,_,fieldName,{:type,tag,type,_elementSet,[],:no},_optional,_,_} ->
            trace(10)
            case {part(lookup(fieldType(name,fieldName,type)),0,1),
                  :application.get_env(:asn1scg, {:array, lookup(fieldType(name,fieldName(fieldName),type))}, [])} do
-                {"[", {:set, _}} -> emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), "SetOf")
-                {"[", {:sequence, _}} -> emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), "SequenceOf")
-                _ -> emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), "")
+                {"[", {:set, _}} -> emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), type, "SetOf")
+                {"[", {:sequence, _}} -> emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), type, "SequenceOf")
+                _ -> emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), type, "")
            end
          _ -> ""
       end, cases), "\n")
@@ -391,7 +391,7 @@ public struct #{name} : Hashable, Sendable, Comparable {
                 {"[", {:set, inner}} -> emitChoiceDecoderBodyElementForArray(12, tag, fieldName(fieldName), inner, "set")
                 {"[", {:sequence, inner}} -> emitChoiceDecoderBodyElementForArray(12, tag, fieldName(fieldName), inner, "sequence")
                 _ -> emitChoiceDecoderBodyElement(12, tag, fieldName(fieldName),
-                        substituteType(lookup(fieldType(name, fieldName(fieldName), type))))
+                        substituteType(lookup(fieldType(name, fieldName(fieldName), type))), "")
            end
          _ -> ""
       end, cases), "\n")
@@ -672,6 +672,6 @@ case System.argv() do
   ["compile",i,o]      -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.compile
   ["compile","-v",i,o] -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.setEnv(:verbose, true) ; ASN1.compile
   _ -> :io.format('Copyright © 1994—2024 Namdak Tönpa.~n')
-       :io.format('ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 30.10.1.~n')
+       :io.format('ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 30.10.7.~n')
        :io.format('Usage: ./asn1.ex help | compile [-v] [input [output]]~n')
 end

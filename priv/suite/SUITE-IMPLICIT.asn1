@@ -81,8 +81,8 @@ SUITE-IMPLICIT DEFINITIONS IMPLICIT TAGS ::= BEGIN
   ListOrTensorRaw ::= CHOICE {
     list [1] List,
     tensor [2] Tensor,
-    int [3] INTEGER,
-    oct [4] OCTET STRING,
+    int  [3] INTEGER,
+    oct  [4] OCTET STRING,
     bool [5] BOOLEAN
   }
 
@@ -93,8 +93,8 @@ SUITE-IMPLICIT DEFINITIONS IMPLICIT TAGS ::= BEGIN
     tensor1 [4] Tensor,
     tensor2 [5] IMPLICIT Tensor,
     tensor3 [6] EXPLICIT Tensor,
-    int [7] INTEGER,
-    oct [8] OCTET STRING,
+    int  [7] INTEGER,
+    oct  [8] OCTET STRING,
     bool [9] BOOLEAN
   }
 
@@ -102,23 +102,23 @@ SUITE-IMPLICIT DEFINITIONS IMPLICIT TAGS ::= BEGIN
 -- {ok,<<48,5,96,3,129,1,51>>}
 
   Msg ::= SEQUENCE { protocolOp CHOICE { seq Seq } }
-  Seq ::= [APPLICATION 0] SEQUENCE { listOrTensor  ListOrTensorApp }
+  Seq ::= [APPLICATION 0] SEQUENCE { listOrTensor ListOrTensorApp }
   ListOrTensorApp ::= CHOICE {
-    int [1] INTEGER,
-    oct [2] OCTET STRING,
+    int  [1] INTEGER,
+    oct  [2] OCTET STRING,
     bool [3] BOOLEAN,
-    ts [4] TeletexString,
-    us [5] UniversalString,
-    ias [6] IA5String,
-    vs [7] VisibleString,
+    ts   [4] TeletexString,
+    us   [5] UniversalString,
+    ias  [6] IA5String,
+    vs   [7] VisibleString,
     utf8 [8] UTF8String,
-    ps [9] PrintableString,
-    ns [10] NumericString,
-    bpm [11] BMPString,
-    bs [12] BIT STRING,
-    io [13] OBJECT IDENTIFIER,
+    ps   [9] PrintableString,
+    ns   [10] NumericString,
+    bpm  [11] BMPString,
+    bs   [12] BIT STRING,
+    io   [13] OBJECT IDENTIFIER,
     tensor [100] Tensor,
-    list [101] List,
+    list   [101] List,
     ...
   }
 
