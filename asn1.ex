@@ -14,7 +14,7 @@ defmodule ASN1 do
       type1 = bin(type)
       case level do
            "" -> []
-            _ -> print 'array: #{level} : ~ts = [~ts] ~p ~n', [name1, type1, tag]
+            _ -> print "array: #{level} : ~ts = [~ts] ~p ~n", [name1, type1, tag]
       end
       setEnv(name1, "[#{type1}]")
       setEnv({:array, name1}, {tag, type1})
@@ -320,12 +320,12 @@ public struct #{name} : Hashable, Sendable, Comparable {
                   case line do
                    {:'ComponentType',l,name,{:type,tag,ref,x,y,no},opt,z,w} ->
                         tagNew = case tag do [] -> [{:tag,:APPLICATION,newNo,:'IMPLICIT',32}] ; x -> x end
-                        :io.format 'line: ~p~n', [{line,tagNew}]
+                        :io.format "line: ~p~n", [{line,tagNew}]
                         {:'ComponentType',l,name,{:type,tagNew,ref,x,y,no},opt,z,w}
                    _ -> []
                    end
                  end, zip))
-                 :io.format 'casesTagged: ~p~n', [casesTagged]
+                 :io.format "casesTagged: ~p~n", [casesTagged]
                  choice(fieldType(name,fieldName,fieldType), casesTagged, modname, true)
               {:INTEGER, cases} ->
                  integerEnum(fieldType(name,fieldName,fieldType), cases, modname, true)
@@ -334,8 +334,8 @@ public struct #{name} : Hashable, Sendable, Comparable {
               _ ->
                  :skip
            end
-           print 'field: ~ts.~ts : ~ts ~n', [name,fieldName(fieldName), substituteType(lookup(field))]
-           pad(w) <> 
+           print "field: ~ts.~ts : ~ts ~n", [name,fieldName(fieldName), substituteType(lookup(field))]
+           pad(w) <>
                 emitSequenceElementOptional(fieldName(fieldName), substituteType(lookup(field)), opt(optional))
          _ -> ""
       end, fields), "")
@@ -486,23 +486,23 @@ public struct #{name} : Hashable, Sendable, Comparable {
   end
 
   def dump() do
-      :lists.foldl(fn {{:array,x},{tag,y}}, _ -> print 'env array: ~ts = [~ts] ~tp ~n', [x,y,tag]
-                      {x,y}, _  when is_binary(x) -> print 'env alias: ~ts = ~ts ~n', [x,y] 
-                      {{:type,x},_}, _ -> print 'env type: ~ts = ... ~n', [x] 
+      :lists.foldl(fn {{:array,x},{tag,y}}, _ -> print "env array: ~ts = [~ts] ~tp ~n", [x,y,tag]
+                      {x,y}, _  when is_binary(x) -> print "env alias: ~ts = ~ts ~n", [x,y]
+                      {{:type,x},_}, _ -> print "env type: ~ts = ... ~n", [x]
                       _, _ -> :ok
       end, [], :lists.sort(:application.get_all_env(:asn1scg)))
   end
 
   def compile() do
       {:ok, f} = :file.list_dir inputDir()
-      :io.format 'F: ~p~n', [f]
-      files = :lists.filter(fn x -> [_,y] = :string.tokens(x, '.') ; y == 'asn1' end, f)
+      :io.format "F: ~p~n", [f]
+      files = :lists.filter(fn x -> [_,y] = :string.tokens(x, ".") ; y == "asn1" end, f)
       setEnv(:save, false) ; :lists.map(fn file -> compile(false, inputDir() <> :erlang.list_to_binary(file))  end, files)
       setEnv(:save, false) ; :lists.map(fn file -> compile(false, inputDir() <> :erlang.list_to_binary(file))  end, files)
       setEnv(:save, true)  ; :lists.map(fn file -> compile(true,  inputDir() <> :erlang.list_to_binary(file))  end, files)
-      print 'inputDir: ~ts~n', [inputDir()]
-      print 'outputDir: ~ts~n', [outputDir()]
-      print 'coverage: ~tp~n', [coverage()]
+      print "inputDir: ~ts~n", [inputDir()]
+      print "outputDir: ~ts~n", [outputDir()]
+      print "coverage: ~tp~n", [coverage()]
       dump()
       :ok
   end
@@ -556,14 +556,14 @@ public struct #{name} : Hashable, Sendable, Comparable {
           _ -> :skip
       end
       case res do
-           :skip -> print 'Unhandled type definition ~p: ~p~n', [name, typeDefinition]
+           :skip -> print "Unhandled type definition ~p: ~p~n", [name, typeDefinition]
                _ -> :skip
       end
   end
 
-  def compileValue(_pos, name, type, value, _mod), do: (print 'Unhandled value definition ~p : ~p = ~p ~n', [name, type, value] ; [])
-  def compileClass(_pos, name, _mod, type),        do: (print 'Unhandled class definition ~p : ~p~n', [name, type] ; [])
-  def compilePType(_pos, name, args, type),        do: (print 'Unhandled PType definition ~p : ~p(~p)~n', [name, type, args] ; [])
+  def compileValue(_pos, name, type, value, _mod), do: (print "Unhandled value definition ~p : ~p = ~p ~n", [name, type, value] ; [])
+  def compileClass(_pos, name, _mod, type),        do: (print "Unhandled class definition ~p : ~p~n", [name, type] ; [])
+  def compilePType(_pos, name, args, type),        do: (print "Unhandled PType definition ~p : ~p(~p)~n", [name, type, args] ; [])
   def compileModule(_pos, _name, _defid, _tagdefault, _exports, _imports), do: []
 
   def sequence(name, fields, modname, saveFlag) do
@@ -612,9 +612,9 @@ public struct #{name} : Hashable, Sendable, Comparable {
       fileName = dir <> norm <> ".swift"
       verbose = getEnv(:verbose, false)
       case :lists.member(norm,exceptions()) do
-           true ->  print 'skipping: ~ts.swift~n', [fileName] ; setEnv(:verbose, verbose)
+           true ->  print "skipping: ~ts.swift~n", [fileName] ; setEnv(:verbose, verbose)
            false -> :ok = :file.write_file(fileName,res)      ; setEnv(:verbose, true)
-                    print 'compiled: ~ts.swift~n', [fileName] ; setEnv(:verbose, verbose) end
+                    print "compiled: ~ts.swift~n", [fileName] ; setEnv(:verbose, verbose) end
   end
 
   def save(_, _, _, _), do: []
@@ -671,7 +671,7 @@ case System.argv() do
   ["compile","-v",i]   -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:verbose, true) ; ASN1.compile
   ["compile",i,o]      -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.compile
   ["compile","-v",i,o] -> ASN1.setEnv(:input, i <> "/") ; ASN1.setEnv(:output, o <> "/") ; ASN1.setEnv(:verbose, true) ; ASN1.compile
-  _ -> :io.format('Copyright © 1994—2024 Namdak Tönpa.~n')
-       :io.format('ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 30.10.7.~n')
-       :io.format('Usage: ./asn1.ex help | compile [-v] [input [output]]~n')
+  _ -> :io.format("Copyright © 1994—2024 Namdak Tönpa.~n")
+       :io.format("ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 30.10.7.~n")
+       :io.format("Usage: ./asn1.ex help | compile [-v] [input [output]]~n")
 end
