@@ -67,16 +67,16 @@ public class Console {
      }
   }
 
-  public static func verifyX509(file: String) throws {
+  public static func verifyX509(file: String, output: String = "verified.der") throws {
      let url = URL(fileURLWithPath: file)
      if (!Console.exists(f: url.path)) { print(": X509 file not found.") } else {
          let data = try Data(contentsOf: url)
          let cert = try DSTU_Certificate(derEncoded: Array(data))
          var serializer = DER.Serializer()
          try cert.serialize(into: &serializer)
-         let outputUrl = URL(fileURLWithPath: "verified.der")
+         let outputUrl = URL(fileURLWithPath: output)
          try Data(serializer.serializedBytes).write(to: outputUrl)
-         print(": X509 Certificate read and re-written to verified.der")
+         print(": X509 Certificate read and re-written to \(output)")
          print(": X509 Certificate ⟼ \(cert)\n")
          if (Array(data) != serializer.serializedBytes) { 
             print(": [WARN] DER <-> Certificate round trip differs.") 
@@ -233,8 +233,9 @@ public class Console {
 
 
        try showCertificate(file: "ca.crt")
-       try verifyX509(file: "ca.crt")
+       try verifyX509(file: "ca.crt", output: "verified.der")
        try generateX509()
+       try verifyX509(file: "generated.crt", output: "generated_verified.der")
        try showContentInfo(file: "data.bin")
        try showDirectoryString(data: [19,3,49,50,51])
        // try showLDAPMessage(data: [48,16,2,1,1,96,9,2,1,1,4,0,128,2,49,50,160,0])
