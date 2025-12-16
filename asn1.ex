@@ -143,11 +143,10 @@ defmodule ASN1 do
   def emitChoiceElement(name, type), do: "case #{name}(#{lookup(bin(normalizeName(type)))})\n"
   def emitChoiceEncoderBodyElement(w, no, name, _type, spec) when no == [], do:
       pad(w) <> "case .#{name}(let #{name}): try coder.serialize#{spec}(#{name})"
-  def emitChoiceEncoderBodyElement(w, no, name, _type, spec), do:
-      pad(w) <> "case .#{name}(let #{name}):\n" <>
-      pad(w+4) <> "try coder.appendConstructedNode(\n" <>
-      pad(w+4) <> "identifier: ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}),\n" <>
-      pad(w+4) <> "{ coder in try coder.serialize#{spec}(#{name}) })"
+  def emitChoiceEncoderBodyElement(w, no, name, _type, spec) do
+      label = if spec == "", do: "withIdentifier", else: "identifier"
+      pad(w) <> "case .#{name}(let #{name}): try coder.serialize#{spec}(#{name}, #{label}: ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}))"
+  end
   def emitChoiceDecoderBodyElement(w, no, name, type, _spec) when no == [], do:
       pad(w) <> "case #{type}.defaultIdentifier:\n" <>
       pad(w+4) <> "self = .#{name}(try #{type}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
@@ -165,7 +164,7 @@ defmodule ASN1 do
       pad(w+4) <> "self = .#{name}(try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, nodes: &nodes))"
   def emitChoiceDecoderBodyElementForArray(w, no,  name, type, spec), do:
       pad(w) <> "case ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}):\n" <>
-      pad(w+4) <> "self = .#{name}(try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: rootNode))"
+      pad(w+4) <> "self = .#{name}(try DER.#{spec}(of: #{type}.self, identifier: rootNode.identifier, rootNode: rootNode))"
 
   def emitSequenceDefinition(name,fields,ctor,decoder,encoder), do:
 """
@@ -187,8 +186,8 @@ import SwiftASN1\nimport Foundation\n
 """
 #{emitImprint()}
 import SwiftASN1\nimport Foundation\n
-@usableFromInline indirect enum #{name}: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
-    @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }\n#{cases}#{decoder}#{encoder}
+@usableFromInline indirect enum #{name}: DERParseable, DERSerializable, Hashable, Sendable {
+    #{cases}#{decoder}#{encoder}
 }
 """
 
@@ -212,16 +211,24 @@ public struct #{name}: DERImplicitlyTaggable, Hashable, Sendable, RawRepresentab
   def emitIntegerEnumDefinition(name,cases), do:
 """
 #{emitImprint()}
-public struct #{name} : Hashable, Sendable, Comparable {
+import SwiftASN1\nimport Foundation\n
+public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+    public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: #{name}, rhs: #{name}) -> Bool { lhs.rawValue < rhs.rawValue }
     @inlinable init(rawValue: Int) { self.rawValue = rawValue }
+    @inlinable public init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
+        self.rawValue = try Int(derEncoded: rootNode, withIdentifier: identifier)
+    }
+    @inlinable public func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
+        try self.rawValue.serialize(into: &coder, withIdentifier: identifier)
+    }
 #{cases}}
 """
 
   def emitChoiceDecoder(cases), do:
 """
-    @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier: ASN1Identifier) throws {
+    @inlinable init(derEncoded rootNode: ASN1Node) throws {
         switch rootNode.identifier {\n#{cases}
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
