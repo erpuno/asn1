@@ -225,6 +225,7 @@ public class Console {
   public static func suite() -> Int32 {
      do {
        try verifyOID()
+       print(": UsefulDefinitions_id_ce ⟼ \(UsefulDefinitions_id_ce)")
        try showPentanomial(data: [48, 9, 2, 1, 1, 2, 1, 2, 2, 1, 3])
        // try showAttributeValueAssertion(data: [48, 14, 4, 2, 99, 110, 4, 8, 74, 111, 104, 110, 32, 68, 111, 101])
        try showIntMatrix(data: [48, 22, 48, 9, 2, 1, 1, 2, 1, 2, 2, 1, 3, 48, 9, 2, 1, 4, 2, 1, 5, 2, 1, 6])

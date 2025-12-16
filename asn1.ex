@@ -22,6 +22,16 @@ defmodule ASN1 do
 
        print "array: #{level} : ~ts = [~ts] ~p (Struct Generated)~n", [name1, type1, tag]
 
+       decoder = case tag do
+           :set -> "DER.set(of: #{type1}.self, identifier: identifier, rootNode: rootNode)"
+           _ -> "DER.sequence(of: #{type1}.self, identifier: identifier, rootNode: rootNode)"
+       end
+
+       encoder = case tag do
+           :set -> "serializeSetOf"
+           _ -> "serializeSequenceOf"
+       end
+
        structDef = """
 #{emitImprint()}
 import SwiftASN1
@@ -32,10 +42,10 @@ import Foundation
     @usableFromInline var value: [#{type1}]
     @inlinable public init(_ value: [#{type1}]) { self.value = value }
     @inlinable public init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
-        self.value = try DER.sequence(of: #{type1}.self, identifier: identifier, rootNode: rootNode)
+        self.value = try #{decoder}
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
-        try coder.serializeSequenceOf(value, identifier: identifier)
+        try coder.#{encoder}(value, identifier: identifier)
     }
 }
 """
@@ -61,8 +71,10 @@ import Foundation
   def fieldName({:contentType, {:Externaltypereference,_,_mod, name}}), do: normalizeName("#{name}")
   def fieldName(name), do: normalizeName("#{name}")
 
+  def fieldType(name, field, {:tag, _, _, _, inner}), do: fieldType(name, field, inner)
   def fieldType(name,field,{:ComponentType,_,_,{:type,_,oc,_,[],:no},_opt,_,_}), do: fieldType(name, field, oc)
   def fieldType(name,field,{:"SEQUENCE", _, _, _, _}), do: bin(name) <> "_" <> bin(field) <> "_Sequence"
+  def fieldType(name,field,{:"SET", _, _, _, _}), do: bin(name) <> "_" <> bin(field) <> "_Set"
   def fieldType(name,field,{:"CHOICE",_}), do: bin(name) <> "_" <> bin(field) <> "_Choice"
   def fieldType(name,field,{:"ENUMERATED",_}), do: bin(name) <> "_" <> bin(field) <> "_Enum"
   def fieldType(name,field,{:"INTEGER",_}), do: bin(name) <> "_" <> bin(field) <> "_IntEnum"
@@ -72,12 +84,13 @@ import Foundation
   def fieldType(name,field,{:"Set Of", type}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set, "pro #{name}.#{field}")  end
   def fieldType(_,_,{:contentType, {:Externaltypereference,_,_,type}}), do: "#{type}"
   def fieldType(_,_,{:"BIT STRING", _}), do: "ASN1BitString"
-  def fieldType(_,_,{:pt, {_,_,_,type}, _}) when is_atom(type), do: "#{type}"
+  def fieldType(_,_,{:pt, {_,_,_,type}, _}) when is_atom(type), do: "#{substituteType(lookup(bin(type)))}"
   def fieldType(_,_,{:ANY_DEFINED_BY, type}) when is_atom(type), do: "ASN1Any"
   def fieldType(_name,_field,{:Externaltypereference,_,_,type}) when type == :OrganizationalUnitNames, do: "#{substituteType(lookup(bin(type)))}"
   def fieldType(_name,_field,{:Externaltypereference,_,_,type}), do: "#{substituteType(lookup(bin(type)))}"
-  def fieldType(_,_,{:ObjectClassFieldType,_,_,[{_,type}],_}), do: "#{type}"
-  def fieldType(_,_,type) when is_atom(type), do: "#{type}"
+  def fieldType(_,_,{:ObjectClassFieldType,_,_,[{:valuefieldreference, :id}],_}), do: "ASN1ObjectIdentifier"
+  def fieldType(_,_,{:ObjectClassFieldType,_,_,_field,_}), do: "ASN1Any"
+  def fieldType(_,_,type) when is_atom(type), do: "#{substituteType(lookup(bin(type)))}"
   def fieldType(name,_,_), do: "#{name}"
 
   def sequenceOf(name,field,type) do
@@ -85,14 +98,23 @@ import Foundation
   end
 
   def sequenceOf2(name,field,{:type,_,{:Externaltypereference,_,_,type},_,_,_}), do: "#{sequenceOf(name,field,type)}"
+  def sequenceOf2(_,_,{:pt, {:Externaltypereference, _, _, type}, _}), do: substituteType("#{lookup(bin(type))}")
   def sequenceOf2(name,field,{:type,_,{:"SET OF", type},_,_,_}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set, "arr #{name}.#{field}")  end
   def sequenceOf2(name,field,{:type,_,{:"Set Of", type},_,_,_}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set, "arr #{name}.#{field}")  end
   def sequenceOf2(name,field,{:type,_,{:"SEQUENCE OF", type},_,_,_}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :sequence, "arr #{name}.#{field}") end
   def sequenceOf2(name,field,{:type,_,{:"Sequence Of", type},_,_,_}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :sequence, "arr #{name}.#{field}") end
   def sequenceOf2(name,field,{:type,_,{:CHOICE, cases} = sum,_,_,_}) do choice(fieldType(name,field,sum), cases, getEnv(:current_module, ""), true) ; bin(name) <> "_" <> bin(field) <> "_Choice" end
   def sequenceOf2(name,field,{:type,_,{:SEQUENCE, _, _, _, fields} = product,_,_,_}) do sequence(fieldType(name,field,product), fields, getEnv(:current_module, ""), true) ; bin(name) <> "_" <> bin(field) <> "_Sequence" end
+  def sequenceOf2(name,field,{:type,_,{:SET, _, _, _, fields} = product,_,_,_}) do
+      typeName = bin(name) <> "_" <> bin(field) <> "_Set"
+      :io.format("DEBUG sequenceOf2 SET: generated typeName=~p for name=~p field=~p~n", [typeName, name, field])
+      set(typeName, fields, getEnv(:current_module, ""), true)
+      typeName
+  end
   def sequenceOf2(name,field,{:type,_,type,_,_,_}) do "#{sequenceOf(name,field,type)}" end
   def sequenceOf2(name,_,{:Externaltypereference, _, _, type}) do :application.get_env(:asn1scg, bin(name), bin(type)) end
+  def sequenceOf2(_,_,{:ObjectClassFieldType,_,_,[{:valuefieldreference, :id}],_}), do: "ASN1ObjectIdentifier"
+  def sequenceOf2(_,_,{:ObjectClassFieldType,_,_,_field,_}), do: "ASN1Any"
   def sequenceOf2(_,_,x) when is_tuple(x), do: substituteType("#{bin(:erlang.element(1, x))}")
   def sequenceOf2(_,_,x) when is_atom(x), do: substituteType("#{lookup(x)}")
   def sequenceOf2(_,_,x) when is_binary(x), do: substituteType("#{lookup(x)}")
@@ -115,103 +137,184 @@ import Foundation
   def substituteType("NULL"),              do: "ASN1Null"
   def substituteType("EXTERNAL"),          do: "EXTERNAL"
   def substituteType("External"),          do: "EXTERNAL"
-  def substituteType(t),                   do: t
+  def substituteType("GeneralString"),     do: "ASN1UTF8String"
+  def substituteType("REAL"),              do: "ASN1Any"
+  def substituteType("TYPE-IDENTIFIER"),   do: "ASN1Any"
+  def substituteType("ABSTRACT-SYNTAX"),   do: "ASN1Any"
+  def substituteType(t) do
+    key = try do
+      String.to_existing_atom(t)
+    rescue
+      _ -> nil
+    end
+
+    case key do
+      nil -> t
+      k -> :application.get_env(:asn1scg, k, t)
+    end
+  end
+
+  def swiftEsc(name) do
+      s = bin(name)
+      if s in [
+          "associatedtype", "class", "deinit", "enum", "extension", "fileprivate", "func", "import",
+          "init", "inout", "internal", "let", "open", "operator", "private", "protocol", "public",
+          "rethrows", "static", "struct", "subscript", "typealias", "var",
+          "break", "case", "continue", "default", "defer", "do", "else", "fallthrough", "for",
+          "guard", "if", "in", "repeat", "return", "switch", "where", "while",
+          "as", "Any", "catch", "false", "is", "nil", "super", "self", "Self", "throw", "throws",
+          "true", "try"
+      ] do
+          "`" <> s <> "`"
+      else
+          s
+      end
+  end
 
   def emitImprint(), do: "// Generated by ASN1.ERP.UNO Compiler, Copyright © 2023—2024 Namdak Tönpa."
-  def emitArg(name), do: "#{name}: #{name}"
-  def emitCtorBodyElement(name), do: "self.#{name} = #{name}"
-  def emitCtorParam(name, type, opt \\ ""), do: "#{name}: #{normalizeName(type)}#{opt}"
+  def emitArg(name) do
+      n = swiftEsc(name)
+      "#{n}: #{n}"
+  end
+  def emitCtorBodyElement(name) do
+      n = swiftEsc(name)
+      "self.#{n} = #{n}"
+  end
+  def emitCtorParam(name, type, opt \\ "") do
+      n = swiftEsc(name)
+      "#{n}: #{normalizeName(type)}#{opt}"
+  end
   def emitCtor(params,fields), do: pad(4) <> "@inlinable init(#{params}) {\n#{fields}\n    }\n"
-  def emitEnumElement(_type, field, value), do: pad(4) <> "static let #{field} = Self(rawValue: #{value})\n"
-  def emitIntegerEnumElement(field, value), do: pad(4) <> "public static let #{field} = Self(rawValue: #{value})\n"
-  def emitOptional(:OPTIONAL, name, body), do: "if let #{name} = self.#{name} { #{body} }"
+  def emitEnumElement(_type, field, value), do: pad(4) <> "static let #{swiftEsc(field)} = Self(rawValue: #{value})\n"
+  def emitIntegerEnumElement(field, value), do: pad(4) <> "public static let #{swiftEsc(field)} = Self(rawValue: #{value})\n"
+  def emitOptional(:OPTIONAL, name, body) do
+      n = swiftEsc(name)
+      "if let #{n} = self.#{n} { #{body} }"
+  end
+  def emitOptional({:DEFAULT, _}, name, body), do: emitOptional(:OPTIONAL, name, body)
   def emitOptional(_, _, body), do: "#{body}"
-  def emitSequenceElementOptional(name, type, opt \\ ""), do: "@usableFromInline var #{name}: #{lookup(normalizeName(type))}#{opt}\n"
+  def emitSequenceElementOptional(name, type, opt \\ ""), do: "@usableFromInline var #{swiftEsc(name)}: #{lookup(normalizeName(type))}#{opt}\n"
 
   # Vector Decoder
 
-  def emitSequenceDecoderBodyElement(:OPTIONAL, plicit, no, name, type) when plicit == "Implicit", do:
-      "let #{name}: #{type}? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific))"
-  def emitSequenceDecoderBodyElement(:OPTIONAL, plicit, no, name, type) when plicit == "Explicit", do:
-      "let #{name}: #{type}? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in return try #{type}(derEncoded: node) }"
-  def emitSequenceDecoderBodyElement(_, plicit, no, name, type) when plicit == "Explicit", do:
-      "let #{name}: #{type} = try DER.explicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in return try #{type}(derEncoded: node) }"
-  def emitSequenceDecoderBodyElement(_, plicit, no, name, type) when plicit == "Implicit", do:
-      "let #{name}: #{type} = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific)))!"
-  def emitSequenceDecoderBodyElement(:OPTIONAL, _, _, name, "ASN1Any"), do:
-      "let #{name}: ASN1Any? = nodes.next().map { ASN1Any(derEncoded: $0) }"
+  def emitSequenceDecoderBodyElement(:OPTIONAL, plicit, no, name, type) when plicit == "Implicit" do
+      n = swiftEsc(name)
+      "let #{n}: #{type}? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific))"
+  end
+  def emitSequenceDecoderBodyElement(:OPTIONAL, plicit, no, name, type) when plicit == "Explicit" do
+      n = swiftEsc(name)
+      "let #{n}: #{type}? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in return try #{type}(derEncoded: node) }"
+  end
+  def emitSequenceDecoderBodyElement(_, plicit, no, name, type) when plicit == "Explicit" do
+      n = swiftEsc(name)
+      "let #{n}: #{type} = try DER.explicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in return try #{type}(derEncoded: node) }"
+  end
+  def emitSequenceDecoderBodyElement(_, plicit, no, name, type) when plicit == "Implicit" do
+      n = swiftEsc(name)
+      "let #{n}: #{type} = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific)))!"
+  end
+  def emitSequenceDecoderBodyElement(:OPTIONAL, _, _, name, "ASN1Any") do
+      n = swiftEsc(name)
+      "let #{n}: ASN1Any? = nodes.next().map { ASN1Any(derEncoded: $0) }"
+  end
   def emitSequenceDecoderBodyElement(_, _, _, name, "Bool"), do:
       "let #{name}: Bool = try DER.decodeDefault(&nodes, defaultValue: false)"
-  def emitSequenceDecoderBodyElement(optional, _, _, name, type), do:
-      "let #{name}: #{type}#{opt(optional)} = try #{type}(derEncoded: &nodes)"
+  def emitSequenceDecoderBodyElement(optional, _, _, name, type) do
+      n = swiftEsc(name)
+      "let #{n}: #{type}#{opt(optional)} = try #{type}(derEncoded: &nodes)"
+  end
 
-  def emitSequenceDecoderBodyElementArray(:OPTIONAL, plicit, no, name, type, spec) when plicit == "Explicit" and no != [] and (spec == "set" or spec == "sequence"), do:
-      "let #{name}: [#{type}]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: node) }"
-  def emitSequenceDecoderBodyElementArray(_, plicit, no, name, type, spec) when plicit == "Implicit" and no != [] and (spec == "set" or spec == "sequence"), do:
-      "let #{name}: [#{type}] = try DER.#{spec}(of: #{type}.self, identifier: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific), nodes: &nodes)"
-  def emitSequenceDecoderBodyElementArray(_, _, no, name, type, spec) when no != [] and (spec == "set" or spec == "sequence"), do:
-      "let #{name}: [#{type}] = try DER.explicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: node) }"
-  def emitSequenceDecoderBodyElementArray(optional, _, no, name, type, spec) when no == [], do:
-      "let #{name}: [#{type}]#{opt(optional)} = try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, nodes: &nodes)"
+  def emitSequenceDecoderBodyElementArray(:OPTIONAL, plicit, no, name, type, spec) when plicit == "Explicit" and no != [] and (spec == "set" or spec == "sequence") do
+      n = swiftEsc(name)
+      "let #{n}: [#{type}]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: node) }"
+  end
+  def emitSequenceDecoderBodyElementArray(:OPTIONAL, plicit, no, name, type, spec) when plicit == "Implicit" and no != [] and (spec == "set" or spec == "sequence") do
+      n = swiftEsc(name)
+      "let #{n}: [#{type}]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in try DER.#{spec}(of: #{type}.self, identifier: node.identifier, rootNode: node) }"
+  end
+  def emitSequenceDecoderBodyElementArray(_, plicit, no, name, type, spec) when plicit == "Implicit" and no != [] and (spec == "set" or spec == "sequence") do
+      n = swiftEsc(name)
+      "let #{n}: [#{type}] = try DER.#{spec}(of: #{type}.self, identifier: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific), nodes: &nodes)"
+  end
+  def emitSequenceDecoderBodyElementArray(_, _, no, name, type, spec) when no != [] and (spec == "set" or spec == "sequence") do
+      n = swiftEsc(name)
+      "let #{n}: [#{type}] = try DER.explicitlyTagged(&nodes, tagNumber: #{no}, tagClass: .contextSpecific) { node in try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, rootNode: node) }"
+  end
+  def emitSequenceDecoderBodyElementArray(optional, _, no, name, type, spec) when no == [] do
+      n = swiftEsc(name)
+      "let #{n}: [#{type}]#{opt(optional)} = try DER.#{spec}(of: #{type}.self, identifier: .#{spec}, nodes: &nodes)"
+  end
   def emitSequenceDecoderBodyElementIntEnum(name, type), do:
       "let #{name} = try #{type}(rawValue: Int(derEncoded: &nodes))"
 
   # Vector Encoder
 
-  def emitSequenceEncoderBodyElement(_, plicit, no, name, s) when plicit == "Explicit" and no != [] and (s == "set" or s == "sequence"), do:
+  def emitSequenceEncoderBodyElement(optional, plicit, no, name, s) do
+      body = emitGenEncoder(plicit, no, name, s)
+      emitOptional(optional, name, body)
+  end
+
+  def emitGenEncoder(plicit, no, name, s) when plicit == "Explicit" and no != [] and (s == "set" or s == "sequence"), do:
       "try coder.serialize(explicitlyTaggedWithTagNumber: #{no}, tagClass: .contextSpecific) { codec in try codec.serialize#{spec(s)}(#{name}) }"
-  def emitSequenceEncoderBodyElement(_, plicit, no, name, s) when plicit == "Implicit" and no != [] and (s == "set" or s == "sequence"), do:
+  def emitGenEncoder(plicit, no, name, s) when plicit == "Implicit" and no != [] and (s == "set" or s == "sequence"), do:
       "try coder.serialize#{spec(s)}(#{name}, identifier: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific))"
-  def emitSequenceEncoderBodyElement(_, plicit, no, name, _) when no != [] and plicit == "Implicit", do:
+  def emitGenEncoder(plicit, no, name, _) when no != [] and plicit == "Implicit", do:
       "try coder.serializeOptionalImplicitlyTagged(#{name}, withIdentifier: ASN1Identifier(tagWithNumber: #{no}, tagClass: .contextSpecific))"
-  def emitSequenceEncoderBodyElement(_, plicit, no, name, _) when no != [] and plicit == "Explicit", do:
+  def emitGenEncoder(plicit, no, name, _) when no != [] and plicit == "Explicit", do:
       "try coder.serialize(explicitlyTaggedWithTagNumber: #{no}, tagClass: .contextSpecific) { codec in try codec.serialize(#{name}) }"
-  def emitSequenceEncoderBodyElement(_, _, no, name, spec) when spec == "sequence" and no == [], do:
+  def emitGenEncoder(_, no, name, spec) when spec == "sequence" and no == [], do:
       "try coder.serializeSequenceOf(#{name})"
-  def emitSequenceEncoderBodyElement(_, _, no, name, spec) when spec == "set" and no == [], do:
+  def emitGenEncoder(_, no, name, spec) when spec == "set" and no == [], do:
       "try coder.serializeSetOf(#{name})"
-  def emitSequenceEncoderBodyElement(_, _, no, name, _) when no == [], do:
+  def emitGenEncoder(_, no, name, _) when no == [], do:
       "try coder.serialize(#{name})"
   def emitSequenceEncoderBodyElementIntEnum(no, name) when no == [], do:
       "try coder.serialize(#{name}.rawValue)"
   def emitSequenceEncoderBodyElementIntEnum(no, name), do:
-      "try coder.serialize(#{name}.rawValue, explicitlyTaggedWithTagNumber: #{no}, tagClass: .contextSpecific)"
+      "try coder.serialize(#{swiftEsc(name)}.rawValue, explicitlyTaggedWithTagNumber: #{no}, tagClass: .contextSpecific)"
 
   # Scalar Sum Component
 
-  def emitChoiceElement(name, type), do: "case #{name}(#{lookup(bin(normalizeName(type)))})\n"
-  def emitChoiceEncoderBodyElement(w, no, name, _type, spec, _plicit) when no == [], do:
-      pad(w) <> "case .#{name}(let #{name}): try coder.serialize#{spec}(#{name})"
+  def emitChoiceElement(name, type), do: "case #{swiftEsc(name)}(#{lookup(bin(normalizeName(type)))})\n"
+  def emitChoiceEncoderBodyElement(w, no, name, _type, spec, _plicit) when no == [] do
+      n = swiftEsc(name)
+      pad(w) <> "case .#{n}(let #{n}): try coder.serialize#{spec}(#{n})"
+  end
   def emitChoiceEncoderBodyElement(w, no, name, _type, spec, plicit) do
+      n = swiftEsc(name)
       tag = "ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)})"
       if plicit == "Explicit" do
-         pad(w) <> "case .#{name}(let #{name}): try coder.appendConstructedNode(identifier: #{tag}) { coder in try #{name}.serialize(into: &coder) }"
+         if spec == "SetOf" or spec == "SequenceOf" do
+            pad(w) <> "case .#{n}(let #{n}): try coder.appendConstructedNode(identifier: #{tag}) { coder in try coder.serialize#{spec}(#{n}) }"
+         else
+            pad(w) <> "case .#{n}(let #{n}): try coder.appendConstructedNode(identifier: #{tag}) { coder in try #{n}.serialize(into: &coder) }"
+         end
       else
           if spec == "" do
-            pad(w) <> "case .#{name}(let #{name}): try #{name}.serialize(into: &coder, withIdentifier: #{tag})"
+            pad(w) <> "case .#{n}(let #{n}): try #{n}.serialize(into: &coder, withIdentifier: #{tag})"
           else
-            pad(w) <> "case .#{name}(let #{name}): try coder.serialize#{spec}(#{name}, identifier: #{tag})"
+            pad(w) <> "case .#{n}(let #{n}): try coder.serialize#{spec}(#{n}, identifier: #{tag})"
           end
       end
   end
   def emitChoiceDecoderBodyElement(w, no, name, type, _spec) when no == [], do:
       pad(w) <> "case #{normalizeName(type)}.defaultIdentifier:\n" <>
-      pad(w+4) <> "self = .#{name}(try #{normalizeName(type)}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
+      pad(w+4) <> "self = .#{swiftEsc(name)}(try #{normalizeName(type)}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
   def emitChoiceDecoderBodyElement(w, no, name, type, _spec), do:
       pad(w) <> "case ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}):\n" <>
-      pad(w+4) <> "self = .#{name}(try #{normalizeName(type)}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
+      pad(w+4) <> "self = .#{swiftEsc(name)}(try #{normalizeName(type)}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
 
   # Vector Sum Component
 
   def emitChoiceDecoderBodyElementForArray(w, no, name, type, spec) when no == [], do:
       pad(w) <> "case ASN1Identifier.#{spec}:\n" <>
-      pad(w+4) <> "self = .#{name}(try DER.#{spec}(of: #{normalizeName(type)}.self, identifier: .#{spec}, rootNode: rootNode))"
+      pad(w+4) <> "self = .#{swiftEsc(name)}(try DER.#{spec}(of: #{normalizeName(type)}.self, identifier: .#{spec}, rootNode: rootNode))"
   def emitChoiceDecoderBodyElementForArray(w, no,  name, type, spec) when spec == "", do:
       pad(w) <> "case ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}):\n" <>
-      pad(w+4) <> "self = .#{name}(try DER.#{spec}(of: #{normalizeName(type)}.self, identifier: .#{spec}, nodes: &nodes))"
+      pad(w+4) <> "self = .#{swiftEsc(name)}(try DER.#{spec}(of: #{normalizeName(type)}.self, identifier: .#{spec}, nodes: &nodes))"
   def emitChoiceDecoderBodyElementForArray(w, no,  name, type, spec), do:
       pad(w) <> "case ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}):\n" <>
-      pad(w+4) <> "self = .#{name}(try DER.#{spec}(of: #{normalizeName(type)}.self, identifier: rootNode.identifier, rootNode: rootNode))"
+      pad(w+4) <> "self = .#{swiftEsc(name)}(try DER.#{spec}(of: #{normalizeName(type)}.self, identifier: rootNode.identifier, rootNode: rootNode))"
 
   def emitSequenceDefinition(name,fields,ctor,decoder,encoder), do:
 """
@@ -404,6 +507,8 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
            case fieldType do
               {:SEQUENCE, _, _, _, fields} ->
                  sequence(fieldType(name,fieldName,fieldType), fields, modname, true)
+              {:SET, _, _, _, fields} ->
+                 set(fieldType(name,fieldName,fieldType), fields, modname, true)
               {:CHOICE, cases} ->
                  zip = :lists.zip(cases, :lists.seq(0, :erlang.length(cases)-1))
                  casesTagged = :lists.flatten(:lists.map(fn {line,newNo} ->
@@ -565,8 +670,7 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
                     trace(23)
                     emitSequenceEncoderBodyElementIntEnum(tagNo(tag), fieldName(fieldName))
                 :BOOLEAN ->
-                    # DER: Do not encode fields with DEFAULT values when they match the default
-                    "if #{fieldName(fieldName)} { try coder.serialize(#{fieldName(fieldName)}) }"
+                    emitSequenceEncoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), "")
                 {:Externaltypereference,_,_,inner} ->
                     trace(24)
                      innerName = lookup(bin(inner))
@@ -586,7 +690,7 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
       end, fields), "\n")
 
   def emitParams(name,fields) when is_list(fields) do
-      Enum.join(:lists.map(fn
+      list = :lists.map(fn
         {:"COMPONENTS OF", {:type, _, {_,_,_,n}, _, _, :no}} ->
            trace(26)
            inclusion = :application.get_env(:asn1scg, {:type,lookup(n)}, [])
@@ -595,11 +699,12 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
            trace(27)
            emitCtorParam(fieldName(fieldName), substituteType(lookup(fieldType(name,fieldName,type))), opt(optional))
          _ -> ""
-      end, fields), ", ")
+      end, fields)
+      Enum.join(Enum.filter(list, fn x -> x != "" end), ", ")
   end
 
   def emitArgs(fields) when is_list(fields) do
-      Enum.join(:lists.map(fn
+      list = :lists.map(fn
         {:"COMPONENTS OF", {:type, _, {_,_,_,n}, _, _, :no}} ->
            trace(28)
            inclusion = :application.get_env(:asn1scg, {:type,lookup(n)}, [])
@@ -608,7 +713,8 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
            trace(29)
            emitArg(fieldName(fieldName))
          _ ->  ""
-      end, fields), ", ")
+      end, fields)
+      Enum.join(Enum.filter(list, fn x -> x != "" end), ", ")
   end
 
   def dump() do
@@ -648,6 +754,9 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
          {:typedef,  _, _, name, _} ->
              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
              setEnv(name, swiftName)
+         {:ptypedef, _, _, name, _args, _} ->
+             swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+             setEnv(name, swiftName)
          {:valuedef, _, _, name, _, _, _} ->
              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
              setEnv(name, swiftName)
@@ -666,16 +775,16 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
       :lists.map(fn import_def ->
           case import_def do
               {:SymbolsFromModule, _, symbols, module, _objid} ->
-                  # :io.format("Import: module=~p symbols=~p~n", [module, symbols])
-                  modName = normalizeName(module)
+                  :io.format("Import: module=~p symbols=~p~n", [module, symbols])
+                  modName = normalizeName(importModuleName(module))
                   :lists.map(fn
                       {:Externaltypereference, _, _, type} ->
                           swiftName = bin(modName) <> "_" <> bin(normalizeName(type))
-                          setEnv(type, swiftName)
+                          setEnvGlobal(type, swiftName)
                       {:Externalvaluereference, _, _, val} ->
                           swiftName = bin(modName) <> "_" <> bin(normalizeName(val))
                           :io.format("Import Value: ~p (~p) -> ~ts~n", [val, is_atom(val), swiftName])
-                          setEnv(val, swiftName)
+                          setEnvGlobal(val, swiftName)
                       _ -> :ok
                   end, symbols)
               _ -> :ok
@@ -688,27 +797,66 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
          {:classdef, _, pos, name, mod, type} -> compileClass(pos, name, mod, type)
          {:valuedef, _, pos, name, type, value, mod} -> compileValue(pos, name, type, value, mod)
       end, declarations)
-      compileModule(pos, modname, defid, tagdefault, exports, imports)
+  end
+
+  def compileClass(_pos, name, modname, _type) do
+      swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+      setEnv(name, swiftName)
+      save(true, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1Any
+""")
   end
 
   def compileType(pos, name, typeDefinition, modname, save \\ true) do
       res = case typeDefinition do
-          {:type, _, {:"INTEGER", cases}, _, [], :no} ->  setEnv(name, "Int") ; integerEnum(name, cases, modname, save)
-          {:type, _, {:"ENUMERATED", cases}, _, [], :no} -> enumeration(name, cases, modname, save)
-          {:type, _, {:"CHOICE", cases}, _, [], :no} -> choice(name, cases, modname, save)
+          {:type, _, {:"INTEGER", cases}, _, _, :no} ->  setEnv(name, "Int") ; integerEnum(name, cases, modname, save)
+          {:type, _, {:"ENUMERATED", cases}, _, _, :no} -> enumeration(name, cases, modname, save)
+          {:type, _, {:"CHOICE", cases}, _, _, :no} -> choice(name, cases, modname, save)
           {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
           {:type, _, {:"Sequence", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
           {:type, _, {:"SET", _, _, _, fields}, _, _, :no} -> set(name, fields, modname, save)
           {:type, _, {:"Set", _, _, _, fields}, _, _, :no} -> set(name, fields, modname, save)
           {:type, _, {:"SEQUENCE OF", {:type, _, type, _, _, :no}}, _, _, _} when is_atom(type) -> array(name,substituteType(lookup(bin(type))),:sequence,"top")
           {:type, _, {:"Sequence Of", {:type, _, type, _, _, :no}}, _, _, _} when is_atom(type) -> array(name,substituteType(lookup(bin(type))),:sequence,"top")
+          {:type, _, {:"SEQUENCE OF", {:type, _, {:pt, {:Externaltypereference, _, _, pt_type}, _}, _, _, :no}}, _, _, _} -> array(name, substituteType(lookup(bin(pt_type))), :sequence, "top")
+          {:type, _, {:"Sequence Of", {:type, _, {:pt, {:Externaltypereference, _, _, pt_type}, _}, _, _, :no}}, _, _, _} -> array(name, substituteType(lookup(bin(pt_type))), :sequence, "top")
           {:type, _, {:"SEQUENCE OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> array(name,substituteType(lookup(bin(type))),:sequence,"top")
           {:type, _, {:"Sequence Of", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> array(name,substituteType(lookup(bin(type))),:sequence,"top")
           {:type, _, {:"SET OF", {:type, _, type, _, _, :no}}, _, _, _} when is_atom(type) -> array(name,substituteType(lookup(bin(type))),:set,"top")
           {:type, _, {:"Set Of", {:type, _, type, _, _, :no}}, _, _, _} when is_atom(type) -> array(name,substituteType(lookup(bin(type))),:set,"top")
+          {:type, _, {:"SET OF", {:type, _, {:pt, {:Externaltypereference, _, _, pt_type}, _}, _, _, :no}}, _, _, _} -> array(name, substituteType(lookup(bin(pt_type))), :set, "top")
+          {:type, _, {:"Set Of", {:type, _, {:pt, {:Externaltypereference, _, _, pt_type}, _}, _, _, :no}}, _, _, _} -> array(name, substituteType(lookup(bin(pt_type))), :set, "top")
+          {:type, _, {:"SET OF", {type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> array(name,substituteType(lookup(bin(type))),:set,"top")
+          {:type, _, {:"SEQUENCE OF", {:type, _, {:SEQUENCE, _, _, _, fields}, _, _, :no}}, _, _, _} ->
+              # e.g. PollReqContent ::= SEQUENCE OF SEQUENCE { ... }
+              element_name = bin(name) <> "_Element"
+              sequence(element_name, fields, modname, save)
+              element_swift = getSwiftName(element_name, modname)
+              array(name, element_swift, :sequence, "top")
+          {:type, _, {:"Sequence Of", {:type, _, {:SEQUENCE, _, _, _, fields}, _, _, :no}}, _, _, _} ->
+              element_name = bin(name) <> "_Element"
+              sequence(element_name, fields, modname, save)
+              element_swift = getSwiftName(element_name, modname)
+              array(name, element_swift, :sequence, "top")
+          {:type, _, {:"Set Of", {type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> array(name,substituteType(lookup(bin(type))),:set,"top")
+          {:type, _, {:"SET OF", {:type, _, {:SET, _, _, _, fields}, _, _, :no}}, _, _, _} ->
+              # e.g. Local-File-References ::= SET OF SET { ... }
+              element_name = bin(name) <> "_Element"
+              set(element_name, fields, modname, save)
+              element_swift = getSwiftName(element_name, modname)
+              array(name, element_swift, :set, "top")
+          {:type, _, {:"Set Of", {:type, _, {:SET, _, _, _, fields}, _, _, :no}}, _, _, _} ->
+              element_name = bin(name) <> "_Element"
+              set(element_name, fields, modname, save)
+              element_swift = getSwiftName(element_name, modname)
+              array(name, element_swift, :set, "top")
           {:type, _, {:"SET OF", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> array(name,substituteType(lookup(bin(type))),:set,"top")
           {:type, _, {:"Set Of", {:type, _, {_, _, _, type}, _, _, _}}, _, _, _} -> array(name,substituteType(lookup(bin(type))),:set,"top")
-          {:type, _, {:pt, {:Externaltypereference, _, _, :'SIGNED'}, [innerType]}, _, [], :no} ->
+          {:type, _, {:pt, {:Externaltypereference, _, _pt_mod, :'SIGNED'}, [innerType]}, _, [], :no} ->
               tbsName = bin(name) <> "_toBeSigned"
               compileType(pos, tbsName, innerType, modname, save)
 
@@ -718,23 +866,259 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
                   {:ComponentType, pos, :encrypted, {:type, [], :'BIT STRING', [], [], :no}, [], [], []}
               ]
               sequence(name, fields, modname, save)
-          {:type, _, {:"BIT STRING",_}, _, [], :no} -> setEnv(name, "BIT STRING")
-          {:type, _, :'BIT STRING', _, [], :no} -> setEnv(name, "BIT STRING")
-          {:type, _, :'INTEGER', _set, [], :no} -> setEnv(name, "INTEGER")
-          {:type, _, :'NULL', _set, [], :no} -> setEnv(name, "NULL")
+
+          {:type, _, {:pt, {:Externaltypereference, _, _pt_mod, pt_type}, _args}, _, [], :no} ->
+              # e.g. ECPKAlgorithm ::= AlgorithmIdentifier {{ ECPKAlgorithms }}
+              swiftName = getSwiftName(name, modname)
+              setEnv(name, swiftName)
+              target = substituteType(lookup(bin(pt_type)))
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = #{target}
+""")
+          {:type, _, {:"BIT STRING",_}, _, [], :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1BitString
+""")
+          {:type, _, :'BIT STRING', _, [], :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1BitString
+""")
+          {:type, _, :'INTEGER', _set, [], :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = Int
+""")
+          {:type, _, :'NULL', _set, [], :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1Null
+""")
           {:type, _, :'ANY', _set, [], :no} -> setEnv(name, "ANY")
-          {:type, _, :'EXTERNAL', _set, [], :no} -> setEnv(name, "EXTERNAL")
+          {:type, _, :'OBJECT IDENTIFIER', _set, _constraints, :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              setEnv({:is_oid, swiftName}, true)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1ObjectIdentifier
+""")
+          {:type, _, 'OBJECT IDENTIFIER', _set, _constraints, :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              setEnv({:is_oid, swiftName}, true)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1ObjectIdentifier
+""")
           {:type, _, :'External', _set, [], :no} -> setEnv(name, "EXTERNAL")
-          {:type, _, :'PrintableString', _set, [], :no} -> setEnv(name, "PrintableString")
-          {:type, _, :'NumericString', _set, [], :no} -> setEnv(name, "PrintableString")
-          {:type, _, :'IA5String', _set, [], :no} -> setEnv(name, "IA5String")
-          {:type, _, :'TeletexString', _set, [], :no} -> setEnv(name, "TeletexString")
-          {:type, _, :'UniversalString', _set, [], :no} -> setEnv(name, "UniversalString")
-          {:type, _, :'OBJECT IDENTIFIER', _, _, :no} -> setEnv(name, "OBJECT IDENTIFIER")
-          {:type, _, :'OCTET STRING', [], [], :no} -> setEnv(name, "OCTET STRING")
-          {:type, _, {:Externaltypereference, _, _, ext}, _set, [], _} -> setEnv(name, ext)
+          {:type, _, :'PrintableString', _set, [], :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1PrintableString
+""")
+          {:type, _, :'PrintableString', _set, _constraints, :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1PrintableString
+""")
+          {:type, _, :'NumericString', _set, [], :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1PrintableString
+""")
+          {:type, _, :'NumericString', _set, _constraints, :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1PrintableString
+""")
+          {:type, _, :'IA5String', _set, [], :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1IA5String
+""")
+          {:type, _, :'TeletexString', _set, [], :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1TeletexString
+""")
+          {:type, _, :'UniversalString', _set, [], :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1UniversalString
+""")
+          {:type, _, :'UTF8String', _set, [], :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1UTF8String
+""")
+          {:type, _, :'VisibleString', _set, [], :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1UTF8String
+""")
+          {:type, _, :'BMPString', _set, [], :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1BMPString
+""")
+          {:type, _, {:Externaltypereference, _, _, ext}, _set, [], :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              target = substituteType(lookup(bin(ext)))
+              if getEnv({:is_oid, target}, false) or target == "ASN1ObjectIdentifier" do
+                 setEnv({:is_oid, swiftName}, true)
+              end
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = #{target}
+""")
+          {:type, _, {:Externaltypereference, _, _, ext}, _set, _constraints, :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              target = substituteType(lookup(bin(ext)))
+              if getEnv({:is_oid, target}, false) or target == "ASN1ObjectIdentifier" do
+                 setEnv({:is_oid, swiftName}, true)
+              end
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = #{target}
+""")
+          {:type, _, type, _set, [], :no} when is_atom(type) ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              target = substituteType(lookup(bin(type)))
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = #{target}
+""")
+          {:type, _, type, _set, [], :no} when is_list(type) ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              target = substituteType(lookup(bin(type)))
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = #{target}
+""")
+          {:type, _, type, _set, _constraints, :no} when is_list(type) ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              target = substituteType(lookup(bin(type)))
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = #{target}
+""")
+          {:type, _, {:ObjectClassFieldType, _, _class, [{:valuefieldreference, :id}], _}, _, _, :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              setEnv({:is_oid, swiftName}, true)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = ASN1ObjectIdentifier
+""")
+          {:type, _, {:ObjectClassFieldType, _, _class, field, _} = type_def, _, _, :no} ->
+              :io.format("DEBUG ObjectClassFieldType: name=~p field=~p~n", [name, field])
+              :skip
           {:type, _, {:pt, _, _}, _, [], _} -> :skip
-          {:type, _, {:ObjectClassFieldType, _, _, _, _fields}, _, _, :no} -> :skip
           {:Object, _, _val} -> :skip
           {:Object, _, _, _} -> :skip
           {:ObjectSet, _, _, _, _} -> :skip
@@ -747,8 +1131,14 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
   end
 
   def extractOIDList(val) do
+      # :io.format("DEBUG extractOIDList: ~p~n", [val])
       list = if is_list(val), do: val, else: [val]
-      Enum.flat_map(list, &resolveOIDComponent/1)
+      Enum.flat_map(list, fn x ->
+         if x == :'id-at' or (is_tuple(x) and elem(x, 0) == :Externalvaluereference and elem(x, 3) == :'id-at') do
+             :io.format("DEBUG extractOIDList id-at component: ~p~n", [x])
+         end
+         resolveOIDComponent(x)
+      end)
   end
 
   def resolveOIDComponent({:NamedNumber, _, val}), do: resolveOIDComponent(val)
@@ -761,7 +1151,15 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
   def resolveOIDComponent({:Externalvaluereference, _, _, :'itu-t'}), do: ["0"]
   def resolveOIDComponent({:Externalvaluereference, _, _, :ccitt}), do: ["0"]
   def resolveOIDComponent({:Externalvaluereference, _, mod, name}) do
-      res = bin(normalizeName(mod)) <> "_" <> bin(normalizeName(name))
+      current = getEnv(:current_module, "")
+      res = if normalizeName(mod) == normalizeName(current) do
+          case lookup(name) do
+             val when is_binary(val) -> val
+             _ -> bin(normalizeName(mod)) <> "_" <> bin(normalizeName(name))
+          end
+      else
+          bin(normalizeName(mod)) <> "_" <> bin(normalizeName(name))
+      end
       [res]
   end
 
@@ -775,6 +1173,9 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
       res = case lookup(val) do
           :undefined -> val
           found -> found
+      end
+      if val == :'id-at' do
+         :io.format("DEBUG resolveOIDComponent id-at: ~p -> ~p~n", [val, res])
       end
       [res]
   end
@@ -814,7 +1215,7 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
             "public let #{swiftName}: ASN1ObjectIdentifier = [#{oid_str}]"
     end
 
-      save(saveFlag, modname, swiftName, """
+      save(saveFlag, modname, swiftName <> "_oid", """
 #{emitImprint()}
 import SwiftASN1
 import Foundation
@@ -826,7 +1227,7 @@ import Foundation
   def compileValue(_pos, name, {:type, [], :'OBJECT IDENTIFIER', [], [], :no} = type, val, mod), do: value(name, type, val, mod, true)
   def compileValue(_pos, name, {:type, _, {:Externaltypereference, _, _, ref}, _, _, _} = type, val, mod) do
       resolved = lookup(bin(ref))
-      if resolved == "ASN1ObjectIdentifier" or resolved == "OBJECT IDENTIFIER" do
+      if resolved == "ASN1ObjectIdentifier" or resolved == "OBJECT IDENTIFIER" or getEnv({:is_oid, resolved}, false) do
           value(name, type, val, mod, true)
       else
           :io.format("Unhandled value definition ~p : ~p = ~p ~n", [name, type, val])
@@ -835,49 +1236,125 @@ import Foundation
   end
   def compileValue(_pos, name, type, val, _mod), do: (:io.format("Unhandled value definition ~p : ~p = ~p ~n", [name, type, val]) ; [])
   def compileClass(_pos, name, _mod, type),        do: (print "Unhandled class definition ~p : ~p~n", [name, type] ; [])
-  def compilePType(_pos, name, args, type),        do: (print "Unhandled PType definition ~p : ~p(~p)~n", [name, type, args] ; [])
-  def compileModule(_pos, _name, _defid, _tagdefault, _exports, _imports), do: []
+  def compilePType(pos, name, args, type) do
+      sname = to_string(name)
+      ptypes = Application.get_env(:asn1scg, :ptypes, %{})
+
+      case Map.get(ptypes, sname) do
+         nil ->
+             if args != [], do: :skip, else: compileType(pos, name, type, getEnv(:current_module, ""), true)
+         definition ->
+             modname = getEnv(:current_module, "")
+             gen_type = build_ptype_ast(pos, definition, modname)
+             compileType(pos, name, gen_type, modname, true)
+      end
+  end
+
+  defp build_ptype_ast(pos, {:sequence, fields}, mod) do
+      new_fields = Enum.map(fields, fn {name, type, opts} ->
+          build_component(pos, name, type, opts, mod)
+      end)
+      {:type, [], {:SEQUENCE, [], [], [], new_fields}, [], [], :no}
+  end
+
+  defp build_ptype_ast(pos, {:choice, cases}, mod) do
+      new_cases = Enum.map(cases, fn {name, type} ->
+          type_ast = build_type_ast(pos, type, [], mod)
+          {:ComponentType, pos, name, type_ast, [], [], []}
+      end)
+      {:type, [], {:CHOICE, new_cases}, [], [], :no}
+  end
+
+  defp build_ptype_ast(pos, {:set_of, type}, mod) do
+      type_ast = build_type_ast(pos, type, [], mod)
+      {:type, [], {:"SET OF", type_ast}, [], [], :no}
+  end
+
+  defp build_ptype_ast(pos, {:sequence_of, type}, mod) do
+      type_ast = build_type_ast(pos, type, [], mod)
+      {:type, [], {:"SEQUENCE OF", type_ast}, [], [], :no}
+  end
+
+  defp build_ptype_ast(pos, type_atom, mod) when is_atom(type_atom) do
+      build_type_ast(pos, type_atom, [], mod)
+  end
+
+  defp build_component(pos, name, type, opts, mod) do
+      tags = Keyword.get(opts, :tag)
+      attrs = if tags do
+           {cls, num, method} = tags
+           cls_atom = cls |> to_string |> String.upcase |> String.to_atom
+           method_atom = method |> to_string |> String.upcase |> String.to_atom
+           [{:tag, cls_atom, num, method_atom, nil}]
+      else
+           []
+      end
+
+      optional = if Keyword.get(opts, :optional), do: :OPTIONAL, else: []
+
+      type_ast = build_type_ast(pos, type, attrs, mod)
+      {:ComponentType, pos, name, type_ast, optional, [], []}
+  end
+
+  defp build_type_ast(_pos, :oid, attrs, _mod), do: {:type, attrs, :'OBJECT IDENTIFIER', [], [], :no}
+  defp build_type_ast(_pos, :any, attrs, _mod), do: {:type, attrs, :'ANY', [], [], :no}
+  defp build_type_ast(_pos, :boolean, attrs, _mod), do: {:type, attrs, :'BOOLEAN', [], [], :no}
+  defp build_type_ast(_pos, :octet_string, attrs, _mod), do: {:type, attrs, :'OCTET STRING', [], [], :no}
+  defp build_type_ast(pos, {:set_of, type}, attrs, mod), do: {:type, attrs, {:"SET OF", build_type_ast(pos, type, [], mod)}, [], [], :no}
+  defp build_type_ast(pos, {:sequence_of, type}, attrs, mod), do: {:type, attrs, {:"SEQUENCE OF", build_type_ast(pos, type, [], mod)}, [], [], :no}
+  defp build_type_ast(pos, {:external, ref_name}, attrs, mod), do: {:type, attrs, {:Externaltypereference, pos, mod, String.to_atom(ref_name)}, [], [], :no}
+  defp build_type_ast(_pos, atom, attrs, _mod) when is_atom(atom), do: {:type, attrs, atom, [], [], :no}
+
+  def getSwiftName(name, modname) do
+      nname = bin(normalizeName(name))
+      nmod = bin(normalizeName(modname))
+      if String.starts_with?(nname, nmod <> "_") do
+          nname
+      else
+          nmod <> "_" <> nname
+      end
+  end
 
   def sequence(name, fields, modname, saveFlag) do
-      swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+      swiftName = getSwiftName(name, modname)
       setEnv(name, swiftName)
       :application.set_env(:asn1scg, {:type,swiftName}, fields)
       save(saveFlag, modname, swiftName, emitSequenceDefinition(swiftName,
-          emitFields(name, 4, fields, modname), emitCtor(emitParams(name,fields), emitCtorBody(fields)),
-          emitSequenceDecoder(emitSequenceDecoderBody(name, fields), swiftName, emitArgs(fields)),
-          emitSequenceEncoder(emitSequenceEncoderBody(name, fields))))
+          emitFields(swiftName, 4, fields, modname), emitCtor(emitParams(swiftName,fields), emitCtorBody(fields)),
+          emitSequenceDecoder(emitSequenceDecoderBody(swiftName, fields), swiftName, emitArgs(fields)),
+          emitSequenceEncoder(emitSequenceEncoderBody(swiftName, fields))))
   end
 
   def set(name, fields, modname, saveFlag) do
-      swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+      swiftName = getSwiftName(name, modname)
       setEnv(name, swiftName)
       :application.set_env(:asn1scg, {:type,swiftName}, fields)
       save(saveFlag, modname, swiftName, emitSetDefinition(swiftName,
-          emitFields(name, 4, fields, modname), emitCtor(emitParams(name,fields), emitCtorBody(fields)),
-          emitSetDecoder(emitSequenceDecoderBody(name, fields), swiftName, emitArgs(fields)),
-          emitSequenceEncoder(emitSequenceEncoderBody(name, fields))))
+          emitFields(swiftName, 4, fields, modname), emitCtor(emitParams(swiftName,fields), emitCtorBody(fields)),
+          emitSetDecoder(emitSequenceDecoderBody(swiftName, fields), swiftName, emitArgs(fields)),
+          emitSequenceEncoder(emitSequenceEncoderBody(swiftName, fields))))
   end
 
   def choice(name, cases, modname, saveFlag) do
-      swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+      swiftName = getSwiftName(name, modname)
       setEnv(name, swiftName)
 
       defId = case cases do
           [{:ComponentType,_,fieldName,{:type,_,type,_,_,_},_,_,_}] ->
-               field = fieldType(name, fieldName(fieldName), type)
+               field = fieldType(swiftName, fieldName(fieldName), type)
                t = substituteType(lookup(field))
                "#{t}.defaultIdentifier"
           _ -> ".enumerated"
       end
 
       save(saveFlag, modname, swiftName, emitChoiceDefinition(swiftName,
-          emitCases(name, 4, cases, modname),
-          emitChoiceDecoder(emitChoiceDecoderBody(name,cases), name, cases),
-          emitChoiceEncoder(emitChoiceEncoderBody(name,cases)), defId))
+          emitCases(swiftName, 4, cases, modname),
+          emitChoiceDecoder(emitChoiceDecoderBody(swiftName,cases), swiftName, cases),
+          emitChoiceEncoder(emitChoiceEncoderBody(swiftName,cases)), defId))
   end
 
   def enumeration(name, cases, modname, saveFlag) do
-      swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+      swiftName = getSwiftName(name, modname)
       setEnv(name, swiftName)
       save(saveFlag, modname, swiftName,
            emitEnumerationDefinition(swiftName,
@@ -885,7 +1362,7 @@ import Foundation
   end
 
   def integerEnum(name, cases, modname, saveFlag) do
-      swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+      swiftName = getSwiftName(name, modname)
       setEnv(name, swiftName)
       save(saveFlag, modname, swiftName,
            emitIntegerEnumDefinition(swiftName,
@@ -912,6 +1389,10 @@ import Foundation
 
   def lookup(name) do
       b = bin(name)
+      if b == "id-at" do
+         :io.format("DEBUG lookup id-at: mod=~p~n", [getEnv(:current_module, "")])
+      end
+
       if String.starts_with?(b, "[") and String.ends_with?(b, "]") and String.length(b) > 2 do
          inner = String.slice(b, 1..-2//1)
          "[" <> lookup(inner) <> "]"
@@ -919,11 +1400,21 @@ import Foundation
         mod = getEnv(:current_module, "")
         val = if mod != "" and is_binary(b) do
            full = bin(normalizeName(mod)) <> "_" <> b
-           :application.get_env(:asn1scg, full, :undefined)
+           key = try do String.to_existing_atom(full) rescue _ -> nil end
+           v = if key, do: :application.get_env(:asn1scg, key, :undefined), else: :undefined
+           if b == "id-at" do
+              :io.format("DEBUG lookup id-at local: ~p -> ~p~n", [full, v])
+           end
+           v
         else :undefined end
 
         res = case val do
-             :undefined -> :application.get_env(:asn1scg, b, b)
+             :undefined ->
+                 v = :application.get_env(:asn1scg, b, b)
+                 if b == "id-at" do
+                    :io.format("DEBUG lookup id-at global: ~p -> ~p~n", [b, v])
+                 end
+                 v
              v -> v
         end
         case res do
@@ -941,6 +1432,7 @@ import Foundation
   def plicit(_), do: ""
 
   def opt(:OPTIONAL), do: "?"
+  def opt({:DEFAULT, _}), do: "?"
   def opt(_), do: ""
   def spec("sequence"), do: "SequenceOf"
   def spec("set"), do: "SetOf"
@@ -951,9 +1443,16 @@ import Foundation
     |> String.replace("-", "_")
     |> String.replace(".", "_")
   end
+
+  def importModuleName({:Externaltypereference, _, _, mod}), do: mod
+  def importModuleName(mod), do: mod
   def setEnv(x,y) do
       mod = getEnv(:current_module, "")
       bx = bin(x)
+
+      if is_binary(bx) and (String.contains?(bx, "subordinate_nodes") or String.contains?(bx, "subordinate-nodes")) do
+          :io.format("DEBUG setEnv subordinate: key=~p val=~p~n", [bx, y])
+      end
 
       if bx == "id-ce" or bx == "id_ce" do
           :io.format("DEBUG setEnv for id-ce: mod=~p key=~p val=~p~n", [mod, bx, y])
@@ -962,10 +1461,32 @@ import Foundation
       if mod != "" and is_binary(bx) do
          full = bin(normalizeName(mod)) <> "_" <> bx
          :application.set_env(:asn1scg, full, y)
+         # Also store a normalized variant for lookups that normalize symbols (e.g. replace '-' with '_').
+         nxb = normalizeName(bx)
+         nfull = bin(normalizeName(mod)) <> "_" <> nxb
+         if nfull != full do
+            :application.set_env(:asn1scg, nfull, y)
+         end
          # :io.format("setEnv: ~ts -> ~ts~n", [full, y])
       end
       :application.set_env(:asn1scg, bx, y)
+      if is_binary(bx) do
+         nxb = normalizeName(bx)
+         if nxb != bx do
+            :application.set_env(:asn1scg, nxb, y)
+         end
+      end
       # :io.format("setEnv: ~ts -> ~ts~n", [bx, y])
+  end
+  def setEnvGlobal(x, y) do
+      bx = bin(x)
+      :application.set_env(:asn1scg, bx, y)
+      if is_binary(bx) do
+         nx = normalizeName(bx)
+         if nx != bx do
+            :application.set_env(:asn1scg, nx, y)
+         end
+      end
   end
   def getEnv(x,y), do: :application.get_env(:asn1scg, bin(x), y)
   def bin(x) when is_atom(x), do: :erlang.atom_to_binary x

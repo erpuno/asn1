@@ -11,13 +11,13 @@ extension ASN1ObjectIdentifier {
         // description gives "1.2.3".
         let newString = lhs.description + "." + suffix
         // Initialize from string. Force unwrap as we assume valid generation.
-        return try! ASN1ObjectIdentifier(oidString: newString)
+        return try! ASN1ObjectIdentifier(dotRepresentation: newString)
     }
     
     public static func + (lhs: ASN1ObjectIdentifier, rhs: [UInt]) -> ASN1ObjectIdentifier {
         let suffix = rhs.map { String($0) }.joined(separator: ".")
         let newString = lhs.description + "." + suffix
-        return try! ASN1ObjectIdentifier(oidString: newString)
+        return try! ASN1ObjectIdentifier(dotRepresentation: newString)
     }
 
     /// Appends a single integer.
