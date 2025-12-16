@@ -156,6 +156,72 @@ public class Console {
      if (data != serializer.serializedBytes) { throw "DER <-> Certificate lacks equality properties." }
   }
 
+  public static func generateX509() throws {
+     print("Debug: generateX509")
+     
+     // 1. Construct Issuer/Subject Name: CN=Test
+     // 2.5.4.3 (commonName)
+     let cnOID = try ASN1ObjectIdentifier(dotRepresentation: "2.5.4.3")
+     // PrintableString "Test" -> Tag 0x13, Length 0x04, Bytes "Test"
+     let cnValueDer: [UInt8] = [0x13, 0x04, 0x54, 0x65, 0x73, 0x74] 
+     let cnValue = try ASN1Any(derEncoded: cnValueDer)
+     
+     let atav = DSTU_AttributeTypeAndValue(type: cnOID, value: cnValue)
+     let rdn = DSTU_RelativeDistinguishedName([atav])
+     let name = DSTU_Name.rdnSequence(DSTU_RDNSequence([rdn]))
+     
+     // 2. Validity (Now to Now + 1 year)
+     let now = Date()
+     let later = Date(timeIntervalSinceNow: 3600 * 24 * 365)
+     
+     let calendar = Calendar(identifier: .gregorian)
+     let nowComps = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: now)
+     let laterComps = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: later)
+     
+     let notBefore = try DSTU_Time.utcTime(UTCTime(year: nowComps.year!, month: nowComps.month!, day: nowComps.day!, hours: nowComps.hour!, minutes: nowComps.minute!, seconds: nowComps.second!))
+     let notAfter = try DSTU_Time.utcTime(UTCTime(year: laterComps.year!, month: laterComps.month!, day: laterComps.day!, hours: laterComps.hour!, minutes: laterComps.minute!, seconds: laterComps.second!))
+     
+     let validity = DSTU_Validity(notBefore: notBefore, notAfter: notAfter)
+     
+     // 3. Algorithm: 1.2.840.113549.1.1.1 (rsaEncryption)
+     let algoOID = try ASN1ObjectIdentifier(dotRepresentation: "1.2.840.113549.1.1.1")
+     // Parameters: NULL
+     let nullParams = try ASN1Any(erasing: ASN1Null())
+     let algo = DSTU_AlgorithmIdentifier(algorithm: algoOID, parameters: nullParams)
+     
+     // 4. SubjectPublicKeyInfo
+     let pubKeyBitString = ASN1BitString(bytes: [0x01, 0x02, 0x03, 0x04])
+     let spki = DSTU_SubjectPublicKeyInfo(algorithm: algo, subjectPublicKey: pubKeyBitString)
+     
+     // 5. TBSCertificate
+     let serial: ArraySlice<UInt8> = [0x01]
+     let tbs = DSTU_TBSCertificate(
+        version: .v3,
+        serialNumber: serial,
+        signature: algo,
+        issuer: name,
+        validity: validity,
+        subject: name,
+        subjectPublicKeyInfo: spki,
+        issuerUniqueID: nil,
+        subjectUniqueID: nil,
+        extensions: nil
+     )
+     
+     // 6. Certificate
+     let sigValue = ASN1BitString(bytes: [0xFF, 0xEE, 0xDD])
+     let cert = DSTU_Certificate(tbsCertificate: tbs, signatureAlgorithm: algo, signatureValue: sigValue)
+     
+     print(": Generated Certificate ⟼ \(cert)\n")
+     
+     var serializer = DER.Serializer()
+     try cert.serialize(into: &serializer)
+     
+     let url = URL(fileURLWithPath: "generated.crt")
+     try Data(serializer.serializedBytes).write(to: url)
+     print(": Written to generated.crt")
+  }
+
   public static func suite() -> Int32 {
      do {
        try verifyOID()
@@ -168,6 +234,7 @@ public class Console {
 
        try showCertificate(file: "ca.crt")
        try verifyX509(file: "ca.crt")
+       try generateX509()
        try showContentInfo(file: "data.bin")
        try showDirectoryString(data: [19,3,49,50,51])
        // try showLDAPMessage(data: [48,16,2,1,1,96,9,2,1,1,4,0,128,2,49,50,160,0])

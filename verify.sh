@@ -33,4 +33,43 @@ else
   diff original.txt verified.txt | head -n 10 || true
 fi
 
+echo "--- 4. Verifying Generated Certificate ---"
+if [ ! -f "generated.crt" ]; then
+    echo "Error: generated.crt was not generated!"
+    exit 1
+fi
+
+echo "Parsability Check (Generated X.509):"
+openssl x509 -in generated.crt -inform DER -text -noout > /dev/null
+echo "  [OK] OpenSSL x509 check passed for generated.crt."
+
+echo "Content Verification (Generated X.509):"
+# Verify Subject
+SUBJECT=$(openssl x509 -in generated.crt -inform DER -noout -subject)
+# Normalize spaces
+if [[ "$SUBJECT" == *"CN=Test"* ]] || [[ "$SUBJECT" == *"CN = Test"* ]]; then
+    echo "  [OK] Subject matches 'Test'."
+else
+    echo "  [FAIL] Subject mismatch. Got: $SUBJECT"
+    exit 1
+fi
+
+# Verify Issuer
+ISSUER=$(openssl x509 -in generated.crt -inform DER -noout -issuer)
+if [[ "$ISSUER" == *"CN=Test"* ]] || [[ "$ISSUER" == *"CN = Test"* ]]; then
+    echo "  [OK] Issuer matches 'Test'."
+else
+    echo "  [FAIL] Issuer mismatch. Got: $ISSUER"
+    exit 1
+fi
+
+# Verify Serial
+SERIAL=$(openssl x509 -in generated.crt -inform DER -noout -serial)
+if [[ "$SERIAL" == *"serial=01"* ]]; then
+    echo "  [OK] Serial matches '01'."
+else
+    echo "  [FAIL] Serial mismatch. Got: $SERIAL"
+    exit 1
+fi
+
 echo "--- SUCCESS: Verification Complete ---"
