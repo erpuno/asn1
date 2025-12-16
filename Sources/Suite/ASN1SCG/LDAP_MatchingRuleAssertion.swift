@@ -30,7 +30,7 @@ import Foundation
             if let matchingRule = self.matchingRule { try coder.serializeOptionalImplicitlyTagged(matchingRule, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
             if let type = self.type { try coder.serializeOptionalImplicitlyTagged(type, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
             try coder.serializeOptionalImplicitlyTagged(matchValue, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
-            try coder.serializeOptionalImplicitlyTagged(dnAttributes, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
+            if dnAttributes { try coder.serialize(dnAttributes) }
         }
     }
 }

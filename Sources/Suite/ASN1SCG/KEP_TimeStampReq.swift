@@ -37,7 +37,7 @@ import Foundation
             try coder.serialize(messageImprint)
             if let reqPolicy = self.reqPolicy { try coder.serialize(reqPolicy) }
             if let nonce = self.nonce { try coder.serialize(nonce) }
-            try coder.serialize(certReq)
+            if certReq { try coder.serialize(certReq) }
             if let extensions = self.extensions { try coder.serializeOptionalImplicitlyTagged(extensions, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
         }
     }

@@ -14,7 +14,7 @@ defmodule ASN1 do
        name1 = bin(normalizeName(name))
        type1 = bin(type)
        mod = getEnv(:current_module, "")
-       fullName = if mod != "" and not String.starts_with?(name1, "["), do: bin(mod) <> "_" <> name1, else: name1
+       fullName = if mod != "" and not String.starts_with?(name1, "["), do: bin(normalizeName(mod)) <> "_" <> name1, else: name1
 
        setEnv(name1, fullName)
        setEnv({:array, fullName}, {tag, type1})
@@ -52,7 +52,7 @@ import Foundation
       end
       setEnv(name1, "[#{type1}]")
       mod = getEnv(:current_module, "")
-      prefixed = if mod != "" and not String.starts_with?(name1, "["), do: bin(mod) <> "_" <> name1, else: name1
+      prefixed = if mod != "" and not String.starts_with?(name1, "["), do: bin(normalizeName(mod)) <> "_" <> name1, else: name1
       setEnv({:array, prefixed}, {tag, type1})
       setEnv({:array, "[#{type1}]"}, {tag, type1})
       name1
@@ -405,12 +405,10 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
                   case line do
                    {:'ComponentType',l,name,{:type,tag,ref,x,y,no},opt,z,w} ->
                         tagNew = case tag do [] -> [{:tag,:APPLICATION,newNo,:'IMPLICIT',32}] ; x -> x end
-                        :io.format "line: ~p~n", [{line,tagNew}]
                         {:'ComponentType',l,name,{:type,tagNew,ref,x,y,no},opt,z,w}
                    _ -> []
                    end
                  end, zip))
-                 :io.format "casesTagged: ~p~n", [casesTagged]
                  choice(fieldType(name,fieldName,fieldType), casesTagged, modname, true)
               {:INTEGER, cases} ->
                  integerEnum(fieldType(name,fieldName,fieldType), cases, modname, true)
@@ -535,6 +533,9 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
                 {:"INTEGER", _} ->
                     trace(23)
                     emitSequenceEncoderBodyElementIntEnum(tagNo(tag), fieldName(fieldName))
+                :BOOLEAN ->
+                    # DER: Do not encode fields with DEFAULT values when they match the default
+                    "if #{fieldName(fieldName)} { try coder.serialize(#{fieldName(fieldName)}) }"
                 {:Externaltypereference,_,_,inner} ->
                     trace(24)
                      innerName = lookup(bin(inner))
@@ -656,15 +657,19 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
       end
   end
 
-  def extractOID(list) do
-      Enum.join(:lists.map(fn
+  def extractOID(val) do
+      list = if is_list(val), do: val, else: [val]
+      Enum.map(list, fn
          {:NamedNumber, _, val} -> val
+         {{:seqtag, _, _, _}, val} -> val
+         {:Externalvaluereference, _, mod, name} -> bin(normalizeName(mod)) <> "_" <> bin(normalizeName(name))
          val -> val
-      end, list), ", ")
+      end)
+      |> Enum.join(", ")
   end
 
   def value(name, _type, val, modname, saveFlag) do
-      swiftName = bin(modname) <> "_" <> bin(normalizeName(name))
+      swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
       setEnv(name, swiftName)
       oid = extractOID(val)
       save(saveFlag, modname, swiftName, """
@@ -683,7 +688,7 @@ public let #{swiftName}: ASN1ObjectIdentifier = [#{oid}]
   def compileModule(_pos, _name, _defid, _tagdefault, _exports, _imports), do: []
 
   def sequence(name, fields, modname, saveFlag) do
-      swiftName = bin(modname) <> "_" <> bin(normalizeName(name))
+      swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
       setEnv(name, swiftName)
       :application.set_env(:asn1scg, {:type,swiftName}, fields)
       save(saveFlag, modname, swiftName, emitSequenceDefinition(swiftName,
@@ -693,7 +698,7 @@ public let #{swiftName}: ASN1ObjectIdentifier = [#{oid}]
   end
 
   def set(name, fields, modname, saveFlag) do
-      swiftName = bin(modname) <> "_" <> bin(normalizeName(name))
+      swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
       setEnv(name, swiftName)
       :application.set_env(:asn1scg, {:type,swiftName}, fields)
       save(saveFlag, modname, swiftName, emitSetDefinition(swiftName,
@@ -703,7 +708,7 @@ public let #{swiftName}: ASN1ObjectIdentifier = [#{oid}]
   end
 
   def choice(name, cases, modname, saveFlag) do
-      swiftName = bin(modname) <> "_" <> bin(normalizeName(name))
+      swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
       setEnv(name, swiftName)
 
       defId = case cases do
@@ -721,7 +726,7 @@ public let #{swiftName}: ASN1ObjectIdentifier = [#{oid}]
   end
 
   def enumeration(name, cases, modname, saveFlag) do
-      swiftName = bin(modname) <> "_" <> bin(normalizeName(name))
+      swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
       setEnv(name, swiftName)
       save(saveFlag, modname, swiftName,
            emitEnumerationDefinition(swiftName,
@@ -729,7 +734,7 @@ public let #{swiftName}: ASN1ObjectIdentifier = [#{oid}]
   end
 
   def integerEnum(name, cases, modname, saveFlag) do
-      swiftName = bin(modname) <> "_" <> bin(normalizeName(name))
+      swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
       setEnv(name, swiftName)
       save(saveFlag, modname, swiftName,
            emitIntegerEnumDefinition(swiftName,
@@ -749,7 +754,7 @@ public let #{swiftName}: ASN1ObjectIdentifier = [#{oid}]
       case :lists.member(norm,exceptions()) do
            true ->  print "skipping: ~ts.swift~n", [fileName] ; setEnv(:verbose, verbose)
            false -> :ok = :file.write_file(fileName,res)      ; setEnv(:verbose, true)
-                    print "compiled: ~ts.swift~n", [fileName] ; setEnv(:verbose, verbose) end
+                    print "compiled: ~ts~n", [fileName] ; setEnv(:verbose, verbose) end
   end
 
   def save(_, _, _, _), do: []
@@ -762,7 +767,7 @@ public let #{swiftName}: ASN1ObjectIdentifier = [#{oid}]
       else
         mod = getEnv(:current_module, "")
         val = if mod != "" and is_binary(b) do
-           full = bin(mod) <> "_" <> b
+           full = bin(normalizeName(mod)) <> "_" <> b
            :application.get_env(:asn1scg, full, :undefined)
         else :undefined end
 
@@ -790,12 +795,16 @@ public let #{swiftName}: ASN1ObjectIdentifier = [#{oid}]
   def spec("set"), do: "SetOf"
   def spec(_), do: ""
   def trace(x), do: setEnv({:trace, x}, x)
-  def normalizeName(name), do: Enum.join(String.split("#{name}", "-"), "_")
+  def normalizeName(name) do
+    "#{name}"
+    |> String.replace("-", "_")
+    |> String.replace(".", "_")
+  end
   def setEnv(x,y) do
       mod = getEnv(:current_module, "")
       bx = bin(x)
       if mod != "" and is_binary(bx) do
-         full = bin(mod) <> "_" <> bx
+         full = bin(normalizeName(mod)) <> "_" <> bx
          :application.set_env(:asn1scg, full, y)
       end
       :application.set_env(:asn1scg, bx, y)

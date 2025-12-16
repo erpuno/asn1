@@ -25,7 +25,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(controlType)
-            try coder.serialize(criticality)
+            if criticality { try coder.serialize(criticality) }
             if let controlValue = self.controlValue { try coder.serialize(controlValue) }
         }
     }

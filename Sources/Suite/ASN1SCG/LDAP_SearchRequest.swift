@@ -44,7 +44,7 @@ import Foundation
             try coder.serialize(derefAliases)
             try coder.serialize(sizeLimit)
             try coder.serialize(timeLimit)
-            try coder.serialize(typesOnly)
+            if typesOnly { try coder.serialize(typesOnly) }
             try coder.serialize(filter)
             try coder.serialize(attributes)
         }

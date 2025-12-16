@@ -29,7 +29,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(entry)
             try coder.serialize(newrdn)
-            try coder.serialize(deleteoldrdn)
+            if deleteoldrdn { try coder.serialize(deleteoldrdn) }
             if let newSuperior = self.newSuperior { try coder.serializeOptionalImplicitlyTagged(newSuperior, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
         }
     }

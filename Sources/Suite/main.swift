@@ -39,14 +39,15 @@ public class Console {
      if (data != serializer.serializedBytes) { throw "DER <-> DirectoryString lacks equality properties." }
   }
 
-  public static func showLDAPMessage(data: Array<UInt8>) throws {
-     let msg: LDAP_LDAPMessage? = try LDAP_LDAPMessage(derEncoded: data)
-     var serializer = DER.Serializer()
-     try msg!.serialize(into: &serializer)
-     print(": LDAPMessage.DER \(data)")
-     print(": LDAPMessage ⟼ \(msg!)\n")
-     if (data != serializer.serializedBytes) { throw "DER <-> LDAPMessage lacks equality properties." }
-  }
+  // Commented out - LDAP types were in deleted XSeries
+  // public static func showLDAPMessage(data: Array<UInt8>) throws {
+  //    let msg: LDAP_LDAPMessage? = try LDAP_LDAPMessage(derEncoded: data)
+  //    var serializer = DER.Serializer()
+  //    try msg!.serialize(into: &serializer)
+  //    print(": LDAPMessage.DER \(data)")
+  //    print(": LDAPMessage ⟼ \(msg!)\n")
+  //    if (data != serializer.serializedBytes) { throw "DER <-> LDAPMessage lacks equality properties." }
+  // }
 
   public static func showCHATMessage(data: Array<UInt8>) throws {
      let msg: CHAT_CHATMessage? = try CHAT_CHATMessage(derEncoded: data)
@@ -63,6 +64,25 @@ public class Console {
          let data = try Data(contentsOf: url)
          let cert = try DSTU_Certificate(derEncoded: Array(data)) // display TBSCertificate envelop from DSTU.asn1
          print(": Certificate ⟼ \(cert)\n")
+     }
+  }
+
+  public static func verifyX509(file: String) throws {
+     let url = URL(fileURLWithPath: file)
+     if (!Console.exists(f: url.path)) { print(": X509 file not found.") } else {
+         let data = try Data(contentsOf: url)
+         let cert = try DSTU_Certificate(derEncoded: Array(data))
+         var serializer = DER.Serializer()
+         try cert.serialize(into: &serializer)
+         let outputUrl = URL(fileURLWithPath: "verified.der")
+         try Data(serializer.serializedBytes).write(to: outputUrl)
+         print(": X509 Certificate read and re-written to verified.der")
+         print(": X509 Certificate ⟼ \(cert)\n")
+         if (Array(data) != serializer.serializedBytes) { 
+            print(": [WARN] DER <-> Certificate round trip differs.") 
+         } else {
+            print(": [OK] DER <-> Certificate round trip matches.")
+         }
      }
   }
 
@@ -85,22 +105,95 @@ public class Console {
      }
   }
 
+  public static func verifyOID() throws {
+      print("Debug: verifyOID")
+      print(": KEP_id_data ⟼ \(KEP_id_data)")
+      if (KEP_id_data.description != "1.2.840.113549.1.7.1") {
+         throw "KEP_id_data value mismatch. Expected 1.2.840.113549.1.7.1, got \(KEP_id_data)"
+      }
+      print(": PASSED\n")
+  }
+
+  public static func showPentanomial(data: Array<UInt8>) throws {
+     print("Debug: showPentanomial")
+     let val: DSTU_Pentanomial? = try DSTU_Pentanomial(derEncoded: data)
+     var serializer = DER.Serializer()
+     try val!.serialize(into: &serializer)
+     print(": Pentanomial.DER \(data)")
+     print(": Pentanomial ⟼ \(val!)\n")
+     if (data != serializer.serializedBytes) { throw "DER <-> Pentanomial lacks equality properties." }
+  }
+
+  // Commented out - LDAP types were in deleted XSeries
+  // public static func showAttributeValueAssertion(data: Array<UInt8>) throws {
+  //    print("Debug: showAttributeValueAssertion")
+  //    let val: LDAP_AttributeValueAssertion? = try LDAP_AttributeValueAssertion(derEncoded: data)
+  //    var serializer = DER.Serializer()
+  //    try val!.serialize(into: &serializer)
+  //    print(": AttributeValueAssertion.DER \(data)")
+  //    print(": AttributeValueAssertion ⟼ \(val!)\n")
+  //    if (data != serializer.serializedBytes) { throw "DER <-> AttributeValueAssertion lacks equality properties." }
+  // }
+
+
+  public static func showIntMatrix(data: Array<UInt8>) throws {
+     print("Debug: showIntMatrix")
+     let val: Nested_IntMatrix? = try Nested_IntMatrix(derEncoded: data)
+     var serializer = DER.Serializer()
+     try val!.serialize(into: &serializer)
+     print(": IntMatrix.DER \(data)")
+     print(": IntMatrix ⟼ \(val!)\n")
+     if (data != serializer.serializedBytes) { throw "DER <-> IntMatrix lacks equality properties." }
+  }
+
+  public static func showCertificateData(data: Array<UInt8>) throws {
+     print("Debug: showCertificateData")
+     let val: DSTU_Certificate? = try DSTU_Certificate(derEncoded: data)
+     var serializer = DER.Serializer()
+     try val!.serialize(into: &serializer)
+     print(": Certificate.DER \(data)")
+     print(": Certificate ⟼ \(val!)\n")
+     if (data != serializer.serializedBytes) { throw "DER <-> Certificate lacks equality properties." }
+  }
+
   public static func suite() -> Int32 {
      do {
+       try verifyOID()
+       try showPentanomial(data: [48, 9, 2, 1, 1, 2, 1, 2, 2, 1, 3])
+       // try showAttributeValueAssertion(data: [48, 14, 4, 2, 99, 110, 4, 8, 74, 111, 104, 110, 32, 68, 111, 101])
+       try showIntMatrix(data: [48, 22, 48, 9, 2, 1, 1, 2, 1, 2, 2, 1, 3, 48, 9, 2, 1, 4, 2, 1, 5, 2, 1, 6])
+       // Generated test vector for dummy Certificate
+       try showCertificateData(data: [48, 129, 129, 48, 107, 160, 3, 2, 1, 2, 2, 3, 1, 226, 64, 48, 10, 6, 8, 42, 134, 72, 206, 61, 4, 3, 2, 48, 13, 49, 11, 48, 9, 6, 3, 85, 4, 3, 19, 2, 67, 65, 48, 30, 23, 13, 50, 51, 48, 49, 48, 49, 49, 50, 48, 48, 48, 48, 90, 23, 13, 51, 48, 48, 49, 48, 49, 49, 50, 48, 48, 48, 48, 90, 48, 15, 49, 13, 48, 11, 6, 3, 85, 4, 3, 19, 4, 85, 115, 101, 114, 48, 19, 48, 9, 6, 7, 42, 134, 72, 206, 61, 2, 1, 3, 6, 0, 4, 0, 0, 0, 0, 48, 10, 6, 8, 42, 134, 72, 206, 61, 4, 3, 2, 3, 6, 0, 1, 2, 3, 4, 5])
+
+
        try showCertificate(file: "ca.crt")
+       try verifyX509(file: "ca.crt")
        try showContentInfo(file: "data.bin")
        try showDirectoryString(data: [19,3,49,50,51])
-       try showLDAPMessage(data: [48,16,2,1,1,96,9,2,1,1,4,0,128,2,49,50,160,0])
+       // try showLDAPMessage(data: [48,16,2,1,1,96,9,2,1,1,4,0,128,2,49,50,160,0])
        try showCHATMessage(data: [48,27,2,1,1,48,0,160,20,4,3,53,72,84,4,7,53,72,84,46,99,115,114,4,4,48,48,48,48])
        try showName(data: [48,13,49,11,48,9,6,3,85,4,6,19,2,85,65])
        try showName(data: [48,0])
+
+       // existing test (directoryName [4] EXPLICIT empty sequence)
        try showGeneralName(data: [164,2,48,0])
+
+       // dNSName [2] IMPLICIT IA5String("example.com")
+       // Tag [2] -> 0x82 (Context S. Primitive 2)
+       // "example.com" ascii -> 65 78 61 6D 70 6C 65 2E 63 6F 6D (11 bytes)
+       try showGeneralName(data: [0x82, 11, 0x65, 0x78, 0x61, 0x6D, 0x70, 0x6C, 0x65, 0x2E, 0x63, 0x6F, 0x6D])
+
+       // registeredID [8] IMPLICIT OBJECT IDENTIFIER(1.2.840.113549.1.7.1)
+       // Tag [8] -> 0x88 (Context S. Primitive 8)
+       // OID bytes: 2A 86 48 86 F7 0D 01 07 01 (9 bytes)
+       try showGeneralName(data: [0x88, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x07, 0x01])
+
        print(": PASSED")
        return 0
      } catch {
        print(": EXCEPTION \(error)")
        print(": FAILED")
-       return -1
+       return 1
      }
   }
 

@@ -25,7 +25,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(extnID)
-            try coder.serialize(critical)
+            if critical { try coder.serialize(critical) }
             try coder.serialize(extnvalue)
         }
     }
