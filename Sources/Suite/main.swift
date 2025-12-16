@@ -3,14 +3,15 @@ import Foundation
 
 exit(Console.suite())
 
-extension String: Error { }
+extension String: @retroactive Error { }
 
 public class Console {
 
   public static func exists(f: String) -> Bool { return FileManager.default.fileExists(atPath: f) }
 
   public static func showName(data: Array<UInt8>) throws {
-     let name: Name? = try Name(derEncoded: data)
+     print("Debug: showName")
+     let name: DSTU_Name? = try DSTU_Name(derEncoded: data)
      var serializer = DER.Serializer()
      try name!.serialize(into: &serializer)
      print(": Name.DER \(data)")
@@ -19,7 +20,8 @@ public class Console {
   }
 
   public static func showGeneralName(data: Array<UInt8>) throws {
-     let name: GeneralName? = try GeneralName(derEncoded: data)
+     print("Debug: showGeneralName")
+     let name: KEP_GeneralName? = try KEP_GeneralName(derEncoded: data)
      var serializer = DER.Serializer()
      try name!.serialize(into: &serializer)
      print(": GeneralName.DER \(data)")
@@ -28,7 +30,8 @@ public class Console {
   }
 
   public static func showDirectoryString(data: Array<UInt8>) throws {
-     let ds: DirectoryString? = try DirectoryString(derEncoded: data)
+     print("Debug: showDirectoryString")
+     let ds: DSTU_DirectoryString? = try DSTU_DirectoryString(derEncoded: data)
      var serializer = DER.Serializer()
      try ds!.serialize(into: &serializer)
      print(": DirectoryString.DER \(data)")
@@ -37,7 +40,7 @@ public class Console {
   }
 
   public static func showLDAPMessage(data: Array<UInt8>) throws {
-     let msg: LDAPMessage? = try LDAPMessage(derEncoded: data)
+     let msg: LDAP_LDAPMessage? = try LDAP_LDAPMessage(derEncoded: data)
      var serializer = DER.Serializer()
      try msg!.serialize(into: &serializer)
      print(": LDAPMessage.DER \(data)")
@@ -46,7 +49,7 @@ public class Console {
   }
 
   public static func showCHATMessage(data: Array<UInt8>) throws {
-     let msg: CHATMessage? = try CHATMessage(derEncoded: data)
+     let msg: CHAT_CHATMessage? = try CHAT_CHATMessage(derEncoded: data)
      var serializer = DER.Serializer()
      try msg!.serialize(into: &serializer)
      print(": CHATMessage.DER \(data)")
@@ -58,7 +61,7 @@ public class Console {
      let url = URL(fileURLWithPath: file)
      if (!Console.exists(f: url.path)) { print(": CERT file not found.") } else {
          let data = try Data(contentsOf: url)
-         let cert = try Certificate(derEncoded: Array(data)) // display TBSCertificate envelop from DSTU.asn1
+         let cert = try DSTU_Certificate(derEncoded: Array(data)) // display TBSCertificate envelop from DSTU.asn1
          print(": Certificate ⟼ \(cert)\n")
      }
   }
@@ -67,10 +70,10 @@ public class Console {
      let url = URL(fileURLWithPath: file)
      if (!Console.exists(f: url.path)) { print(": CI file not found.") } else {
          let data = try Data(contentsOf: url)
-         var cert = try ContentInfo(derEncoded: Array(data))
+         var cert = try KEP_ContentInfo(derEncoded: Array(data))
          var serializer = DER.Serializer()
          try cert.content.serialize(into: &serializer)
-         var signedData = try SignedData(derEncoded: Array(serializer.serializedBytes))
+         var signedData = try KEP_SignedData(derEncoded: Array(serializer.serializedBytes))
          let content: String? = try String(bytes: signedData.encapContentInfo.eContent!.bytes, encoding: .utf8)
          cert.content = try ASN1Any(erasing: ASN1Null())
          signedData.encapContentInfo.eContent = nil
