@@ -3,6 +3,7 @@ set -e
 
 echo "--- 1. Using existing DSTU X.509 types (from Sources/Suite/ASN1SCG) ---"
 echo "  Note: DSTU.asn1 provides Certificate, Name, AlgorithmIdentifier, etc."
+rm -rf Sources/Suite/XSeries/*
 
 echo "--- 2. Building and Running Swift Suite ---"
 swift run chat-x509
@@ -70,6 +71,23 @@ if [[ "$SERIAL" == *"serial=01"* ]]; then
 else
     echo "  [FAIL] Serial mismatch. Got: $SERIAL"
     exit 1
+fi
+
+echo "--- 5. Full Cycle Verification (Generated -> DER -> Generated) ---"
+if [ ! -f "generated_verified.der" ]; then
+    echo "Error: generated_verified.der was not generated!"
+    exit 1
+fi
+
+openssl asn1parse -in generated.crt -inform DER > generated_orig.txt
+openssl asn1parse -in generated_verified.der -inform DER > generated_cycle.txt
+
+if diff -q generated_orig.txt generated_cycle.txt > /dev/null; then
+  echo "  [OK] Generated Certificate round-trip matches exactly."
+else
+  echo "  [WARN] Generated Certificate round-trip differs."
+  diff generated_orig.txt generated_cycle.txt | head -n 10 || true
+  exit 1
 fi
 
 echo "--- SUCCESS: Verification Complete ---"
