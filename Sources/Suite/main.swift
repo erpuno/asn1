@@ -82,6 +82,28 @@ public class Console {
      }
   }
 
+
+  public static func verifyX509(file: String) throws {
+     let url = URL(fileURLWithPath: file)
+     if (!Console.exists(f: url.path)) { print(": X509 file not found.") } else {
+         let data = try Data(contentsOf: url)
+         let cert = try Certificate(derEncoded: Array(data))
+         var serializer = DER.Serializer()
+         try cert.serialize(into: &serializer)
+         let outputUrl = URL(fileURLWithPath: "verified.der")
+         try Data(serializer.serializedBytes).write(to: outputUrl)
+         print(": X509 Certificate read and re-written to verified.der")
+         print(": X509 Certificate ⟼ \(cert)\n")
+         if (Array(data) != serializer.serializedBytes) { 
+            print(": [WARN] DER <-> Certificate round trip differs.") 
+         } else {
+            print(": [OK] DER <-> Certificate round trip matches.")
+         }
+     }
+  }
+
+
+
   public static func suite() -> Int32 {
      do {
        try showCertificate(file: "ca.crt")
@@ -92,6 +114,7 @@ public class Console {
        try showName(data: [48,13,49,11,48,9,6,3,85,4,6,19,2,85,65])
        try showName(data: [48,0])
        try showGeneralName(data: [164,2,48,0])
+       try verifyX509(file: "ca.crt")
        print(": PASSED")
        return 0
      } catch {
