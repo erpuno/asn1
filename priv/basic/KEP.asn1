@@ -67,7 +67,7 @@ GeneralName ::= CHOICE {
   otherName                  [0]  INSTANCE OF OTHER-NAME,
   rfc822Name                 [1]  IA5String,
   dNSName                    [2]  IA5String,
-  directoryName              [4]  Name,
+  directoryName              [4] EXPLICIT Name,
   uniformResourceIdentifier  [6]  IA5String,
   iPAddress                  [7]  OCTET STRING,
   registeredID               [8]  OBJECT IDENTIFIER
