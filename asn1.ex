@@ -9,7 +9,41 @@ defmodule ASN1 do
       end
   end
 
-  def array(name,type,tag,level \\ "") when tag == :sequence or tag == :set do
+  def array(name,type,tag,level \\ "")
+  def array(name,type,tag,level) when level == "top" do
+       name1 = bin(normalizeName(name))
+       type1 = bin(type)
+       mod = getEnv(:current_module, "")
+       fullName = if mod != "" and not String.starts_with?(name1, "["), do: bin(mod) <> "_" <> name1, else: name1
+
+       setEnv(name1, fullName)
+       setEnv({:array, fullName}, {tag, type1})
+       setEnv({:array, "[#{type1}]"}, {tag, type1})
+
+       print "array: #{level} : ~ts = [~ts] ~p (Struct Generated)~n", [name1, type1, tag]
+
+       structDef = """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline struct #{fullName}: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+    @inlinable static var defaultIdentifier: ASN1Identifier { .#{tag} }
+    @usableFromInline var value: [#{type1}]
+    @inlinable public init(_ value: [#{type1}]) { self.value = value }
+    @inlinable public init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
+        self.value = try DER.sequence(of: #{type1}.self, identifier: identifier, rootNode: rootNode)
+    }
+    @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
+        try coder.serializeSequenceOf(value, identifier: identifier)
+    }
+}
+"""
+       save(true, mod, fullName, structDef)
+       name1
+  end
+
+  def array(name,type,tag,level) when tag == :sequence or tag == :set do
       name1 = bin(normalizeName(name))
       type1 = bin(type)
       case level do
@@ -141,11 +175,19 @@ defmodule ASN1 do
   # Scalar Sum Component
 
   def emitChoiceElement(name, type), do: "case #{name}(#{lookup(bin(normalizeName(type)))})\n"
-  def emitChoiceEncoderBodyElement(w, no, name, _type, spec) when no == [], do:
+  def emitChoiceEncoderBodyElement(w, no, name, _type, spec, _plicit) when no == [], do:
       pad(w) <> "case .#{name}(let #{name}): try coder.serialize#{spec}(#{name})"
-  def emitChoiceEncoderBodyElement(w, no, name, _type, spec) do
-      label = if spec == "", do: "withIdentifier", else: "identifier"
-      pad(w) <> "case .#{name}(let #{name}): try coder.serialize#{spec}(#{name}, #{label}: ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}))"
+  def emitChoiceEncoderBodyElement(w, no, name, _type, spec, plicit) do
+      tag = "ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)})"
+      if plicit == "Explicit" do
+         pad(w) <> "case .#{name}(let #{name}): try coder.appendConstructedNode(identifier: #{tag}) { coder in try #{name}.serialize(into: &coder) }"
+      else
+          if spec == "" do
+            pad(w) <> "case .#{name}(let #{name}): try #{name}.serialize(into: &coder, withIdentifier: #{tag})"
+          else
+            pad(w) <> "case .#{name}(let #{name}): try coder.serialize#{spec}(#{name}, identifier: #{tag})"
+          end
+      end
   end
   def emitChoiceDecoderBodyElement(w, no, name, type, _spec) when no == [], do:
       pad(w) <> "case #{type}.defaultIdentifier:\n" <>
@@ -182,11 +224,14 @@ import SwiftASN1\nimport Foundation\n
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }\n#{fields}#{ctor}#{decoder}#{encoder}}
 """
 
-  def emitChoiceDefinition(name,cases,decoder,encoder), do:
+  def emitChoiceDefinition(name,cases,decoder,encoder,defId), do:
 """
 #{emitImprint()}
-import SwiftASN1\nimport Foundation\n
-@usableFromInline indirect enum #{name}: DERParseable, DERSerializable, Hashable, Sendable {
+import SwiftASN1
+import Foundation
+
+@usableFromInline indirect enum #{name}: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+    @inlinable static var defaultIdentifier: ASN1Identifier { #{defId} }
     #{cases}#{decoder}#{encoder}
 }
 """
@@ -226,19 +271,49 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
 #{cases}}
 """
 
-  def emitChoiceDecoder(cases), do:
+  def emitChoiceDecoder(body, name, cases) do
+     fallback = if length(cases) == 1 do
+         case hd(cases) do
+            {:ComponentType,_,fieldName,{:type,_tag,type,_elementSet,[],:no},_optional,_,_} ->
+                typeName = substituteType(lookup(fieldType(name, fieldName(fieldName), type)))
+                caseName = fieldName(fieldName)
+                """
+                default:
+                    if identifier == rootNode.identifier {
+                        if case .constructed(let nodes) = rootNode.content {
+                            var iterator = nodes.makeIterator()
+                            if let first = iterator.next(), iterator.next() == nil {
+                                if first.identifier == #{typeName}.defaultIdentifier {
+                                    self = .#{caseName}(try #{typeName}(derEncoded: first, withIdentifier: #{typeName}.defaultIdentifier))
+                                    return
+                                }
+                            }
+                        }
+                        self = .#{caseName}(try #{typeName}(derEncoded: rootNode, withIdentifier: identifier))
+                    } else {
+                        throw ASN1Error.unexpectedFieldType(rootNode.identifier)
+                    }
+                """
+            _ -> "            default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)"
+         end
+     else
+         "            default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)"
+     end
 """
-    @inlinable init(derEncoded rootNode: ASN1Node) throws {
-        switch rootNode.identifier {\n#{cases}
-            default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
+    @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
+        switch rootNode.identifier {
+#{body}
+#{fallback}
         }
     }
 """
+  end
 
   def emitChoiceEncoder(cases), do:
 """
-    @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier: ASN1Identifier) throws {
-        switch self {\n#{cases}
+    @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
+        switch self {
+#{cases}
         }
     }
 """
@@ -369,17 +444,17 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
       Enum.join(:lists.map(fn
         {:ComponentType,_,fieldName,{:type,tag,{:"SEQUENCE OF", {_,_,type,_,_,_}},_,_,_},_,_,_} ->
            trace(8)
-           emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), type, "SequenceOf")
+           emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), type, "SequenceOf", plicit(tag))
         {:ComponentType,_,fieldName,{:type,tag,{:"SET OF", {_,_,type,_,_,_}},_,_,_},_,_,_} ->
            trace(9)
-           emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), type, "SetOf")
+           emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), type, "SetOf", plicit(tag))
         {:ComponentType,_,fieldName,{:type,tag,type,_elementSet,[],:no},_optional,_,_} ->
            trace(10)
            case {part(lookup(fieldType(name,fieldName,type)),0,1),
                  :application.get_env(:asn1scg, {:array, lookup(fieldType(name,fieldName(fieldName),type))}, [])} do
-                {"[", {:set, _}} -> emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), type, "SetOf")
-                {"[", {:sequence, _}} -> emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), type, "SequenceOf")
-                _ -> emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), type, "")
+                {"[", {:set, _}} -> emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), type, "SetOf", plicit(tag))
+                {"[", {:sequence, _}} -> emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), type, "SequenceOf", plicit(tag))
+                _ -> emitChoiceEncoderBodyElement(12, tag, fieldName(fieldName), type, "", plicit(tag))
            end
          _ -> ""
       end, cases), "\n")
@@ -426,11 +501,16 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
                     emitSequenceDecoderBodyElementIntEnum(fieldName(fieldName), substituteType(lookup(fieldType(name,fieldName(fieldName),type))))
                 {:Externaltypereference,_,_,inner} ->
                     trace(18)
-                    case :application.get_env(:asn1scg, {:array, lookup(bin(inner))}, []) do
-                       {:sequence, _} -> emitSequenceDecoderBodyElementArray(optional, plicit(tag), tagNo(tag), fieldName(fieldName), substituteType(part(look,1,:erlang.size(look)-2)), "sequence")
-                       {:set, _} -> emitSequenceDecoderBodyElementArray(optional, plicit(tag), tagNo(tag), fieldName(fieldName), substituteType(part(look,1,:erlang.size(look)-2)), "set")
-                        _ -> emitSequenceDecoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), look)
-                    end
+                     innerName = lookup(bin(inner))
+                     resName = if String.starts_with?(innerName, "["), do: part(look,1,:erlang.size(look)-2), else: look
+                     is_struct = not String.starts_with?(innerName, "[")
+                     case :application.get_env(:asn1scg, {:array, innerName}, []) do
+                        {:sequence, _} when is_struct -> emitSequenceDecoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), look)
+                        {:sequence, _} -> emitSequenceDecoderBodyElementArray(optional, plicit(tag), tagNo(tag), fieldName(fieldName), resName, "sequence")
+                        {:set, _} when is_struct -> emitSequenceDecoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), look)
+                        {:set, _} -> emitSequenceDecoderBodyElementArray(optional, plicit(tag), tagNo(tag), fieldName(fieldName), resName, "set")
+                         _ -> emitSequenceDecoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), look)
+                     end
               _ ->  trace(19)
                     emitSequenceDecoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), look)
           end
@@ -457,11 +537,15 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
                     emitSequenceEncoderBodyElementIntEnum(tagNo(tag), fieldName(fieldName))
                 {:Externaltypereference,_,_,inner} ->
                     trace(24)
-                    case :application.get_env(:asn1scg, {:array, lookup(bin(inner))}, []) do
-                       {:sequence, _} -> emitSequenceEncoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), "sequence")
-                       {:set, _} -> emitSequenceEncoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), "set")
-                        _ -> emitSequenceEncoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), "")
-                    end
+                     innerName = lookup(bin(inner))
+                     is_struct = not String.starts_with?(innerName, "[")
+                     case :application.get_env(:asn1scg, {:array, innerName}, []) do
+                        {:sequence, _} when is_struct -> emitSequenceEncoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), "")
+                        {:sequence, _} -> emitSequenceEncoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), "sequence")
+                        {:set, _} when is_struct -> emitSequenceEncoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), "")
+                        {:set, _} -> emitSequenceEncoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), "set")
+                         _ -> emitSequenceEncoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), "")
+                     end
               _ ->  trace(25)
                     emitSequenceEncoderBodyElement(optional, plicit(tag), tagNo(tag), fieldName(fieldName), "")
            end
@@ -572,6 +656,27 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
       end
   end
 
+  def extractOID(list) do
+      Enum.join(:lists.map(fn
+         {:NamedNumber, _, val} -> val
+         val -> val
+      end, list), ", ")
+  end
+
+  def value(name, _type, val, modname, saveFlag) do
+      swiftName = bin(modname) <> "_" <> bin(normalizeName(name))
+      setEnv(name, swiftName)
+      oid = extractOID(val)
+      save(saveFlag, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+public let #{swiftName}: ASN1ObjectIdentifier = [#{oid}]
+""")
+  end
+
+  def compileValue(_pos, name, {:type, [], :'OBJECT IDENTIFIER', [], [], :no} = type, val, mod), do: value(name, type, val, mod, true)
   def compileValue(_pos, name, type, value, _mod), do: (print "Unhandled value definition ~p : ~p = ~p ~n", [name, type, value] ; [])
   def compileClass(_pos, name, _mod, type),        do: (print "Unhandled class definition ~p : ~p~n", [name, type] ; [])
   def compilePType(_pos, name, args, type),        do: (print "Unhandled PType definition ~p : ~p(~p)~n", [name, type, args] ; [])
@@ -600,10 +705,19 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
   def choice(name, cases, modname, saveFlag) do
       swiftName = bin(modname) <> "_" <> bin(normalizeName(name))
       setEnv(name, swiftName)
+
+      defId = case cases do
+          [{:ComponentType,_,fieldName,{:type,_,type,_,_,_},_,_,_}] ->
+               field = fieldType(name, fieldName(fieldName), type)
+               t = substituteType(lookup(field))
+               "#{t}.defaultIdentifier"
+          _ -> ".enumerated"
+      end
+
       save(saveFlag, modname, swiftName, emitChoiceDefinition(swiftName,
           emitCases(name, 4, cases, modname),
-          emitChoiceDecoder(emitChoiceDecoderBody(name,cases)),
-          emitChoiceEncoder(emitChoiceEncoderBody(name,cases))))
+          emitChoiceDecoder(emitChoiceDecoderBody(name,cases), name, cases),
+          emitChoiceEncoder(emitChoiceEncoderBody(name,cases)), defId))
   end
 
   def enumeration(name, cases, modname, saveFlag) do
@@ -642,19 +756,24 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
 
   def lookup(name) do
       b = bin(name)
-      mod = getEnv(:current_module, "")
-      val = if mod != "" and is_binary(b) do
-         full = bin(mod) <> "_" <> b
-         :application.get_env(:asn1scg, full, :undefined)
-      else :undefined end
+      if String.starts_with?(b, "[") and String.ends_with?(b, "]") and String.length(b) > 2 do
+         inner = String.slice(b, 1..-2//1)
+         "[" <> lookup(inner) <> "]"
+      else
+        mod = getEnv(:current_module, "")
+        val = if mod != "" and is_binary(b) do
+           full = bin(mod) <> "_" <> b
+           :application.get_env(:asn1scg, full, :undefined)
+        else :undefined end
 
-      res = case val do
-           :undefined -> :application.get_env(:asn1scg, b, b)
-           v -> v
-      end
-      case res do
-           a when a == b -> bin(a)
-           x -> lookup(x)
+        res = case val do
+             :undefined -> :application.get_env(:asn1scg, b, b)
+             v -> v
+        end
+        case res do
+             a when a == b -> bin(a)
+             x -> lookup(x)
+        end
       end
   end
 
