@@ -803,13 +803,16 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
           [] -> {nil, []}
       end
 
-      definition = if base do
-          suffix_str = Enum.join(suffix, ", ")
-          "public let #{swiftName}: ASN1ObjectIdentifier = #{base} + [#{suffix_str}]"
-      else
-          oid_str = Enum.join(components, ", ")
-          "public let #{swiftName}: ASN1ObjectIdentifier = [#{oid_str}]"
-      end
+      definition = cond do
+        base && suffix == [] ->
+            "public let #{swiftName}: ASN1ObjectIdentifier = #{base}"
+        base ->
+            suffix_str = Enum.join(suffix, ", ")
+            "public let #{swiftName}: ASN1ObjectIdentifier = #{base} + [#{suffix_str}]"
+        true ->
+            oid_str = Enum.join(components, ", ")
+            "public let #{swiftName}: ASN1ObjectIdentifier = [#{oid_str}]"
+    end
 
       save(saveFlag, modname, swiftName, """
 #{emitImprint()}
