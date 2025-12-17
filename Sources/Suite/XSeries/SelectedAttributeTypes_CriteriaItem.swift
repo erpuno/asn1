@@ -12,15 +12,20 @@ import Foundation
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .equality(try PKIX1Explicit88_AttributeType(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .equality(try PKIX1Explicit88_AttributeType(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .substrings(try PKIX1Explicit88_AttributeType(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .substrings(try PKIX1Explicit88_AttributeType(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .greaterOrEqual(try PKIX1Explicit88_AttributeType(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .greaterOrEqual(try PKIX1Explicit88_AttributeType(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .lessOrEqual(try PKIX1Explicit88_AttributeType(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .lessOrEqual(try PKIX1Explicit88_AttributeType(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                self = .approximateMatch(try PKIX1Explicit88_AttributeType(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .approximateMatch(try PKIX1Explicit88_AttributeType(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }

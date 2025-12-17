@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let certReqId: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let certTemplate: PKIXCRMF_2009_CertTemplate = try PKIXCRMF_2009_CertTemplate(derEncoded: &nodes)
-            let controls: PKIXCRMF_2009_Controls? = try PKIXCRMF_2009_Controls(derEncoded: &nodes)
+            var controls: PKIXCRMF_2009_Controls? = nil
+var peek_controls = nodes
+if let next = peek_controls.next(), next.identifier == PKIXCRMF_2009_Controls.defaultIdentifier {
+    controls = try PKIXCRMF_2009_Controls(derEncoded: &nodes)
+}
             return PKIXCRMF_2009_CertRequest(certReqId: certReqId, certTemplate: certTemplate, controls: controls)
         }
     }

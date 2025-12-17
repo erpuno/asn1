@@ -19,8 +19,16 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let cMCStatus: EnrollmentMessageSyntax_2009_CMCStatus = try EnrollmentMessageSyntax_2009_CMCStatus(derEncoded: &nodes)
             let bodyList: [EnrollmentMessageSyntax_2009_BodyPartReference] = try DER.sequence(of: EnrollmentMessageSyntax_2009_BodyPartReference.self, identifier: .sequence, nodes: &nodes)
-            let statusString: ASN1UTF8String? = try ASN1UTF8String(derEncoded: &nodes)
-            let otherInfo: EnrollmentMessageSyntax_2009_CMCStatusInfoV2_otherInfo_Choice? = try EnrollmentMessageSyntax_2009_CMCStatusInfoV2_otherInfo_Choice(derEncoded: &nodes)
+            var statusString: ASN1UTF8String? = nil
+var peek_statusString = nodes
+if let next = peek_statusString.next(), next.identifier == ASN1UTF8String.defaultIdentifier {
+    statusString = try ASN1UTF8String(derEncoded: &nodes)
+}
+            var otherInfo: EnrollmentMessageSyntax_2009_CMCStatusInfoV2_otherInfo_Choice? = nil
+var peek_otherInfo = nodes
+if let next = peek_otherInfo.next(), next.identifier == EnrollmentMessageSyntax_2009_CMCStatusInfoV2_otherInfo_Choice.defaultIdentifier {
+    otherInfo = try EnrollmentMessageSyntax_2009_CMCStatusInfoV2_otherInfo_Choice(derEncoded: &nodes)
+}
             return EnrollmentMessageSyntax_2009_CMCStatusInfoV2(cMCStatus: cMCStatus, bodyList: bodyList, statusString: statusString, otherInfo: otherInfo)
         }
     }

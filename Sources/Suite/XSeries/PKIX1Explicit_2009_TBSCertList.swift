@@ -27,11 +27,19 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let version: PKIX1Explicit_2009_Version? = try PKIX1Explicit_2009_Version(derEncoded: &nodes)
+            var version: PKIX1Explicit_2009_Version? = nil
+var peek_version = nodes
+if let next = peek_version.next(), next.identifier == PKIX1Explicit_2009_Version.defaultIdentifier {
+    version = try PKIX1Explicit_2009_Version(derEncoded: &nodes)
+}
             let signature: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let issuer: PKIX1Explicit_2009_Name = try PKIX1Explicit_2009_Name(derEncoded: &nodes)
             let thisUpdate: PKIX1Explicit_2009_Time = try PKIX1Explicit_2009_Time(derEncoded: &nodes)
-            let nextUpdate: PKIX1Explicit_2009_Time? = try PKIX1Explicit_2009_Time(derEncoded: &nodes)
+            var nextUpdate: PKIX1Explicit_2009_Time? = nil
+var peek_nextUpdate = nodes
+if let next = peek_nextUpdate.next(), next.identifier == PKIX1Explicit_2009_Time.defaultIdentifier {
+    nextUpdate = try PKIX1Explicit_2009_Time(derEncoded: &nodes)
+}
             let revokedCertificates: [PKIX1Explicit_2009_TBSCertList_revokedCertificates_Sequence]? = try DER.sequence(of: PKIX1Explicit_2009_TBSCertList_revokedCertificates_Sequence.self, identifier: .sequence, nodes: &nodes)
 
 

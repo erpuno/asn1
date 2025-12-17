@@ -15,7 +15,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let authorization: Document_Profile_Descriptor_Security_Information_authorization_Choice? = try Document_Profile_Descriptor_Security_Information_authorization_Choice(derEncoded: &nodes)
+            var authorization: Document_Profile_Descriptor_Security_Information_authorization_Choice? = nil
+var peek_authorization = nodes
+if let next = peek_authorization.next(), next.identifier == Document_Profile_Descriptor_Security_Information_authorization_Choice.defaultIdentifier {
+    authorization = try Document_Profile_Descriptor_Security_Information_authorization_Choice(derEncoded: &nodes)
+}
             let security_classification: Document_Profile_Descriptor_Character_Data? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let access_rights: [Document_Profile_Descriptor_Character_Data]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.set(of: Document_Profile_Descriptor_Character_Data.self, identifier: node.identifier, rootNode: node) }
             return Document_Profile_Descriptor_Security_Information(authorization: authorization, security_classification: security_classification, access_rights: access_rights)

@@ -20,7 +20,11 @@ import Foundation
             let glInfo: SMIMESymmetricKeyDistribution_2009_GLInfo = try SMIMESymmetricKeyDistribution_2009_GLInfo(derEncoded: &nodes)
             let glOwnerInfo: [SMIMESymmetricKeyDistribution_2009_GLOwnerInfo] = try DER.sequence(of: SMIMESymmetricKeyDistribution_2009_GLOwnerInfo.self, identifier: .sequence, nodes: &nodes)
             let glAdministration: SMIMESymmetricKeyDistribution_2009_GLAdministration? = try SMIMESymmetricKeyDistribution_2009_GLAdministration(derEncoded: &nodes)
-            let glKeyAttributes: SMIMESymmetricKeyDistribution_2009_GLKeyAttributes? = try SMIMESymmetricKeyDistribution_2009_GLKeyAttributes(derEncoded: &nodes)
+            var glKeyAttributes: SMIMESymmetricKeyDistribution_2009_GLKeyAttributes? = nil
+var peek_glKeyAttributes = nodes
+if let next = peek_glKeyAttributes.next(), next.identifier == SMIMESymmetricKeyDistribution_2009_GLKeyAttributes.defaultIdentifier {
+    glKeyAttributes = try SMIMESymmetricKeyDistribution_2009_GLKeyAttributes(derEncoded: &nodes)
+}
             return SMIMESymmetricKeyDistribution_2009_GLUseKEK(glInfo: glInfo, glOwnerInfo: glOwnerInfo, glAdministration: glAdministration, glKeyAttributes: glKeyAttributes)
         }
     }

@@ -23,7 +23,8 @@ import Foundation
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
                 self = .compression(try Raster_Gr_Coding_Attributes_Compression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                self = .bits_per_colour_component(try Raster_Gr_Coding_Attributes_Bits_Per_Colour_Component(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .bits_per_colour_component(try Raster_Gr_Coding_Attributes_Bits_Per_Colour_Component(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
                 self = .interleaving_format(try Raster_Gr_Profile_Attributes_Ra_Gr_Coding_Attribute_interleaving_format_IntEnum(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):

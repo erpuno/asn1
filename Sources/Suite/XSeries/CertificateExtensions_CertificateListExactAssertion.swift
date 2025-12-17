@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let issuer: PKIX1Explicit88_Name = try PKIX1Explicit88_Name(derEncoded: &nodes)
             let thisUpdate: AuthenticationFramework_Time = try AuthenticationFramework_Time(derEncoded: &nodes)
-            let distributionPoint: CertificateExtensions_DistributionPointName? = try CertificateExtensions_DistributionPointName(derEncoded: &nodes)
+            var distributionPoint: CertificateExtensions_DistributionPointName? = nil
+var peek_distributionPoint = nodes
+if let next = peek_distributionPoint.next(), next.identifier == CertificateExtensions_DistributionPointName.defaultIdentifier {
+    distributionPoint = try CertificateExtensions_DistributionPointName(derEncoded: &nodes)
+}
             return CertificateExtensions_CertificateListExactAssertion(issuer: issuer, thisUpdate: thisUpdate, distributionPoint: distributionPoint)
         }
     }

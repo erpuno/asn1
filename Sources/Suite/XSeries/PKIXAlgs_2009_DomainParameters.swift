@@ -22,8 +22,16 @@ import Foundation
             let p: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let g: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let q: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let j: ArraySlice<UInt8>? = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let validationParams: PKIXAlgs_2009_ValidationParams? = try PKIXAlgs_2009_ValidationParams(derEncoded: &nodes)
+            var j: ArraySlice<UInt8>? = nil
+var peek_j = nodes
+if let next = peek_j.next(), next.identifier == ArraySlice<UInt8>.defaultIdentifier {
+    j = try ArraySlice<UInt8>(derEncoded: &nodes)
+}
+            var validationParams: PKIXAlgs_2009_ValidationParams? = nil
+var peek_validationParams = nodes
+if let next = peek_validationParams.next(), next.identifier == PKIXAlgs_2009_ValidationParams.defaultIdentifier {
+    validationParams = try PKIXAlgs_2009_ValidationParams(derEncoded: &nodes)
+}
             return PKIXAlgs_2009_DomainParameters(p: p, g: g, q: q, j: j, validationParams: validationParams)
         }
     }

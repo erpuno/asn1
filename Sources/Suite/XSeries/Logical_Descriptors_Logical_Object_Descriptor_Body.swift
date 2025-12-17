@@ -47,7 +47,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let object_identifier: Identifiers_and_Expressions_Object_or_Class_Identifier? = try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: &nodes)
+            var object_identifier: Identifiers_and_Expressions_Object_or_Class_Identifier? = nil
+var peek_object_identifier = nodes
+if let next = peek_object_identifier.next(), next.identifier == Identifiers_and_Expressions_Object_or_Class_Identifier.defaultIdentifier {
+    object_identifier = try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: &nodes)
+}
             let subordinates: [ASN1PrintableString]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in try DER.sequence(of: ASN1PrintableString.self, identifier: node.identifier, rootNode: node) }
             let content_portions: [ASN1PrintableString]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.sequence(of: ASN1PrintableString.self, identifier: node.identifier, rootNode: node) }
             let object_class: Identifiers_and_Expressions_Object_or_Class_Identifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))

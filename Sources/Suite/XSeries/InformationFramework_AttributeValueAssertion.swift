@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let type: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let assertion: ASN1Any = try ASN1Any(derEncoded: &nodes)
-            let assertedContexts: InformationFramework_AttributeValueAssertion_assertedContexts_Choice? = try InformationFramework_AttributeValueAssertion_assertedContexts_Choice(derEncoded: &nodes)
+            var assertedContexts: InformationFramework_AttributeValueAssertion_assertedContexts_Choice? = nil
+var peek_assertedContexts = nodes
+if let next = peek_assertedContexts.next(), next.identifier == InformationFramework_AttributeValueAssertion_assertedContexts_Choice.defaultIdentifier {
+    assertedContexts = try InformationFramework_AttributeValueAssertion_assertedContexts_Choice(derEncoded: &nodes)
+}
             return InformationFramework_AttributeValueAssertion(type: type, assertion: assertion, assertedContexts: assertedContexts)
         }
     }

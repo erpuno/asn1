@@ -11,13 +11,21 @@ import Foundation
             case Identifiers_and_Expressions_Construction_Type.defaultIdentifier:
                 self = .construction_type(try Identifiers_and_Expressions_Construction_Type(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .single_term_construction(try Identifiers_and_Expressions_Construction_Term(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .single_term_construction(try Identifiers_and_Expressions_Construction_Term(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .construction_type(let construction_type): try coder.serialize(construction_type)
+            case .construction_type(let construction_type):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(construction_type)
+                                }
+                            } else {
+                                try coder.serialize(construction_type)
+                            }
             case .single_term_construction(let single_term_construction): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) { coder in try single_term_construction.serialize(into: &coder) }
         }
     }

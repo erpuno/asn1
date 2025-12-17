@@ -19,8 +19,16 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let certReqId: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let status: PKIXCMP_2009_PKIStatusInfo = try PKIXCMP_2009_PKIStatusInfo(derEncoded: &nodes)
-            let certifiedKeyPair: PKIXCMP_2009_CertifiedKeyPair? = try PKIXCMP_2009_CertifiedKeyPair(derEncoded: &nodes)
-            let rspInfo: ASN1OctetString? = try ASN1OctetString(derEncoded: &nodes)
+            var certifiedKeyPair: PKIXCMP_2009_CertifiedKeyPair? = nil
+var peek_certifiedKeyPair = nodes
+if let next = peek_certifiedKeyPair.next(), next.identifier == PKIXCMP_2009_CertifiedKeyPair.defaultIdentifier {
+    certifiedKeyPair = try PKIXCMP_2009_CertifiedKeyPair(derEncoded: &nodes)
+}
+            var rspInfo: ASN1OctetString? = nil
+var peek_rspInfo = nodes
+if let next = peek_rspInfo.next(), next.identifier == ASN1OctetString.defaultIdentifier {
+    rspInfo = try ASN1OctetString(derEncoded: &nodes)
+}
             return PKIXCMP_2009_CertResponse(certReqId: certReqId, status: status, certifiedKeyPair: certifiedKeyPair, rspInfo: rspInfo)
         }
     }

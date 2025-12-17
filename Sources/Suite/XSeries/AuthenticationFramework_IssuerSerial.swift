@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let issuer: PKIX1Implicit_2009_GeneralNames = try PKIX1Implicit_2009_GeneralNames(derEncoded: &nodes)
             let serial: AuthenticationFramework_CertificateSerialNumber = try AuthenticationFramework_CertificateSerialNumber(derEncoded: &nodes)
-            let issuerUID: SelectedAttributeTypes_UniqueIdentifier? = try SelectedAttributeTypes_UniqueIdentifier(derEncoded: &nodes)
+            var issuerUID: SelectedAttributeTypes_UniqueIdentifier? = nil
+var peek_issuerUID = nodes
+if let next = peek_issuerUID.next(), next.identifier == SelectedAttributeTypes_UniqueIdentifier.defaultIdentifier {
+    issuerUID = try SelectedAttributeTypes_UniqueIdentifier(derEncoded: &nodes)
+}
             return AuthenticationFramework_IssuerSerial(issuer: issuer, serial: serial, issuerUID: issuerUID)
         }
     }

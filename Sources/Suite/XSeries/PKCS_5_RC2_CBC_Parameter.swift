@@ -13,7 +13,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let rc2ParameterVersion: ArraySlice<UInt8>? = try ArraySlice<UInt8>(derEncoded: &nodes)
+            var rc2ParameterVersion: ArraySlice<UInt8>? = nil
+var peek_rc2ParameterVersion = nodes
+if let next = peek_rc2ParameterVersion.next(), next.identifier == ArraySlice<UInt8>.defaultIdentifier {
+    rc2ParameterVersion = try ArraySlice<UInt8>(derEncoded: &nodes)
+}
             let iv: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             return PKCS_5_RC2_CBC_Parameter(rc2ParameterVersion: rc2ParameterVersion, iv: iv)
         }

@@ -34,59 +34,86 @@ import Foundation
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .ir(try PKIXCRMF_2009_CertReqMessages(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .ir(try PKIXCRMF_2009_CertReqMessages(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .ip(try PKIXCMP_2009_CertRepMessage(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .ip(try PKIXCMP_2009_CertRepMessage(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .cr(try PKIXCRMF_2009_CertReqMessages(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .cr(try PKIXCRMF_2009_CertReqMessages(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .cp(try PKIXCMP_2009_CertRepMessage(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .cp(try PKIXCMP_2009_CertRepMessage(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                self = .p10cr(try PKCS_10_CertificationRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .p10cr(try PKCS_10_CertificationRequest(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
-                self = .popdecc(try PKIXCMP_2009_POPODecKeyChallContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .popdecc(try PKIXCMP_2009_POPODecKeyChallContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
-                self = .popdecr(try PKIXCMP_2009_POPODecKeyRespContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .popdecr(try PKIXCMP_2009_POPODecKeyRespContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
-                self = .kur(try PKIXCRMF_2009_CertReqMessages(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .kur(try PKIXCRMF_2009_CertReqMessages(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific):
-                self = .kup(try PKIXCMP_2009_CertRepMessage(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .kup(try PKIXCMP_2009_CertRepMessage(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific):
-                self = .krr(try PKIXCRMF_2009_CertReqMessages(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .krr(try PKIXCRMF_2009_CertReqMessages(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific):
-                self = .krp(try PKIXCMP_2009_KeyRecRepContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .krp(try PKIXCMP_2009_KeyRecRepContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific):
-                self = .rr(try PKIXCMP_2009_RevReqContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .rr(try PKIXCMP_2009_RevReqContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific):
-                self = .rp(try PKIXCMP_2009_RevRepContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .rp(try PKIXCMP_2009_RevRepContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific):
-                self = .ccr(try PKIXCRMF_2009_CertReqMessages(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .ccr(try PKIXCRMF_2009_CertReqMessages(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific):
-                self = .ccp(try PKIXCMP_2009_CertRepMessage(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .ccp(try PKIXCMP_2009_CertRepMessage(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific):
-                self = .ckuann(try PKIXCMP_2009_CAKeyUpdAnnContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .ckuann(try PKIXCMP_2009_CAKeyUpdAnnContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 16, tagClass: .contextSpecific):
-                self = .cann(try PKIXCMP_2009_CertAnnContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .cann(try PKIXCMP_2009_CertAnnContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific):
-                self = .rann(try PKIXCMP_2009_RevAnnContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .rann(try PKIXCMP_2009_RevAnnContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 18, tagClass: .contextSpecific):
-                self = .crlann(try PKIXCMP_2009_CRLAnnContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .crlann(try PKIXCMP_2009_CRLAnnContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 19, tagClass: .contextSpecific):
-                self = .pkiconf(try PKIXCMP_2009_PKIConfirmContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .pkiconf(try PKIXCMP_2009_PKIConfirmContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 20, tagClass: .contextSpecific):
-                self = .nested(try PKIXCMP_2009_NestedMessageContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .nested(try PKIXCMP_2009_NestedMessageContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 21, tagClass: .contextSpecific):
-                self = .genm(try PKIXCMP_2009_GenMsgContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .genm(try PKIXCMP_2009_GenMsgContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 22, tagClass: .contextSpecific):
-                self = .genp(try PKIXCMP_2009_GenRepContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .genp(try PKIXCMP_2009_GenRepContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 23, tagClass: .contextSpecific):
-                self = .error(try PKIXCMP_2009_ErrorMsgContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .error(try PKIXCMP_2009_ErrorMsgContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific):
-                self = .certConf(try PKIXCMP_2009_CertConfirmContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .certConf(try PKIXCMP_2009_CertConfirmContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 25, tagClass: .contextSpecific):
-                self = .pollReq(try PKIXCMP_2009_PollReqContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .pollReq(try PKIXCMP_2009_PollReqContent(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 26, tagClass: .contextSpecific):
-                self = .pollRep(try PKIXCMP_2009_PollRepContent(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .pollRep(try PKIXCMP_2009_PollRepContent(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }

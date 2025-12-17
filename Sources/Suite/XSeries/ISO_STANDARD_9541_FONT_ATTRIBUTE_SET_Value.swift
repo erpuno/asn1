@@ -19,29 +19,41 @@ import Foundation
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .global_Name(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .global_Name(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .match_String(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Match_String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .match_String(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Match_String(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .message(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Message(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .message(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Message(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .octetString(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .octetString(try ASN1OctetString(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                self = .boolean(try Bool(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .boolean(try Bool(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
-                self = .integer(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Integer(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .integer(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Integer(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
-                self = .cardinal(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Cardinal(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .cardinal(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Cardinal(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
-                self = .code(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Code(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .code(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Code(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific):
-                self = .rational(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rational(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .rational(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rational(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific):
-                self = .rel_Rational(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .rel_Rational(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific):
-                self = .angle(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Angle(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .angle(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Angle(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific):
-                self = .proprietary_Data(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Proprietary_Data(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .proprietary_Data(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Proprietary_Data(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }

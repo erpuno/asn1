@@ -17,8 +17,22 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .localeID1(let localeID1): try coder.serialize(localeID1)
-            case .localeID2(let localeID2): try coder.serialize(localeID2)
+            case .localeID1(let localeID1):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(localeID1)
+                                }
+                            } else {
+                                try coder.serialize(localeID1)
+                            }
+            case .localeID2(let localeID2):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(localeID2)
+                                }
+                            } else {
+                                try coder.serialize(localeID2)
+                            }
         }
     }
 

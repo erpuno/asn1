@@ -26,11 +26,46 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .teletexString(let teletexString): try coder.serialize(teletexString)
-            case .printableString(let printableString): try coder.serialize(printableString)
-            case .bmpString(let bmpString): try coder.serialize(bmpString)
-            case .universalString(let universalString): try coder.serialize(universalString)
-            case .uTF8String(let uTF8String): try coder.serialize(uTF8String)
+            case .teletexString(let teletexString):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(teletexString)
+                                }
+                            } else {
+                                try coder.serialize(teletexString)
+                            }
+            case .printableString(let printableString):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(printableString)
+                                }
+                            } else {
+                                try coder.serialize(printableString)
+                            }
+            case .bmpString(let bmpString):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(bmpString)
+                                }
+                            } else {
+                                try coder.serialize(bmpString)
+                            }
+            case .universalString(let universalString):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(universalString)
+                                }
+                            } else {
+                                try coder.serialize(universalString)
+                            }
+            case .uTF8String(let uTF8String):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(uTF8String)
+                                }
+                            } else {
+                                try coder.serialize(uTF8String)
+                            }
         }
     }
 

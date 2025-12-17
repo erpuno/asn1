@@ -78,7 +78,11 @@ import Foundation
             let object_class_identifier: Identifiers_and_Expressions_Object_or_Class_Identifier = try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: &nodes)
             let generator_for_subordinates: Identifiers_and_Expressions_Construction_Expression? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try Identifiers_and_Expressions_Construction_Expression(derEncoded: node) }
             let content_portions: [ASN1PrintableString]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.sequence(of: ASN1PrintableString.self, identifier: node.identifier, rootNode: node) }
-            let position: Layout_Descriptors_Layout_Class_Descriptor_Body_position_Choice? = try Layout_Descriptors_Layout_Class_Descriptor_Body_position_Choice(derEncoded: &nodes)
+            var position: Layout_Descriptors_Layout_Class_Descriptor_Body_position_Choice? = nil
+var peek_position = nodes
+if let next = peek_position.next(), next.identifier == Layout_Descriptors_Layout_Class_Descriptor_Body_position_Choice.defaultIdentifier {
+    position = try Layout_Descriptors_Layout_Class_Descriptor_Body_position_Choice(derEncoded: &nodes)
+}
             let dimensions: Layout_Descriptors_Dimension_Spec? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
             let transparency: Layout_Descriptors_Transparency? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
             let presentation_attributes: Style_Descriptors_Presentation_Attributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))

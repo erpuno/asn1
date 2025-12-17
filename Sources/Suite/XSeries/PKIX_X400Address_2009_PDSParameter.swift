@@ -13,8 +13,16 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let printable_string: ASN1PrintableString? = try ASN1PrintableString(derEncoded: &nodes)
-            let teletex_string: ASN1TeletexString? = try ASN1TeletexString(derEncoded: &nodes)
+            var printable_string: ASN1PrintableString? = nil
+var peek_printable_string = nodes
+if let next = peek_printable_string.next(), next.identifier == ASN1PrintableString.defaultIdentifier {
+    printable_string = try ASN1PrintableString(derEncoded: &nodes)
+}
+            var teletex_string: ASN1TeletexString? = nil
+var peek_teletex_string = nodes
+if let next = peek_teletex_string.next(), next.identifier == ASN1TeletexString.defaultIdentifier {
+    teletex_string = try ASN1TeletexString(derEncoded: &nodes)
+}
             return PKIX_X400Address_2009_PDSParameter(printable_string: printable_string, teletex_string: teletex_string)
         }
     }

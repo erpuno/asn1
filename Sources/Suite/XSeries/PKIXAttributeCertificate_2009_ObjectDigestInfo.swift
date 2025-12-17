@@ -18,7 +18,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let digestedObjectType: PKIXAttributeCertificate_2009_ObjectDigestInfo_digestedObjectType_Enum = try PKIXAttributeCertificate_2009_ObjectDigestInfo_digestedObjectType_Enum(derEncoded: &nodes)
-            let otherObjectTypeID: ASN1ObjectIdentifier? = try ASN1ObjectIdentifier(derEncoded: &nodes)
+            var otherObjectTypeID: ASN1ObjectIdentifier? = nil
+var peek_otherObjectTypeID = nodes
+if let next = peek_otherObjectTypeID.next(), next.identifier == ASN1ObjectIdentifier.defaultIdentifier {
+    otherObjectTypeID = try ASN1ObjectIdentifier(derEncoded: &nodes)
+}
             let digestAlgorithm: PKIX1Explicit88_AlgorithmIdentifier = try PKIX1Explicit88_AlgorithmIdentifier(derEncoded: &nodes)
             let objectDigest: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
             return PKIXAttributeCertificate_2009_ObjectDigestInfo(digestedObjectType: digestedObjectType, otherObjectTypeID: otherObjectTypeID, digestAlgorithm: digestAlgorithm, objectDigest: objectDigest)

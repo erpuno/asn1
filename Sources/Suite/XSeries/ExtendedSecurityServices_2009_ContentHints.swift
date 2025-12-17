@@ -13,7 +13,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let contentDescription: ASN1UTF8String? = try ASN1UTF8String(derEncoded: &nodes)
+            var contentDescription: ASN1UTF8String? = nil
+var peek_contentDescription = nodes
+if let next = peek_contentDescription.next(), next.identifier == ASN1UTF8String.defaultIdentifier {
+    contentDescription = try ASN1UTF8String(derEncoded: &nodes)
+}
             let contentType: CryptographicMessageSyntax_2010_ContentType = try CryptographicMessageSyntax_2010_ContentType(derEncoded: &nodes)
             return ExtendedSecurityServices_2009_ContentHints(contentDescription: contentDescription, contentType: contentType)
         }

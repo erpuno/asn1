@@ -22,8 +22,16 @@ import Foundation
             let p: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let g: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let q: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let j: ArraySlice<UInt8>? = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let validationParms: ANSI_X9_42_ValidationParms? = try ANSI_X9_42_ValidationParms(derEncoded: &nodes)
+            var j: ArraySlice<UInt8>? = nil
+var peek_j = nodes
+if let next = peek_j.next(), next.identifier == ArraySlice<UInt8>.defaultIdentifier {
+    j = try ArraySlice<UInt8>(derEncoded: &nodes)
+}
+            var validationParms: ANSI_X9_42_ValidationParms? = nil
+var peek_validationParms = nodes
+if let next = peek_validationParms.next(), next.identifier == ANSI_X9_42_ValidationParms.defaultIdentifier {
+    validationParms = try ANSI_X9_42_ValidationParms(derEncoded: &nodes)
+}
             return ANSI_X9_42_DomainParameters(p: p, g: g, q: q, j: j, validationParms: validationParms)
         }
     }

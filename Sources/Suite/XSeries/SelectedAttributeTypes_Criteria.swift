@@ -11,13 +11,15 @@ import Foundation
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .type(try SelectedAttributeTypes_CriteriaItem(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .type(try SelectedAttributeTypes_CriteriaItem(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
                 self = .and(try DER.set(of: SelectedAttributeTypes_Criteria.self, identifier: rootNode.identifier, rootNode: rootNode))
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
                 self = .or(try DER.set(of: SelectedAttributeTypes_Criteria.self, identifier: rootNode.identifier, rootNode: rootNode))
             case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .not(try SelectedAttributeTypes_Criteria(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .not(try SelectedAttributeTypes_Criteria(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }

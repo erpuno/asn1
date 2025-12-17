@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let logical_object: Style_Descriptors_Same_Layout_Object_logical_object_Choice = try Style_Descriptors_Same_Layout_Object_logical_object_Choice(derEncoded: &nodes)
-            let layout_object: Style_Descriptors_Same_Layout_Object_layout_object_Choice? = try Style_Descriptors_Same_Layout_Object_layout_object_Choice(derEncoded: &nodes)
+            var layout_object: Style_Descriptors_Same_Layout_Object_layout_object_Choice? = nil
+var peek_layout_object = nodes
+if let next = peek_layout_object.next(), next.identifier == Style_Descriptors_Same_Layout_Object_layout_object_Choice.defaultIdentifier {
+    layout_object = try Style_Descriptors_Same_Layout_Object_layout_object_Choice(derEncoded: &nodes)
+}
             return Style_Descriptors_Same_Layout_Object(logical_object: logical_object, layout_object: layout_object)
         }
     }

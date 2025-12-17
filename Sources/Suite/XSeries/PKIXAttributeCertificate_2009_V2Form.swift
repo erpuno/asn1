@@ -15,7 +15,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let issuerName: PKIX1Implicit_2009_GeneralNames? = try PKIX1Implicit_2009_GeneralNames(derEncoded: &nodes)
+            var issuerName: PKIX1Implicit_2009_GeneralNames? = nil
+var peek_issuerName = nodes
+if let next = peek_issuerName.next(), next.identifier == PKIX1Implicit_2009_GeneralNames.defaultIdentifier {
+    issuerName = try PKIX1Implicit_2009_GeneralNames(derEncoded: &nodes)
+}
             let baseCertificateID: AuthenticationFramework_IssuerSerial? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let objectDigestInfo: PKIXAttributeCertificate_2009_ObjectDigestInfo? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             return PKIXAttributeCertificate_2009_V2Form(issuerName: issuerName, baseCertificateID: baseCertificateID, objectDigestInfo: objectDigestInfo)

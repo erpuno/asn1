@@ -15,8 +15,16 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let timing: Temporal_Relationships_Presentation_Time_timing_Choice? = try Temporal_Relationships_Presentation_Time_timing_Choice(derEncoded: &nodes)
-            let duration: Temporal_Relationships_Presentation_Time_duration_Choice? = try Temporal_Relationships_Presentation_Time_duration_Choice(derEncoded: &nodes)
+            var timing: Temporal_Relationships_Presentation_Time_timing_Choice? = nil
+var peek_timing = nodes
+if let next = peek_timing.next(), next.identifier == Temporal_Relationships_Presentation_Time_timing_Choice.defaultIdentifier {
+    timing = try Temporal_Relationships_Presentation_Time_timing_Choice(derEncoded: &nodes)
+}
+            var duration: Temporal_Relationships_Presentation_Time_duration_Choice? = nil
+var peek_duration = nodes
+if let next = peek_duration.next(), next.identifier == Temporal_Relationships_Presentation_Time_duration_Choice.defaultIdentifier {
+    duration = try Temporal_Relationships_Presentation_Time_duration_Choice(derEncoded: &nodes)
+}
             let cyclic: Temporal_Relationships_Cyclic? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 5, tagClass: .contextSpecific) { node in return try Temporal_Relationships_Cyclic(derEncoded: node) }
             return Temporal_Relationships_Presentation_Time(timing: timing, duration: duration, cyclic: cyclic)
         }

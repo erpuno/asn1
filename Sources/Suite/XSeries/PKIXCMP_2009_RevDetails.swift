@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let certDetails: PKIXCRMF_2009_CertTemplate = try PKIXCRMF_2009_CertTemplate(derEncoded: &nodes)
-            let crlEntryDetails: PKIX1Explicit88_Extensions? = try PKIX1Explicit88_Extensions(derEncoded: &nodes)
+            var crlEntryDetails: PKIX1Explicit88_Extensions? = nil
+var peek_crlEntryDetails = nodes
+if let next = peek_crlEntryDetails.next(), next.identifier == PKIX1Explicit88_Extensions.defaultIdentifier {
+    crlEntryDetails = try PKIX1Explicit88_Extensions(derEncoded: &nodes)
+}
             return PKIXCMP_2009_RevDetails(certDetails: certDetails, crlEntryDetails: crlEntryDetails)
         }
     }

@@ -16,7 +16,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let attributeType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let outputValues: InformationFramework_ResultAttribute_outputValues_Choice? = try InformationFramework_ResultAttribute_outputValues_Choice(derEncoded: &nodes)
+            var outputValues: InformationFramework_ResultAttribute_outputValues_Choice? = nil
+var peek_outputValues = nodes
+if let next = peek_outputValues.next(), next.identifier == InformationFramework_ResultAttribute_outputValues_Choice.defaultIdentifier {
+    outputValues = try InformationFramework_ResultAttribute_outputValues_Choice(derEncoded: &nodes)
+}
             let contexts: [InformationFramework_ContextProfile]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in try DER.sequence(of: InformationFramework_ContextProfile.self, identifier: .sequence, rootNode: node) }
             return InformationFramework_ResultAttribute(attributeType: attributeType, outputValues: outputValues, contexts: contexts)
         }

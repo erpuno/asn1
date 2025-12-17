@@ -15,7 +15,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let precedence: BasicAccessControl_Precedence? = try BasicAccessControl_Precedence(derEncoded: &nodes)
+            var precedence: BasicAccessControl_Precedence? = nil
+var peek_precedence = nodes
+if let next = peek_precedence.next(), next.identifier == BasicAccessControl_Precedence.defaultIdentifier {
+    precedence = try BasicAccessControl_Precedence(derEncoded: &nodes)
+}
             let protectedItems: BasicAccessControl_ProtectedItems = try BasicAccessControl_ProtectedItems(derEncoded: &nodes)
             let grantsAndDenials: BasicAccessControl_GrantsAndDenials = try BasicAccessControl_GrantsAndDenials(derEncoded: &nodes)
             return BasicAccessControl_UserPermission(precedence: precedence, protectedItems: protectedItems, grantsAndDenials: grantsAndDenials)

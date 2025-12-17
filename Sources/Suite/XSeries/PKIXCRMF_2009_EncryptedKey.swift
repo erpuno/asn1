@@ -17,7 +17,14 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .encryptedValue(let encryptedValue): try coder.serialize(encryptedValue)
+            case .encryptedValue(let encryptedValue):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(encryptedValue)
+                                }
+                            } else {
+                                try coder.serialize(encryptedValue)
+                            }
             case .envelopedData(let envelopedData): try envelopedData.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
         }
     }

@@ -23,7 +23,11 @@ import Foundation
             let certId: PKIXCRMF_2009_CertId = try PKIXCRMF_2009_CertId(derEncoded: &nodes)
             let willBeRevokedAt: GeneralizedTime = try GeneralizedTime(derEncoded: &nodes)
             let badSinceDate: GeneralizedTime = try GeneralizedTime(derEncoded: &nodes)
-            let crlDetails: PKIX1Explicit88_Extensions? = try PKIX1Explicit88_Extensions(derEncoded: &nodes)
+            var crlDetails: PKIX1Explicit88_Extensions? = nil
+var peek_crlDetails = nodes
+if let next = peek_crlDetails.next(), next.identifier == PKIX1Explicit88_Extensions.defaultIdentifier {
+    crlDetails = try PKIX1Explicit88_Extensions(derEncoded: &nodes)
+}
             return PKIXCMP_2009_RevAnnContent(status: status, certId: certId, willBeRevokedAt: willBeRevokedAt, badSinceDate: badSinceDate, crlDetails: crlDetails)
         }
     }

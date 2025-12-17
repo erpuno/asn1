@@ -23,8 +23,16 @@ import Foundation
         self = try DER.set(root, identifier: identifier) { nodes in
             let attributes: DirectoryAbstractService_EntryInformationSelection_attributes_Choice? = try DirectoryAbstractService_EntryInformationSelection_attributes_Choice(derEncoded: &nodes)
             let infoTypes = try DirectoryAbstractService_EntryInformationSelection_infoTypes_IntEnum(rawValue: Int(derEncoded: &nodes))
-            let extraAttributes: DirectoryAbstractService_EntryInformationSelection_extraAttributes_Choice? = try DirectoryAbstractService_EntryInformationSelection_extraAttributes_Choice(derEncoded: &nodes)
-            let contextSelection: DirectoryAbstractService_ContextSelection? = try DirectoryAbstractService_ContextSelection(derEncoded: &nodes)
+            var extraAttributes: DirectoryAbstractService_EntryInformationSelection_extraAttributes_Choice? = nil
+var peek_extraAttributes = nodes
+if let next = peek_extraAttributes.next(), next.identifier == DirectoryAbstractService_EntryInformationSelection_extraAttributes_Choice.defaultIdentifier {
+    extraAttributes = try DirectoryAbstractService_EntryInformationSelection_extraAttributes_Choice(derEncoded: &nodes)
+}
+            var contextSelection: DirectoryAbstractService_ContextSelection? = nil
+var peek_contextSelection = nodes
+if let next = peek_contextSelection.next(), next.identifier == DirectoryAbstractService_ContextSelection.defaultIdentifier {
+    contextSelection = try DirectoryAbstractService_ContextSelection(derEncoded: &nodes)
+}
             let returnContexts: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
             let familyReturn: DirectoryAbstractService_FamilyReturn? = try DirectoryAbstractService_FamilyReturn(derEncoded: &nodes)
             return DirectoryAbstractService_EntryInformationSelection(attributes: attributes, infoTypes: infoTypes, extraAttributes: extraAttributes, contextSelection: contextSelection, returnContexts: returnContexts, familyReturn: familyReturn)

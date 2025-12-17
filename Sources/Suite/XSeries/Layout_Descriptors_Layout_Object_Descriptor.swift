@@ -13,8 +13,16 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let object_type: Layout_Descriptors_Layout_Object_Type? = try Layout_Descriptors_Layout_Object_Type(derEncoded: &nodes)
-            let descriptor_body: Layout_Descriptors_Layout_Object_Descriptor_Body? = try Layout_Descriptors_Layout_Object_Descriptor_Body(derEncoded: &nodes)
+            var object_type: Layout_Descriptors_Layout_Object_Type? = nil
+var peek_object_type = nodes
+if let next = peek_object_type.next(), next.identifier == Layout_Descriptors_Layout_Object_Type.defaultIdentifier {
+    object_type = try Layout_Descriptors_Layout_Object_Type(derEncoded: &nodes)
+}
+            var descriptor_body: Layout_Descriptors_Layout_Object_Descriptor_Body? = nil
+var peek_descriptor_body = nodes
+if let next = peek_descriptor_body.next(), next.identifier == Layout_Descriptors_Layout_Object_Descriptor_Body.defaultIdentifier {
+    descriptor_body = try Layout_Descriptors_Layout_Object_Descriptor_Body(derEncoded: &nodes)
+}
             return Layout_Descriptors_Layout_Object_Descriptor(object_type: object_type, descriptor_body: descriptor_body)
         }
     }

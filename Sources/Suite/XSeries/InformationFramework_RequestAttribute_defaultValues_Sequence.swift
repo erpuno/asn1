@@ -13,7 +13,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let entryType: ASN1ObjectIdentifier? = try ASN1ObjectIdentifier(derEncoded: &nodes)
+            var entryType: ASN1ObjectIdentifier? = nil
+var peek_entryType = nodes
+if let next = peek_entryType.next(), next.identifier == ASN1ObjectIdentifier.defaultIdentifier {
+    entryType = try ASN1ObjectIdentifier(derEncoded: &nodes)
+}
             let values: [ASN1Any] = try DER.sequence(of: ASN1Any.self, identifier: .sequence, nodes: &nodes)
             return InformationFramework_RequestAttribute_defaultValues_Sequence(entryType: entryType, values: values)
         }

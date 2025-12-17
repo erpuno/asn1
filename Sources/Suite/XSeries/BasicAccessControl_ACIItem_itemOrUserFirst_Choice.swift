@@ -9,9 +9,11 @@ import Foundation
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .itemFirst(try BasicAccessControl_ACIItem_itemOrUserFirst_Choice_itemFirst_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .itemFirst(try BasicAccessControl_ACIItem_itemOrUserFirst_Choice_itemFirst_Sequence(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .userFirst(try BasicAccessControl_ACIItem_itemOrUserFirst_Choice_userFirst_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .userFirst(try BasicAccessControl_ACIItem_itemOrUserFirst_Choice_userFirst_Sequence(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }

@@ -19,7 +19,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let content_architecture_class: Style_Descriptors_Presentation_Attributes_content_architecture_class_Choice? = try Style_Descriptors_Presentation_Attributes_content_architecture_class_Choice(derEncoded: &nodes)
+            var content_architecture_class: Style_Descriptors_Presentation_Attributes_content_architecture_class_Choice? = nil
+var peek_content_architecture_class = nodes
+if let next = peek_content_architecture_class.next(), next.identifier == Style_Descriptors_Presentation_Attributes_content_architecture_class_Choice.defaultIdentifier {
+    content_architecture_class = try Style_Descriptors_Presentation_Attributes_content_architecture_class_Choice(derEncoded: &nodes)
+}
             let character_attributes: Character_Presentation_Attributes_Character_Attributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let raster_graphics_attributes: Raster_Gr_Presentation_Attributes_Raster_Graphics_Attributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let geometric_graphics_attributes: Geo_Gr_Presentation_Attributes_Geometric_Graphics_Attributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))

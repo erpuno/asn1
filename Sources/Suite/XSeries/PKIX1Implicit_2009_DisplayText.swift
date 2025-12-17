@@ -23,10 +23,38 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .ia5String(let ia5String): try coder.serialize(ia5String)
-            case .visibleString(let visibleString): try coder.serialize(visibleString)
-            case .bmpString(let bmpString): try coder.serialize(bmpString)
-            case .utf8String(let utf8String): try coder.serialize(utf8String)
+            case .ia5String(let ia5String):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(ia5String)
+                                }
+                            } else {
+                                try coder.serialize(ia5String)
+                            }
+            case .visibleString(let visibleString):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(visibleString)
+                                }
+                            } else {
+                                try coder.serialize(visibleString)
+                            }
+            case .bmpString(let bmpString):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(bmpString)
+                                }
+                            } else {
+                                try coder.serialize(bmpString)
+                            }
+            case .utf8String(let utf8String):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(utf8String)
+                                }
+                            } else {
+                                try coder.serialize(utf8String)
+                            }
         }
     }
 

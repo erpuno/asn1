@@ -26,7 +26,14 @@ import Foundation
             case .initial(let initial): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try initial.serialize(into: &coder) }
             case .any(let any): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try any.serialize(into: &coder) }
             case .`final`(let `final`): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) { coder in try `final`.serialize(into: &coder) }
-            case .control(let control): try coder.serialize(control)
+            case .control(let control):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(control)
+                                }
+                            } else {
+                                try coder.serialize(control)
+                            }
         }
     }
 

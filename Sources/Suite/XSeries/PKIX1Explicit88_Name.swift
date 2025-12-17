@@ -29,7 +29,14 @@ default:
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .rdnSequence(let rdnSequence): try coder.serialize(rdnSequence)
+            case .rdnSequence(let rdnSequence):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(rdnSequence)
+                                }
+                            } else {
+                                try coder.serialize(rdnSequence)
+                            }
         }
     }
 

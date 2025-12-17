@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let service: PKIX1Implicit88_GeneralName = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
             let ident: PKIX1Implicit88_GeneralName = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
-            let authInfo: ASN1OctetString? = try ASN1OctetString(derEncoded: &nodes)
+            var authInfo: ASN1OctetString? = nil
+var peek_authInfo = nodes
+if let next = peek_authInfo.next(), next.identifier == ASN1OctetString.defaultIdentifier {
+    authInfo = try ASN1OctetString(derEncoded: &nodes)
+}
             return PKIXAttributeCertificate_2009_SvceAuthInfo(service: service, ident: ident, authInfo: authInfo)
         }
     }

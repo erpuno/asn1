@@ -13,8 +13,16 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let content_portion_attributes: Text_Units_Content_Portion_Attributes? = try Text_Units_Content_Portion_Attributes(derEncoded: &nodes)
-            let content_information: Text_Units_Content_Information? = try Text_Units_Content_Information(derEncoded: &nodes)
+            var content_portion_attributes: Text_Units_Content_Portion_Attributes? = nil
+var peek_content_portion_attributes = nodes
+if let next = peek_content_portion_attributes.next(), next.identifier == Text_Units_Content_Portion_Attributes.defaultIdentifier {
+    content_portion_attributes = try Text_Units_Content_Portion_Attributes(derEncoded: &nodes)
+}
+            var content_information: Text_Units_Content_Information? = nil
+var peek_content_information = nodes
+if let next = peek_content_information.next(), next.identifier == Text_Units_Content_Information.defaultIdentifier {
+    content_information = try Text_Units_Content_Information(derEncoded: &nodes)
+}
             return Text_Units_Text_Unit(content_portion_attributes: content_portion_attributes, content_information: content_information)
         }
     }

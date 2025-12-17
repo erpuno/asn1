@@ -16,8 +16,16 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let keyIdentifier: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
-            let date: GeneralizedTime? = try GeneralizedTime(derEncoded: &nodes)
-            let other: CryptographicMessageSyntax_2010_OtherKeyAttribute? = try CryptographicMessageSyntax_2010_OtherKeyAttribute(derEncoded: &nodes)
+            var date: GeneralizedTime? = nil
+var peek_date = nodes
+if let next = peek_date.next(), next.identifier == GeneralizedTime.defaultIdentifier {
+    date = try GeneralizedTime(derEncoded: &nodes)
+}
+            var other: CryptographicMessageSyntax_2010_OtherKeyAttribute? = nil
+var peek_other = nodes
+if let next = peek_other.next(), next.identifier == CryptographicMessageSyntax_2010_OtherKeyAttribute.defaultIdentifier {
+    other = try CryptographicMessageSyntax_2010_OtherKeyAttribute(derEncoded: &nodes)
+}
             return CryptographicMessageSyntax_2010_KEKIdentifier(keyIdentifier: keyIdentifier, date: date, other: other)
         }
     }

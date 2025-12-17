@@ -17,7 +17,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let pathLenConstraint: ArraySlice<UInt8>? = try ArraySlice<UInt8>(derEncoded: &nodes)
+            var pathLenConstraint: ArraySlice<UInt8>? = nil
+var peek_pathLenConstraint = nodes
+if let next = peek_pathLenConstraint.next(), next.identifier == ArraySlice<UInt8>.defaultIdentifier {
+    pathLenConstraint = try ArraySlice<UInt8>(derEncoded: &nodes)
+}
             let permittedAttrs: PKIXAttributeCertificate_2009_AttrSpec? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let excludedAttrs: PKIXAttributeCertificate_2009_AttrSpec? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let permitUnSpecified: Bool = try DER.decodeDefault(&nodes, defaultValue: false)

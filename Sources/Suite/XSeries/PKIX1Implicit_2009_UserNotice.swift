@@ -13,8 +13,16 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let noticeRef: PKIX1Implicit_2009_NoticeReference? = try PKIX1Implicit_2009_NoticeReference(derEncoded: &nodes)
-            let explicitText: PKIX1Implicit_2009_DisplayText? = try PKIX1Implicit_2009_DisplayText(derEncoded: &nodes)
+            var noticeRef: PKIX1Implicit_2009_NoticeReference? = nil
+var peek_noticeRef = nodes
+if let next = peek_noticeRef.next(), next.identifier == PKIX1Implicit_2009_NoticeReference.defaultIdentifier {
+    noticeRef = try PKIX1Implicit_2009_NoticeReference(derEncoded: &nodes)
+}
+            var explicitText: PKIX1Implicit_2009_DisplayText? = nil
+var peek_explicitText = nodes
+if let next = peek_explicitText.next(), next.identifier == PKIX1Implicit_2009_DisplayText.defaultIdentifier {
+    explicitText = try PKIX1Implicit_2009_DisplayText(derEncoded: &nodes)
+}
             return PKIX1Implicit_2009_UserNotice(noticeRef: noticeRef, explicitText: explicitText)
         }
     }

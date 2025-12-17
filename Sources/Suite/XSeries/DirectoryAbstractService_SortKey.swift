@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let type: PKIX1Explicit88_AttributeType = try PKIX1Explicit88_AttributeType(derEncoded: &nodes)
-            let orderingRule: ASN1ObjectIdentifier? = try ASN1ObjectIdentifier(derEncoded: &nodes)
+            var orderingRule: ASN1ObjectIdentifier? = nil
+var peek_orderingRule = nodes
+if let next = peek_orderingRule.next(), next.identifier == ASN1ObjectIdentifier.defaultIdentifier {
+    orderingRule = try ASN1ObjectIdentifier(derEncoded: &nodes)
+}
             return DirectoryAbstractService_SortKey(type: type, orderingRule: orderingRule)
         }
     }

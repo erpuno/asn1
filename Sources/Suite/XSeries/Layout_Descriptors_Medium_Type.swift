@@ -15,7 +15,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let nominal_page_size: Layout_Descriptors_Measure_Pair? = try Layout_Descriptors_Measure_Pair(derEncoded: &nodes)
+            var nominal_page_size: Layout_Descriptors_Measure_Pair? = nil
+var peek_nominal_page_size = nodes
+if let next = peek_nominal_page_size.next(), next.identifier == Layout_Descriptors_Measure_Pair.defaultIdentifier {
+    nominal_page_size = try Layout_Descriptors_Measure_Pair(derEncoded: &nodes)
+}
             let side_of_sheet = try Layout_Descriptors_Medium_Type_side_of_sheet_IntEnum(rawValue: Int(derEncoded: &nodes))
             let colour_of_medium: Layout_Descriptors_Colour_Of_Medium? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try Layout_Descriptors_Colour_Of_Medium(derEncoded: node) }
             return Layout_Descriptors_Medium_Type(nominal_page_size: nominal_page_size, side_of_sheet: side_of_sheet, colour_of_medium: colour_of_medium)

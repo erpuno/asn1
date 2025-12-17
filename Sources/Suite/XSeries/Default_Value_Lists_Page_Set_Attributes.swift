@@ -13,8 +13,16 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let layout_stream_categories: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
-            let layout_stream_sub_categories: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            var layout_stream_categories: Default_Value_Lists_Attribute? = nil
+var peek_layout_stream_categories = nodes
+if let next = peek_layout_stream_categories.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    layout_stream_categories = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
+            var layout_stream_sub_categories: Default_Value_Lists_Attribute? = nil
+var peek_layout_stream_sub_categories = nodes
+if let next = peek_layout_stream_sub_categories.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    layout_stream_sub_categories = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
             return Default_Value_Lists_Page_Set_Attributes(layout_stream_categories: layout_stream_categories, layout_stream_sub_categories: layout_stream_sub_categories)
         }
     }

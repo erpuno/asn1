@@ -27,8 +27,16 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let country_name: PKIX1Explicit88_CountryName? = try PKIX1Explicit88_CountryName(derEncoded: &nodes)
-            let administration_domain_name: PKIX1Explicit88_AdministrationDomainName? = try PKIX1Explicit88_AdministrationDomainName(derEncoded: &nodes)
+            var country_name: PKIX1Explicit88_CountryName? = nil
+var peek_country_name = nodes
+if let next = peek_country_name.next(), next.identifier == PKIX1Explicit88_CountryName.defaultIdentifier {
+    country_name = try PKIX1Explicit88_CountryName(derEncoded: &nodes)
+}
+            var administration_domain_name: PKIX1Explicit88_AdministrationDomainName? = nil
+var peek_administration_domain_name = nodes
+if let next = peek_administration_domain_name.next(), next.identifier == PKIX1Explicit88_AdministrationDomainName.defaultIdentifier {
+    administration_domain_name = try PKIX1Explicit88_AdministrationDomainName(derEncoded: &nodes)
+}
             let network_address: PKIX1Explicit88_NetworkAddress? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let terminal_identifier: PKIX1Explicit88_TerminalIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let private_domain_name: PKIX1Explicit88_PrivateDomainName? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try PKIX1Explicit88_PrivateDomainName(derEncoded: node) }

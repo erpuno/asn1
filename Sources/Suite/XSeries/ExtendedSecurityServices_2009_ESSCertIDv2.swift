@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let hashAlgorithm: ExtendedSecurityServices_2009_HashAlgorithm? = try ExtendedSecurityServices_2009_HashAlgorithm(derEncoded: &nodes)
             let certHash: ExtendedSecurityServices_2009_Hash = try ExtendedSecurityServices_2009_Hash(derEncoded: &nodes)
-            let issuerSerial: AuthenticationFramework_IssuerSerial? = try AuthenticationFramework_IssuerSerial(derEncoded: &nodes)
+            var issuerSerial: AuthenticationFramework_IssuerSerial? = nil
+var peek_issuerSerial = nodes
+if let next = peek_issuerSerial.next(), next.identifier == AuthenticationFramework_IssuerSerial.defaultIdentifier {
+    issuerSerial = try AuthenticationFramework_IssuerSerial(derEncoded: &nodes)
+}
             return ExtendedSecurityServices_2009_ESSCertIDv2(hashAlgorithm: hashAlgorithm, certHash: certHash, issuerSerial: issuerSerial)
         }
     }

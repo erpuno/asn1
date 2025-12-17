@@ -24,9 +24,21 @@ import Foundation
             let issuerName: PKIX1Explicit88_Name = try PKIX1Explicit88_Name(derEncoded: &nodes)
             let serialNumber: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let reason: CertificateExtensions_CRLReason = try CertificateExtensions_CRLReason(derEncoded: &nodes)
-            let invalidityDate: GeneralizedTime? = try GeneralizedTime(derEncoded: &nodes)
-            let passphrase: ASN1OctetString? = try ASN1OctetString(derEncoded: &nodes)
-            let comment: ASN1UTF8String? = try ASN1UTF8String(derEncoded: &nodes)
+            var invalidityDate: GeneralizedTime? = nil
+var peek_invalidityDate = nodes
+if let next = peek_invalidityDate.next(), next.identifier == GeneralizedTime.defaultIdentifier {
+    invalidityDate = try GeneralizedTime(derEncoded: &nodes)
+}
+            var passphrase: ASN1OctetString? = nil
+var peek_passphrase = nodes
+if let next = peek_passphrase.next(), next.identifier == ASN1OctetString.defaultIdentifier {
+    passphrase = try ASN1OctetString(derEncoded: &nodes)
+}
+            var comment: ASN1UTF8String? = nil
+var peek_comment = nodes
+if let next = peek_comment.next(), next.identifier == ASN1UTF8String.defaultIdentifier {
+    comment = try ASN1UTF8String(derEncoded: &nodes)
+}
             return EnrollmentMessageSyntax_2009_RevokeRequest(issuerName: issuerName, serialNumber: serialNumber, reason: reason, invalidityDate: invalidityDate, passphrase: passphrase, comment: comment)
         }
     }

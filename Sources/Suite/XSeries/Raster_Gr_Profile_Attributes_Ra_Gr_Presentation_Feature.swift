@@ -19,11 +19,13 @@ import Foundation
             case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
                 self = .clipping(try Raster_Gr_Presentation_Attributes_Clipping(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
-                self = .pel_spacing(try Raster_Gr_Presentation_Attributes_Pel_Spacing(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .pel_spacing(try Raster_Gr_Presentation_Attributes_Pel_Spacing(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
                 self = .spacing_ratio(try Raster_Gr_Presentation_Attributes_Spacing_Ratio(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
-                self = .image_dimensions(try Raster_Gr_Presentation_Attributes_Image_Dimensions(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .image_dimensions(try Raster_Gr_Presentation_Attributes_Image_Dimensions(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific):
                 self = .pel_path(try Raster_Gr_Presentation_Attributes_One_Of_Four_Angles(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific):

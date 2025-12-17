@@ -18,9 +18,21 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let issuerName: PKIX1Explicit88_Name = try PKIX1Explicit88_Name(derEncoded: &nodes)
-            let cRLName: CertificateExtensions_GeneralName? = try CertificateExtensions_GeneralName(derEncoded: &nodes)
-            let time: GeneralizedTime? = try GeneralizedTime(derEncoded: &nodes)
-            let reasons: CertificateExtensions_ReasonFlags? = try CertificateExtensions_ReasonFlags(derEncoded: &nodes)
+            var cRLName: CertificateExtensions_GeneralName? = nil
+var peek_cRLName = nodes
+if let next = peek_cRLName.next(), next.identifier == CertificateExtensions_GeneralName.defaultIdentifier {
+    cRLName = try CertificateExtensions_GeneralName(derEncoded: &nodes)
+}
+            var time: GeneralizedTime? = nil
+var peek_time = nodes
+if let next = peek_time.next(), next.identifier == GeneralizedTime.defaultIdentifier {
+    time = try GeneralizedTime(derEncoded: &nodes)
+}
+            var reasons: CertificateExtensions_ReasonFlags? = nil
+var peek_reasons = nodes
+if let next = peek_reasons.next(), next.identifier == CertificateExtensions_ReasonFlags.defaultIdentifier {
+    reasons = try CertificateExtensions_ReasonFlags(derEncoded: &nodes)
+}
             return EnrollmentMessageSyntax_2009_GetCRL(issuerName: issuerName, cRLName: cRLName, time: time, reasons: reasons)
         }
     }

@@ -16,8 +16,16 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let glMemberName: PKIX1Implicit88_GeneralName = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
-            let glMemberAddress: PKIX1Implicit88_GeneralName? = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
-            let certificates: SMIMESymmetricKeyDistribution_2009_Certificates? = try SMIMESymmetricKeyDistribution_2009_Certificates(derEncoded: &nodes)
+            var glMemberAddress: PKIX1Implicit88_GeneralName? = nil
+var peek_glMemberAddress = nodes
+if let next = peek_glMemberAddress.next(), next.identifier == PKIX1Implicit88_GeneralName.defaultIdentifier {
+    glMemberAddress = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
+}
+            var certificates: SMIMESymmetricKeyDistribution_2009_Certificates? = nil
+var peek_certificates = nodes
+if let next = peek_certificates.next(), next.identifier == SMIMESymmetricKeyDistribution_2009_Certificates.defaultIdentifier {
+    certificates = try SMIMESymmetricKeyDistribution_2009_Certificates(derEncoded: &nodes)
+}
             return SMIMESymmetricKeyDistribution_2009_GLMember(glMemberName: glMemberName, glMemberAddress: glMemberAddress, certificates: certificates)
         }
     }

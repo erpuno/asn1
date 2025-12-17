@@ -18,9 +18,21 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let security_policy_identifier: ExtendedSecurityServices_2009_SecurityPolicyIdentifier = try ExtendedSecurityServices_2009_SecurityPolicyIdentifier(derEncoded: &nodes)
-            let security_classification: ExtendedSecurityServices_2009_SecurityClassification? = try ExtendedSecurityServices_2009_SecurityClassification(derEncoded: &nodes)
-            let privacy_mark: ExtendedSecurityServices_2009_ESSPrivacyMark? = try ExtendedSecurityServices_2009_ESSPrivacyMark(derEncoded: &nodes)
-            let security_categories: ExtendedSecurityServices_2009_SecurityCategories? = try ExtendedSecurityServices_2009_SecurityCategories(derEncoded: &nodes)
+            var security_classification: ExtendedSecurityServices_2009_SecurityClassification? = nil
+var peek_security_classification = nodes
+if let next = peek_security_classification.next(), next.identifier == ExtendedSecurityServices_2009_SecurityClassification.defaultIdentifier {
+    security_classification = try ExtendedSecurityServices_2009_SecurityClassification(derEncoded: &nodes)
+}
+            var privacy_mark: ExtendedSecurityServices_2009_ESSPrivacyMark? = nil
+var peek_privacy_mark = nodes
+if let next = peek_privacy_mark.next(), next.identifier == ExtendedSecurityServices_2009_ESSPrivacyMark.defaultIdentifier {
+    privacy_mark = try ExtendedSecurityServices_2009_ESSPrivacyMark(derEncoded: &nodes)
+}
+            var security_categories: ExtendedSecurityServices_2009_SecurityCategories? = nil
+var peek_security_categories = nodes
+if let next = peek_security_categories.next(), next.identifier == ExtendedSecurityServices_2009_SecurityCategories.defaultIdentifier {
+    security_categories = try ExtendedSecurityServices_2009_SecurityCategories(derEncoded: &nodes)
+}
             return ExtendedSecurityServices_2009_ESSSecurityLabel(security_policy_identifier: security_policy_identifier, security_classification: security_classification, privacy_mark: privacy_mark, security_categories: security_categories)
         }
     }

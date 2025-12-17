@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let pubMethod = try PKIXCRMF_2009_SinglePubInfo_pubMethod_IntEnum(rawValue: Int(derEncoded: &nodes))
-            let pubLocation: PKIX1Implicit88_GeneralName? = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
+            var pubLocation: PKIX1Implicit88_GeneralName? = nil
+var peek_pubLocation = nodes
+if let next = peek_pubLocation.next(), next.identifier == PKIX1Implicit88_GeneralName.defaultIdentifier {
+    pubLocation = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
+}
             return PKIXCRMF_2009_SinglePubInfo(pubMethod: pubMethod, pubLocation: pubLocation)
         }
     }

@@ -27,8 +27,16 @@ import Foundation
             let recipientInfos: PKCS_7_RecipientInfos = try PKCS_7_RecipientInfos(derEncoded: &nodes)
             let digestAlgorithms: PKCS_7_DigestAlgorithmIdentifiers = try PKCS_7_DigestAlgorithmIdentifiers(derEncoded: &nodes)
             let encryptedContentInfo: PKCS_7_EncryptedContentInfo = try PKCS_7_EncryptedContentInfo(derEncoded: &nodes)
-            let certificates: PKCS_7_SignedAndEnvelopedData_certificates_Choice? = try PKCS_7_SignedAndEnvelopedData_certificates_Choice(derEncoded: &nodes)
-            let crls: PKCS_7_SignedAndEnvelopedData_crls_Choice? = try PKCS_7_SignedAndEnvelopedData_crls_Choice(derEncoded: &nodes)
+            var certificates: PKCS_7_SignedAndEnvelopedData_certificates_Choice? = nil
+var peek_certificates = nodes
+if let next = peek_certificates.next(), next.identifier == PKCS_7_SignedAndEnvelopedData_certificates_Choice.defaultIdentifier {
+    certificates = try PKCS_7_SignedAndEnvelopedData_certificates_Choice(derEncoded: &nodes)
+}
+            var crls: PKCS_7_SignedAndEnvelopedData_crls_Choice? = nil
+var peek_crls = nodes
+if let next = peek_crls.next(), next.identifier == PKCS_7_SignedAndEnvelopedData_crls_Choice.defaultIdentifier {
+    crls = try PKCS_7_SignedAndEnvelopedData_crls_Choice(derEncoded: &nodes)
+}
             let signerInfos: PKCS_7_SignerInfos = try PKCS_7_SignerInfos(derEncoded: &nodes)
             return PKCS_7_SignedAndEnvelopedData(version: version, recipientInfos: recipientInfos, digestAlgorithms: digestAlgorithms, encryptedContentInfo: encryptedContentInfo, certificates: certificates, crls: crls, signerInfos: signerInfos)
         }

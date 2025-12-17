@@ -23,11 +23,19 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let version: AuthenticationFramework_Version? = try AuthenticationFramework_Version(derEncoded: &nodes)
+            var version: AuthenticationFramework_Version? = nil
+var peek_version = nodes
+if let next = peek_version.next(), next.identifier == AuthenticationFramework_Version.defaultIdentifier {
+    version = try AuthenticationFramework_Version(derEncoded: &nodes)
+}
             let signature: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let issuer: PKIX1Explicit88_Name = try PKIX1Explicit88_Name(derEncoded: &nodes)
             let thisUpdate: AuthenticationFramework_Time = try AuthenticationFramework_Time(derEncoded: &nodes)
-            let nextUpdate: AuthenticationFramework_Time? = try AuthenticationFramework_Time(derEncoded: &nodes)
+            var nextUpdate: AuthenticationFramework_Time? = nil
+var peek_nextUpdate = nodes
+if let next = peek_nextUpdate.next(), next.identifier == AuthenticationFramework_Time.defaultIdentifier {
+    nextUpdate = try AuthenticationFramework_Time(derEncoded: &nodes)
+}
             let revokedCertificates: [AuthenticationFramework_CertificateList_toBeSigned_revokedCertificates_Sequence]? = try DER.sequence(of: AuthenticationFramework_CertificateList_toBeSigned_revokedCertificates_Sequence.self, identifier: .sequence, nodes: &nodes)
             let crlExtensions: AuthenticationFramework_Extensions? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try AuthenticationFramework_Extensions(derEncoded: node) }
             return AuthenticationFramework_CertificateList_toBeSigned(version: version, signature: signature, issuer: issuer, thisUpdate: thisUpdate, nextUpdate: nextUpdate, revokedCertificates: revokedCertificates, crlExtensions: crlExtensions)

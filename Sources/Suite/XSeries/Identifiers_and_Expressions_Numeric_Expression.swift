@@ -14,11 +14,14 @@ import Foundation
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
                 self = .numeric_literal(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .increment_application(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .increment_application(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .decrement_application(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .decrement_application(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .ordinal_application(try Identifiers_and_Expressions_Numeric_Expression_ordinal_application_Choice(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .ordinal_application(try Identifiers_and_Expressions_Numeric_Expression_ordinal_application_Choice(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
                 self = .binding_reference(try Identifiers_and_Expressions_Binding_Reference(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)

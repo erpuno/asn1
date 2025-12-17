@@ -21,11 +21,23 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let issuer: PKIX1Explicit88_Name? = try PKIX1Explicit88_Name(derEncoded: &nodes)
+            var issuer: PKIX1Explicit88_Name? = nil
+var peek_issuer = nodes
+if let next = peek_issuer.next(), next.identifier == PKIX1Explicit88_Name.defaultIdentifier {
+    issuer = try PKIX1Explicit88_Name(derEncoded: &nodes)
+}
             let minCRLNumber: CertificateExtensions_CRLNumber? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let maxCRLNumber: CertificateExtensions_CRLNumber? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            let reasonFlags: CertificateExtensions_ReasonFlags? = try CertificateExtensions_ReasonFlags(derEncoded: &nodes)
-            let dateAndTime: AuthenticationFramework_Time? = try AuthenticationFramework_Time(derEncoded: &nodes)
+            var reasonFlags: CertificateExtensions_ReasonFlags? = nil
+var peek_reasonFlags = nodes
+if let next = peek_reasonFlags.next(), next.identifier == CertificateExtensions_ReasonFlags.defaultIdentifier {
+    reasonFlags = try CertificateExtensions_ReasonFlags(derEncoded: &nodes)
+}
+            var dateAndTime: AuthenticationFramework_Time? = nil
+var peek_dateAndTime = nodes
+if let next = peek_dateAndTime.next(), next.identifier == AuthenticationFramework_Time.defaultIdentifier {
+    dateAndTime = try AuthenticationFramework_Time(derEncoded: &nodes)
+}
             let distributionPoint: CertificateExtensions_DistributionPointName? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             return CertificateExtensions_CertificateListAssertion(issuer: issuer, minCRLNumber: minCRLNumber, maxCRLNumber: maxCRLNumber, reasonFlags: reasonFlags, dateAndTime: dateAndTime, distributionPoint: distributionPoint)
         }

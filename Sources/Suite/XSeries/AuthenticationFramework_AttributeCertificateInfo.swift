@@ -34,8 +34,16 @@ import Foundation
             let serialNumber: AuthenticationFramework_CertificateSerialNumber = try AuthenticationFramework_CertificateSerialNumber(derEncoded: &nodes)
             let attCertValidityPeriod: AuthenticationFramework_AttCertValidityPeriod = try AuthenticationFramework_AttCertValidityPeriod(derEncoded: &nodes)
             let attributes: [PKIX1Explicit88_Attribute] = try DER.sequence(of: PKIX1Explicit88_Attribute.self, identifier: .sequence, nodes: &nodes)
-            let issuerUniqueID: SelectedAttributeTypes_UniqueIdentifier? = try SelectedAttributeTypes_UniqueIdentifier(derEncoded: &nodes)
-            let extensions: AuthenticationFramework_Extensions? = try AuthenticationFramework_Extensions(derEncoded: &nodes)
+            var issuerUniqueID: SelectedAttributeTypes_UniqueIdentifier? = nil
+var peek_issuerUniqueID = nodes
+if let next = peek_issuerUniqueID.next(), next.identifier == SelectedAttributeTypes_UniqueIdentifier.defaultIdentifier {
+    issuerUniqueID = try SelectedAttributeTypes_UniqueIdentifier(derEncoded: &nodes)
+}
+            var extensions: AuthenticationFramework_Extensions? = nil
+var peek_extensions = nodes
+if let next = peek_extensions.next(), next.identifier == AuthenticationFramework_Extensions.defaultIdentifier {
+    extensions = try AuthenticationFramework_Extensions(derEncoded: &nodes)
+}
             return AuthenticationFramework_AttributeCertificateInfo(version: version, subject: subject, issuer: issuer, signature: signature, serialNumber: serialNumber, attCertValidityPeriod: attCertValidityPeriod, attributes: attributes, issuerUniqueID: issuerUniqueID, extensions: extensions)
         }
     }

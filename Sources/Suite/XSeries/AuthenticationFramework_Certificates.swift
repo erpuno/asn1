@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let userCertificate: AuthenticationFramework_Certificate = try AuthenticationFramework_Certificate(derEncoded: &nodes)
-            let certificationPath: AuthenticationFramework_ForwardCertificationPath? = try AuthenticationFramework_ForwardCertificationPath(derEncoded: &nodes)
+            var certificationPath: AuthenticationFramework_ForwardCertificationPath? = nil
+var peek_certificationPath = nodes
+if let next = peek_certificationPath.next(), next.identifier == AuthenticationFramework_ForwardCertificationPath.defaultIdentifier {
+    certificationPath = try AuthenticationFramework_ForwardCertificationPath(derEncoded: &nodes)
+}
             return AuthenticationFramework_Certificates(userCertificate: userCertificate, certificationPath: certificationPath)
         }
     }

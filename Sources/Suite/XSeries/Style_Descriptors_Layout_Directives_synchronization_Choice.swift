@@ -12,7 +12,8 @@ import Foundation
             case ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific):
                 self = .a(try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific):
-                self = .b(try Identifiers_and_Expressions_Object_Id_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .b(try Identifiers_and_Expressions_Object_Id_Expression(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 18, tagClass: .contextSpecific):
                 self = .c(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)

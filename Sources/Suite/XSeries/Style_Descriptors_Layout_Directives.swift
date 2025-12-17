@@ -37,18 +37,30 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let indivisibility: Style_Descriptors_Layout_Directives_indivisibility_Choice? = try Style_Descriptors_Layout_Directives_indivisibility_Choice(derEncoded: &nodes)
+            var indivisibility: Style_Descriptors_Layout_Directives_indivisibility_Choice? = nil
+var peek_indivisibility = nodes
+if let next = peek_indivisibility.next(), next.identifier == Style_Descriptors_Layout_Directives_indivisibility_Choice.defaultIdentifier {
+    indivisibility = try Style_Descriptors_Layout_Directives_indivisibility_Choice(derEncoded: &nodes)
+}
             let separation: Style_Descriptors_Separation? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             let offset: Style_Descriptors_Offset? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
             let fill_order: Style_Descriptors_Fill_Order? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
             let concatenation: Style_Descriptors_Concatenation? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
-            let new_layout_object: Style_Descriptors_Layout_Directives_new_layout_object_Choice? = try Style_Descriptors_Layout_Directives_new_layout_object_Choice(derEncoded: &nodes)
+            var new_layout_object: Style_Descriptors_Layout_Directives_new_layout_object_Choice? = nil
+var peek_new_layout_object = nodes
+if let next = peek_new_layout_object.next(), next.identifier == Style_Descriptors_Layout_Directives_new_layout_object_Choice.defaultIdentifier {
+    new_layout_object = try Style_Descriptors_Layout_Directives_new_layout_object_Choice(derEncoded: &nodes)
+}
             let same_layout_object: Style_Descriptors_Same_Layout_Object? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
             let layout_object_class: Identifiers_and_Expressions_Object_or_Class_Identifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific))
             let logical_stream_category: Identifiers_and_Expressions_Category_Name? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 19, tagClass: .contextSpecific))
             let logical_stream_sub_category: Identifiers_and_Expressions_Category_Name? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 20, tagClass: .contextSpecific))
             let layout_category: Identifiers_and_Expressions_Category_Name? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific))
-            let synchronization: Style_Descriptors_Layout_Directives_synchronization_Choice? = try Style_Descriptors_Layout_Directives_synchronization_Choice(derEncoded: &nodes)
+            var synchronization: Style_Descriptors_Layout_Directives_synchronization_Choice? = nil
+var peek_synchronization = nodes
+if let next = peek_synchronization.next(), next.identifier == Style_Descriptors_Layout_Directives_synchronization_Choice.defaultIdentifier {
+    synchronization = try Style_Descriptors_Layout_Directives_synchronization_Choice(derEncoded: &nodes)
+}
             let block_alignment: Style_Descriptors_Block_Alignment? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific))
             let floatability_range: Style_Descriptors_Floatability_Range? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific))
             return Style_Descriptors_Layout_Directives(indivisibility: indivisibility, separation: separation, offset: offset, fill_order: fill_order, concatenation: concatenation, new_layout_object: new_layout_object, same_layout_object: same_layout_object, layout_object_class: layout_object_class, logical_stream_category: logical_stream_category, logical_stream_sub_category: logical_stream_sub_category, layout_category: layout_category, synchronization: synchronization, block_alignment: block_alignment, floatability_range: floatability_range)

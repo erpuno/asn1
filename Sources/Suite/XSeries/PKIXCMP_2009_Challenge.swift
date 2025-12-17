@@ -15,7 +15,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let owf: PKIX1Explicit88_AlgorithmIdentifier? = try PKIX1Explicit88_AlgorithmIdentifier(derEncoded: &nodes)
+            var owf: PKIX1Explicit88_AlgorithmIdentifier? = nil
+var peek_owf = nodes
+if let next = peek_owf.next(), next.identifier == PKIX1Explicit88_AlgorithmIdentifier.defaultIdentifier {
+    owf = try PKIX1Explicit88_AlgorithmIdentifier(derEncoded: &nodes)
+}
             let witness: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let challenge: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             return PKIXCMP_2009_Challenge(owf: owf, witness: witness, challenge: challenge)

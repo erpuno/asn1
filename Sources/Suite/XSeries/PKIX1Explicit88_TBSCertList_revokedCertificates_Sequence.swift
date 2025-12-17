@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let userCertificate: PKIX1Explicit88_CertificateSerialNumber = try PKIX1Explicit88_CertificateSerialNumber(derEncoded: &nodes)
             let revocationDate: PKIX1Explicit88_Time = try PKIX1Explicit88_Time(derEncoded: &nodes)
-            let crlEntryExtensions: PKIX1Explicit88_Extensions? = try PKIX1Explicit88_Extensions(derEncoded: &nodes)
+            var crlEntryExtensions: PKIX1Explicit88_Extensions? = nil
+var peek_crlEntryExtensions = nodes
+if let next = peek_crlEntryExtensions.next(), next.identifier == PKIX1Explicit88_Extensions.defaultIdentifier {
+    crlEntryExtensions = try PKIX1Explicit88_Extensions(derEncoded: &nodes)
+}
             return PKIX1Explicit88_TBSCertList_revokedCertificates_Sequence(userCertificate: userCertificate, revocationDate: revocationDate, crlEntryExtensions: crlEntryExtensions)
         }
     }

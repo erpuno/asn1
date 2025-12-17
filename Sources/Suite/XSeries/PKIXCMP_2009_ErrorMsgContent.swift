@@ -16,8 +16,16 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let pKIStatusInfo: PKIXCMP_2009_PKIStatusInfo = try PKIXCMP_2009_PKIStatusInfo(derEncoded: &nodes)
-            let errorCode: ArraySlice<UInt8>? = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let errorDetails: PKIXCMP_2009_PKIFreeText? = try PKIXCMP_2009_PKIFreeText(derEncoded: &nodes)
+            var errorCode: ArraySlice<UInt8>? = nil
+var peek_errorCode = nodes
+if let next = peek_errorCode.next(), next.identifier == ArraySlice<UInt8>.defaultIdentifier {
+    errorCode = try ArraySlice<UInt8>(derEncoded: &nodes)
+}
+            var errorDetails: PKIXCMP_2009_PKIFreeText? = nil
+var peek_errorDetails = nodes
+if let next = peek_errorDetails.next(), next.identifier == PKIXCMP_2009_PKIFreeText.defaultIdentifier {
+    errorDetails = try PKIXCMP_2009_PKIFreeText(derEncoded: &nodes)
+}
             return PKIXCMP_2009_ErrorMsgContent(pKIStatusInfo: pKIStatusInfo, errorCode: errorCode, errorDetails: errorDetails)
         }
     }

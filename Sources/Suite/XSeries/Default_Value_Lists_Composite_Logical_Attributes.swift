@@ -15,9 +15,21 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let protection: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
-            let layout_style: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
-            let sealed: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            var protection: Default_Value_Lists_Attribute? = nil
+var peek_protection = nodes
+if let next = peek_protection.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    protection = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
+            var layout_style: Default_Value_Lists_Attribute? = nil
+var peek_layout_style = nodes
+if let next = peek_layout_style.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    layout_style = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
+            var sealed: Default_Value_Lists_Attribute? = nil
+var peek_sealed = nodes
+if let next = peek_sealed.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    sealed = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
             return Default_Value_Lists_Composite_Logical_Attributes(protection: protection, layout_style: layout_style, sealed: sealed)
         }
     }

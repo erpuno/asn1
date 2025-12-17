@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let userCertificate: AuthenticationFramework_CertificateSerialNumber = try AuthenticationFramework_CertificateSerialNumber(derEncoded: &nodes)
             let revocationDate: AuthenticationFramework_Time = try AuthenticationFramework_Time(derEncoded: &nodes)
-            let crlEntryExtensions: AuthenticationFramework_Extensions? = try AuthenticationFramework_Extensions(derEncoded: &nodes)
+            var crlEntryExtensions: AuthenticationFramework_Extensions? = nil
+var peek_crlEntryExtensions = nodes
+if let next = peek_crlEntryExtensions.next(), next.identifier == AuthenticationFramework_Extensions.defaultIdentifier {
+    crlEntryExtensions = try AuthenticationFramework_Extensions(derEncoded: &nodes)
+}
             return AuthenticationFramework_CertificateList_toBeSigned_revokedCertificates_Sequence(userCertificate: userCertificate, revocationDate: revocationDate, crlEntryExtensions: crlEntryExtensions)
         }
     }

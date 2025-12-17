@@ -17,7 +17,14 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .e163_4_address(let e163_4_address): try coder.serialize(e163_4_address)
+            case .e163_4_address(let e163_4_address):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(e163_4_address)
+                                }
+                            } else {
+                                try coder.serialize(e163_4_address)
+                            }
             case .psap_address(let psap_address): try psap_address.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
         }
     }

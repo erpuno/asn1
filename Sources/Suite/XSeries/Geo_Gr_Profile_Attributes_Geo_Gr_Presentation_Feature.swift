@@ -17,7 +17,14 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .null(let null): try coder.serialize(null)
+            case .null(let null):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(null)
+                                }
+                            } else {
+                                try coder.serialize(null)
+                            }
             case .text_rendition(let text_rendition): try text_rendition.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
         }
     }

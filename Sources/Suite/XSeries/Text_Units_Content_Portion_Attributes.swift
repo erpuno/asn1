@@ -19,10 +19,22 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let content_identifier_layout: Identifiers_and_Expressions_Content_Portion_Identifier? = try Identifiers_and_Expressions_Content_Portion_Identifier(derEncoded: &nodes)
+            var content_identifier_layout: Identifiers_and_Expressions_Content_Portion_Identifier? = nil
+var peek_content_identifier_layout = nodes
+if let next = peek_content_identifier_layout.next(), next.identifier == Identifiers_and_Expressions_Content_Portion_Identifier.defaultIdentifier {
+    content_identifier_layout = try Identifiers_and_Expressions_Content_Portion_Identifier(derEncoded: &nodes)
+}
             let content_identifier_logical: Identifiers_and_Expressions_Content_Portion_Identifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
-            let type_of_coding: Text_Units_Type_Of_Coding? = try Text_Units_Type_Of_Coding(derEncoded: &nodes)
-            let coding_attributes: Text_Units_Content_Portion_Attributes_coding_attributes_Choice? = try Text_Units_Content_Portion_Attributes_coding_attributes_Choice(derEncoded: &nodes)
+            var type_of_coding: Text_Units_Type_Of_Coding? = nil
+var peek_type_of_coding = nodes
+if let next = peek_type_of_coding.next(), next.identifier == Text_Units_Type_Of_Coding.defaultIdentifier {
+    type_of_coding = try Text_Units_Type_Of_Coding(derEncoded: &nodes)
+}
+            var coding_attributes: Text_Units_Content_Portion_Attributes_coding_attributes_Choice? = nil
+var peek_coding_attributes = nodes
+if let next = peek_coding_attributes.next(), next.identifier == Text_Units_Content_Portion_Attributes_coding_attributes_Choice.defaultIdentifier {
+    coding_attributes = try Text_Units_Content_Portion_Attributes_coding_attributes_Choice(derEncoded: &nodes)
+}
             let alternative_representation: Text_Units_Alternative_Representation? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             return Text_Units_Content_Portion_Attributes(content_identifier_layout: content_identifier_layout, content_identifier_logical: content_identifier_logical, type_of_coding: type_of_coding, coding_attributes: coding_attributes, alternative_representation: alternative_representation)
         }

@@ -11,13 +11,15 @@ import Foundation
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .item(try DirectoryAbstractService_FilterItem(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .item(try DirectoryAbstractService_FilterItem(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
                 self = .and(try DER.set(of: DirectoryAbstractService_Filter.self, identifier: rootNode.identifier, rootNode: rootNode))
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
                 self = .or(try DER.set(of: DirectoryAbstractService_Filter.self, identifier: rootNode.identifier, rootNode: rootNode))
             case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .not(try DirectoryAbstractService_Filter(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .not(try DirectoryAbstractService_Filter(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }

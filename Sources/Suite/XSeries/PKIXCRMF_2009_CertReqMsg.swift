@@ -16,7 +16,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let certReq: PKIXCRMF_2009_CertRequest = try PKIXCRMF_2009_CertRequest(derEncoded: &nodes)
-            let popo: PKIXCRMF_2009_ProofOfPossession? = try PKIXCRMF_2009_ProofOfPossession(derEncoded: &nodes)
+            var popo: PKIXCRMF_2009_ProofOfPossession? = nil
+var peek_popo = nodes
+if let next = peek_popo.next(), next.identifier == PKIXCRMF_2009_ProofOfPossession.defaultIdentifier {
+    popo = try PKIXCRMF_2009_ProofOfPossession(derEncoded: &nodes)
+}
             let regInfo: [PKIX_CommonTypes_2009_SingleAttribute]? = try DER.sequence(of: PKIX_CommonTypes_2009_SingleAttribute.self, identifier: .sequence, nodes: &nodes)
             return PKIXCRMF_2009_CertReqMsg(certReq: certReq, popo: popo, regInfo: regInfo)
         }

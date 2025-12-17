@@ -20,7 +20,11 @@ import Foundation
             let bodyHashAlg: CryptographicMessageSyntax_2010_DigestAlgorithmIdentifier = try CryptographicMessageSyntax_2010_DigestAlgorithmIdentifier(derEncoded: &nodes)
             let signAlg: CryptographicMessageSyntax_2010_SignatureAlgorithmIdentifier = try CryptographicMessageSyntax_2010_SignatureAlgorithmIdentifier(derEncoded: &nodes)
             let signAttrsHash: MultipleSignatures_2010_SignAttrsHash = try MultipleSignatures_2010_SignAttrsHash(derEncoded: &nodes)
-            let cert: ExtendedSecurityServices_2009_ESSCertIDv2? = try ExtendedSecurityServices_2009_ESSCertIDv2(derEncoded: &nodes)
+            var cert: ExtendedSecurityServices_2009_ESSCertIDv2? = nil
+var peek_cert = nodes
+if let next = peek_cert.next(), next.identifier == ExtendedSecurityServices_2009_ESSCertIDv2.defaultIdentifier {
+    cert = try ExtendedSecurityServices_2009_ESSCertIDv2(derEncoded: &nodes)
+}
             return MultipleSignatures_2010_MultipleSignatures(bodyHashAlg: bodyHashAlg, signAlg: signAlg, signAttrsHash: signAttrsHash, cert: cert)
         }
     }

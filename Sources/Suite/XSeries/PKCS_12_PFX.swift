@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let version = try PKCS_12_PFX_version_IntEnum(rawValue: Int(derEncoded: &nodes))
             let authSafe: CryptographicMessageSyntax_2010_ContentInfo = try CryptographicMessageSyntax_2010_ContentInfo(derEncoded: &nodes)
-            let macData: PKCS_12_MacData? = try PKCS_12_MacData(derEncoded: &nodes)
+            var macData: PKCS_12_MacData? = nil
+var peek_macData = nodes
+if let next = peek_macData.next(), next.identifier == PKCS_12_MacData.defaultIdentifier {
+    macData = try PKCS_12_MacData(derEncoded: &nodes)
+}
             return PKCS_12_PFX(version: version, authSafe: authSafe, macData: macData)
         }
     }

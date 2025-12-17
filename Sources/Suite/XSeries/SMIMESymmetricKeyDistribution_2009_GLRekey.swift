@@ -18,8 +18,16 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let glName: PKIX1Implicit88_GeneralName = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
-            let glAdministration: SMIMESymmetricKeyDistribution_2009_GLAdministration? = try SMIMESymmetricKeyDistribution_2009_GLAdministration(derEncoded: &nodes)
-            let glNewKeyAttributes: SMIMESymmetricKeyDistribution_2009_GLNewKeyAttributes? = try SMIMESymmetricKeyDistribution_2009_GLNewKeyAttributes(derEncoded: &nodes)
+            var glAdministration: SMIMESymmetricKeyDistribution_2009_GLAdministration? = nil
+var peek_glAdministration = nodes
+if let next = peek_glAdministration.next(), next.identifier == SMIMESymmetricKeyDistribution_2009_GLAdministration.defaultIdentifier {
+    glAdministration = try SMIMESymmetricKeyDistribution_2009_GLAdministration(derEncoded: &nodes)
+}
+            var glNewKeyAttributes: SMIMESymmetricKeyDistribution_2009_GLNewKeyAttributes? = nil
+var peek_glNewKeyAttributes = nodes
+if let next = peek_glNewKeyAttributes.next(), next.identifier == SMIMESymmetricKeyDistribution_2009_GLNewKeyAttributes.defaultIdentifier {
+    glNewKeyAttributes = try SMIMESymmetricKeyDistribution_2009_GLNewKeyAttributes(derEncoded: &nodes)
+}
             let glRekeyAllGLKeys: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
             return SMIMESymmetricKeyDistribution_2009_GLRekey(glName: glName, glAdministration: glAdministration, glNewKeyAttributes: glNewKeyAttributes, glRekeyAllGLKeys: glRekeyAllGLKeys)
         }

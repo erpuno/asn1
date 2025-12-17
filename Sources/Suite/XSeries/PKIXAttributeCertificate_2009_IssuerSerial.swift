@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let issuer: PKIX1Implicit_2009_GeneralNames = try PKIX1Implicit_2009_GeneralNames(derEncoded: &nodes)
             let serial: PKIX1Explicit88_CertificateSerialNumber = try PKIX1Explicit88_CertificateSerialNumber(derEncoded: &nodes)
-            let issuerUID: PKIX1Explicit88_UniqueIdentifier? = try PKIX1Explicit88_UniqueIdentifier(derEncoded: &nodes)
+            var issuerUID: PKIX1Explicit88_UniqueIdentifier? = nil
+var peek_issuerUID = nodes
+if let next = peek_issuerUID.next(), next.identifier == PKIX1Explicit88_UniqueIdentifier.defaultIdentifier {
+    issuerUID = try PKIX1Explicit88_UniqueIdentifier(derEncoded: &nodes)
+}
             return PKIXAttributeCertificate_2009_IssuerSerial(issuer: issuer, serial: serial, issuerUID: issuerUID)
         }
     }

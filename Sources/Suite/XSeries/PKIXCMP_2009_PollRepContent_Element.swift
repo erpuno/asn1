@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let certReqId: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let checkAfter: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let reason: PKIXCMP_2009_PKIFreeText? = try PKIXCMP_2009_PKIFreeText(derEncoded: &nodes)
+            var reason: PKIXCMP_2009_PKIFreeText? = nil
+var peek_reason = nodes
+if let next = peek_reason.next(), next.identifier == PKIXCMP_2009_PKIFreeText.defaultIdentifier {
+    reason = try PKIXCMP_2009_PKIFreeText(derEncoded: &nodes)
+}
             return PKIXCMP_2009_PollRepContent_Element(certReqId: certReqId, checkAfter: checkAfter, reason: reason)
         }
     }

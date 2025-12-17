@@ -16,8 +16,16 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let built_in_standard_attributes: PKIX1Explicit88_BuiltInStandardAttributes = try PKIX1Explicit88_BuiltInStandardAttributes(derEncoded: &nodes)
-            let built_in_domain_defined_attributes: PKIX1Explicit88_BuiltInDomainDefinedAttributes? = try PKIX1Explicit88_BuiltInDomainDefinedAttributes(derEncoded: &nodes)
-            let extension_attributes: PKIX1Explicit88_ExtensionAttributes? = try PKIX1Explicit88_ExtensionAttributes(derEncoded: &nodes)
+            var built_in_domain_defined_attributes: PKIX1Explicit88_BuiltInDomainDefinedAttributes? = nil
+var peek_built_in_domain_defined_attributes = nodes
+if let next = peek_built_in_domain_defined_attributes.next(), next.identifier == PKIX1Explicit88_BuiltInDomainDefinedAttributes.defaultIdentifier {
+    built_in_domain_defined_attributes = try PKIX1Explicit88_BuiltInDomainDefinedAttributes(derEncoded: &nodes)
+}
+            var extension_attributes: PKIX1Explicit88_ExtensionAttributes? = nil
+var peek_extension_attributes = nodes
+if let next = peek_extension_attributes.next(), next.identifier == PKIX1Explicit88_ExtensionAttributes.defaultIdentifier {
+    extension_attributes = try PKIX1Explicit88_ExtensionAttributes(derEncoded: &nodes)
+}
             return PKIX1Explicit88_ORAddress(built_in_standard_attributes: built_in_standard_attributes, built_in_domain_defined_attributes: built_in_domain_defined_attributes, extension_attributes: extension_attributes)
         }
     }

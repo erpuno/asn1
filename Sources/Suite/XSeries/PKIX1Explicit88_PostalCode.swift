@@ -17,8 +17,22 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .numeric_code(let numeric_code): try coder.serialize(numeric_code)
-            case .printable_code(let printable_code): try coder.serialize(printable_code)
+            case .numeric_code(let numeric_code):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(numeric_code)
+                                }
+                            } else {
+                                try coder.serialize(numeric_code)
+                            }
+            case .printable_code(let printable_code):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(printable_code)
+                                }
+                            } else {
+                                try coder.serialize(printable_code)
+                            }
         }
     }
 

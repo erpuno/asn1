@@ -23,11 +23,19 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let version: PKIX1Explicit88_Version? = try PKIX1Explicit88_Version(derEncoded: &nodes)
+            var version: PKIX1Explicit88_Version? = nil
+var peek_version = nodes
+if let next = peek_version.next(), next.identifier == PKIX1Explicit88_Version.defaultIdentifier {
+    version = try PKIX1Explicit88_Version(derEncoded: &nodes)
+}
             let signature: PKIX1Explicit88_AlgorithmIdentifier = try PKIX1Explicit88_AlgorithmIdentifier(derEncoded: &nodes)
             let issuer: PKIX1Explicit88_Name = try PKIX1Explicit88_Name(derEncoded: &nodes)
             let thisUpdate: PKIX1Explicit88_Time = try PKIX1Explicit88_Time(derEncoded: &nodes)
-            let nextUpdate: PKIX1Explicit88_Time? = try PKIX1Explicit88_Time(derEncoded: &nodes)
+            var nextUpdate: PKIX1Explicit88_Time? = nil
+var peek_nextUpdate = nodes
+if let next = peek_nextUpdate.next(), next.identifier == PKIX1Explicit88_Time.defaultIdentifier {
+    nextUpdate = try PKIX1Explicit88_Time(derEncoded: &nodes)
+}
             let revokedCertificates: [PKIX1Explicit88_TBSCertList_revokedCertificates_Sequence]? = try DER.sequence(of: PKIX1Explicit88_TBSCertList_revokedCertificates_Sequence.self, identifier: .sequence, nodes: &nodes)
             let crlExtensions: PKIX1Explicit88_Extensions? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try PKIX1Explicit88_Extensions(derEncoded: node) }
             return PKIX1Explicit88_TBSCertList(version: version, signature: signature, issuer: issuer, thisUpdate: thisUpdate, nextUpdate: nextUpdate, revokedCertificates: revokedCertificates, crlExtensions: crlExtensions)

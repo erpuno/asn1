@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let time: SelectedAttributeTypes_TimeSpecification_time_Choice = try SelectedAttributeTypes_TimeSpecification_time_Choice(derEncoded: &nodes)
             let notThisTime: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
-            let timeZone: SelectedAttributeTypes_TimeZone? = try SelectedAttributeTypes_TimeZone(derEncoded: &nodes)
+            var timeZone: SelectedAttributeTypes_TimeZone? = nil
+var peek_timeZone = nodes
+if let next = peek_timeZone.next(), next.identifier == SelectedAttributeTypes_TimeZone.defaultIdentifier {
+    timeZone = try SelectedAttributeTypes_TimeZone(derEncoded: &nodes)
+}
             return SelectedAttributeTypes_TimeSpecification(time: time, notThisTime: notThisTime, timeZone: timeZone)
         }
     }

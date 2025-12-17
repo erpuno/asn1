@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let privateKey: PKIXCRMF_2009_PrivateKeyInfo = try PKIXCRMF_2009_PrivateKeyInfo(derEncoded: &nodes)
-            let ident: PKIXCRMF_2009_EncKeyWithID_identifier_Choice? = try PKIXCRMF_2009_EncKeyWithID_identifier_Choice(derEncoded: &nodes)
+            var ident: PKIXCRMF_2009_EncKeyWithID_identifier_Choice? = nil
+var peek_ident = nodes
+if let next = peek_ident.next(), next.identifier == PKIXCRMF_2009_EncKeyWithID_identifier_Choice.defaultIdentifier {
+    ident = try PKIXCRMF_2009_EncKeyWithID_identifier_Choice(derEncoded: &nodes)
+}
             return PKIXCRMF_2009_EncKeyWithID(privateKey: privateKey, ident: ident)
         }
     }

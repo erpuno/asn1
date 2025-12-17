@@ -26,10 +26,18 @@ import Foundation
             let version = try PKCS_7_SignerInfo_version_IntEnum(rawValue: Int(derEncoded: &nodes))
             let issuerAndSerialNumber: PKCS_7_IssuerAndSerialNumber = try PKCS_7_IssuerAndSerialNumber(derEncoded: &nodes)
             let digestAlgorithm: PKCS_7_DigestAlgorithmIdentifier = try PKCS_7_DigestAlgorithmIdentifier(derEncoded: &nodes)
-            let authenticatedAttributes: PKCS_7_SignerInfo_authenticatedAttributes_Choice? = try PKCS_7_SignerInfo_authenticatedAttributes_Choice(derEncoded: &nodes)
+            var authenticatedAttributes: PKCS_7_SignerInfo_authenticatedAttributes_Choice? = nil
+var peek_authenticatedAttributes = nodes
+if let next = peek_authenticatedAttributes.next(), next.identifier == PKCS_7_SignerInfo_authenticatedAttributes_Choice.defaultIdentifier {
+    authenticatedAttributes = try PKCS_7_SignerInfo_authenticatedAttributes_Choice(derEncoded: &nodes)
+}
             let digestEncryptionAlgorithm: PKCS_7_DigestEncryptionAlgorithmIdentifier = try PKCS_7_DigestEncryptionAlgorithmIdentifier(derEncoded: &nodes)
             let encryptedDigest: PKCS_7_EncryptedDigest = try PKCS_7_EncryptedDigest(derEncoded: &nodes)
-            let unauthenticatedAttributes: PKCS_7_SignerInfo_unauthenticatedAttributes_Choice? = try PKCS_7_SignerInfo_unauthenticatedAttributes_Choice(derEncoded: &nodes)
+            var unauthenticatedAttributes: PKCS_7_SignerInfo_unauthenticatedAttributes_Choice? = nil
+var peek_unauthenticatedAttributes = nodes
+if let next = peek_unauthenticatedAttributes.next(), next.identifier == PKCS_7_SignerInfo_unauthenticatedAttributes_Choice.defaultIdentifier {
+    unauthenticatedAttributes = try PKCS_7_SignerInfo_unauthenticatedAttributes_Choice(derEncoded: &nodes)
+}
             return PKCS_7_SignerInfo(version: version, issuerAndSerialNumber: issuerAndSerialNumber, digestAlgorithm: digestAlgorithm, authenticatedAttributes: authenticatedAttributes, digestEncryptionAlgorithm: digestEncryptionAlgorithm, encryptedDigest: encryptedDigest, unauthenticatedAttributes: unauthenticatedAttributes)
         }
     }

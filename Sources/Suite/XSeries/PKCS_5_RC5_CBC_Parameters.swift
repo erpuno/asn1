@@ -20,7 +20,11 @@ import Foundation
             let version = try PKCS_5_RC5_CBC_Parameters_version_IntEnum(rawValue: Int(derEncoded: &nodes))
             let rounds: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let blockSizeInBits: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let iv: ASN1OctetString? = try ASN1OctetString(derEncoded: &nodes)
+            var iv: ASN1OctetString? = nil
+var peek_iv = nodes
+if let next = peek_iv.next(), next.identifier == ASN1OctetString.defaultIdentifier {
+    iv = try ASN1OctetString(derEncoded: &nodes)
+}
             return PKCS_5_RC5_CBC_Parameters(version: version, rounds: rounds, blockSizeInBits: blockSizeInBits, iv: iv)
         }
     }

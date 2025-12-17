@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let dn: PKIX1Explicit88_DistinguishedName = try PKIX1Explicit88_DistinguishedName(derEncoded: &nodes)
-            let uid: SelectedAttributeTypes_UniqueIdentifier? = try SelectedAttributeTypes_UniqueIdentifier(derEncoded: &nodes)
+            var uid: SelectedAttributeTypes_UniqueIdentifier? = nil
+var peek_uid = nodes
+if let next = peek_uid.next(), next.identifier == SelectedAttributeTypes_UniqueIdentifier.defaultIdentifier {
+    uid = try SelectedAttributeTypes_UniqueIdentifier(derEncoded: &nodes)
+}
             return SelectedAttributeTypes_NameAndOptionalUID(dn: dn, uid: uid)
         }
     }

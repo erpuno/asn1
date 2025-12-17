@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let certHash: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let certReqId: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let statusInfo: PKIXCMP_2009_PKIStatusInfo? = try PKIXCMP_2009_PKIStatusInfo(derEncoded: &nodes)
+            var statusInfo: PKIXCMP_2009_PKIStatusInfo? = nil
+var peek_statusInfo = nodes
+if let next = peek_statusInfo.next(), next.identifier == PKIXCMP_2009_PKIStatusInfo.defaultIdentifier {
+    statusInfo = try PKIXCMP_2009_PKIStatusInfo(derEncoded: &nodes)
+}
             return PKIXCMP_2009_CertStatus(certHash: certHash, certReqId: certReqId, statusInfo: statusInfo)
         }
     }

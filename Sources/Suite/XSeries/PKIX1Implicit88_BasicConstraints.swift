@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let cA: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
-            let pathLenConstraint: ArraySlice<UInt8>? = try ArraySlice<UInt8>(derEncoded: &nodes)
+            var pathLenConstraint: ArraySlice<UInt8>? = nil
+var peek_pathLenConstraint = nodes
+if let next = peek_pathLenConstraint.next(), next.identifier == ArraySlice<UInt8>.defaultIdentifier {
+    pathLenConstraint = try ArraySlice<UInt8>(derEncoded: &nodes)
+}
             return PKIX1Implicit88_BasicConstraints(cA: cA, pathLenConstraint: pathLenConstraint)
         }
     }

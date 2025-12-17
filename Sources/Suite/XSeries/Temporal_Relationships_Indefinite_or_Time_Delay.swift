@@ -11,7 +11,8 @@ import Foundation
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
                 self = .indefinite(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .fixed(try Temporal_Relationships_Time_Delay(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .fixed(try Temporal_Relationships_Time_Delay(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }

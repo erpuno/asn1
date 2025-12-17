@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let certHash: ExtendedSecurityServices_2009_Hash = try ExtendedSecurityServices_2009_Hash(derEncoded: &nodes)
-            let issuerSerial: AuthenticationFramework_IssuerSerial? = try AuthenticationFramework_IssuerSerial(derEncoded: &nodes)
+            var issuerSerial: AuthenticationFramework_IssuerSerial? = nil
+var peek_issuerSerial = nodes
+if let next = peek_issuerSerial.next(), next.identifier == AuthenticationFramework_IssuerSerial.defaultIdentifier {
+    issuerSerial = try AuthenticationFramework_IssuerSerial(derEncoded: &nodes)
+}
             return ExtendedSecurityServices_2009_ESSCertID(certHash: certHash, issuerSerial: issuerSerial)
         }
     }

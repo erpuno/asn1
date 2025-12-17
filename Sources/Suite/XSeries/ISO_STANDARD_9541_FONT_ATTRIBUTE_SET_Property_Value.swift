@@ -12,15 +12,20 @@ import Foundation
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .value(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Value(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .value(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Value(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .value_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Value_List(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .value_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Value_List(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .ordered_value_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Ordered_Value_List(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .ordered_value_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Ordered_Value_List(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .property_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .property_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                self = .ordered_property_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Ordered_Property_List(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .ordered_property_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Ordered_Property_List(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }

@@ -16,7 +16,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let level: BasicAccessControl_AuthenticationLevel_basicLevels_Sequence_level_Enum = try BasicAccessControl_AuthenticationLevel_basicLevels_Sequence_level_Enum(derEncoded: &nodes)
-            let localQualifier: ArraySlice<UInt8>? = try ArraySlice<UInt8>(derEncoded: &nodes)
+            var localQualifier: ArraySlice<UInt8>? = nil
+var peek_localQualifier = nodes
+if let next = peek_localQualifier.next(), next.identifier == ArraySlice<UInt8>.defaultIdentifier {
+    localQualifier = try ArraySlice<UInt8>(derEncoded: &nodes)
+}
             let signed: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
             return BasicAccessControl_AuthenticationLevel_basicLevels_Sequence(level: level, localQualifier: localQualifier, signed: signed)
         }

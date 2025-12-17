@@ -29,7 +29,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let document_application_profile: Document_Profile_Descriptor_Document_Characteristics_document_application_profile_Choice? = try Document_Profile_Descriptor_Document_Characteristics_document_application_profile_Choice(derEncoded: &nodes)
+            var document_application_profile: Document_Profile_Descriptor_Document_Characteristics_document_application_profile_Choice? = nil
+var peek_document_application_profile = nodes
+if let next = peek_document_application_profile.next(), next.identifier == Document_Profile_Descriptor_Document_Characteristics_document_application_profile_Choice.defaultIdentifier {
+    document_application_profile = try Document_Profile_Descriptor_Document_Characteristics_document_application_profile_Choice(derEncoded: &nodes)
+}
             let doc_appl_profile_defaults: Document_Profile_Descriptor_Doc_Appl_Profile_Defaults? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
             let document_architecture_class = try Document_Profile_Descriptor_Document_Characteristics_document_architecture_class_IntEnum(rawValue: Int(derEncoded: &nodes))
             let content_architecture_classes: [ASN1ObjectIdentifier] = try DER.set(of: ASN1ObjectIdentifier.self, identifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific), nodes: &nodes)

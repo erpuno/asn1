@@ -27,7 +27,14 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .certificate(let certificate): try coder.serialize(certificate)
+            case .certificate(let certificate):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(certificate)
+                                }
+                            } else {
+                                try coder.serialize(certificate)
+                            }
             case .extendedCertificate(let extendedCertificate): try extendedCertificate.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
 
             case .v1AttrCert(let v1AttrCert): try v1AttrCert.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))

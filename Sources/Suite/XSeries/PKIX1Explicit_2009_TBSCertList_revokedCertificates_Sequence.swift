@@ -23,7 +23,11 @@ import Foundation
             let revocationDate: PKIX1Explicit_2009_Time = try PKIX1Explicit_2009_Time(derEncoded: &nodes)
 
 
-            let crlEntryExtensions: PKIX_CommonTypes_2009_Extensions? = try PKIX_CommonTypes_2009_Extensions(derEncoded: &nodes)
+            var crlEntryExtensions: PKIX_CommonTypes_2009_Extensions? = nil
+var peek_crlEntryExtensions = nodes
+if let next = peek_crlEntryExtensions.next(), next.identifier == PKIX_CommonTypes_2009_Extensions.defaultIdentifier {
+    crlEntryExtensions = try PKIX_CommonTypes_2009_Extensions(derEncoded: &nodes)
+}
 
 
             return PKIX1Explicit_2009_TBSCertList_revokedCertificates_Sequence(userCertificate: userCertificate, revocationDate: revocationDate, crlEntryExtensions: crlEntryExtensions)

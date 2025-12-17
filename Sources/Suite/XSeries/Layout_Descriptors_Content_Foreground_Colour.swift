@@ -22,7 +22,14 @@ import Foundation
         switch self {
             case .implementation_defined(let implementation_defined): try implementation_defined.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             case .content_foreground_transparency(let content_foreground_transparency): try content_foreground_transparency.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
-            case .colour_expression(let colour_expression): try coder.serialize(colour_expression)
+            case .colour_expression(let colour_expression):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(colour_expression)
+                                }
+                            } else {
+                                try coder.serialize(colour_expression)
+                            }
         }
     }
 

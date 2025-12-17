@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let printable_address: [ASN1PrintableString]? = try DER.sequence(of: ASN1PrintableString.self, identifier: .sequence, nodes: &nodes)
-            let teletex_string: ASN1TeletexString? = try ASN1TeletexString(derEncoded: &nodes)
+            var teletex_string: ASN1TeletexString? = nil
+var peek_teletex_string = nodes
+if let next = peek_teletex_string.next(), next.identifier == ASN1TeletexString.defaultIdentifier {
+    teletex_string = try ASN1TeletexString(derEncoded: &nodes)
+}
             return PKIX1Explicit88_UnformattedPostalAddress(printable_address: printable_address, teletex_string: teletex_string)
         }
     }

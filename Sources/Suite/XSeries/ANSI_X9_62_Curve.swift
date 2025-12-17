@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let a: ANSI_X9_62_FieldElement = try ANSI_X9_62_FieldElement(derEncoded: &nodes)
             let b: ANSI_X9_62_FieldElement = try ANSI_X9_62_FieldElement(derEncoded: &nodes)
-            let seed: ASN1BitString? = try ASN1BitString(derEncoded: &nodes)
+            var seed: ASN1BitString? = nil
+var peek_seed = nodes
+if let next = peek_seed.next(), next.identifier == ASN1BitString.defaultIdentifier {
+    seed = try ASN1BitString(derEncoded: &nodes)
+}
             return ANSI_X9_62_Curve(a: a, b: b, seed: seed)
         }
     }

@@ -16,8 +16,16 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let targetCertificate: AuthenticationFramework_IssuerSerial = try AuthenticationFramework_IssuerSerial(derEncoded: &nodes)
-            let targetName: PKIX1Implicit88_GeneralName? = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
-            let certDigestInfo: PKIXAttributeCertificate_2009_ObjectDigestInfo? = try PKIXAttributeCertificate_2009_ObjectDigestInfo(derEncoded: &nodes)
+            var targetName: PKIX1Implicit88_GeneralName? = nil
+var peek_targetName = nodes
+if let next = peek_targetName.next(), next.identifier == PKIX1Implicit88_GeneralName.defaultIdentifier {
+    targetName = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
+}
+            var certDigestInfo: PKIXAttributeCertificate_2009_ObjectDigestInfo? = nil
+var peek_certDigestInfo = nodes
+if let next = peek_certDigestInfo.next(), next.identifier == PKIXAttributeCertificate_2009_ObjectDigestInfo.defaultIdentifier {
+    certDigestInfo = try PKIXAttributeCertificate_2009_ObjectDigestInfo(derEncoded: &nodes)
+}
             return PKIXAttributeCertificate_2009_TargetCert(targetCertificate: targetCertificate, targetName: targetName, certDigestInfo: certDigestInfo)
         }
     }

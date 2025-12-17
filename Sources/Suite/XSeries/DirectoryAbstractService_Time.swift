@@ -17,8 +17,22 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .utcTime(let utcTime): try coder.serialize(utcTime)
-            case .generalizedTime(let generalizedTime): try coder.serialize(generalizedTime)
+            case .utcTime(let utcTime):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(utcTime)
+                                }
+                            } else {
+                                try coder.serialize(utcTime)
+                            }
+            case .generalizedTime(let generalizedTime):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(generalizedTime)
+                                }
+                            } else {
+                                try coder.serialize(generalizedTime)
+                            }
         }
     }
 

@@ -39,7 +39,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let content_architecture_class: Document_Profile_Descriptor_Document_Architecture_Defaults_content_architecture_class_Choice? = try Document_Profile_Descriptor_Document_Architecture_Defaults_content_architecture_class_Choice(derEncoded: &nodes)
+            var content_architecture_class: Document_Profile_Descriptor_Document_Architecture_Defaults_content_architecture_class_Choice? = nil
+var peek_content_architecture_class = nodes
+if let next = peek_content_architecture_class.next(), next.identifier == Document_Profile_Descriptor_Document_Architecture_Defaults_content_architecture_class_Choice.defaultIdentifier {
+    content_architecture_class = try Document_Profile_Descriptor_Document_Architecture_Defaults_content_architecture_class_Choice(derEncoded: &nodes)
+}
             let page_dimensions: Character_Presentation_Attributes_Measure_Pair? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let transparency: Layout_Descriptors_Transparency? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             let colour: Layout_Descriptors_Colour? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))

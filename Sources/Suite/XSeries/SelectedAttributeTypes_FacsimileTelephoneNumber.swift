@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let telephoneNumber: SelectedAttributeTypes_TelephoneNumber = try SelectedAttributeTypes_TelephoneNumber(derEncoded: &nodes)
-            let parameters: SelectedAttributeTypes_G3FacsimileNonBasicParameters? = try SelectedAttributeTypes_G3FacsimileNonBasicParameters(derEncoded: &nodes)
+            var parameters: SelectedAttributeTypes_G3FacsimileNonBasicParameters? = nil
+var peek_parameters = nodes
+if let next = peek_parameters.next(), next.identifier == SelectedAttributeTypes_G3FacsimileNonBasicParameters.defaultIdentifier {
+    parameters = try SelectedAttributeTypes_G3FacsimileNonBasicParameters(derEncoded: &nodes)
+}
             return SelectedAttributeTypes_FacsimileTelephoneNumber(telephoneNumber: telephoneNumber, parameters: parameters)
         }
     }

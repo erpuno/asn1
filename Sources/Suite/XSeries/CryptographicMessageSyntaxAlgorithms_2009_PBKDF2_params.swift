@@ -19,7 +19,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let salt: CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_params_salt_Choice = try CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_params_salt_Choice(derEncoded: &nodes)
             let iterationCount: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let keyLength: ArraySlice<UInt8>? = try ArraySlice<UInt8>(derEncoded: &nodes)
+            var keyLength: ArraySlice<UInt8>? = nil
+var peek_keyLength = nodes
+if let next = peek_keyLength.next(), next.identifier == ArraySlice<UInt8>.defaultIdentifier {
+    keyLength = try ArraySlice<UInt8>(derEncoded: &nodes)
+}
             let prf: CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_PRFsAlgorithmIdentifier? = try CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_PRFsAlgorithmIdentifier(derEncoded: &nodes)
             return CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_params(salt: salt, iterationCount: iterationCount, keyLength: keyLength, prf: prf)
         }

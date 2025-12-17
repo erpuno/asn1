@@ -27,7 +27,14 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .ktri(let ktri): try coder.serialize(ktri)
+            case .ktri(let ktri):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(ktri)
+                                }
+                            } else {
+                                try coder.serialize(ktri)
+                            }
 
             case .kari(let kari): try kari.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             case .kekri(let kekri): try kekri.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))

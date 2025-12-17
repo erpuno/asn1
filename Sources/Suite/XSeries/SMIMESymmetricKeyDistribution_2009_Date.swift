@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let start: GeneralizedTime = try GeneralizedTime(derEncoded: &nodes)
-            let end: GeneralizedTime? = try GeneralizedTime(derEncoded: &nodes)
+            var end: GeneralizedTime? = nil
+var peek_end = nodes
+if let next = peek_end.next(), next.identifier == GeneralizedTime.defaultIdentifier {
+    end = try GeneralizedTime(derEncoded: &nodes)
+}
             return SMIMESymmetricKeyDistribution_2009_Date(start: start, end: end)
         }
     }

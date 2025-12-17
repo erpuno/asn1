@@ -33,18 +33,66 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let position: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
-            let dimensions: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
-            let transparency: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
-            let layout_path: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
-            let permitted_categories: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
-            let layout_stream_categories: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
-            let layout_stream_sub_categories: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
-            let colour: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
-            let colour_of_layout_object: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
-            let object_colour_table: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
-            let border: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
-            let sealed: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            var position: Default_Value_Lists_Attribute? = nil
+var peek_position = nodes
+if let next = peek_position.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    position = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
+            var dimensions: Default_Value_Lists_Attribute? = nil
+var peek_dimensions = nodes
+if let next = peek_dimensions.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    dimensions = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
+            var transparency: Default_Value_Lists_Attribute? = nil
+var peek_transparency = nodes
+if let next = peek_transparency.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    transparency = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
+            var layout_path: Default_Value_Lists_Attribute? = nil
+var peek_layout_path = nodes
+if let next = peek_layout_path.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    layout_path = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
+            var permitted_categories: Default_Value_Lists_Attribute? = nil
+var peek_permitted_categories = nodes
+if let next = peek_permitted_categories.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    permitted_categories = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
+            var layout_stream_categories: Default_Value_Lists_Attribute? = nil
+var peek_layout_stream_categories = nodes
+if let next = peek_layout_stream_categories.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    layout_stream_categories = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
+            var layout_stream_sub_categories: Default_Value_Lists_Attribute? = nil
+var peek_layout_stream_sub_categories = nodes
+if let next = peek_layout_stream_sub_categories.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    layout_stream_sub_categories = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
+            var colour: Default_Value_Lists_Attribute? = nil
+var peek_colour = nodes
+if let next = peek_colour.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    colour = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
+            var colour_of_layout_object: Default_Value_Lists_Attribute? = nil
+var peek_colour_of_layout_object = nodes
+if let next = peek_colour_of_layout_object.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    colour_of_layout_object = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
+            var object_colour_table: Default_Value_Lists_Attribute? = nil
+var peek_object_colour_table = nodes
+if let next = peek_object_colour_table.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    object_colour_table = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
+            var border: Default_Value_Lists_Attribute? = nil
+var peek_border = nodes
+if let next = peek_border.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    border = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
+            var sealed: Default_Value_Lists_Attribute? = nil
+var peek_sealed = nodes
+if let next = peek_sealed.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
+    sealed = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+}
             return Default_Value_Lists_Frame_Attributes(position: position, dimensions: dimensions, transparency: transparency, layout_path: layout_path, permitted_categories: permitted_categories, layout_stream_categories: layout_stream_categories, layout_stream_sub_categories: layout_stream_sub_categories, colour: colour, colour_of_layout_object: colour_of_layout_object, object_colour_table: object_colour_table, border: border, sealed: sealed)
         }
     }

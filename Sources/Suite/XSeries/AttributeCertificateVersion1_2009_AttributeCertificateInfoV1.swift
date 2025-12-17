@@ -34,8 +34,16 @@ import Foundation
             let serialNumber: PKIX1Explicit88_CertificateSerialNumber = try PKIX1Explicit88_CertificateSerialNumber(derEncoded: &nodes)
             let attCertValidityPeriod: PKIXAttributeCertificate_2009_AttCertValidityPeriod = try PKIXAttributeCertificate_2009_AttCertValidityPeriod(derEncoded: &nodes)
             let attributes: [PKIX_CommonTypes_2009_AttributeSet] = try DER.sequence(of: PKIX_CommonTypes_2009_AttributeSet.self, identifier: .sequence, nodes: &nodes)
-            let issuerUniqueID: SelectedAttributeTypes_UniqueIdentifier? = try SelectedAttributeTypes_UniqueIdentifier(derEncoded: &nodes)
-            let extensions: PKIX1Explicit88_Extensions? = try PKIX1Explicit88_Extensions(derEncoded: &nodes)
+            var issuerUniqueID: SelectedAttributeTypes_UniqueIdentifier? = nil
+var peek_issuerUniqueID = nodes
+if let next = peek_issuerUniqueID.next(), next.identifier == SelectedAttributeTypes_UniqueIdentifier.defaultIdentifier {
+    issuerUniqueID = try SelectedAttributeTypes_UniqueIdentifier(derEncoded: &nodes)
+}
+            var extensions: PKIX1Explicit88_Extensions? = nil
+var peek_extensions = nodes
+if let next = peek_extensions.next(), next.identifier == PKIX1Explicit88_Extensions.defaultIdentifier {
+    extensions = try PKIX1Explicit88_Extensions(derEncoded: &nodes)
+}
             return AttributeCertificateVersion1_2009_AttributeCertificateInfoV1(version: version, subject: subject, issuer: issuer, signature: signature, serialNumber: serialNumber, attCertValidityPeriod: attCertValidityPeriod, attributes: attributes, issuerUniqueID: issuerUniqueID, extensions: extensions)
         }
     }

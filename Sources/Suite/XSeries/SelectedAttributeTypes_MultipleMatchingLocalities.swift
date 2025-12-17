@@ -13,7 +13,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let matchingRuleUsed: ASN1ObjectIdentifier? = try ASN1ObjectIdentifier(derEncoded: &nodes)
+            var matchingRuleUsed: ASN1ObjectIdentifier? = nil
+var peek_matchingRuleUsed = nodes
+if let next = peek_matchingRuleUsed.next(), next.identifier == ASN1ObjectIdentifier.defaultIdentifier {
+    matchingRuleUsed = try ASN1ObjectIdentifier(derEncoded: &nodes)
+}
             let attributeList: [InformationFramework_AttributeValueAssertion] = try DER.sequence(of: InformationFramework_AttributeValueAssertion.self, identifier: .sequence, nodes: &nodes)
             return SelectedAttributeTypes_MultipleMatchingLocalities(matchingRuleUsed: matchingRuleUsed, attributeList: attributeList)
         }

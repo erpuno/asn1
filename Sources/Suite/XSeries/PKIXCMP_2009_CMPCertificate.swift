@@ -15,7 +15,14 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .x509v3PKCert(let x509v3PKCert): try coder.serialize(x509v3PKCert)
+            case .x509v3PKCert(let x509v3PKCert):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(x509v3PKCert)
+                                }
+                            } else {
+                                try coder.serialize(x509v3PKCert)
+                            }
 
         }
     }

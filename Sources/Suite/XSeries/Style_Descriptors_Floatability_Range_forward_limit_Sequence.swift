@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let logical_object: Style_Descriptors_Floatability_Range_forward_limit_Sequence_logical_object_Choice = try Style_Descriptors_Floatability_Range_forward_limit_Sequence_logical_object_Choice(derEncoded: &nodes)
-            let layout_object: Style_Descriptors_Floatability_Range_forward_limit_Sequence_layout_object_Choice? = try Style_Descriptors_Floatability_Range_forward_limit_Sequence_layout_object_Choice(derEncoded: &nodes)
+            var layout_object: Style_Descriptors_Floatability_Range_forward_limit_Sequence_layout_object_Choice? = nil
+var peek_layout_object = nodes
+if let next = peek_layout_object.next(), next.identifier == Style_Descriptors_Floatability_Range_forward_limit_Sequence_layout_object_Choice.defaultIdentifier {
+    layout_object = try Style_Descriptors_Floatability_Range_forward_limit_Sequence_layout_object_Choice(derEncoded: &nodes)
+}
             return Style_Descriptors_Floatability_Range_forward_limit_Sequence(logical_object: logical_object, layout_object: layout_object)
         }
     }

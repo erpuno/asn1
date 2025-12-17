@@ -18,15 +18,20 @@ import Foundation
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
                 self = .binding_reference(try Identifiers_and_Expressions_Binding_Reference(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .make_string_application(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .make_string_application(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                self = .upper_alpha_application(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .upper_alpha_application(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
-                self = .lower_alpha_application(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .lower_alpha_application(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
-                self = .upper_roman_application(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .upper_roman_application(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
-                self = .lower_roman_application(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .lower_roman_application(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }

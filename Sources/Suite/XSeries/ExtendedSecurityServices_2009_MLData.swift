@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let mailListIdentifier: ExtendedSecurityServices_2009_EntityIdentifier = try ExtendedSecurityServices_2009_EntityIdentifier(derEncoded: &nodes)
             let expansionTime: GeneralizedTime = try GeneralizedTime(derEncoded: &nodes)
-            let mlReceiptPolicy: ExtendedSecurityServices_2009_MLReceiptPolicy? = try ExtendedSecurityServices_2009_MLReceiptPolicy(derEncoded: &nodes)
+            var mlReceiptPolicy: ExtendedSecurityServices_2009_MLReceiptPolicy? = nil
+var peek_mlReceiptPolicy = nodes
+if let next = peek_mlReceiptPolicy.next(), next.identifier == ExtendedSecurityServices_2009_MLReceiptPolicy.defaultIdentifier {
+    mlReceiptPolicy = try ExtendedSecurityServices_2009_MLReceiptPolicy(derEncoded: &nodes)
+}
             return ExtendedSecurityServices_2009_MLData(mailListIdentifier: mailListIdentifier, expansionTime: expansionTime, mlReceiptPolicy: mlReceiptPolicy)
         }
     }

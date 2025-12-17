@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let qoS_level: DOR_definition_Requested_QoS_level? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try DOR_definition_Requested_QoS_level(derEncoded: node) }
-            let usage_of_reference: DOR_definition_Single_use_of_reference? = try DOR_definition_Single_use_of_reference(derEncoded: &nodes)
+            var usage_of_reference: DOR_definition_Single_use_of_reference? = nil
+var peek_usage_of_reference = nodes
+if let next = peek_usage_of_reference.next(), next.identifier == DOR_definition_Single_use_of_reference.defaultIdentifier {
+    usage_of_reference = try DOR_definition_Single_use_of_reference(derEncoded: &nodes)
+}
             return DOR_definition_Extend_QoS(qoS_level: qoS_level, usage_of_reference: usage_of_reference)
         }
     }

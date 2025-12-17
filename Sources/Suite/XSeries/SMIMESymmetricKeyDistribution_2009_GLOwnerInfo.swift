@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let glOwnerName: PKIX1Implicit88_GeneralName = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
             let glOwnerAddress: PKIX1Implicit88_GeneralName = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
-            let certificates: SMIMESymmetricKeyDistribution_2009_Certificates? = try SMIMESymmetricKeyDistribution_2009_Certificates(derEncoded: &nodes)
+            var certificates: SMIMESymmetricKeyDistribution_2009_Certificates? = nil
+var peek_certificates = nodes
+if let next = peek_certificates.next(), next.identifier == SMIMESymmetricKeyDistribution_2009_Certificates.defaultIdentifier {
+    certificates = try SMIMESymmetricKeyDistribution_2009_Certificates(derEncoded: &nodes)
+}
             return SMIMESymmetricKeyDistribution_2009_GLOwnerInfo(glOwnerName: glOwnerName, glOwnerAddress: glOwnerAddress, certificates: certificates)
         }
     }

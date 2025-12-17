@@ -350,6 +350,24 @@ import Foundation
   end
   def emitSequenceDecoderBodyElement(_, _, _, name, "Bool"), do:
       "let #{name}: Bool = try DER.decodeDefault(&nodes, defaultValue: false)"
+  def emitSequenceDecoderBodyElement(:OPTIONAL, _, _, name, type) do
+      n = swiftEsc(name)
+      boxed = isBoxed(getEnv(:current_struct, ""), name)
+      peekVar = "peek_#{n}"
+      if boxed do
+          "var #{n}: Box<#{type}>? = nil\n" <>
+          "var #{peekVar} = nodes\n" <>
+          "if let next = #{peekVar}.next(), next.identifier == #{type}.defaultIdentifier {\n" <>
+          "    #{n} = Box(try #{type}(derEncoded: &nodes))\n" <>
+          "}"
+      else
+          "var #{n}: #{type}? = nil\n" <>
+          "var #{peekVar} = nodes\n" <>
+          "if let next = #{peekVar}.next(), next.identifier == #{type}.defaultIdentifier {\n" <>
+          "    #{n} = try #{type}(derEncoded: &nodes)\n" <>
+          "}"
+      end
+  end
   def emitSequenceDecoderBodyElement(optional, _, _, name, type) do
       n = swiftEsc(name)
       boxed = isBoxed(getEnv(:current_struct, ""), name)
@@ -459,7 +477,23 @@ import Foundation
   def emitChoiceElement(name, type), do: "case #{swiftEsc(name)}(#{lookup(bin(normalizeName(type)))})\n"
   def emitChoiceEncoderBodyElement(w, no, name, _type, spec, _plicit) when no == [] do
       n = swiftEsc(name)
-      pad(w) <> "case .#{n}(let #{n}): try coder.serialize#{spec}(#{n})"
+      # For untagged CHOICE elements, we need to respect the withIdentifier parameter
+      # When the CHOICE is used in an explicit tagging context (e.g., GeneralName.directoryName),
+      # we must wrap the content with the provided identifier
+      if spec == "" do
+         # For single values, serialize with identifier check for explicit tagging
+         pad(w) <> "case .#{n}(let #{n}):\n" <>
+         pad(w+16) <> "if identifier != Self.defaultIdentifier {\n" <>
+         pad(w+20) <> "try coder.appendConstructedNode(identifier: identifier) { coder in\n" <>
+         pad(w+24) <> "try coder.serialize(#{n})\n" <>
+         pad(w+20) <> "}\n" <>
+         pad(w+16) <> "} else {\n" <>
+         pad(w+20) <> "try coder.serialize(#{n})\n" <>
+         pad(w+16) <> "}"
+      else
+         # For SequenceOf/SetOf
+         pad(w) <> "case .#{n}(let #{n}): try coder.serialize#{spec}(#{n})"
+      end
   end
   def emitChoiceEncoderBodyElement(w, no, name, type, spec, plicit) do
       n = swiftEsc(name)
@@ -503,6 +537,11 @@ import Foundation
   def emitChoiceDecoderBodyElement(w, no, name, type, _spec) when no == [], do:
       pad(w) <> "case #{normalizeName(type)}.defaultIdentifier:\n" <>
       pad(w+4) <> "self = .#{swiftEsc(name)}(try #{normalizeName(type)}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
+  def emitChoiceDecoderBodyElement(w, no, name, type, "Explicit") do
+      pad(w) <> "case ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}):\n" <>
+      pad(w+4) <> "guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: \"Invalid explicit tag content\") }\n" <>
+      pad(w+4) <> "self = .#{swiftEsc(name)}(try #{normalizeName(type)}(derEncoded: inner))"
+  end
   def emitChoiceDecoderBodyElement(w, no, name, type, _spec), do:
       pad(w) <> "case ASN1Identifier(tagWithNumber: #{tagNo(no)}, tagClass: #{tagClass(no)}):\n" <>
       pad(w+4) <> "self = .#{swiftEsc(name)}(try #{normalizeName(type)}(derEncoded: rootNode, withIdentifier: rootNode.identifier))"
@@ -803,7 +842,7 @@ public struct #{name} : DERImplicitlyTaggable, DERParseable, DERSerializable, Ha
                 {"[", {:set, inner}} -> emitChoiceDecoderBodyElementForArray(12, tag, fieldName(fieldName), inner, "set")
                 {"[", {:sequence, inner}} -> emitChoiceDecoderBodyElementForArray(12, tag, fieldName(fieldName), inner, "sequence")
                 _ -> emitChoiceDecoderBodyElement(12, tag, fieldName(fieldName),
-                        substituteType(lookup(fieldType(name, fieldName(fieldName), type))), "")
+                        substituteType(lookup(fieldType(name, fieldName(fieldName), type))), plicit(tag))
            end
          _ -> ""
       end, cases), "\n")

@@ -29,8 +29,16 @@ import Foundation
             let curve: ANSI_X9_62_Curve = try ANSI_X9_62_Curve(derEncoded: &nodes)
             let base: ANSI_X9_62_ECPoint = try ANSI_X9_62_ECPoint(derEncoded: &nodes)
             let order: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let cofactor: ArraySlice<UInt8>? = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let hash: ANSI_X9_62_HashAlgorithm? = try ANSI_X9_62_HashAlgorithm(derEncoded: &nodes)
+            var cofactor: ArraySlice<UInt8>? = nil
+var peek_cofactor = nodes
+if let next = peek_cofactor.next(), next.identifier == ArraySlice<UInt8>.defaultIdentifier {
+    cofactor = try ArraySlice<UInt8>(derEncoded: &nodes)
+}
+            var hash: ANSI_X9_62_HashAlgorithm? = nil
+var peek_hash = nodes
+if let next = peek_hash.next(), next.identifier == ANSI_X9_62_HashAlgorithm.defaultIdentifier {
+    hash = try ANSI_X9_62_HashAlgorithm(derEncoded: &nodes)
+}
 
             return ANSI_X9_62_SpecifiedECDomain(version: version, fieldID: fieldID, curve: curve, base: base, order: order, cofactor: cofactor, hash: hash)
         }

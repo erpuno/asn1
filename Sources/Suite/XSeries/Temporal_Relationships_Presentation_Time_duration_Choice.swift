@@ -10,7 +10,8 @@ import Foundation
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .fixed_duration(try Temporal_Relationships_Presentation_Time_duration_Choice_fixed_duration_Choice(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+                self = .fixed_duration(try Temporal_Relationships_Presentation_Time_duration_Choice_fixed_duration_Choice(derEncoded: inner))
             case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
                 self = .rule_A(try Temporal_Relationships_Rule_Spec(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
