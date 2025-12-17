@@ -1,3 +1,11 @@
 .build
 Package.resolved
 .windsurf
+.vscode/
+original.txt
+verified.der
+verified.txt
+generated.crt
+generated_cycle.txt
+generated_orig.txt
+generated_verified.der
