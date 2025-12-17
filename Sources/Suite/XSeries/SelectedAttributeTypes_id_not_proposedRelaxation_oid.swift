@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_not_proposedRelaxation: ASN1ObjectIdentifier = [14]
+public let SelectedAttributeTypes_id_not_proposedRelaxation: ASN1ObjectIdentifier = UsefulDefinitions_id_not + [14]

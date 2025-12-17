@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_pr_unavailableHierarchySelect: ASN1ObjectIdentifier = [25]
+public let SelectedAttributeTypes_id_pr_unavailableHierarchySelect: ASN1ObjectIdentifier = UsefulDefinitions_id_pr + [25]

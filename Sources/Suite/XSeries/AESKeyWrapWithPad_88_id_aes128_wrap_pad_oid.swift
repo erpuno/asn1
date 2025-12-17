@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let AESKeyWrapWithPad_88_id_aes128_wrap_pad: ASN1ObjectIdentifier = [8]
+public let AESKeyWrapWithPad_88_id_aes128_wrap_pad: ASN1ObjectIdentifier = AESKeyWrapWithPad_88_aes + [8]

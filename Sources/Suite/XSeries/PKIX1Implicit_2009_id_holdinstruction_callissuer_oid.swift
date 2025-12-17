@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKIX1Implicit_2009_id_holdinstruction_callissuer: ASN1ObjectIdentifier = [2]
+public let PKIX1Implicit_2009_id_holdinstruction_callissuer: ASN1ObjectIdentifier = PKIX1Implicit_2009_holdInstruction + [2]

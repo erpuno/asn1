@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SMIMESymmetricKeyDistribution_2009_id_skd_glAddOwner: ASN1ObjectIdentifier = [6]
+public let SMIMESymmetricKeyDistribution_2009_id_skd_glAddOwner: ASN1ObjectIdentifier = SMIMESymmetricKeyDistribution_2009_id_skd + [6]

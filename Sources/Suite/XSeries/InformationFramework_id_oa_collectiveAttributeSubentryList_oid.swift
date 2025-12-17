@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_oa_collectiveAttributeSubentryList: ASN1ObjectIdentifier = [12]
+public let InformationFramework_id_oa_collectiveAttributeSubentryList: ASN1ObjectIdentifier = UsefulDefinitions_id_oa + [12]

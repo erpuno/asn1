@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_oa_subschemaTimestamp: ASN1ObjectIdentifier = [8]
+public let InformationFramework_id_oa_subschemaTimestamp: ASN1ObjectIdentifier = UsefulDefinitions_id_oa + [8]

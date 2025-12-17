@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_not_substringRequirements: ASN1ObjectIdentifier = [16]
+public let SelectedAttributeTypes_id_not_substringRequirements: ASN1ObjectIdentifier = UsefulDefinitions_id_not + [16]

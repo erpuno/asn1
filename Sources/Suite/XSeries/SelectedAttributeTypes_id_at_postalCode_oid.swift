@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_at_postalCode: ASN1ObjectIdentifier = [17]
+public let SelectedAttributeTypes_id_at_postalCode: ASN1ObjectIdentifier = PKIX1Explicit88_id_at + [17]

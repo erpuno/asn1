@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let AuthenticationFramework_id_mr_attributeCertificateMatch: ASN1ObjectIdentifier = [42]
+public let AuthenticationFramework_id_mr_attributeCertificateMatch: ASN1ObjectIdentifier = UsefulDefinitions_id_mr + [42]

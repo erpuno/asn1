@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let CertificateExtensions_id_at_deltaRevocationList: ASN1ObjectIdentifier = [53]
+public let CertificateExtensions_id_at_deltaRevocationList: ASN1ObjectIdentifier = UsefulDefinitions_id_at + [53]

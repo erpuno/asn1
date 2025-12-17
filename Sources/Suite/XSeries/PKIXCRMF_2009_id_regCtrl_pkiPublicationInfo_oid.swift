@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKIXCRMF_2009_id_regCtrl_pkiPublicationInfo: ASN1ObjectIdentifier = [3]
+public let PKIXCRMF_2009_id_regCtrl_pkiPublicationInfo: ASN1ObjectIdentifier = PKIXCRMF_2009_id_regCtrl + [3]

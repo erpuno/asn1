@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_at_stateOrProvinceName: ASN1ObjectIdentifier = [8]
+public let InformationFramework_id_at_stateOrProvinceName: ASN1ObjectIdentifier = InformationFramework_id_at + [8]

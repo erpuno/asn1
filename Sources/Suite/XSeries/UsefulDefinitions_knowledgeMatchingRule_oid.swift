@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let UsefulDefinitions_knowledgeMatchingRule: ASN1ObjectIdentifier = [14]
+public let UsefulDefinitions_knowledgeMatchingRule: ASN1ObjectIdentifier = UsefulDefinitions_ds + [14]

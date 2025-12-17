@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let OCSP_id_pkix_ocsp_response: ASN1ObjectIdentifier = [4]
+public let OCSP_id_pkix_ocsp_response: ASN1ObjectIdentifier = OCSP_id_pkix_ocsp + [4]

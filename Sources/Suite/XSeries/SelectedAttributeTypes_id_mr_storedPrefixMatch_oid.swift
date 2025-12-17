@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_mr_storedPrefixMatch: ASN1ObjectIdentifier = [41]
+public let SelectedAttributeTypes_id_mr_storedPrefixMatch: ASN1ObjectIdentifier = UsefulDefinitions_id_mr + [41]

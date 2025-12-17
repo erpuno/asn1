@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKIX1Explicit_2009_id_at_surname: ASN1ObjectIdentifier = [4]
+public let PKIX1Explicit_2009_id_at_surname: ASN1ObjectIdentifier = PKIX1Explicit_2009_id_at + [4]

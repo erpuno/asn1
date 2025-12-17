@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKIXAttributeCertificate_2009_id_pe_aaControls: ASN1ObjectIdentifier = [6]
+public let PKIXAttributeCertificate_2009_id_pe_aaControls: ASN1ObjectIdentifier = PKIX1Explicit88_id_pe + [6]

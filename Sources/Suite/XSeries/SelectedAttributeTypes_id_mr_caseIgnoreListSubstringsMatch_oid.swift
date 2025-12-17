@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_mr_caseIgnoreListSubstringsMatch: ASN1ObjectIdentifier = [12]
+public let SelectedAttributeTypes_id_mr_caseIgnoreListSubstringsMatch: ASN1ObjectIdentifier = UsefulDefinitions_id_mr + [12]

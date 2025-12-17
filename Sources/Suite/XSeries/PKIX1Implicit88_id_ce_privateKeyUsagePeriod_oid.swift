@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKIX1Implicit88_id_ce_privateKeyUsagePeriod: ASN1ObjectIdentifier = [16]
+public let PKIX1Implicit88_id_ce_privateKeyUsagePeriod: ASN1ObjectIdentifier = PKIX1Implicit88_id_ce + [16]

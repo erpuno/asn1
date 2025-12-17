@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_mr_approximateStringMatch: ASN1ObjectIdentifier = [49]
+public let SelectedAttributeTypes_id_mr_approximateStringMatch: ASN1ObjectIdentifier = UsefulDefinitions_id_mr + [49]

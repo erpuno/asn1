@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKIX1Implicit_2009_id_ce_policyConstraints: ASN1ObjectIdentifier = [36]
+public let PKIX1Implicit_2009_id_ce_policyConstraints: ASN1ObjectIdentifier = PKIX1Implicit_2009_id_ce + [36]

@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let UsefulDefinitions_attributeValueContext: ASN1ObjectIdentifier = [31]
+public let UsefulDefinitions_attributeValueContext: ASN1ObjectIdentifier = UsefulDefinitions_ds + [31]

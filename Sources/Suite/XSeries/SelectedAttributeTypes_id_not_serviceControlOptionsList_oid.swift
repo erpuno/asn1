@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_not_serviceControlOptionsList: ASN1ObjectIdentifier = [12]
+public let SelectedAttributeTypes_id_not_serviceControlOptionsList: ASN1ObjectIdentifier = UsefulDefinitions_id_not + [12]

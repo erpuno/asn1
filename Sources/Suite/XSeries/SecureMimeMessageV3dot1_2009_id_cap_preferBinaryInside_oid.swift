@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SecureMimeMessageV3dot1_2009_id_cap_preferBinaryInside: ASN1ObjectIdentifier = [1]
+public let SecureMimeMessageV3dot1_2009_id_cap_preferBinaryInside: ASN1ObjectIdentifier = SecureMimeMessageV3dot1_2009_id_cap + [1]

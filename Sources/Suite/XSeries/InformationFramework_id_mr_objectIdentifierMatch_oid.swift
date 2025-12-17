@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_mr_objectIdentifierMatch: ASN1ObjectIdentifier = [0]
+public let InformationFramework_id_mr_objectIdentifierMatch: ASN1ObjectIdentifier = UsefulDefinitions_id_mr + [0]

@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKCS_9_pkcs_9_at_challengePassword: ASN1ObjectIdentifier = [7]
+public let PKCS_9_pkcs_9_at_challengePassword: ASN1ObjectIdentifier = PKCS_9_pkcs_9 + [7]

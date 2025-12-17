@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_not_multipleMatchingLocalities: ASN1ObjectIdentifier = [13]
+public let SelectedAttributeTypes_id_not_multipleMatchingLocalities: ASN1ObjectIdentifier = UsefulDefinitions_id_not + [13]

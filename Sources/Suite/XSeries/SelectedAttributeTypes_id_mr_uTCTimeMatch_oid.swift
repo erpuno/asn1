@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_mr_uTCTimeMatch: ASN1ObjectIdentifier = [25]
+public let SelectedAttributeTypes_id_mr_uTCTimeMatch: ASN1ObjectIdentifier = UsefulDefinitions_id_mr + [25]

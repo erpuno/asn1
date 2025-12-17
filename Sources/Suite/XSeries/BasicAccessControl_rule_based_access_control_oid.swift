@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let BasicAccessControl_rule_based_access_control: ASN1ObjectIdentifier = [3]
+public let BasicAccessControl_rule_based_access_control: ASN1ObjectIdentifier = UsefulDefinitions_id_acScheme + [3]

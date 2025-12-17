@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let UsefulDefinitions_schemaObjectClass: ASN1ObjectIdentifier = [20]
+public let UsefulDefinitions_schemaObjectClass: ASN1ObjectIdentifier = UsefulDefinitions_ds + [20]

@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let UsefulDefinitions_notification: ASN1ObjectIdentifier = [35]
+public let UsefulDefinitions_notification: ASN1ObjectIdentifier = UsefulDefinitions_ds + [35]

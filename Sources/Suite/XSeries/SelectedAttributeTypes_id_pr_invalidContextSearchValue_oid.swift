@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_pr_invalidContextSearchValue: ASN1ObjectIdentifier = [18]
+public let SelectedAttributeTypes_id_pr_invalidContextSearchValue: ASN1ObjectIdentifier = UsefulDefinitions_id_pr + [18]

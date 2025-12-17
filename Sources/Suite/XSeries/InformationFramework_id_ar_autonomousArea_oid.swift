@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_ar_autonomousArea: ASN1ObjectIdentifier = [1]
+public let InformationFramework_id_ar_autonomousArea: ASN1ObjectIdentifier = UsefulDefinitions_id_ar + [1]

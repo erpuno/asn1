@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_not_serviceType: ASN1ObjectIdentifier = [2]
+public let SelectedAttributeTypes_id_not_serviceType: ASN1ObjectIdentifier = UsefulDefinitions_id_not + [2]

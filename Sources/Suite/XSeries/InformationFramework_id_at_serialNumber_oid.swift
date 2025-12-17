@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_at_serialNumber: ASN1ObjectIdentifier = [5]
+public let InformationFramework_id_at_serialNumber: ASN1ObjectIdentifier = InformationFramework_id_at + [5]

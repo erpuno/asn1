@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_pr_invalidServiceControlOptions: ASN1ObjectIdentifier = [28]
+public let SelectedAttributeTypes_id_pr_invalidServiceControlOptions: ASN1ObjectIdentifier = UsefulDefinitions_id_pr + [28]

@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKIXCRMF_2009_id_ct_encKeyWithID: ASN1ObjectIdentifier = [21]
+public let PKIXCRMF_2009_id_ct_encKeyWithID: ASN1ObjectIdentifier = PKIXCRMF_2009_id_ct + [21]

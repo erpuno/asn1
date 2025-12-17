@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let EnrollmentMessageSyntax_2009_id_cmc_popLinkRandom: ASN1ObjectIdentifier = [22]
+public let EnrollmentMessageSyntax_2009_id_cmc_popLinkRandom: ASN1ObjectIdentifier = EnrollmentMessageSyntax_2009_id_cmc + [22]

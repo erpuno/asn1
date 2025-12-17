@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKCS_5_des_EDE3_CBC: ASN1ObjectIdentifier = [7]
+public let PKCS_5_des_EDE3_CBC: ASN1ObjectIdentifier = PKCS_5_encryptionAlgorithm + [7]

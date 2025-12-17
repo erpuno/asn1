@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_at_organizationalUnitName: ASN1ObjectIdentifier = [11]
+public let InformationFramework_id_at_organizationalUnitName: ASN1ObjectIdentifier = InformationFramework_id_at + [11]

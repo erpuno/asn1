@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let CertificateExtensions_id_ce_authorityKeyIdentifier: ASN1ObjectIdentifier = [35]
+public let CertificateExtensions_id_ce_authorityKeyIdentifier: ASN1ObjectIdentifier = UsefulDefinitions_id_ce + [35]

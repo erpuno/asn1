@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_nf_subentryNameForm: ASN1ObjectIdentifier = [16]
+public let InformationFramework_id_nf_subentryNameForm: ASN1ObjectIdentifier = UsefulDefinitions_id_nf + [16]

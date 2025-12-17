@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKIX1Implicit88_id_kp_emailProtection: ASN1ObjectIdentifier = [4]
+public let PKIX1Implicit88_id_kp_emailProtection: ASN1ObjectIdentifier = PKIX1Explicit88_id_kp + [4]

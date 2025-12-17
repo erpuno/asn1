@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let UsefulDefinitions_dsaOperationalAttribute: ASN1ObjectIdentifier = [12]
+public let UsefulDefinitions_dsaOperationalAttribute: ASN1ObjectIdentifier = UsefulDefinitions_ds + [12]

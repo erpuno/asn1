@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_pr_unavailableOperation: ASN1ObjectIdentifier = [4]
+public let SelectedAttributeTypes_id_pr_unavailableOperation: ASN1ObjectIdentifier = UsefulDefinitions_id_pr + [4]

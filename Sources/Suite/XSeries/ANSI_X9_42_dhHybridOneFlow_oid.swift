@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let ANSI_X9_42_dhHybridOneFlow: ASN1ObjectIdentifier = [6]
+public let ANSI_X9_42_dhHybridOneFlow: ASN1ObjectIdentifier = ANSI_X9_42_scheme + [6]

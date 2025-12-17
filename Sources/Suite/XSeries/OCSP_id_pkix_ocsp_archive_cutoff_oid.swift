@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let OCSP_id_pkix_ocsp_archive_cutoff: ASN1ObjectIdentifier = [6]
+public let OCSP_id_pkix_ocsp_archive_cutoff: ASN1ObjectIdentifier = OCSP_id_pkix_ocsp + [6]

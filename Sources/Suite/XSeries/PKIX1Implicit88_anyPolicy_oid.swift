@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKIX1Implicit88_anyPolicy: ASN1ObjectIdentifier = [0]
+public let PKIX1Implicit88_anyPolicy: ASN1ObjectIdentifier = PKIX1Implicit88_id_ce_certificatePolicies + [0]

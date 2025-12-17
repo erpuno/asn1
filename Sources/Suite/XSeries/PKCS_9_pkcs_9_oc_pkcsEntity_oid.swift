@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKCS_9_pkcs_9_oc_pkcsEntity: ASN1ObjectIdentifier = [1]
+public let PKCS_9_pkcs_9_oc_pkcsEntity: ASN1ObjectIdentifier = PKCS_9_pkcs_9_oc + [1]

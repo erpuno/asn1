@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_sc_subentry: ASN1ObjectIdentifier = [0]
+public let InformationFramework_id_sc_subentry: ASN1ObjectIdentifier = UsefulDefinitions_id_sc + [0]

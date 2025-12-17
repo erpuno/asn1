@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SMIMESymmetricKeyDistribution_2009_id_skd_glaQueryResponse: ASN1ObjectIdentifier = [12]
+public let SMIMESymmetricKeyDistribution_2009_id_skd_glaQueryResponse: ASN1ObjectIdentifier = SMIMESymmetricKeyDistribution_2009_id_skd + [12]

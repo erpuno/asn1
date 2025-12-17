@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_avc_locale: ASN1ObjectIdentifier = [2]
+public let SelectedAttributeTypes_id_avc_locale: ASN1ObjectIdentifier = UsefulDefinitions_id_avc + [2]

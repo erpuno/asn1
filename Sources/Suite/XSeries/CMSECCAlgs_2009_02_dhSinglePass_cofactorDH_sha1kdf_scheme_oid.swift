@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let CMSECCAlgs_2009_02_dhSinglePass_cofactorDH_sha1kdf_scheme: ASN1ObjectIdentifier = [3]
+public let CMSECCAlgs_2009_02_dhSinglePass_cofactorDH_sha1kdf_scheme: ASN1ObjectIdentifier = CMSECCAlgs_2009_02_x9_63_scheme + [3]

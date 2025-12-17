@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_not_matchingRuleList: ASN1ObjectIdentifier = [4]
+public let SelectedAttributeTypes_id_not_matchingRuleList: ASN1ObjectIdentifier = UsefulDefinitions_id_not + [4]

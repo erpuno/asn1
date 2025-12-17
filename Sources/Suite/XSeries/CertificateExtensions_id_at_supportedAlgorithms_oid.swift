@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let CertificateExtensions_id_at_supportedAlgorithms: ASN1ObjectIdentifier = [52]
+public let CertificateExtensions_id_at_supportedAlgorithms: ASN1ObjectIdentifier = UsefulDefinitions_id_at + [52]

@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let EnrollmentMessageSyntax_2009_id_cmc_recipientNonce: ASN1ObjectIdentifier = [7]
+public let EnrollmentMessageSyntax_2009_id_cmc_recipientNonce: ASN1ObjectIdentifier = EnrollmentMessageSyntax_2009_id_cmc + [7]

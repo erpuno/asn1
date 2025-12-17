@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_oa_administrativeRole: ASN1ObjectIdentifier = [5]
+public let InformationFramework_id_oa_administrativeRole: ASN1ObjectIdentifier = UsefulDefinitions_id_oa + [5]

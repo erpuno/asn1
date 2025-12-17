@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_oc_parent: ASN1ObjectIdentifier = [28]
+public let InformationFramework_id_oc_parent: ASN1ObjectIdentifier = UsefulDefinitions_id_oc + [28]

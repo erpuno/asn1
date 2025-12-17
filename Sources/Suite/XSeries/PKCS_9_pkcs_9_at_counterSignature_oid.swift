@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKCS_9_pkcs_9_at_counterSignature: ASN1ObjectIdentifier = [6]
+public let PKCS_9_pkcs_9_at_counterSignature: ASN1ObjectIdentifier = PKCS_9_pkcs_9 + [6]

@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKCS_5_id_hmacWithSHA512_256: ASN1ObjectIdentifier = [13]
+public let PKCS_5_id_hmacWithSHA512_256: ASN1ObjectIdentifier = PKCS_5_digestAlgorithm + [13]

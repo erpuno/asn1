@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_oa_hierarchyLevel: ASN1ObjectIdentifier = [17]
+public let InformationFramework_id_oa_hierarchyLevel: ASN1ObjectIdentifier = UsefulDefinitions_id_oa + [17]

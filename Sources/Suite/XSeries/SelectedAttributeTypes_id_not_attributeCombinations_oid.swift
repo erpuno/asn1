@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_not_attributeCombinations: ASN1ObjectIdentifier = [6]
+public let SelectedAttributeTypes_id_not_attributeCombinations: ASN1ObjectIdentifier = UsefulDefinitions_id_not + [6]

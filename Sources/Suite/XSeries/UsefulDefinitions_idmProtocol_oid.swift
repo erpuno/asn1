@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let UsefulDefinitions_idmProtocol: ASN1ObjectIdentifier = [33]
+public let UsefulDefinitions_idmProtocol: ASN1ObjectIdentifier = UsefulDefinitions_ds + [33]

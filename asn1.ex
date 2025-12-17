@@ -1434,8 +1434,22 @@ import Foundation
   end
 
   def resolveOIDComponent({:NamedNumber, _, val}), do: resolveOIDComponent(val)
-  def resolveOIDComponent({:seqtag, _, _, _} = val), do: extractOIDList([val])
-  def resolveOIDComponent({{:seqtag, _, _, _}, val}), do: resolveOIDComponent(val)
+  def resolveOIDComponent({:seqtag, _, mod, name}) do
+      # Reference to a value in a module - check if imported, otherwise use module prefix
+      swift_name = case lookup(name) do
+          val when is_binary(val) -> val
+          _ -> bin(normalizeName(mod)) <> "_" <> bin(normalizeName(name))
+      end
+      [swift_name]
+  end
+  def resolveOIDComponent({{:seqtag, _, mod, name}, val}) do
+      # Tuple of (reference, value) - resolve the reference and append the numeric value
+      swift_name = case lookup(name) do
+          found when is_binary(found) -> found
+          _ -> bin(normalizeName(mod)) <> "_" <> bin(normalizeName(name))
+      end
+      [swift_name | resolveOIDComponent(val)]
+  end
 
   def resolveOIDComponent({:Externalvaluereference, _, _, :'joint-iso-itu-t'}), do: ["2"]
   def resolveOIDComponent({:Externalvaluereference, _, _, :'joint-iso-ccitt'}), do: ["2"]

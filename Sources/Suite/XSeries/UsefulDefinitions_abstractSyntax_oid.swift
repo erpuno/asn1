@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let UsefulDefinitions_abstractSyntax: ASN1ObjectIdentifier = [9]
+public let UsefulDefinitions_abstractSyntax: ASN1ObjectIdentifier = UsefulDefinitions_ds + [9]

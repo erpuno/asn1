@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SecureMimeMessageV3dot1_2009_id_aa_encrypKeyPref: ASN1ObjectIdentifier = [11]
+public let SecureMimeMessageV3dot1_2009_id_aa_encrypKeyPref: ASN1ObjectIdentifier = SecureMimeMessageV3dot1_2009_id_aa + [11]

@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKCS_9_pkcs_9_sx_signingTime: ASN1ObjectIdentifier = [2]
+public let PKCS_9_pkcs_9_sx_signingTime: ASN1ObjectIdentifier = PKCS_9_pkcs_9_sx + [2]

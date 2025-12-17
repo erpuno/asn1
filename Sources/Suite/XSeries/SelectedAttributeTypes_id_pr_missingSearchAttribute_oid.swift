@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_pr_missingSearchAttribute: ASN1ObjectIdentifier = [8]
+public let SelectedAttributeTypes_id_pr_missingSearchAttribute: ASN1ObjectIdentifier = UsefulDefinitions_id_pr + [8]

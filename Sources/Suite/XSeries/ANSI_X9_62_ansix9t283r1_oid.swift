@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let ANSI_X9_62_ansix9t283r1: ASN1ObjectIdentifier = [17]
+public let ANSI_X9_62_ansix9t283r1: ASN1ObjectIdentifier = ANSI_X9_62_secgCurve + [17]

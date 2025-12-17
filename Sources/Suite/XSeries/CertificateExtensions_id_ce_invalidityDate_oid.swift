@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let CertificateExtensions_id_ce_invalidityDate: ASN1ObjectIdentifier = [24]
+public let CertificateExtensions_id_ce_invalidityDate: ASN1ObjectIdentifier = UsefulDefinitions_id_ce + [24]

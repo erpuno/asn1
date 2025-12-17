@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_oa_contextAssertionDefault: ASN1ObjectIdentifier = [14]
+public let InformationFramework_id_oa_contextAssertionDefault: ASN1ObjectIdentifier = UsefulDefinitions_id_oa + [14]

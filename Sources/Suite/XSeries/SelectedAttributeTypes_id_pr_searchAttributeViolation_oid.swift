@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_pr_searchAttributeViolation: ASN1ObjectIdentifier = [5]
+public let SelectedAttributeTypes_id_pr_searchAttributeViolation: ASN1ObjectIdentifier = UsefulDefinitions_id_pr + [5]

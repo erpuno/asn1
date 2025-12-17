@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKCS_12_pbeWithSHAAnd128BitRC2_CBC: ASN1ObjectIdentifier = [5]
+public let PKCS_12_pbeWithSHAAnd128BitRC2_CBC: ASN1ObjectIdentifier = PKCS_12_pkcs_12PbeIds + [5]

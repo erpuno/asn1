@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_cat_characterMatchTypes: ASN1ObjectIdentifier = [3]
+public let SelectedAttributeTypes_id_cat_characterMatchTypes: ASN1ObjectIdentifier = UsefulDefinitions_id_cat + [3]

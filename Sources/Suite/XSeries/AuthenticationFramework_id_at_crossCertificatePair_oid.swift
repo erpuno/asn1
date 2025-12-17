@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let AuthenticationFramework_id_at_crossCertificatePair: ASN1ObjectIdentifier = [40]
+public let AuthenticationFramework_id_at_crossCertificatePair: ASN1ObjectIdentifier = UsefulDefinitions_id_at + [40]

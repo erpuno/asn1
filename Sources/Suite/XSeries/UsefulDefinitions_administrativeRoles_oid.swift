@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let UsefulDefinitions_administrativeRoles: ASN1ObjectIdentifier = [23]
+public let UsefulDefinitions_administrativeRoles: ASN1ObjectIdentifier = UsefulDefinitions_ds + [23]

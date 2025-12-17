@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let UsefulDefinitions_rosObject: ASN1ObjectIdentifier = [25]
+public let UsefulDefinitions_rosObject: ASN1ObjectIdentifier = UsefulDefinitions_ds + [25]

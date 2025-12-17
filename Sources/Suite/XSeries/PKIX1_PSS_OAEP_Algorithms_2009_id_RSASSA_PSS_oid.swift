@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKIX1_PSS_OAEP_Algorithms_2009_id_RSASSA_PSS: ASN1ObjectIdentifier = [10]
+public let PKIX1_PSS_OAEP_Algorithms_2009_id_RSASSA_PSS: ASN1ObjectIdentifier = PKIX1_PSS_OAEP_Algorithms_2009_pkcs_1 + [10]

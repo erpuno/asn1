@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let UsefulDefinitions_nameForm: ASN1ObjectIdentifier = [15]
+public let UsefulDefinitions_nameForm: ASN1ObjectIdentifier = UsefulDefinitions_ds + [15]

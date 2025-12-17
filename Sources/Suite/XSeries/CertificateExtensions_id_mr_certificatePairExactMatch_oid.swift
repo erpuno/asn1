@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let CertificateExtensions_id_mr_certificatePairExactMatch: ASN1ObjectIdentifier = [36]
+public let CertificateExtensions_id_mr_certificatePairExactMatch: ASN1ObjectIdentifier = UsefulDefinitions_id_mr + [36]

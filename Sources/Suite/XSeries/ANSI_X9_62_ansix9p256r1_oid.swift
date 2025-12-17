@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let ANSI_X9_62_ansix9p256r1: ASN1ObjectIdentifier = [7]
+public let ANSI_X9_62_ansix9p256r1: ASN1ObjectIdentifier = ANSI_X9_62_primeCurve + [7]

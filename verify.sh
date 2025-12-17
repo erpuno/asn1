@@ -8,7 +8,8 @@ echo "  Note: DSTU.asn1 provides Certificate, Name, AlgorithmIdentifier, etc."
 elixir gen_x509.exs
 
 echo "--- 2. Building and Running Swift Suite ---"
-swift run chat-x509
+# swift run chat-x509
+swift run -Xswiftc -suppress-warnings 
 
 echo "--- 3. Verifying Output with OpenSSL ---"
 if [ ! -f "verified.der" ]; then

@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKCS_5_rc5_CBC_PAD: ASN1ObjectIdentifier = [9]
+public let PKCS_5_rc5_CBC_PAD: ASN1ObjectIdentifier = PKCS_5_encryptionAlgorithm + [9]

@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let CertificateExtensions_id_ce_deltaCRLIndicator: ASN1ObjectIdentifier = [27]
+public let CertificateExtensions_id_ce_deltaCRLIndicator: ASN1ObjectIdentifier = UsefulDefinitions_id_ce + [27]

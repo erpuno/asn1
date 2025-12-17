@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let CMSAesRsaesOaep_2009_id_aes128_CBC: ASN1ObjectIdentifier = [2]
+public let CMSAesRsaesOaep_2009_id_aes128_CBC: ASN1ObjectIdentifier = CMSAesRsaesOaep_2009_aes + [2]

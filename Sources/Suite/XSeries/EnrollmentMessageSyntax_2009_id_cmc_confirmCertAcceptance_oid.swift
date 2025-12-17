@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let EnrollmentMessageSyntax_2009_id_cmc_confirmCertAcceptance: ASN1ObjectIdentifier = [24]
+public let EnrollmentMessageSyntax_2009_id_cmc_confirmCertAcceptance: ASN1ObjectIdentifier = EnrollmentMessageSyntax_2009_id_cmc + [24]

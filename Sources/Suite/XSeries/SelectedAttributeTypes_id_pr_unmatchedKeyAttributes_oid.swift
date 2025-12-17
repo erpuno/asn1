@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_pr_unmatchedKeyAttributes: ASN1ObjectIdentifier = [31]
+public let SelectedAttributeTypes_id_pr_unmatchedKeyAttributes: ASN1ObjectIdentifier = UsefulDefinitions_id_pr + [31]

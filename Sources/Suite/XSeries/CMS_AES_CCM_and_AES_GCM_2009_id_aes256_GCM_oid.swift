@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let CMS_AES_CCM_and_AES_GCM_2009_id_aes256_GCM: ASN1ObjectIdentifier = [46]
+public let CMS_AES_CCM_and_AES_GCM_2009_id_aes256_GCM: ASN1ObjectIdentifier = CMS_AES_CCM_and_AES_GCM_2009_aes + [46]

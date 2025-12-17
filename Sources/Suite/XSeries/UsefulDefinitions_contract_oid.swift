@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let UsefulDefinitions_contract: ASN1ObjectIdentifier = [26]
+public let UsefulDefinitions_contract: ASN1ObjectIdentifier = UsefulDefinitions_ds + [26]

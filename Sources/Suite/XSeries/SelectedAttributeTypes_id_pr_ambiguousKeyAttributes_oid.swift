@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_pr_ambiguousKeyAttributes: ASN1ObjectIdentifier = [32]
+public let SelectedAttributeTypes_id_pr_ambiguousKeyAttributes: ASN1ObjectIdentifier = UsefulDefinitions_id_pr + [32]

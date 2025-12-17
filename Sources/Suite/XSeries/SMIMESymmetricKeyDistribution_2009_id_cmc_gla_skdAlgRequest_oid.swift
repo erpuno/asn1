@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SMIMESymmetricKeyDistribution_2009_id_cmc_gla_skdAlgRequest: ASN1ObjectIdentifier = [1]
+public let SMIMESymmetricKeyDistribution_2009_id_cmc_gla_skdAlgRequest: ASN1ObjectIdentifier = SMIMESymmetricKeyDistribution_2009_id_cmc_glaRR + [1]

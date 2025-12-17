@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let AuthenticationFramework_id_at_certificateRevocationList: ASN1ObjectIdentifier = [39]
+public let AuthenticationFramework_id_at_certificateRevocationList: ASN1ObjectIdentifier = UsefulDefinitions_id_at + [39]

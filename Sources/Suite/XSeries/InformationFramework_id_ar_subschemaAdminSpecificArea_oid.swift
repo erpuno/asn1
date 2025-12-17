@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_ar_subschemaAdminSpecificArea: ASN1ObjectIdentifier = [4]
+public let InformationFramework_id_ar_subschemaAdminSpecificArea: ASN1ObjectIdentifier = UsefulDefinitions_id_ar + [4]

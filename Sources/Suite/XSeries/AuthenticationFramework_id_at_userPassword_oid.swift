@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let AuthenticationFramework_id_at_userPassword: ASN1ObjectIdentifier = [35]
+public let AuthenticationFramework_id_at_userPassword: ASN1ObjectIdentifier = UsefulDefinitions_id_at + [35]

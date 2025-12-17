@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let ANSI_X9_62_ecdsa_with_Sha384: ASN1ObjectIdentifier = [3]
+public let ANSI_X9_62_ecdsa_with_Sha384: ASN1ObjectIdentifier = ANSI_X9_62_ecdsa_with_Specified + [3]

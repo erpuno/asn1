@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let UsefulDefinitions_operationalBinding: ASN1ObjectIdentifier = [19]
+public let UsefulDefinitions_operationalBinding: ASN1ObjectIdentifier = UsefulDefinitions_ds + [19]

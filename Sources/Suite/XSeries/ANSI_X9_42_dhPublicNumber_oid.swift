@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let ANSI_X9_42_dhPublicNumber: ASN1ObjectIdentifier = [1]
+public let ANSI_X9_42_dhPublicNumber: ASN1ObjectIdentifier = ANSI_X9_42_numberType + [1]

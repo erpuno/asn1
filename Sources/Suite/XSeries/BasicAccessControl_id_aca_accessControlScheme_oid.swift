@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let BasicAccessControl_id_aca_accessControlScheme: ASN1ObjectIdentifier = [1]
+public let BasicAccessControl_id_aca_accessControlScheme: ASN1ObjectIdentifier = UsefulDefinitions_id_aca + [1]

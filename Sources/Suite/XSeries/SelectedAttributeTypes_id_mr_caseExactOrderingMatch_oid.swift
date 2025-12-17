@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_mr_caseExactOrderingMatch: ASN1ObjectIdentifier = [6]
+public let SelectedAttributeTypes_id_mr_caseExactOrderingMatch: ASN1ObjectIdentifier = UsefulDefinitions_id_mr + [6]

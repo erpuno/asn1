@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_oa_searchRules: ASN1ObjectIdentifier = [16]
+public let InformationFramework_id_oa_searchRules: ASN1ObjectIdentifier = UsefulDefinitions_id_oa + [16]

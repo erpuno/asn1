@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_mr_ignoreIfAbsentMatch: ASN1ObjectIdentifier = [50]
+public let SelectedAttributeTypes_id_mr_ignoreIfAbsentMatch: ASN1ObjectIdentifier = UsefulDefinitions_id_mr + [50]

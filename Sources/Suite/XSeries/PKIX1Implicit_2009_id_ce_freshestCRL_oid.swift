@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKIX1Implicit_2009_id_ce_freshestCRL: ASN1ObjectIdentifier = [46]
+public let PKIX1Implicit_2009_id_ce_freshestCRL: ASN1ObjectIdentifier = PKIX1Implicit_2009_id_ce + [46]

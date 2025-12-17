@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKIX1Explicit88_id_ad_timeStamping: ASN1ObjectIdentifier = [3]
+public let PKIX1Explicit88_id_ad_timeStamping: ASN1ObjectIdentifier = PKIX1Explicit88_id_ad + [3]

@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKIX1Implicit88_id_ce_extKeyUsage: ASN1ObjectIdentifier = [37]
+public let PKIX1Implicit88_id_ce_extKeyUsage: ASN1ObjectIdentifier = PKIX1Implicit88_id_ce + [37]

@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_pr_targetDsaUnavailable: ASN1ObjectIdentifier = [1]
+public let SelectedAttributeTypes_id_pr_targetDsaUnavailable: ASN1ObjectIdentifier = UsefulDefinitions_id_pr + [1]

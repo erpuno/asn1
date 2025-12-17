@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_at_member: ASN1ObjectIdentifier = [31]
+public let SelectedAttributeTypes_id_at_member: ASN1ObjectIdentifier = PKIX1Explicit88_id_at + [31]

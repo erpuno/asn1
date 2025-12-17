@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_mr_keywordMatch: ASN1ObjectIdentifier = [33]
+public let SelectedAttributeTypes_id_mr_keywordMatch: ASN1ObjectIdentifier = UsefulDefinitions_id_mr + [33]

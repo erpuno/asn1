@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_oa_creatorsName: ASN1ObjectIdentifier = [3]
+public let InformationFramework_id_oa_creatorsName: ASN1ObjectIdentifier = UsefulDefinitions_id_oa + [3]

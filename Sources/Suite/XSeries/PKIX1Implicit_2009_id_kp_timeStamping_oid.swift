@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKIX1Implicit_2009_id_kp_timeStamping: ASN1ObjectIdentifier = [8]
+public let PKIX1Implicit_2009_id_kp_timeStamping: ASN1ObjectIdentifier = PKIX1Explicit88_id_kp + [8]

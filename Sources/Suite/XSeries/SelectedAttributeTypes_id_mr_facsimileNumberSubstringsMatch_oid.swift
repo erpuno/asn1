@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_mr_facsimileNumberSubstringsMatch: ASN1ObjectIdentifier = [64]
+public let SelectedAttributeTypes_id_mr_facsimileNumberSubstringsMatch: ASN1ObjectIdentifier = UsefulDefinitions_id_mr + [64]

@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let EnrollmentMessageSyntax_2009_id_cct: ASN1ObjectIdentifier = [12]
+public let EnrollmentMessageSyntax_2009_id_cct: ASN1ObjectIdentifier = PKIX1Explicit88_id_pkix + [12]

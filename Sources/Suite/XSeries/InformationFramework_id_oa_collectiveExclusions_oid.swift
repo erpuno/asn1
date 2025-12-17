@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let InformationFramework_id_oa_collectiveExclusions: ASN1ObjectIdentifier = [7]
+public let InformationFramework_id_oa_collectiveExclusions: ASN1ObjectIdentifier = UsefulDefinitions_id_oa + [7]

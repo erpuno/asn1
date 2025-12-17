@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let PKCS_9_pkcs_9_mr_caseIgnoreMatch: ASN1ObjectIdentifier = [1]
+public let PKCS_9_pkcs_9_mr_caseIgnoreMatch: ASN1ObjectIdentifier = PKCS_9_pkcs_9_mr + [1]

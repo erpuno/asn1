@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let SelectedAttributeTypes_id_pr_searchContextValueRequired: ASN1ObjectIdentifier = [17]
+public let SelectedAttributeTypes_id_pr_searchContextValueRequired: ASN1ObjectIdentifier = UsefulDefinitions_id_pr + [17]

@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-public let EnrollmentMessageSyntax_2009_id_cmc_batchRequests: ASN1ObjectIdentifier = [28]
+public let EnrollmentMessageSyntax_2009_id_cmc_batchRequests: ASN1ObjectIdentifier = EnrollmentMessageSyntax_2009_id_cmc + [28]
