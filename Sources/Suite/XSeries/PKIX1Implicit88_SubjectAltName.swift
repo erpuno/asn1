@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline typealias PKIX1Implicit88_SubjectAltName = PKIX1Implicit88_GeneralNames
+@usableFromInline typealias PKIX1Implicit88_SubjectAltName = PKIX1Implicit_2009_GeneralNames

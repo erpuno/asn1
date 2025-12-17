@@ -4,16 +4,16 @@ import Foundation
 
 @usableFromInline struct ExtendedSecurityServices_2009_IssuerSerial: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var issuer: CertificateExtensions_GeneralNames
+    @usableFromInline var issuer: PKIX1Implicit_2009_GeneralNames
     @usableFromInline var serialNumber: AuthenticationFramework_CertificateSerialNumber
-    @inlinable init(issuer: CertificateExtensions_GeneralNames, serialNumber: AuthenticationFramework_CertificateSerialNumber) {
+    @inlinable init(issuer: PKIX1Implicit_2009_GeneralNames, serialNumber: AuthenticationFramework_CertificateSerialNumber) {
         self.issuer = issuer
         self.serialNumber = serialNumber
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let issuer: CertificateExtensions_GeneralNames = try CertificateExtensions_GeneralNames(derEncoded: &nodes)
+            let issuer: PKIX1Implicit_2009_GeneralNames = try PKIX1Implicit_2009_GeneralNames(derEncoded: &nodes)
             let serialNumber: AuthenticationFramework_CertificateSerialNumber = try AuthenticationFramework_CertificateSerialNumber(derEncoded: &nodes)
             return ExtendedSecurityServices_2009_IssuerSerial(issuer: issuer, serialNumber: serialNumber)
         }

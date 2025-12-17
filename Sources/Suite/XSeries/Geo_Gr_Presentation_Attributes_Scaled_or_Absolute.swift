@@ -10,15 +10,15 @@ import Foundation
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
                 self = .absolute(try Geo_Gr_Presentation_Attributes_Scaled_or_Absolute_absolute_Choice(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .scaled(try ASN1Any(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+            case ASN1Identifier(tagWithNumber: 9, tagClass: .universal):
+                self = .scaled(ASN1Any(derEncoded: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
             case .absolute(let absolute): try absolute.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .scaled(let scaled): try scaled.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+            case .scaled(let scaled): try coder.serialize(scaled)
         }
     }
 

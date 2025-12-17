@@ -5,8 +5,8 @@ import Foundation
 @usableFromInline struct AuthenticationFramework_SIGNATURE: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier
-    @usableFromInline var encrypted: bit_string
-    @inlinable init(algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier, encrypted: bit_string) {
+    @usableFromInline var encrypted: ASN1BitString
+    @inlinable init(algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier, encrypted: ASN1BitString) {
         self.algorithmIdentifier = algorithmIdentifier
         self.encrypted = encrypted
     }
@@ -14,7 +14,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
-            let encrypted: bit_string = try bit_string(derEncoded: &nodes)
+            let encrypted: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
             return AuthenticationFramework_SIGNATURE(algorithmIdentifier: algorithmIdentifier, encrypted: encrypted)
         }
     }

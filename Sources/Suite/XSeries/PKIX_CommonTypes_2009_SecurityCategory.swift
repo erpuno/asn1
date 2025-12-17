@@ -22,7 +22,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(type, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(value) }
+            try coder.serialize(value)
         }
     }
 }

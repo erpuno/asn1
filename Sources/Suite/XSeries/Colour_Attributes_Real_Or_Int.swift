@@ -8,8 +8,8 @@ import Foundation
     case b(ArraySlice<UInt8>)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Any.defaultIdentifier:
-                self = .a(try ASN1Any(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+            case ASN1Identifier(tagWithNumber: 9, tagClass: .universal):
+                self = .a(ASN1Any(derEncoded: rootNode))
             case ArraySlice<UInt8>.defaultIdentifier:
                 self = .b(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)

@@ -15,18 +15,18 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let x_value: ASN1Any = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
-            let y_value: ASN1Any = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
-            let z_value: ASN1Any = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)))!
+            let x_value: ASN1Any = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in ASN1Any(derEncoded: node) }!
+            let y_value: ASN1Any = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in ASN1Any(derEncoded: node) }!
+            let z_value: ASN1Any = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in ASN1Any(derEncoded: node) }!
             return Colour_Attributes_Grid_Value(x_value: x_value, y_value: y_value, z_value: z_value)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serializeOptionalImplicitlyTagged(x_value, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            try coder.serializeOptionalImplicitlyTagged(y_value, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            try coder.serializeOptionalImplicitlyTagged(z_value, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+            try coder.serialize(x_value)
+            try coder.serialize(y_value)
+            try coder.serialize(z_value)
         }
     }
 }

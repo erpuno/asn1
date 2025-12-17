@@ -2,100 +2,27 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Default_Value_Lists_Attribute: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
-    @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
-        case position(Character_Presentation_Attributes_Measure_Pair)
-    case dimensions(Layout_Descriptors_Dimension_Pair)
-    case transparency(Layout_Descriptors_Transparency)
-    case presentation_attributes(Style_Descriptors_Presentation_Attributes)
-    case layout_path(Character_Presentation_Attributes_One_Of_Four_Angles)
-    case page_position(Character_Presentation_Attributes_Measure_Pair)
-    case medium_type(Layout_Descriptors_Medium_Type)
-    case permitted_categories([Identifiers_and_Expressions_Category_Name])
-    case layout_stream_categories([Identifiers_and_Expressions_Category_Name])
-    case layout_stream_sub_categories([Identifiers_and_Expressions_Category_Name])
-    case protection(Logical_Descriptors_Protection)
-    case presentation_style(Identifiers_and_Expressions_Style_Identifier)
-    case layout_style(Identifiers_and_Expressions_Style_Identifier)
-    case colour(Layout_Descriptors_Colour)
-    case colour_of_layout_object(Colour_Attributes_Colour_Expression)
-    case object_colour_table(Colour_Attributes_Colour_Table)
-    case content_background_colour(Layout_Descriptors_Content_Background_Colour)
-    case content_foreground_colour(Layout_Descriptors_Content_Foreground_Colour)
-    case content_colour_table(Colour_Attributes_Colour_Table)
-    case border(Layout_Descriptors_Border)
-    case sealed(Layout_Descriptors_Sealed)
-    @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
-        switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .position(try Character_Presentation_Attributes_Measure_Pair(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .dimensions(try Layout_Descriptors_Dimension_Pair(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .transparency(try Layout_Descriptors_Transparency(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .presentation_attributes(try Style_Descriptors_Presentation_Attributes(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                self = .layout_path(try Character_Presentation_Attributes_One_Of_Four_Angles(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
-                self = .page_position(try Character_Presentation_Attributes_Measure_Pair(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
-                self = .medium_type(try Layout_Descriptors_Medium_Type(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
-                self = .permitted_categories(try DER.set(of: Identifiers_and_Expressions_Category_Name.self, identifier: rootNode.identifier, rootNode: rootNode))
-            case ASN1Identifier(tagWithNumber: 19, tagClass: .contextSpecific):
-                self = .layout_stream_categories(try DER.set(of: Identifiers_and_Expressions_Category_Name.self, identifier: rootNode.identifier, rootNode: rootNode))
-            case ASN1Identifier(tagWithNumber: 20, tagClass: .contextSpecific):
-                self = .layout_stream_sub_categories(try DER.set(of: Identifiers_and_Expressions_Category_Name.self, identifier: rootNode.identifier, rootNode: rootNode))
-            case ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific):
-                self = .protection(try Logical_Descriptors_Protection(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific):
-                self = .presentation_style(try Identifiers_and_Expressions_Style_Identifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific):
-                self = .layout_style(try Identifiers_and_Expressions_Style_Identifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific):
-                self = .colour(try Layout_Descriptors_Colour(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific):
-                self = .colour_of_layout_object(try Colour_Attributes_Colour_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific):
-                self = .object_colour_table(try Colour_Attributes_Colour_Table(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 16, tagClass: .contextSpecific):
-                self = .content_background_colour(try Layout_Descriptors_Content_Background_Colour(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific):
-                self = .content_foreground_colour(try Layout_Descriptors_Content_Foreground_Colour(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 18, tagClass: .contextSpecific):
-                self = .content_colour_table(try Colour_Attributes_Colour_Table(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific):
-                self = .border(try Layout_Descriptors_Border(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific):
-                self = .sealed(try Layout_Descriptors_Sealed(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
+@usableFromInline struct Default_Value_Lists_Attribute: DERImplicitlyTaggable, Hashable, Sendable {
+    @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
+    @usableFromInline var type: ASN1ObjectIdentifier
+    @usableFromInline var values: [ASN1Any]
+    @inlinable init(type: ASN1ObjectIdentifier, values: [ASN1Any]) {
+        self.type = type
+        self.values = values
+    }
+    @inlinable init(derEncoded root: ASN1Node,
+        withIdentifier identifier: ASN1Identifier) throws {
+        self = try DER.sequence(root, identifier: identifier) { nodes in
+            let type: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
+            let values: [ASN1Any] = try DER.set(of: ASN1Any.self, identifier: .set, nodes: &nodes)
+            return Default_Value_Lists_Attribute(type: type, values: values)
         }
     }
-    @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
-        switch self {
-            case .position(let position): try position.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .dimensions(let dimensions): try dimensions.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            case .transparency(let transparency): try transparency.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
-            case .presentation_attributes(let presentation_attributes): try presentation_attributes.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
-            case .layout_path(let layout_path): try layout_path.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
-            case .page_position(let page_position): try page_position.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
-            case .medium_type(let medium_type): try medium_type.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
-            case .permitted_categories(let permitted_categories): try coder.serializeSetOf(permitted_categories, identifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific))
-            case .layout_stream_categories(let layout_stream_categories): try coder.serializeSetOf(layout_stream_categories, identifier: ASN1Identifier(tagWithNumber: 19, tagClass: .contextSpecific))
-            case .layout_stream_sub_categories(let layout_stream_sub_categories): try coder.serializeSetOf(layout_stream_sub_categories, identifier: ASN1Identifier(tagWithNumber: 20, tagClass: .contextSpecific))
-            case .protection(let protection): try protection.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific))
-            case .presentation_style(let presentation_style): try presentation_style.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
-            case .layout_style(let layout_style): try layout_style.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
-            case .colour(let colour): try colour.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific))
-            case .colour_of_layout_object(let colour_of_layout_object): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific)) { coder in try colour_of_layout_object.serialize(into: &coder) }
-            case .object_colour_table(let object_colour_table): try object_colour_table.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific))
-            case .content_background_colour(let content_background_colour): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 16, tagClass: .contextSpecific)) { coder in try content_background_colour.serialize(into: &coder) }
-            case .content_foreground_colour(let content_foreground_colour): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific)) { coder in try content_foreground_colour.serialize(into: &coder) }
-            case .content_colour_table(let content_colour_table): try content_colour_table.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 18, tagClass: .contextSpecific))
-            case .border(let border): try border.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific))
-            case .sealed(let sealed): try sealed.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific))
+    @inlinable func serialize(into coder: inout DER.Serializer,
+        withIdentifier identifier: ASN1Identifier) throws {
+        try coder.appendConstructedNode(identifier: identifier) { coder in
+            try coder.serialize(type)
+            try coder.serializeSetOf(values)
         }
     }
-
 }

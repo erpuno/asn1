@@ -6,8 +6,8 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var toBeSigned: ASN1Any
     @usableFromInline var algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier
-    @usableFromInline var encrypted: bit_string
-    @inlinable init(toBeSigned: ASN1Any, algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier, encrypted: bit_string) {
+    @usableFromInline var encrypted: ASN1BitString
+    @inlinable init(toBeSigned: ASN1Any, algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier, encrypted: ASN1BitString) {
         self.toBeSigned = toBeSigned
         self.algorithmIdentifier = algorithmIdentifier
         self.encrypted = encrypted
@@ -17,7 +17,7 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let toBeSigned: ASN1Any = try ASN1Any(derEncoded: &nodes)
             let algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
-            let encrypted: bit_string = try bit_string(derEncoded: &nodes)
+            let encrypted: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
             return AuthenticationFramework_SIGNED(toBeSigned: toBeSigned, algorithmIdentifier: algorithmIdentifier, encrypted: encrypted)
         }
     }

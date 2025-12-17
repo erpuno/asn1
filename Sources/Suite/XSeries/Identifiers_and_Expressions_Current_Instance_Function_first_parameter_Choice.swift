@@ -4,13 +4,13 @@ import Foundation
 
 @usableFromInline indirect enum Identifiers_and_Expressions_Current_Instance_Function_first_parameter_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
-        case identifier(Identifiers_and_Expressions_Object_or_Class_Identifier)
+        case ident(Identifiers_and_Expressions_Object_or_Class_Identifier)
     case layout_object_type(Layout_Descriptors_Layout_Object_Type)
     case logical_object_type(Logical_Descriptors_Logical_Object_Type)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .identifier(try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .ident(try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
                 self = .layout_object_type(try Layout_Descriptors_Layout_Object_Type(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
@@ -20,7 +20,7 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .identifier(let identifier): try identifier.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+            case .ident(let ident): try ident.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             case .layout_object_type(let layout_object_type): try layout_object_type.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             case .logical_object_type(let logical_object_type): try logical_object_type.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
         }

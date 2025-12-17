@@ -5,9 +5,9 @@ import Foundation
 @usableFromInline struct CryptographicMessageSyntax_2009_EncryptedContentInfo: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var contentType: ASN1ObjectIdentifier
-    @usableFromInline var contentEncryptionAlgorithm: CryptographicMessageSyntax_2009_ContentEncryptionAlgorithmIdentifier
+    @usableFromInline var contentEncryptionAlgorithm: AuthenticationFramework_AlgorithmIdentifier
     @usableFromInline var encryptedContent: ASN1OctetString?
-    @inlinable init(contentType: ASN1ObjectIdentifier, contentEncryptionAlgorithm: CryptographicMessageSyntax_2009_ContentEncryptionAlgorithmIdentifier, encryptedContent: ASN1OctetString?) {
+    @inlinable init(contentType: ASN1ObjectIdentifier, contentEncryptionAlgorithm: AuthenticationFramework_AlgorithmIdentifier, encryptedContent: ASN1OctetString?) {
         self.contentType = contentType
         self.contentEncryptionAlgorithm = contentEncryptionAlgorithm
         self.encryptedContent = encryptedContent
@@ -16,7 +16,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let contentType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let contentEncryptionAlgorithm: CryptographicMessageSyntax_2009_ContentEncryptionAlgorithmIdentifier = try CryptographicMessageSyntax_2009_ContentEncryptionAlgorithmIdentifier(derEncoded: &nodes)
+            let contentEncryptionAlgorithm: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let encryptedContent: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             return CryptographicMessageSyntax_2009_EncryptedContentInfo(contentType: contentType, contentEncryptionAlgorithm: contentEncryptionAlgorithm, encryptedContent: encryptedContent)
         }

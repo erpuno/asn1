@@ -49,8 +49,8 @@ import Foundation
             let text_bundle_index: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             let text_font_index: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
             let text_precision: Geo_Gr_Presentation_Attributes_Text_Rendition_text_precision_Enum? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
-            let character_expansion_factor: ASN1Any? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
-            let character_spacing: ASN1Any? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific))
+            let character_expansion_factor: ASN1Any? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 6, tagClass: .contextSpecific) { node in ASN1Any(derEncoded: node) }
+            let character_spacing: ASN1Any? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 7, tagClass: .contextSpecific) { node in ASN1Any(derEncoded: node) }
             let text_colour: Geo_Gr_Presentation_Attributes_Colour? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific))
             let character_height: Geo_Gr_Presentation_Attributes_VDC_Value? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
             let character_orientation: Geo_Gr_Presentation_Attributes_Text_Rendition_character_orientation_Sequence? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
@@ -72,8 +72,8 @@ import Foundation
             if let text_bundle_index = self.text_bundle_index { if let text_bundle_index = self.text_bundle_index { try coder.serializeOptionalImplicitlyTagged(text_bundle_index, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
             if let text_font_index = self.text_font_index { if let text_font_index = self.text_font_index { try coder.serializeOptionalImplicitlyTagged(text_font_index, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
             if let text_precision = self.text_precision { if let text_precision = self.text_precision { try coder.serializeOptionalImplicitlyTagged(text_precision, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let character_expansion_factor = self.character_expansion_factor { if let character_expansion_factor = self.character_expansion_factor { try coder.serializeOptionalImplicitlyTagged(character_expansion_factor, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let character_spacing = self.character_spacing { if let character_spacing = self.character_spacing { try coder.serializeOptionalImplicitlyTagged(character_spacing, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) } }
+            if let character_expansion_factor = self.character_expansion_factor { if let character_expansion_factor = self.character_expansion_factor { try coder.serialize(character_expansion_factor) } }
+            if let character_spacing = self.character_spacing { if let character_spacing = self.character_spacing { try coder.serialize(character_spacing) } }
             if let text_colour = self.text_colour { if let text_colour = self.text_colour { try coder.serializeOptionalImplicitlyTagged(text_colour, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) } }
             if let character_height = self.character_height { if let character_height = self.character_height { try coder.serializeOptionalImplicitlyTagged(character_height, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) } }
             if let character_orientation = self.character_orientation { if let character_orientation = self.character_orientation { try coder.serializeOptionalImplicitlyTagged(character_orientation, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) } }

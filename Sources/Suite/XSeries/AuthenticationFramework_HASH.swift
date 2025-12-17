@@ -5,24 +5,24 @@ import Foundation
 @usableFromInline struct AuthenticationFramework_HASH: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier
-    @usableFromInline var hashValue: bit_string
-    @inlinable init(algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier, hashValue: bit_string) {
+    @usableFromInline var hash_value: ASN1BitString
+    @inlinable init(algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier, hash_value: ASN1BitString) {
         self.algorithmIdentifier = algorithmIdentifier
-        self.hashValue = hashValue
+        self.hash_value = hash_value
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
-            let hashValue: bit_string = try bit_string(derEncoded: &nodes)
-            return AuthenticationFramework_HASH(algorithmIdentifier: algorithmIdentifier, hashValue: hashValue)
+            let hash_value: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
+            return AuthenticationFramework_HASH(algorithmIdentifier: algorithmIdentifier, hash_value: hash_value)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(algorithmIdentifier)
-            try coder.serialize(hashValue)
+            try coder.serialize(hash_value)
         }
     }
 }

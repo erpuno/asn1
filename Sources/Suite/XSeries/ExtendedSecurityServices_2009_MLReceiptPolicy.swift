@@ -5,16 +5,16 @@ import Foundation
 @usableFromInline indirect enum ExtendedSecurityServices_2009_MLReceiptPolicy: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case none(ASN1Null)
-    case insteadOf([CertificateExtensions_GeneralNames])
-    case inAdditionTo([CertificateExtensions_GeneralNames])
+    case insteadOf([PKIX1Implicit_2009_GeneralNames])
+    case inAdditionTo([PKIX1Implicit_2009_GeneralNames])
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
                 self = .none(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .insteadOf(try DER.sequence(of: CertificateExtensions_GeneralNames.self, identifier: rootNode.identifier, rootNode: rootNode))
+                self = .insteadOf(try DER.sequence(of: PKIX1Implicit_2009_GeneralNames.self, identifier: rootNode.identifier, rootNode: rootNode))
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .inAdditionTo(try DER.sequence(of: CertificateExtensions_GeneralNames.self, identifier: rootNode.identifier, rootNode: rootNode))
+                self = .inAdditionTo(try DER.sequence(of: PKIX1Implicit_2009_GeneralNames.self, identifier: rootNode.identifier, rootNode: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }

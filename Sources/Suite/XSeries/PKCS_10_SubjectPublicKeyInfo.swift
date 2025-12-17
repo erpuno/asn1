@@ -5,8 +5,8 @@ import Foundation
 @usableFromInline struct PKCS_10_SubjectPublicKeyInfo: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var algorithm: AuthenticationFramework_AlgorithmIdentifier
-    @usableFromInline var subjectPublicKey: bit_string
-    @inlinable init(algorithm: AuthenticationFramework_AlgorithmIdentifier, subjectPublicKey: bit_string) {
+    @usableFromInline var subjectPublicKey: ASN1BitString
+    @inlinable init(algorithm: AuthenticationFramework_AlgorithmIdentifier, subjectPublicKey: ASN1BitString) {
         self.algorithm = algorithm
         self.subjectPublicKey = subjectPublicKey
     }
@@ -14,7 +14,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let algorithm: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
-            let subjectPublicKey: bit_string = try bit_string(derEncoded: &nodes)
+            let subjectPublicKey: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
             return PKCS_10_SubjectPublicKeyInfo(algorithm: algorithm, subjectPublicKey: subjectPublicKey)
         }
     }

@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline typealias AuthenticationFramework_ENCRYPTED = bit_string
+@usableFromInline typealias AuthenticationFramework_ENCRYPTED = ASN1BitString

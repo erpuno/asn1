@@ -7,10 +7,10 @@ import Foundation
         case numeric(ASN1PrintableString)
     case printable(ASN1PrintableString)
     case teletex(ASN1TeletexString)
-    case videotex(VideotexString)
+    case videotex(ASN1UTF8String)
     case visible(ASN1UTF8String)
     case ia5(ASN1IA5String)
-    case graphic(GraphicString)
+    case graphic(ASN1UTF8String)
     case general(ASN1UTF8String)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
@@ -21,13 +21,13 @@ import Foundation
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
                 self = .teletex(try ASN1TeletexString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .videotex(try VideotexString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .videotex(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
                 self = .visible(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
                 self = .ia5(try ASN1IA5String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
-                self = .graphic(try GraphicString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .graphic(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
                 self = .general(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)

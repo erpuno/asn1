@@ -6,21 +6,21 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case teletexString(ASN1TeletexString)
     case printableString(ASN1PrintableString)
-    case universalString(ASN1UniversalString)
-    case utf8String(ASN1UTF8String)
     case bmpString(ASN1BMPString)
+    case universalString(ASN1UniversalString)
+    case uTF8String(ASN1UTF8String)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1TeletexString.defaultIdentifier:
                 self = .teletexString(try ASN1TeletexString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1PrintableString.defaultIdentifier:
                 self = .printableString(try ASN1PrintableString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+            case ASN1BMPString.defaultIdentifier:
+                self = .bmpString(try ASN1BMPString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1UniversalString.defaultIdentifier:
                 self = .universalString(try ASN1UniversalString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1UTF8String.defaultIdentifier:
-                self = .utf8String(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1BMPString.defaultIdentifier:
-                self = .bmpString(try ASN1BMPString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .uTF8String(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
@@ -28,9 +28,9 @@ import Foundation
         switch self {
             case .teletexString(let teletexString): try coder.serialize(teletexString)
             case .printableString(let printableString): try coder.serialize(printableString)
-            case .universalString(let universalString): try coder.serialize(universalString)
-            case .utf8String(let utf8String): try coder.serialize(utf8String)
             case .bmpString(let bmpString): try coder.serialize(bmpString)
+            case .universalString(let universalString): try coder.serialize(universalString)
+            case .uTF8String(let uTF8String): try coder.serialize(uTF8String)
         }
     }
 

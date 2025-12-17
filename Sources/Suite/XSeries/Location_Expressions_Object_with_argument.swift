@@ -5,10 +5,10 @@ import Foundation
 @usableFromInline struct Location_Expressions_Object_with_argument: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var attributeValueObject: Location_Expressions_AttributeValue_Object_Specification
-    @usableFromInline var object: Location_Expressions_Object_Locator?
+    @usableFromInline var object: Box<Location_Expressions_Object_Locator>?
     @usableFromInline var counters: Location_Expressions_CountersType?
     @usableFromInline var not_defaulting: Bool?
-    @inlinable init(attributeValueObject: Location_Expressions_AttributeValue_Object_Specification, object: Location_Expressions_Object_Locator?, counters: Location_Expressions_CountersType?, not_defaulting: Bool?) {
+    @inlinable init(attributeValueObject: Location_Expressions_AttributeValue_Object_Specification, object: Box<Location_Expressions_Object_Locator>?, counters: Location_Expressions_CountersType?, not_defaulting: Bool?) {
         self.attributeValueObject = attributeValueObject
         self.object = object
         self.counters = counters
@@ -18,7 +18,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let attributeValueObject: Location_Expressions_AttributeValue_Object_Specification = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
-            let object: Location_Expressions_Object_Locator? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+            let object: Box<Location_Expressions_Object_Locator>? = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))).map { Box($0) }
             let counters: Location_Expressions_CountersType? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let not_defaulting: Bool = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)))!
             return Location_Expressions_Object_with_argument(attributeValueObject: attributeValueObject, object: object, counters: counters, not_defaulting: not_defaulting)
@@ -28,7 +28,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(attributeValueObject, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            if let object = self.object { if let object = self.object { try coder.serializeOptionalImplicitlyTagged(object, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let object = self.object { if let object = self.object { try coder.serializeOptionalImplicitlyTagged(object.value, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
             if let counters = self.counters { if let counters = self.counters { try coder.serializeOptionalImplicitlyTagged(counters, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
             if let not_defaulting = self.not_defaulting { if let not_defaulting = self.not_defaulting { try coder.serializeOptionalImplicitlyTagged(not_defaulting, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
         }

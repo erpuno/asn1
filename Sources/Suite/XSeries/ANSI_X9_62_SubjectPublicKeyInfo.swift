@@ -4,16 +4,16 @@ import Foundation
 
 @usableFromInline struct ANSI_X9_62_SubjectPublicKeyInfo: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var algorithm: ANSI_X9_62_ECPKAlgorithm
+    @usableFromInline var algorithm: AuthenticationFramework_AlgorithmIdentifier
     @usableFromInline var subjectPublicKey: ASN1BitString
-    @inlinable init(algorithm: ANSI_X9_62_ECPKAlgorithm, subjectPublicKey: ASN1BitString) {
+    @inlinable init(algorithm: AuthenticationFramework_AlgorithmIdentifier, subjectPublicKey: ASN1BitString) {
         self.algorithm = algorithm
         self.subjectPublicKey = subjectPublicKey
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let algorithm: ANSI_X9_62_ECPKAlgorithm = try ANSI_X9_62_ECPKAlgorithm(derEncoded: &nodes)
+            let algorithm: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let subjectPublicKey: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
             return ANSI_X9_62_SubjectPublicKeyInfo(algorithm: algorithm, subjectPublicKey: subjectPublicKey)
         }

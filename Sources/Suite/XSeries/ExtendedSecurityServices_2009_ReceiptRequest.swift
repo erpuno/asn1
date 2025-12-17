@@ -6,8 +6,8 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var signedContentIdentifier: ExtendedSecurityServices_2009_ContentIdentifier
     @usableFromInline var receiptsFrom: ExtendedSecurityServices_2009_ReceiptsFrom
-    @usableFromInline var receiptsTo: [CertificateExtensions_GeneralNames]
-    @inlinable init(signedContentIdentifier: ExtendedSecurityServices_2009_ContentIdentifier, receiptsFrom: ExtendedSecurityServices_2009_ReceiptsFrom, receiptsTo: [CertificateExtensions_GeneralNames]) {
+    @usableFromInline var receiptsTo: [PKIX1Implicit_2009_GeneralNames]
+    @inlinable init(signedContentIdentifier: ExtendedSecurityServices_2009_ContentIdentifier, receiptsFrom: ExtendedSecurityServices_2009_ReceiptsFrom, receiptsTo: [PKIX1Implicit_2009_GeneralNames]) {
         self.signedContentIdentifier = signedContentIdentifier
         self.receiptsFrom = receiptsFrom
         self.receiptsTo = receiptsTo
@@ -17,7 +17,7 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let signedContentIdentifier: ExtendedSecurityServices_2009_ContentIdentifier = try ExtendedSecurityServices_2009_ContentIdentifier(derEncoded: &nodes)
             let receiptsFrom: ExtendedSecurityServices_2009_ReceiptsFrom = try ExtendedSecurityServices_2009_ReceiptsFrom(derEncoded: &nodes)
-            let receiptsTo: [CertificateExtensions_GeneralNames] = try DER.sequence(of: CertificateExtensions_GeneralNames.self, identifier: .sequence, nodes: &nodes)
+            let receiptsTo: [PKIX1Implicit_2009_GeneralNames] = try DER.sequence(of: PKIX1Implicit_2009_GeneralNames.self, identifier: .sequence, nodes: &nodes)
             return ExtendedSecurityServices_2009_ReceiptRequest(signedContentIdentifier: signedContentIdentifier, receiptsFrom: receiptsFrom, receiptsTo: receiptsTo)
         }
     }

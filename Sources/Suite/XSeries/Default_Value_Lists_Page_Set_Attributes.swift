@@ -4,17 +4,17 @@ import Foundation
 
 @usableFromInline struct Default_Value_Lists_Page_Set_Attributes: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
-    @usableFromInline var layout_stream_categories: Default_Value_Lists_Page_Set_Attributes?
-    @usableFromInline var layout_stream_sub_categories: Default_Value_Lists_Page_Set_Attributes?
-    @inlinable init(layout_stream_categories: Default_Value_Lists_Page_Set_Attributes?, layout_stream_sub_categories: Default_Value_Lists_Page_Set_Attributes?) {
+    @usableFromInline var layout_stream_categories: Default_Value_Lists_Attribute?
+    @usableFromInline var layout_stream_sub_categories: Default_Value_Lists_Attribute?
+    @inlinable init(layout_stream_categories: Default_Value_Lists_Attribute?, layout_stream_sub_categories: Default_Value_Lists_Attribute?) {
         self.layout_stream_categories = layout_stream_categories
         self.layout_stream_sub_categories = layout_stream_sub_categories
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let layout_stream_categories: Default_Value_Lists_Page_Set_Attributes? = try Default_Value_Lists_Page_Set_Attributes(derEncoded: &nodes)
-            let layout_stream_sub_categories: Default_Value_Lists_Page_Set_Attributes? = try Default_Value_Lists_Page_Set_Attributes(derEncoded: &nodes)
+            let layout_stream_categories: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let layout_stream_sub_categories: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
             return Default_Value_Lists_Page_Set_Attributes(layout_stream_categories: layout_stream_categories, layout_stream_sub_categories: layout_stream_sub_categories)
         }
     }

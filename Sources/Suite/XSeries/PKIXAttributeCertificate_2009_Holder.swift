@@ -4,10 +4,10 @@ import Foundation
 
 @usableFromInline struct PKIXAttributeCertificate_2009_Holder: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var baseCertificateID: PKIXAttributeCertificate_2009_IssuerSerial?
-    @usableFromInline var entityName: PKIX1Implicit88_GeneralNames?
+    @usableFromInline var baseCertificateID: AuthenticationFramework_IssuerSerial?
+    @usableFromInline var entityName: PKIX1Implicit_2009_GeneralNames?
     @usableFromInline var objectDigestInfo: PKIXAttributeCertificate_2009_ObjectDigestInfo?
-    @inlinable init(baseCertificateID: PKIXAttributeCertificate_2009_IssuerSerial?, entityName: PKIX1Implicit88_GeneralNames?, objectDigestInfo: PKIXAttributeCertificate_2009_ObjectDigestInfo?) {
+    @inlinable init(baseCertificateID: AuthenticationFramework_IssuerSerial?, entityName: PKIX1Implicit_2009_GeneralNames?, objectDigestInfo: PKIXAttributeCertificate_2009_ObjectDigestInfo?) {
         self.baseCertificateID = baseCertificateID
         self.entityName = entityName
         self.objectDigestInfo = objectDigestInfo
@@ -15,8 +15,8 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let baseCertificateID: PKIXAttributeCertificate_2009_IssuerSerial? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            let entityName: PKIX1Implicit88_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+            let baseCertificateID: AuthenticationFramework_IssuerSerial? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+            let entityName: PKIX1Implicit_2009_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let objectDigestInfo: PKIXAttributeCertificate_2009_ObjectDigestInfo? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             return PKIXAttributeCertificate_2009_Holder(baseCertificateID: baseCertificateID, entityName: entityName, objectDigestInfo: objectDigestInfo)
         }

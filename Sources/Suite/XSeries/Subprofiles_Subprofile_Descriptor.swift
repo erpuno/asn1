@@ -7,10 +7,10 @@ import Foundation
     @usableFromInline var subprofile_identifier: Subprofiles_Subprofile_Identifier
     @usableFromInline var subprofile_reference: Subprofiles_Subprofile_Reference?
     @usableFromInline var subprofile_precedence: ArraySlice<UInt8>?
-    @usableFromInline var document_fragment_reference: Location_Expressions_Location_Expression
+    @usableFromInline var document_fragment_reference: Box<Location_Expressions_Location_Expression>
     @usableFromInline var content_architecture_classes: [ASN1ObjectIdentifier]?
     @usableFromInline var document_fragment_management_attributes: Subprofiles_Document_Fragment_Management_Attributes?
-    @inlinable init(subprofile_identifier: Subprofiles_Subprofile_Identifier, subprofile_reference: Subprofiles_Subprofile_Reference?, subprofile_precedence: ArraySlice<UInt8>?, document_fragment_reference: Location_Expressions_Location_Expression, content_architecture_classes: [ASN1ObjectIdentifier]?, document_fragment_management_attributes: Subprofiles_Document_Fragment_Management_Attributes?) {
+    @inlinable init(subprofile_identifier: Subprofiles_Subprofile_Identifier, subprofile_reference: Subprofiles_Subprofile_Reference?, subprofile_precedence: ArraySlice<UInt8>?, document_fragment_reference: Box<Location_Expressions_Location_Expression>, content_architecture_classes: [ASN1ObjectIdentifier]?, document_fragment_management_attributes: Subprofiles_Document_Fragment_Management_Attributes?) {
         self.subprofile_identifier = subprofile_identifier
         self.subprofile_reference = subprofile_reference
         self.subprofile_precedence = subprofile_precedence
@@ -24,7 +24,7 @@ import Foundation
             let subprofile_identifier: Subprofiles_Subprofile_Identifier = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let subprofile_reference: Subprofiles_Subprofile_Reference? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let subprofile_precedence: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
-            let document_fragment_reference: Location_Expressions_Location_Expression = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)))!
+            let document_fragment_reference: Box<Location_Expressions_Location_Expression> = Box((try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)))!)
             let content_architecture_classes: [ASN1ObjectIdentifier]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in try DER.set(of: ASN1ObjectIdentifier.self, identifier: node.identifier, rootNode: node) }
             let document_fragment_management_attributes: Subprofiles_Document_Fragment_Management_Attributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
             return Subprofiles_Subprofile_Descriptor(subprofile_identifier: subprofile_identifier, subprofile_reference: subprofile_reference, subprofile_precedence: subprofile_precedence, document_fragment_reference: document_fragment_reference, content_architecture_classes: content_architecture_classes, document_fragment_management_attributes: document_fragment_management_attributes)
@@ -36,7 +36,7 @@ import Foundation
             try coder.serializeOptionalImplicitlyTagged(subprofile_identifier, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             if let subprofile_reference = self.subprofile_reference { if let subprofile_reference = self.subprofile_reference { try coder.serializeOptionalImplicitlyTagged(subprofile_reference, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
             if let subprofile_precedence = self.subprofile_precedence { if let subprofile_precedence = self.subprofile_precedence { try coder.serializeOptionalImplicitlyTagged(subprofile_precedence, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            try coder.serializeOptionalImplicitlyTagged(document_fragment_reference, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+            try coder.serializeOptionalImplicitlyTagged(document_fragment_reference.value, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             if let content_architecture_classes = self.content_architecture_classes { if let content_architecture_classes = self.content_architecture_classes { try coder.serializeSetOf(content_architecture_classes, identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
             if let document_fragment_management_attributes = self.document_fragment_management_attributes { if let document_fragment_management_attributes = self.document_fragment_management_attributes { try coder.serializeOptionalImplicitlyTagged(document_fragment_management_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
         }

@@ -6,16 +6,16 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case initial(ASN1Any)
     case any(ASN1Any)
-    case final(ASN1Any)
+    case `final`(ASN1Any)
     case control(Default_Value_Lists_Attribute)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .initial(try ASN1Any(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .any(try ASN1Any(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .final(try ASN1Any(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+            case ASN1Identifier(tagWithNumber: 9, tagClass: .universal):
+                self = .initial(ASN1Any(derEncoded: rootNode))
+            case ASN1Identifier(tagWithNumber: 9, tagClass: .universal):
+                self = .any(ASN1Any(derEncoded: rootNode))
+            case ASN1Identifier(tagWithNumber: 9, tagClass: .universal):
+                self = .`final`(ASN1Any(derEncoded: rootNode))
             case Default_Value_Lists_Attribute.defaultIdentifier:
                 self = .control(try Default_Value_Lists_Attribute(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
@@ -25,7 +25,7 @@ import Foundation
         switch self {
             case .initial(let initial): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try initial.serialize(into: &coder) }
             case .any(let any): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try any.serialize(into: &coder) }
-            case .final(let final): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) { coder in try final.serialize(into: &coder) }
+            case .`final`(let `final`): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) { coder in try `final`.serialize(into: &coder) }
             case .control(let control): try coder.serialize(control)
         }
     }

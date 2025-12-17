@@ -4,10 +4,10 @@ import Foundation
 
 @usableFromInline struct PKCS_7_EncryptedContentInfo: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var contentType: PKCS_7_ContentType
-    @usableFromInline var contentEncryptionAlgorithm: PKCS_7_ContentEncryptionAlgorithmIdentifier
-    @usableFromInline var encryptedContent: PKCS_7_EncryptedContent?
-    @inlinable init(contentType: PKCS_7_ContentType, contentEncryptionAlgorithm: PKCS_7_ContentEncryptionAlgorithmIdentifier, encryptedContent: PKCS_7_EncryptedContent?) {
+    @usableFromInline var contentType: ASN1ObjectIdentifier
+    @usableFromInline var contentEncryptionAlgorithm: AuthenticationFramework_AlgorithmIdentifier
+    @usableFromInline var encryptedContent: ASN1OctetString?
+    @inlinable init(contentType: ASN1ObjectIdentifier, contentEncryptionAlgorithm: AuthenticationFramework_AlgorithmIdentifier, encryptedContent: ASN1OctetString?) {
         self.contentType = contentType
         self.contentEncryptionAlgorithm = contentEncryptionAlgorithm
         self.encryptedContent = encryptedContent
@@ -15,9 +15,9 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let contentType: PKCS_7_ContentType = try PKCS_7_ContentType(derEncoded: &nodes)
-            let contentEncryptionAlgorithm: PKCS_7_ContentEncryptionAlgorithmIdentifier = try PKCS_7_ContentEncryptionAlgorithmIdentifier(derEncoded: &nodes)
-            let encryptedContent: PKCS_7_EncryptedContent? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+            let contentType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
+            let contentEncryptionAlgorithm: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
+            let encryptedContent: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             return PKCS_7_EncryptedContentInfo(contentType: contentType, contentEncryptionAlgorithm: contentEncryptionAlgorithm, encryptedContent: encryptedContent)
         }
     }

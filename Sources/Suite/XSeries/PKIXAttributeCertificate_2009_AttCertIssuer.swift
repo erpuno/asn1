@@ -4,12 +4,12 @@ import Foundation
 
 @usableFromInline indirect enum PKIXAttributeCertificate_2009_AttCertIssuer: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
-        case v1Form(PKIX1Implicit88_GeneralNames)
+        case v1Form(PKIX1Implicit_2009_GeneralNames)
     case v2Form(PKIXAttributeCertificate_2009_V2Form)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case PKIX1Implicit88_GeneralNames.defaultIdentifier:
-                self = .v1Form(try PKIX1Implicit88_GeneralNames(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+            case PKIX1Implicit_2009_GeneralNames.defaultIdentifier:
+                self = .v1Form(try PKIX1Implicit_2009_GeneralNames(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
                 self = .v2Form(try PKIXAttributeCertificate_2009_V2Form(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)

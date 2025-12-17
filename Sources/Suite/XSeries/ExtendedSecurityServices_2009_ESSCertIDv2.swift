@@ -6,8 +6,8 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var hashAlgorithm: ExtendedSecurityServices_2009_HashAlgorithm?
     @usableFromInline var certHash: ExtendedSecurityServices_2009_Hash
-    @usableFromInline var issuerSerial: ExtendedSecurityServices_2009_IssuerSerial?
-    @inlinable init(hashAlgorithm: ExtendedSecurityServices_2009_HashAlgorithm?, certHash: ExtendedSecurityServices_2009_Hash, issuerSerial: ExtendedSecurityServices_2009_IssuerSerial?) {
+    @usableFromInline var issuerSerial: AuthenticationFramework_IssuerSerial?
+    @inlinable init(hashAlgorithm: ExtendedSecurityServices_2009_HashAlgorithm?, certHash: ExtendedSecurityServices_2009_Hash, issuerSerial: AuthenticationFramework_IssuerSerial?) {
         self.hashAlgorithm = hashAlgorithm
         self.certHash = certHash
         self.issuerSerial = issuerSerial
@@ -17,7 +17,7 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let hashAlgorithm: ExtendedSecurityServices_2009_HashAlgorithm? = try ExtendedSecurityServices_2009_HashAlgorithm(derEncoded: &nodes)
             let certHash: ExtendedSecurityServices_2009_Hash = try ExtendedSecurityServices_2009_Hash(derEncoded: &nodes)
-            let issuerSerial: ExtendedSecurityServices_2009_IssuerSerial? = try ExtendedSecurityServices_2009_IssuerSerial(derEncoded: &nodes)
+            let issuerSerial: AuthenticationFramework_IssuerSerial? = try AuthenticationFramework_IssuerSerial(derEncoded: &nodes)
             return ExtendedSecurityServices_2009_ESSCertIDv2(hashAlgorithm: hashAlgorithm, certHash: certHash, issuerSerial: issuerSerial)
         }
     }

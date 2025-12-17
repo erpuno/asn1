@@ -4,10 +4,10 @@ import Foundation
 
 @usableFromInline struct PKIXCRMF_2009_Attributes: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
-    @usableFromInline var value: [PKIX_CommonTypes_2009_AttributeSet]
-    @inlinable public init(_ value: [PKIX_CommonTypes_2009_AttributeSet]) { self.value = value }
+    @usableFromInline var value: [PKIX1Explicit88_Attribute]
+    @inlinable public init(_ value: [PKIX1Explicit88_Attribute]) { self.value = value }
     @inlinable public init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
-        self.value = try DER.set(of: PKIX_CommonTypes_2009_AttributeSet.self, identifier: identifier, rootNode: rootNode)
+        self.value = try DER.set(of: PKIX1Explicit88_Attribute.self, identifier: identifier, rootNode: rootNode)
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         try coder.serializeSetOf(value, identifier: identifier)

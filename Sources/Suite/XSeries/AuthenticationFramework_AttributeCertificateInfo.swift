@@ -6,14 +6,14 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: AuthenticationFramework_Version?
     @usableFromInline var subject: AuthenticationFramework_AttributeCertificateInfo_subject_Choice
-    @usableFromInline var issuer: PKIX1Implicit88_GeneralNames
+    @usableFromInline var issuer: PKIX1Implicit_2009_GeneralNames
     @usableFromInline var signature: AuthenticationFramework_AlgorithmIdentifier
     @usableFromInline var serialNumber: AuthenticationFramework_CertificateSerialNumber
     @usableFromInline var attCertValidityPeriod: AuthenticationFramework_AttCertValidityPeriod
     @usableFromInline var attributes: [PKIX1Explicit88_Attribute]
     @usableFromInline var issuerUniqueID: SelectedAttributeTypes_UniqueIdentifier?
     @usableFromInline var extensions: AuthenticationFramework_Extensions?
-    @inlinable init(version: AuthenticationFramework_Version?, subject: AuthenticationFramework_AttributeCertificateInfo_subject_Choice, issuer: PKIX1Implicit88_GeneralNames, signature: AuthenticationFramework_AlgorithmIdentifier, serialNumber: AuthenticationFramework_CertificateSerialNumber, attCertValidityPeriod: AuthenticationFramework_AttCertValidityPeriod, attributes: [PKIX1Explicit88_Attribute], issuerUniqueID: SelectedAttributeTypes_UniqueIdentifier?, extensions: AuthenticationFramework_Extensions?) {
+    @inlinable init(version: AuthenticationFramework_Version?, subject: AuthenticationFramework_AttributeCertificateInfo_subject_Choice, issuer: PKIX1Implicit_2009_GeneralNames, signature: AuthenticationFramework_AlgorithmIdentifier, serialNumber: AuthenticationFramework_CertificateSerialNumber, attCertValidityPeriod: AuthenticationFramework_AttCertValidityPeriod, attributes: [PKIX1Explicit88_Attribute], issuerUniqueID: SelectedAttributeTypes_UniqueIdentifier?, extensions: AuthenticationFramework_Extensions?) {
         self.version = version
         self.subject = subject
         self.issuer = issuer
@@ -29,7 +29,7 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let version: AuthenticationFramework_Version? = try AuthenticationFramework_Version(derEncoded: &nodes)
             let subject: AuthenticationFramework_AttributeCertificateInfo_subject_Choice = try AuthenticationFramework_AttributeCertificateInfo_subject_Choice(derEncoded: &nodes)
-            let issuer: PKIX1Implicit88_GeneralNames = try PKIX1Implicit88_GeneralNames(derEncoded: &nodes)
+            let issuer: PKIX1Implicit_2009_GeneralNames = try PKIX1Implicit_2009_GeneralNames(derEncoded: &nodes)
             let signature: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let serialNumber: AuthenticationFramework_CertificateSerialNumber = try AuthenticationFramework_CertificateSerialNumber(derEncoded: &nodes)
             let attCertValidityPeriod: AuthenticationFramework_AttCertValidityPeriod = try AuthenticationFramework_AttCertValidityPeriod(derEncoded: &nodes)

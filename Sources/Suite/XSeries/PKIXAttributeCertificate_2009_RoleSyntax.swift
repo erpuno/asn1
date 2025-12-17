@@ -4,16 +4,16 @@ import Foundation
 
 @usableFromInline struct PKIXAttributeCertificate_2009_RoleSyntax: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var roleAuthority: PKIX1Implicit88_GeneralNames?
+    @usableFromInline var roleAuthority: PKIX1Implicit_2009_GeneralNames?
     @usableFromInline var roleName: PKIX1Implicit88_GeneralName
-    @inlinable init(roleAuthority: PKIX1Implicit88_GeneralNames?, roleName: PKIX1Implicit88_GeneralName) {
+    @inlinable init(roleAuthority: PKIX1Implicit_2009_GeneralNames?, roleName: PKIX1Implicit88_GeneralName) {
         self.roleAuthority = roleAuthority
         self.roleName = roleName
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let roleAuthority: PKIX1Implicit88_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+            let roleAuthority: PKIX1Implicit_2009_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let roleName: PKIX1Implicit88_GeneralName = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
             return PKIXAttributeCertificate_2009_RoleSyntax(roleAuthority: roleAuthority, roleName: roleName)
         }

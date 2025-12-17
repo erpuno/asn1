@@ -4,12 +4,12 @@ import Foundation
 
 @usableFromInline indirect enum Identifiers_and_Expressions_Numeric_Expression_ordinal_application_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
-        case identifier(Identifiers_and_Expressions_Object_or_Class_Identifier)
+        case ident(Identifiers_and_Expressions_Object_or_Class_Identifier)
     case expression(Identifiers_and_Expressions_Object_Id_Expression)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case Identifiers_and_Expressions_Object_or_Class_Identifier.defaultIdentifier:
-                self = .identifier(try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .ident(try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case Identifiers_and_Expressions_Object_Id_Expression.defaultIdentifier:
                 self = .expression(try Identifiers_and_Expressions_Object_Id_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
@@ -17,7 +17,7 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .identifier(let identifier): try coder.serialize(identifier)
+            case .ident(let ident): try coder.serialize(ident)
             case .expression(let expression): try coder.serialize(expression)
         }
     }

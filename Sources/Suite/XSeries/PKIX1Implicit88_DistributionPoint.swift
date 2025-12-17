@@ -6,8 +6,8 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var distributionPoint: PKIX1Implicit88_DistributionPointName?
     @usableFromInline var reasons: PKIX1Implicit88_ReasonFlags?
-    @usableFromInline var cRLIssuer: PKIX1Implicit88_GeneralNames?
-    @inlinable init(distributionPoint: PKIX1Implicit88_DistributionPointName?, reasons: PKIX1Implicit88_ReasonFlags?, cRLIssuer: PKIX1Implicit88_GeneralNames?) {
+    @usableFromInline var cRLIssuer: PKIX1Implicit_2009_GeneralNames?
+    @inlinable init(distributionPoint: PKIX1Implicit88_DistributionPointName?, reasons: PKIX1Implicit88_ReasonFlags?, cRLIssuer: PKIX1Implicit_2009_GeneralNames?) {
         self.distributionPoint = distributionPoint
         self.reasons = reasons
         self.cRLIssuer = cRLIssuer
@@ -17,7 +17,7 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let distributionPoint: PKIX1Implicit88_DistributionPointName? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let reasons: PKIX1Implicit88_ReasonFlags? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            let cRLIssuer: PKIX1Implicit88_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+            let cRLIssuer: PKIX1Implicit_2009_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             return PKIX1Implicit88_DistributionPoint(distributionPoint: distributionPoint, reasons: reasons, cRLIssuer: cRLIssuer)
         }
     }

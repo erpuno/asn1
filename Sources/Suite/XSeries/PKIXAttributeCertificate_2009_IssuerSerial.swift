@@ -4,10 +4,10 @@ import Foundation
 
 @usableFromInline struct PKIXAttributeCertificate_2009_IssuerSerial: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var issuer: PKIX1Implicit88_GeneralNames
+    @usableFromInline var issuer: PKIX1Implicit_2009_GeneralNames
     @usableFromInline var serial: PKIX1Explicit88_CertificateSerialNumber
     @usableFromInline var issuerUID: PKIX1Explicit88_UniqueIdentifier?
-    @inlinable init(issuer: PKIX1Implicit88_GeneralNames, serial: PKIX1Explicit88_CertificateSerialNumber, issuerUID: PKIX1Explicit88_UniqueIdentifier?) {
+    @inlinable init(issuer: PKIX1Implicit_2009_GeneralNames, serial: PKIX1Explicit88_CertificateSerialNumber, issuerUID: PKIX1Explicit88_UniqueIdentifier?) {
         self.issuer = issuer
         self.serial = serial
         self.issuerUID = issuerUID
@@ -15,7 +15,7 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let issuer: PKIX1Implicit88_GeneralNames = try PKIX1Implicit88_GeneralNames(derEncoded: &nodes)
+            let issuer: PKIX1Implicit_2009_GeneralNames = try PKIX1Implicit_2009_GeneralNames(derEncoded: &nodes)
             let serial: PKIX1Explicit88_CertificateSerialNumber = try PKIX1Explicit88_CertificateSerialNumber(derEncoded: &nodes)
             let issuerUID: PKIX1Explicit88_UniqueIdentifier? = try PKIX1Explicit88_UniqueIdentifier(derEncoded: &nodes)
             return PKIXAttributeCertificate_2009_IssuerSerial(issuer: issuer, serial: serial, issuerUID: issuerUID)

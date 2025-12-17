@@ -5,9 +5,9 @@ import Foundation
 @usableFromInline struct CertificateExtensions_AuthorityKeyIdentifier: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var keyIdentifier: CertificateExtensions_KeyIdentifier?
-    @usableFromInline var authorityCertIssuer: CertificateExtensions_GeneralNames?
+    @usableFromInline var authorityCertIssuer: PKIX1Implicit_2009_GeneralNames?
     @usableFromInline var authorityCertSerialNumber: AuthenticationFramework_CertificateSerialNumber?
-    @inlinable init(keyIdentifier: CertificateExtensions_KeyIdentifier?, authorityCertIssuer: CertificateExtensions_GeneralNames?, authorityCertSerialNumber: AuthenticationFramework_CertificateSerialNumber?) {
+    @inlinable init(keyIdentifier: CertificateExtensions_KeyIdentifier?, authorityCertIssuer: PKIX1Implicit_2009_GeneralNames?, authorityCertSerialNumber: AuthenticationFramework_CertificateSerialNumber?) {
         self.keyIdentifier = keyIdentifier
         self.authorityCertIssuer = authorityCertIssuer
         self.authorityCertSerialNumber = authorityCertSerialNumber
@@ -16,7 +16,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let keyIdentifier: CertificateExtensions_KeyIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            let authorityCertIssuer: CertificateExtensions_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+            let authorityCertIssuer: PKIX1Implicit_2009_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let authorityCertSerialNumber: AuthenticationFramework_CertificateSerialNumber? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             return CertificateExtensions_AuthorityKeyIdentifier(keyIdentifier: keyIdentifier, authorityCertIssuer: authorityCertIssuer, authorityCertSerialNumber: authorityCertSerialNumber)
         }

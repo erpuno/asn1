@@ -7,13 +7,13 @@ import Foundation
     @usableFromInline var structuralObjectClass: ASN1ObjectIdentifier
     @usableFromInline var auxiliaries: [ASN1ObjectIdentifier]?
     @usableFromInline var mandatory: [ASN1ObjectIdentifier]?
-    @usableFromInline var optional: [ASN1ObjectIdentifier]?
+    @usableFromInline var `optional`: [ASN1ObjectIdentifier]?
     @usableFromInline var precluded: [ASN1ObjectIdentifier]?
-    @inlinable init(structuralObjectClass: ASN1ObjectIdentifier, auxiliaries: [ASN1ObjectIdentifier]?, mandatory: [ASN1ObjectIdentifier]?, optional: [ASN1ObjectIdentifier]?, precluded: [ASN1ObjectIdentifier]?) {
+    @inlinable init(structuralObjectClass: ASN1ObjectIdentifier, auxiliaries: [ASN1ObjectIdentifier]?, mandatory: [ASN1ObjectIdentifier]?, `optional`: [ASN1ObjectIdentifier]?, precluded: [ASN1ObjectIdentifier]?) {
         self.structuralObjectClass = structuralObjectClass
         self.auxiliaries = auxiliaries
         self.mandatory = mandatory
-        self.optional = optional
+        self.`optional` = `optional`
         self.precluded = precluded
     }
     @inlinable init(derEncoded root: ASN1Node,
@@ -22,9 +22,9 @@ import Foundation
             let structuralObjectClass: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let auxiliaries: [ASN1ObjectIdentifier]? = try DER.set(of: ASN1ObjectIdentifier.self, identifier: .set, nodes: &nodes)
             let mandatory: [ASN1ObjectIdentifier]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.set(of: ASN1ObjectIdentifier.self, identifier: .set, rootNode: node) }
-            let optional: [ASN1ObjectIdentifier]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.set(of: ASN1ObjectIdentifier.self, identifier: .set, rootNode: node) }
+            let `optional`: [ASN1ObjectIdentifier]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.set(of: ASN1ObjectIdentifier.self, identifier: .set, rootNode: node) }
             let precluded: [ASN1ObjectIdentifier]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in try DER.set(of: ASN1ObjectIdentifier.self, identifier: .set, rootNode: node) }
-            return InformationFramework_DITContentRule(structuralObjectClass: structuralObjectClass, auxiliaries: auxiliaries, mandatory: mandatory, optional: optional, precluded: precluded)
+            return InformationFramework_DITContentRule(structuralObjectClass: structuralObjectClass, auxiliaries: auxiliaries, mandatory: mandatory, `optional`: `optional`, precluded: precluded)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
@@ -33,7 +33,7 @@ import Foundation
             try coder.serialize(structuralObjectClass)
             if let auxiliaries = self.auxiliaries { if let auxiliaries = self.auxiliaries { try coder.serializeSetOf(auxiliaries) } }
             if let mandatory = self.mandatory { if let mandatory = self.mandatory { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(mandatory) } } }
-            if let optional = self.optional { if let optional = self.optional { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(optional) } } }
+            if let `optional` = self.`optional` { if let `optional` = self.`optional` { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(`optional`) } } }
             if let precluded = self.precluded { if let precluded = self.precluded { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(precluded) } } }
         }
     }

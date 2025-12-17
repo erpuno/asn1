@@ -2,4 +2,31 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline typealias InformationFramework_CONTEXT = ASN1Any
+@usableFromInline struct InformationFramework_Context: DERImplicitlyTaggable, Hashable, Sendable {
+    @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
+    @usableFromInline var contextType: ASN1ObjectIdentifier
+    @usableFromInline var contextValues: [ASN1Any]
+    @usableFromInline var fallback: Bool?
+    @inlinable init(contextType: ASN1ObjectIdentifier, contextValues: [ASN1Any], fallback: Bool?) {
+        self.contextType = contextType
+        self.contextValues = contextValues
+        self.fallback = fallback
+    }
+    @inlinable init(derEncoded root: ASN1Node,
+        withIdentifier identifier: ASN1Identifier) throws {
+        self = try DER.sequence(root, identifier: identifier) { nodes in
+            let contextType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
+            let contextValues: [ASN1Any] = try DER.set(of: ASN1Any.self, identifier: .set, nodes: &nodes)
+            let fallback: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
+            return InformationFramework_Context(contextType: contextType, contextValues: contextValues, fallback: fallback)
+        }
+    }
+    @inlinable func serialize(into coder: inout DER.Serializer,
+        withIdentifier identifier: ASN1Identifier) throws {
+        try coder.appendConstructedNode(identifier: identifier) { coder in
+            try coder.serialize(contextType)
+            try coder.serializeSetOf(contextValues)
+            if let fallback = self.fallback { if let fallback = self.fallback { try coder.serialize(fallback) } }
+        }
+    }
+}

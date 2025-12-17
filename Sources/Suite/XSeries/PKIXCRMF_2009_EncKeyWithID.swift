@@ -5,24 +5,24 @@ import Foundation
 @usableFromInline struct PKIXCRMF_2009_EncKeyWithID: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var privateKey: PKIXCRMF_2009_PrivateKeyInfo
-    @usableFromInline var identifier: PKIXCRMF_2009_EncKeyWithID_identifier_Choice?
-    @inlinable init(privateKey: PKIXCRMF_2009_PrivateKeyInfo, identifier: PKIXCRMF_2009_EncKeyWithID_identifier_Choice?) {
+    @usableFromInline var ident: PKIXCRMF_2009_EncKeyWithID_identifier_Choice?
+    @inlinable init(privateKey: PKIXCRMF_2009_PrivateKeyInfo, ident: PKIXCRMF_2009_EncKeyWithID_identifier_Choice?) {
         self.privateKey = privateKey
-        self.identifier = identifier
+        self.ident = ident
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let privateKey: PKIXCRMF_2009_PrivateKeyInfo = try PKIXCRMF_2009_PrivateKeyInfo(derEncoded: &nodes)
-            let identifier: PKIXCRMF_2009_EncKeyWithID_identifier_Choice? = try PKIXCRMF_2009_EncKeyWithID_identifier_Choice(derEncoded: &nodes)
-            return PKIXCRMF_2009_EncKeyWithID(privateKey: privateKey, identifier: identifier)
+            let ident: PKIXCRMF_2009_EncKeyWithID_identifier_Choice? = try PKIXCRMF_2009_EncKeyWithID_identifier_Choice(derEncoded: &nodes)
+            return PKIXCRMF_2009_EncKeyWithID(privateKey: privateKey, ident: ident)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(privateKey)
-            if let identifier = self.identifier { if let identifier = self.identifier { try coder.serialize(identifier) } }
+            if let ident = self.ident { if let ident = self.ident { try coder.serialize(ident) } }
         }
     }
 }

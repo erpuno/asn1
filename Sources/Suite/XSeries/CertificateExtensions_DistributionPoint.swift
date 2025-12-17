@@ -6,8 +6,8 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var distributionPoint: CertificateExtensions_DistributionPointName?
     @usableFromInline var reasons: CertificateExtensions_ReasonFlags?
-    @usableFromInline var cRLIssuer: CertificateExtensions_GeneralNames?
-    @inlinable init(distributionPoint: CertificateExtensions_DistributionPointName?, reasons: CertificateExtensions_ReasonFlags?, cRLIssuer: CertificateExtensions_GeneralNames?) {
+    @usableFromInline var cRLIssuer: PKIX1Implicit_2009_GeneralNames?
+    @inlinable init(distributionPoint: CertificateExtensions_DistributionPointName?, reasons: CertificateExtensions_ReasonFlags?, cRLIssuer: PKIX1Implicit_2009_GeneralNames?) {
         self.distributionPoint = distributionPoint
         self.reasons = reasons
         self.cRLIssuer = cRLIssuer
@@ -17,7 +17,7 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let distributionPoint: CertificateExtensions_DistributionPointName? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let reasons: CertificateExtensions_ReasonFlags? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            let cRLIssuer: CertificateExtensions_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+            let cRLIssuer: PKIX1Implicit_2009_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             return CertificateExtensions_DistributionPoint(distributionPoint: distributionPoint, reasons: reasons, cRLIssuer: cRLIssuer)
         }
     }

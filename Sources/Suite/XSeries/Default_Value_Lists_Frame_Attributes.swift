@@ -4,19 +4,19 @@ import Foundation
 
 @usableFromInline struct Default_Value_Lists_Frame_Attributes: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
-    @usableFromInline var position: Default_Value_Lists_Frame_Attributes?
-    @usableFromInline var dimensions: Default_Value_Lists_Frame_Attributes?
-    @usableFromInline var transparency: Default_Value_Lists_Frame_Attributes?
-    @usableFromInline var layout_path: Default_Value_Lists_Frame_Attributes?
-    @usableFromInline var permitted_categories: Default_Value_Lists_Frame_Attributes?
-    @usableFromInline var layout_stream_categories: Default_Value_Lists_Frame_Attributes?
-    @usableFromInline var layout_stream_sub_categories: Default_Value_Lists_Frame_Attributes?
-    @usableFromInline var colour: Default_Value_Lists_Frame_Attributes?
-    @usableFromInline var colour_of_layout_object: Default_Value_Lists_Frame_Attributes?
-    @usableFromInline var object_colour_table: Default_Value_Lists_Frame_Attributes?
-    @usableFromInline var border: Default_Value_Lists_Frame_Attributes?
-    @usableFromInline var sealed: Default_Value_Lists_Frame_Attributes?
-    @inlinable init(position: Default_Value_Lists_Frame_Attributes?, dimensions: Default_Value_Lists_Frame_Attributes?, transparency: Default_Value_Lists_Frame_Attributes?, layout_path: Default_Value_Lists_Frame_Attributes?, permitted_categories: Default_Value_Lists_Frame_Attributes?, layout_stream_categories: Default_Value_Lists_Frame_Attributes?, layout_stream_sub_categories: Default_Value_Lists_Frame_Attributes?, colour: Default_Value_Lists_Frame_Attributes?, colour_of_layout_object: Default_Value_Lists_Frame_Attributes?, object_colour_table: Default_Value_Lists_Frame_Attributes?, border: Default_Value_Lists_Frame_Attributes?, sealed: Default_Value_Lists_Frame_Attributes?) {
+    @usableFromInline var position: Default_Value_Lists_Attribute?
+    @usableFromInline var dimensions: Default_Value_Lists_Attribute?
+    @usableFromInline var transparency: Default_Value_Lists_Attribute?
+    @usableFromInline var layout_path: Default_Value_Lists_Attribute?
+    @usableFromInline var permitted_categories: Default_Value_Lists_Attribute?
+    @usableFromInline var layout_stream_categories: Default_Value_Lists_Attribute?
+    @usableFromInline var layout_stream_sub_categories: Default_Value_Lists_Attribute?
+    @usableFromInline var colour: Default_Value_Lists_Attribute?
+    @usableFromInline var colour_of_layout_object: Default_Value_Lists_Attribute?
+    @usableFromInline var object_colour_table: Default_Value_Lists_Attribute?
+    @usableFromInline var border: Default_Value_Lists_Attribute?
+    @usableFromInline var sealed: Default_Value_Lists_Attribute?
+    @inlinable init(position: Default_Value_Lists_Attribute?, dimensions: Default_Value_Lists_Attribute?, transparency: Default_Value_Lists_Attribute?, layout_path: Default_Value_Lists_Attribute?, permitted_categories: Default_Value_Lists_Attribute?, layout_stream_categories: Default_Value_Lists_Attribute?, layout_stream_sub_categories: Default_Value_Lists_Attribute?, colour: Default_Value_Lists_Attribute?, colour_of_layout_object: Default_Value_Lists_Attribute?, object_colour_table: Default_Value_Lists_Attribute?, border: Default_Value_Lists_Attribute?, sealed: Default_Value_Lists_Attribute?) {
         self.position = position
         self.dimensions = dimensions
         self.transparency = transparency
@@ -33,18 +33,18 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let position: Default_Value_Lists_Frame_Attributes? = try Default_Value_Lists_Frame_Attributes(derEncoded: &nodes)
-            let dimensions: Default_Value_Lists_Frame_Attributes? = try Default_Value_Lists_Frame_Attributes(derEncoded: &nodes)
-            let transparency: Default_Value_Lists_Frame_Attributes? = try Default_Value_Lists_Frame_Attributes(derEncoded: &nodes)
-            let layout_path: Default_Value_Lists_Frame_Attributes? = try Default_Value_Lists_Frame_Attributes(derEncoded: &nodes)
-            let permitted_categories: Default_Value_Lists_Frame_Attributes? = try Default_Value_Lists_Frame_Attributes(derEncoded: &nodes)
-            let layout_stream_categories: Default_Value_Lists_Frame_Attributes? = try Default_Value_Lists_Frame_Attributes(derEncoded: &nodes)
-            let layout_stream_sub_categories: Default_Value_Lists_Frame_Attributes? = try Default_Value_Lists_Frame_Attributes(derEncoded: &nodes)
-            let colour: Default_Value_Lists_Frame_Attributes? = try Default_Value_Lists_Frame_Attributes(derEncoded: &nodes)
-            let colour_of_layout_object: Default_Value_Lists_Frame_Attributes? = try Default_Value_Lists_Frame_Attributes(derEncoded: &nodes)
-            let object_colour_table: Default_Value_Lists_Frame_Attributes? = try Default_Value_Lists_Frame_Attributes(derEncoded: &nodes)
-            let border: Default_Value_Lists_Frame_Attributes? = try Default_Value_Lists_Frame_Attributes(derEncoded: &nodes)
-            let sealed: Default_Value_Lists_Frame_Attributes? = try Default_Value_Lists_Frame_Attributes(derEncoded: &nodes)
+            let position: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let dimensions: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let transparency: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let layout_path: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let permitted_categories: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let layout_stream_categories: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let layout_stream_sub_categories: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let colour: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let colour_of_layout_object: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let object_colour_table: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let border: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let sealed: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
             return Default_Value_Lists_Frame_Attributes(position: position, dimensions: dimensions, transparency: transparency, layout_path: layout_path, permitted_categories: permitted_categories, layout_stream_categories: layout_stream_categories, layout_stream_sub_categories: layout_stream_sub_categories, colour: colour, colour_of_layout_object: colour_of_layout_object, object_colour_table: object_colour_table, border: border, sealed: sealed)
         }
     }

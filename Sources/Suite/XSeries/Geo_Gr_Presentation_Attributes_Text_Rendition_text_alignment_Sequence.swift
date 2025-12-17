@@ -19,8 +19,8 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let horizontal_alignment: Geo_Gr_Presentation_Attributes_Text_Rendition_text_alignment_Sequence_horizontal_alignment_Enum = try Geo_Gr_Presentation_Attributes_Text_Rendition_text_alignment_Sequence_horizontal_alignment_Enum(derEncoded: &nodes)
             let vertical_alignment: Geo_Gr_Presentation_Attributes_Text_Rendition_text_alignment_Sequence_vertical_alignment_Enum = try Geo_Gr_Presentation_Attributes_Text_Rendition_text_alignment_Sequence_vertical_alignment_Enum(derEncoded: &nodes)
-            let continuous_horizontal_alignment: ASN1Any? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            let continuous_vertical_alignment: ASN1Any? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+            let continuous_horizontal_alignment: ASN1Any? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in ASN1Any(derEncoded: node) }
+            let continuous_vertical_alignment: ASN1Any? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in ASN1Any(derEncoded: node) }
             return Geo_Gr_Presentation_Attributes_Text_Rendition_text_alignment_Sequence(horizontal_alignment: horizontal_alignment, vertical_alignment: vertical_alignment, continuous_horizontal_alignment: continuous_horizontal_alignment, continuous_vertical_alignment: continuous_vertical_alignment)
         }
     }
@@ -29,8 +29,8 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(horizontal_alignment)
             try coder.serialize(vertical_alignment)
-            if let continuous_horizontal_alignment = self.continuous_horizontal_alignment { if let continuous_horizontal_alignment = self.continuous_horizontal_alignment { try coder.serializeOptionalImplicitlyTagged(continuous_horizontal_alignment, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let continuous_vertical_alignment = self.continuous_vertical_alignment { if let continuous_vertical_alignment = self.continuous_vertical_alignment { try coder.serializeOptionalImplicitlyTagged(continuous_vertical_alignment, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let continuous_horizontal_alignment = self.continuous_horizontal_alignment { if let continuous_horizontal_alignment = self.continuous_horizontal_alignment { try coder.serialize(continuous_horizontal_alignment) } }
+            if let continuous_vertical_alignment = self.continuous_vertical_alignment { if let continuous_vertical_alignment = self.continuous_vertical_alignment { try coder.serialize(continuous_vertical_alignment) } }
         }
     }
 }

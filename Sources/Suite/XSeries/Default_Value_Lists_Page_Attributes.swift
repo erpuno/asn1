@@ -4,22 +4,22 @@ import Foundation
 
 @usableFromInline struct Default_Value_Lists_Page_Attributes: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
-    @usableFromInline var dimensions: Default_Value_Lists_Page_Attributes?
-    @usableFromInline var transparency: Default_Value_Lists_Page_Attributes?
-    @usableFromInline var presentation_attributes: Default_Value_Lists_Page_Attributes?
-    @usableFromInline var page_position: Default_Value_Lists_Page_Attributes?
-    @usableFromInline var medium_type: Default_Value_Lists_Page_Attributes?
-    @usableFromInline var presentation_style: Default_Value_Lists_Page_Attributes?
-    @usableFromInline var layout_stream_categories: Default_Value_Lists_Page_Attributes?
-    @usableFromInline var layout_stream_sub_categories: Default_Value_Lists_Page_Attributes?
-    @usableFromInline var colour: Default_Value_Lists_Page_Attributes?
-    @usableFromInline var colour_of_layout_object: Default_Value_Lists_Page_Attributes?
-    @usableFromInline var object_colour_table: Default_Value_Lists_Page_Attributes?
-    @usableFromInline var content_background_colour: Default_Value_Lists_Page_Attributes?
-    @usableFromInline var content_foreground_colour: Default_Value_Lists_Page_Attributes?
-    @usableFromInline var content_colour_table: Default_Value_Lists_Page_Attributes?
-    @usableFromInline var sealed: Default_Value_Lists_Page_Attributes?
-    @inlinable init(dimensions: Default_Value_Lists_Page_Attributes?, transparency: Default_Value_Lists_Page_Attributes?, presentation_attributes: Default_Value_Lists_Page_Attributes?, page_position: Default_Value_Lists_Page_Attributes?, medium_type: Default_Value_Lists_Page_Attributes?, presentation_style: Default_Value_Lists_Page_Attributes?, layout_stream_categories: Default_Value_Lists_Page_Attributes?, layout_stream_sub_categories: Default_Value_Lists_Page_Attributes?, colour: Default_Value_Lists_Page_Attributes?, colour_of_layout_object: Default_Value_Lists_Page_Attributes?, object_colour_table: Default_Value_Lists_Page_Attributes?, content_background_colour: Default_Value_Lists_Page_Attributes?, content_foreground_colour: Default_Value_Lists_Page_Attributes?, content_colour_table: Default_Value_Lists_Page_Attributes?, sealed: Default_Value_Lists_Page_Attributes?) {
+    @usableFromInline var dimensions: Default_Value_Lists_Attribute?
+    @usableFromInline var transparency: Default_Value_Lists_Attribute?
+    @usableFromInline var presentation_attributes: Default_Value_Lists_Attribute?
+    @usableFromInline var page_position: Default_Value_Lists_Attribute?
+    @usableFromInline var medium_type: Default_Value_Lists_Attribute?
+    @usableFromInline var presentation_style: Default_Value_Lists_Attribute?
+    @usableFromInline var layout_stream_categories: Default_Value_Lists_Attribute?
+    @usableFromInline var layout_stream_sub_categories: Default_Value_Lists_Attribute?
+    @usableFromInline var colour: Default_Value_Lists_Attribute?
+    @usableFromInline var colour_of_layout_object: Default_Value_Lists_Attribute?
+    @usableFromInline var object_colour_table: Default_Value_Lists_Attribute?
+    @usableFromInline var content_background_colour: Default_Value_Lists_Attribute?
+    @usableFromInline var content_foreground_colour: Default_Value_Lists_Attribute?
+    @usableFromInline var content_colour_table: Default_Value_Lists_Attribute?
+    @usableFromInline var sealed: Default_Value_Lists_Attribute?
+    @inlinable init(dimensions: Default_Value_Lists_Attribute?, transparency: Default_Value_Lists_Attribute?, presentation_attributes: Default_Value_Lists_Attribute?, page_position: Default_Value_Lists_Attribute?, medium_type: Default_Value_Lists_Attribute?, presentation_style: Default_Value_Lists_Attribute?, layout_stream_categories: Default_Value_Lists_Attribute?, layout_stream_sub_categories: Default_Value_Lists_Attribute?, colour: Default_Value_Lists_Attribute?, colour_of_layout_object: Default_Value_Lists_Attribute?, object_colour_table: Default_Value_Lists_Attribute?, content_background_colour: Default_Value_Lists_Attribute?, content_foreground_colour: Default_Value_Lists_Attribute?, content_colour_table: Default_Value_Lists_Attribute?, sealed: Default_Value_Lists_Attribute?) {
         self.dimensions = dimensions
         self.transparency = transparency
         self.presentation_attributes = presentation_attributes
@@ -39,21 +39,21 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let dimensions: Default_Value_Lists_Page_Attributes? = try Default_Value_Lists_Page_Attributes(derEncoded: &nodes)
-            let transparency: Default_Value_Lists_Page_Attributes? = try Default_Value_Lists_Page_Attributes(derEncoded: &nodes)
-            let presentation_attributes: Default_Value_Lists_Page_Attributes? = try Default_Value_Lists_Page_Attributes(derEncoded: &nodes)
-            let page_position: Default_Value_Lists_Page_Attributes? = try Default_Value_Lists_Page_Attributes(derEncoded: &nodes)
-            let medium_type: Default_Value_Lists_Page_Attributes? = try Default_Value_Lists_Page_Attributes(derEncoded: &nodes)
-            let presentation_style: Default_Value_Lists_Page_Attributes? = try Default_Value_Lists_Page_Attributes(derEncoded: &nodes)
-            let layout_stream_categories: Default_Value_Lists_Page_Attributes? = try Default_Value_Lists_Page_Attributes(derEncoded: &nodes)
-            let layout_stream_sub_categories: Default_Value_Lists_Page_Attributes? = try Default_Value_Lists_Page_Attributes(derEncoded: &nodes)
-            let colour: Default_Value_Lists_Page_Attributes? = try Default_Value_Lists_Page_Attributes(derEncoded: &nodes)
-            let colour_of_layout_object: Default_Value_Lists_Page_Attributes? = try Default_Value_Lists_Page_Attributes(derEncoded: &nodes)
-            let object_colour_table: Default_Value_Lists_Page_Attributes? = try Default_Value_Lists_Page_Attributes(derEncoded: &nodes)
-            let content_background_colour: Default_Value_Lists_Page_Attributes? = try Default_Value_Lists_Page_Attributes(derEncoded: &nodes)
-            let content_foreground_colour: Default_Value_Lists_Page_Attributes? = try Default_Value_Lists_Page_Attributes(derEncoded: &nodes)
-            let content_colour_table: Default_Value_Lists_Page_Attributes? = try Default_Value_Lists_Page_Attributes(derEncoded: &nodes)
-            let sealed: Default_Value_Lists_Page_Attributes? = try Default_Value_Lists_Page_Attributes(derEncoded: &nodes)
+            let dimensions: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let transparency: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let presentation_attributes: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let page_position: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let medium_type: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let presentation_style: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let layout_stream_categories: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let layout_stream_sub_categories: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let colour: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let colour_of_layout_object: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let object_colour_table: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let content_background_colour: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let content_foreground_colour: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let content_colour_table: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let sealed: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
             return Default_Value_Lists_Page_Attributes(dimensions: dimensions, transparency: transparency, presentation_attributes: presentation_attributes, page_position: page_position, medium_type: medium_type, presentation_style: presentation_style, layout_stream_categories: layout_stream_categories, layout_stream_sub_categories: layout_stream_sub_categories, colour: colour, colour_of_layout_object: colour_of_layout_object, object_colour_table: object_colour_table, content_background_colour: content_background_colour, content_foreground_colour: content_foreground_colour, content_colour_table: content_colour_table, sealed: sealed)
         }
     }

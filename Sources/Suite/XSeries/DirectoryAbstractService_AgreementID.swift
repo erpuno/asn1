@@ -4,24 +4,24 @@ import Foundation
 
 @usableFromInline struct DirectoryAbstractService_AgreementID: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var identifier: ArraySlice<UInt8>
+    @usableFromInline var ident: ArraySlice<UInt8>
     @usableFromInline var version: ArraySlice<UInt8>
-    @inlinable init(identifier: ArraySlice<UInt8>, version: ArraySlice<UInt8>) {
-        self.identifier = identifier
+    @inlinable init(ident: ArraySlice<UInt8>, version: ArraySlice<UInt8>) {
+        self.ident = ident
         self.version = version
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let identifier: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+            let ident: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let version: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
-            return DirectoryAbstractService_AgreementID(identifier: identifier, version: version)
+            return DirectoryAbstractService_AgreementID(ident: ident, version: version)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(identifier)
+            try coder.serialize(ident)
             try coder.serialize(version)
         }
     }

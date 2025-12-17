@@ -5,27 +5,27 @@ import Foundation
 @usableFromInline struct EnrollmentMessageSyntax_2009_CMCUnsignedData: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var bodyPartPath: EnrollmentMessageSyntax_2009_BodyPartPath
-    @usableFromInline var identifier: ASN1ObjectIdentifier
+    @usableFromInline var ident: ASN1ObjectIdentifier
     @usableFromInline var content: ASN1Any
-    @inlinable init(bodyPartPath: EnrollmentMessageSyntax_2009_BodyPartPath, identifier: ASN1ObjectIdentifier, content: ASN1Any) {
+    @inlinable init(bodyPartPath: EnrollmentMessageSyntax_2009_BodyPartPath, ident: ASN1ObjectIdentifier, content: ASN1Any) {
         self.bodyPartPath = bodyPartPath
-        self.identifier = identifier
+        self.ident = ident
         self.content = content
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let bodyPartPath: EnrollmentMessageSyntax_2009_BodyPartPath = try EnrollmentMessageSyntax_2009_BodyPartPath(derEncoded: &nodes)
-            let identifier: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
+            let ident: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let content: ASN1Any = try ASN1Any(derEncoded: &nodes)
-            return EnrollmentMessageSyntax_2009_CMCUnsignedData(bodyPartPath: bodyPartPath, identifier: identifier, content: content)
+            return EnrollmentMessageSyntax_2009_CMCUnsignedData(bodyPartPath: bodyPartPath, ident: ident, content: content)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(bodyPartPath)
-            try coder.serialize(identifier)
+            try coder.serialize(ident)
             try coder.serialize(content)
         }
     }

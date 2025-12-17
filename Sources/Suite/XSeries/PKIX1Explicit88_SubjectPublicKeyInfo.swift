@@ -4,16 +4,16 @@ import Foundation
 
 @usableFromInline struct PKIX1Explicit88_SubjectPublicKeyInfo: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var algorithm: PKIX1Explicit88_AlgorithmIdentifier
+    @usableFromInline var algorithm: AuthenticationFramework_AlgorithmIdentifier
     @usableFromInline var subjectPublicKey: ASN1BitString
-    @inlinable init(algorithm: PKIX1Explicit88_AlgorithmIdentifier, subjectPublicKey: ASN1BitString) {
+    @inlinable init(algorithm: AuthenticationFramework_AlgorithmIdentifier, subjectPublicKey: ASN1BitString) {
         self.algorithm = algorithm
         self.subjectPublicKey = subjectPublicKey
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let algorithm: PKIX1Explicit88_AlgorithmIdentifier = try PKIX1Explicit88_AlgorithmIdentifier(derEncoded: &nodes)
+            let algorithm: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let subjectPublicKey: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
             return PKIX1Explicit88_SubjectPublicKeyInfo(algorithm: algorithm, subjectPublicKey: subjectPublicKey)
         }

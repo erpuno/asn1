@@ -5,8 +5,8 @@ import Foundation
 @usableFromInline struct ExtendedSecurityServices_2009_ESSCertID: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var certHash: ExtendedSecurityServices_2009_Hash
-    @usableFromInline var issuerSerial: ExtendedSecurityServices_2009_IssuerSerial?
-    @inlinable init(certHash: ExtendedSecurityServices_2009_Hash, issuerSerial: ExtendedSecurityServices_2009_IssuerSerial?) {
+    @usableFromInline var issuerSerial: AuthenticationFramework_IssuerSerial?
+    @inlinable init(certHash: ExtendedSecurityServices_2009_Hash, issuerSerial: AuthenticationFramework_IssuerSerial?) {
         self.certHash = certHash
         self.issuerSerial = issuerSerial
     }
@@ -14,7 +14,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let certHash: ExtendedSecurityServices_2009_Hash = try ExtendedSecurityServices_2009_Hash(derEncoded: &nodes)
-            let issuerSerial: ExtendedSecurityServices_2009_IssuerSerial? = try ExtendedSecurityServices_2009_IssuerSerial(derEncoded: &nodes)
+            let issuerSerial: AuthenticationFramework_IssuerSerial? = try AuthenticationFramework_IssuerSerial(derEncoded: &nodes)
             return ExtendedSecurityServices_2009_ESSCertID(certHash: certHash, issuerSerial: issuerSerial)
         }
     }

@@ -4,10 +4,10 @@ import Foundation
 
 @usableFromInline struct PKIXAttributeCertificate_2009_TargetCert: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var targetCertificate: PKIXAttributeCertificate_2009_IssuerSerial
+    @usableFromInline var targetCertificate: AuthenticationFramework_IssuerSerial
     @usableFromInline var targetName: PKIX1Implicit88_GeneralName?
     @usableFromInline var certDigestInfo: PKIXAttributeCertificate_2009_ObjectDigestInfo?
-    @inlinable init(targetCertificate: PKIXAttributeCertificate_2009_IssuerSerial, targetName: PKIX1Implicit88_GeneralName?, certDigestInfo: PKIXAttributeCertificate_2009_ObjectDigestInfo?) {
+    @inlinable init(targetCertificate: AuthenticationFramework_IssuerSerial, targetName: PKIX1Implicit88_GeneralName?, certDigestInfo: PKIXAttributeCertificate_2009_ObjectDigestInfo?) {
         self.targetCertificate = targetCertificate
         self.targetName = targetName
         self.certDigestInfo = certDigestInfo
@@ -15,7 +15,7 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let targetCertificate: PKIXAttributeCertificate_2009_IssuerSerial = try PKIXAttributeCertificate_2009_IssuerSerial(derEncoded: &nodes)
+            let targetCertificate: AuthenticationFramework_IssuerSerial = try AuthenticationFramework_IssuerSerial(derEncoded: &nodes)
             let targetName: PKIX1Implicit88_GeneralName? = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
             let certDigestInfo: PKIXAttributeCertificate_2009_ObjectDigestInfo? = try PKIXAttributeCertificate_2009_ObjectDigestInfo(derEncoded: &nodes)
             return PKIXAttributeCertificate_2009_TargetCert(targetCertificate: targetCertificate, targetName: targetName, certDigestInfo: certDigestInfo)

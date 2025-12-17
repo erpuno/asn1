@@ -4,16 +4,16 @@ import Foundation
 
 @usableFromInline struct PKIXAttributeCertificate_2009_IetfAttrSyntax: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var policyAuthority: PKIX1Implicit88_GeneralNames?
+    @usableFromInline var policyAuthority: PKIX1Implicit_2009_GeneralNames?
     @usableFromInline var values: [PKIXAttributeCertificate_2009_IetfAttrSyntax_values_Choice]
-    @inlinable init(policyAuthority: PKIX1Implicit88_GeneralNames?, values: [PKIXAttributeCertificate_2009_IetfAttrSyntax_values_Choice]) {
+    @inlinable init(policyAuthority: PKIX1Implicit_2009_GeneralNames?, values: [PKIXAttributeCertificate_2009_IetfAttrSyntax_values_Choice]) {
         self.policyAuthority = policyAuthority
         self.values = values
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let policyAuthority: PKIX1Implicit88_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+            let policyAuthority: PKIX1Implicit_2009_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let values: [PKIXAttributeCertificate_2009_IetfAttrSyntax_values_Choice] = try DER.sequence(of: PKIXAttributeCertificate_2009_IetfAttrSyntax_values_Choice.self, identifier: .sequence, nodes: &nodes)
             return PKIXAttributeCertificate_2009_IetfAttrSyntax(policyAuthority: policyAuthority, values: values)
         }

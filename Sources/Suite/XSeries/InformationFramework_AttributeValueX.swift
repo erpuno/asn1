@@ -13,8 +13,8 @@ import Foundation
                 self = .utf8(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1PrintableString.defaultIdentifier:
                 self = .printable(try ASN1PrintableString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Any.defaultIdentifier:
-                self = .`else`(try ASN1Any(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+            case ASN1Identifier(tagWithNumber: 9, tagClass: .universal):
+                self = .`else`(ASN1Any(derEncoded: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }

@@ -5,9 +5,9 @@ import Foundation
 @usableFromInline struct PKIX1Implicit88_AuthorityKeyIdentifier: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var keyIdentifier: PKIX1Implicit88_KeyIdentifier?
-    @usableFromInline var authorityCertIssuer: PKIX1Implicit88_GeneralNames?
+    @usableFromInline var authorityCertIssuer: PKIX1Implicit_2009_GeneralNames?
     @usableFromInline var authorityCertSerialNumber: PKIX1Explicit88_CertificateSerialNumber?
-    @inlinable init(keyIdentifier: PKIX1Implicit88_KeyIdentifier?, authorityCertIssuer: PKIX1Implicit88_GeneralNames?, authorityCertSerialNumber: PKIX1Explicit88_CertificateSerialNumber?) {
+    @inlinable init(keyIdentifier: PKIX1Implicit88_KeyIdentifier?, authorityCertIssuer: PKIX1Implicit_2009_GeneralNames?, authorityCertSerialNumber: PKIX1Explicit88_CertificateSerialNumber?) {
         self.keyIdentifier = keyIdentifier
         self.authorityCertIssuer = authorityCertIssuer
         self.authorityCertSerialNumber = authorityCertSerialNumber
@@ -16,7 +16,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let keyIdentifier: PKIX1Implicit88_KeyIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            let authorityCertIssuer: PKIX1Implicit88_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+            let authorityCertIssuer: PKIX1Implicit_2009_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let authorityCertSerialNumber: PKIX1Explicit88_CertificateSerialNumber? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             return PKIX1Implicit88_AuthorityKeyIdentifier(keyIdentifier: keyIdentifier, authorityCertIssuer: authorityCertIssuer, authorityCertSerialNumber: authorityCertSerialNumber)
         }

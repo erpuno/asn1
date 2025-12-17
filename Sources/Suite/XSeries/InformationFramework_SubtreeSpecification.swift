@@ -8,8 +8,8 @@ import Foundation
     @usableFromInline var specificExclusions: [InformationFramework_ChopSpecification_specificExclusions_Choice]?
     @usableFromInline var minimum: InformationFramework_BaseDistance?
     @usableFromInline var maximum: InformationFramework_BaseDistance?
-    @usableFromInline var specificationFilter: InformationFramework_Refinement?
-    @inlinable init(base: InformationFramework_LocalName?, specificExclusions: [InformationFramework_ChopSpecification_specificExclusions_Choice]?, minimum: InformationFramework_BaseDistance?, maximum: InformationFramework_BaseDistance?, specificationFilter: InformationFramework_Refinement?) {
+    @usableFromInline var specificationFilter: Box<InformationFramework_Refinement>?
+    @inlinable init(base: InformationFramework_LocalName?, specificExclusions: [InformationFramework_ChopSpecification_specificExclusions_Choice]?, minimum: InformationFramework_BaseDistance?, maximum: InformationFramework_BaseDistance?, specificationFilter: Box<InformationFramework_Refinement>?) {
         self.base = base
         self.specificExclusions = specificExclusions
         self.minimum = minimum
@@ -23,7 +23,7 @@ import Foundation
             let specificExclusions: [InformationFramework_ChopSpecification_specificExclusions_Choice]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.set(of: InformationFramework_ChopSpecification_specificExclusions_Choice.self, identifier: .set, rootNode: node) }
             let minimum: InformationFramework_BaseDistance = try DER.explicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try InformationFramework_BaseDistance(derEncoded: node) }
             let maximum: InformationFramework_BaseDistance? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try InformationFramework_BaseDistance(derEncoded: node) }
-            let specificationFilter: InformationFramework_Refinement? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in return try InformationFramework_Refinement(derEncoded: node) }
+            let specificationFilter: Box<InformationFramework_Refinement>? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in return Box(try InformationFramework_Refinement(derEncoded: node)) }
             return InformationFramework_SubtreeSpecification(base: base, specificExclusions: specificExclusions, minimum: minimum, maximum: maximum, specificationFilter: specificationFilter)
         }
     }
@@ -34,7 +34,7 @@ import Foundation
             if let specificExclusions = self.specificExclusions { if let specificExclusions = self.specificExclusions { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(specificExclusions) } } }
             if let minimum = self.minimum { if let minimum = self.minimum { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(minimum) } } }
             if let maximum = self.maximum { if let maximum = self.maximum { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(maximum) } } }
-            if let specificationFilter = self.specificationFilter { if let specificationFilter = self.specificationFilter { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(specificationFilter) } } }
+            if let specificationFilter = self.specificationFilter { if let specificationFilter = self.specificationFilter { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(specificationFilter.value) } } }
         }
     }
 }

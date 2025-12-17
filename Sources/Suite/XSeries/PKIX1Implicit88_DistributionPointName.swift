@@ -4,12 +4,12 @@ import Foundation
 
 @usableFromInline indirect enum PKIX1Implicit88_DistributionPointName: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
-        case fullName(PKIX1Implicit88_GeneralNames)
+        case fullName(PKIX1Implicit_2009_GeneralNames)
     case nameRelativeToCRLIssuer(PKIX1Explicit88_RelativeDistinguishedName)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .fullName(try PKIX1Implicit88_GeneralNames(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .fullName(try PKIX1Implicit_2009_GeneralNames(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
                 self = .nameRelativeToCRLIssuer(try PKIX1Explicit88_RelativeDistinguishedName(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)

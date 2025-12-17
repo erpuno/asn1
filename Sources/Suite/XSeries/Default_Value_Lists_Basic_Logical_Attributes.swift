@@ -4,12 +4,12 @@ import Foundation
 
 @usableFromInline struct Default_Value_Lists_Basic_Logical_Attributes: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
-    @usableFromInline var presentation_attributes: Default_Value_Lists_Basic_Logical_Attributes?
-    @usableFromInline var protection: Default_Value_Lists_Basic_Logical_Attributes?
-    @usableFromInline var presentation_style: Default_Value_Lists_Basic_Logical_Attributes?
-    @usableFromInline var layout_style: Default_Value_Lists_Basic_Logical_Attributes?
-    @usableFromInline var sealed: Default_Value_Lists_Basic_Logical_Attributes?
-    @inlinable init(presentation_attributes: Default_Value_Lists_Basic_Logical_Attributes?, protection: Default_Value_Lists_Basic_Logical_Attributes?, presentation_style: Default_Value_Lists_Basic_Logical_Attributes?, layout_style: Default_Value_Lists_Basic_Logical_Attributes?, sealed: Default_Value_Lists_Basic_Logical_Attributes?) {
+    @usableFromInline var presentation_attributes: Default_Value_Lists_Attribute?
+    @usableFromInline var protection: Default_Value_Lists_Attribute?
+    @usableFromInline var presentation_style: Default_Value_Lists_Attribute?
+    @usableFromInline var layout_style: Default_Value_Lists_Attribute?
+    @usableFromInline var sealed: Default_Value_Lists_Attribute?
+    @inlinable init(presentation_attributes: Default_Value_Lists_Attribute?, protection: Default_Value_Lists_Attribute?, presentation_style: Default_Value_Lists_Attribute?, layout_style: Default_Value_Lists_Attribute?, sealed: Default_Value_Lists_Attribute?) {
         self.presentation_attributes = presentation_attributes
         self.protection = protection
         self.presentation_style = presentation_style
@@ -19,11 +19,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
-            let presentation_attributes: Default_Value_Lists_Basic_Logical_Attributes? = try Default_Value_Lists_Basic_Logical_Attributes(derEncoded: &nodes)
-            let protection: Default_Value_Lists_Basic_Logical_Attributes? = try Default_Value_Lists_Basic_Logical_Attributes(derEncoded: &nodes)
-            let presentation_style: Default_Value_Lists_Basic_Logical_Attributes? = try Default_Value_Lists_Basic_Logical_Attributes(derEncoded: &nodes)
-            let layout_style: Default_Value_Lists_Basic_Logical_Attributes? = try Default_Value_Lists_Basic_Logical_Attributes(derEncoded: &nodes)
-            let sealed: Default_Value_Lists_Basic_Logical_Attributes? = try Default_Value_Lists_Basic_Logical_Attributes(derEncoded: &nodes)
+            let presentation_attributes: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let protection: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let presentation_style: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let layout_style: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
+            let sealed: Default_Value_Lists_Attribute? = try Default_Value_Lists_Attribute(derEncoded: &nodes)
             return Default_Value_Lists_Basic_Logical_Attributes(presentation_attributes: presentation_attributes, protection: protection, presentation_style: presentation_style, layout_style: layout_style, sealed: sealed)
         }
     }

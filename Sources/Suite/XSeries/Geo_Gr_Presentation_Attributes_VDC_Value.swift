@@ -10,8 +10,8 @@ import Foundation
         switch rootNode.identifier {
             case ArraySlice<UInt8>.defaultIdentifier:
                 self = .a(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Any.defaultIdentifier:
-                self = .b(try ASN1Any(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+            case ASN1Identifier(tagWithNumber: 9, tagClass: .universal):
+                self = .b(ASN1Any(derEncoded: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }

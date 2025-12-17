@@ -6,14 +6,14 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: AttributeCertificateVersion1_2009_AttCertVersionV1?
     @usableFromInline var subject: AttributeCertificateVersion1_2009_AttributeCertificateInfoV1_subject_Choice
-    @usableFromInline var issuer: PKIX1Implicit88_GeneralNames
+    @usableFromInline var issuer: PKIX1Implicit_2009_GeneralNames
     @usableFromInline var signature: AuthenticationFramework_AlgorithmIdentifier
     @usableFromInline var serialNumber: PKIX1Explicit88_CertificateSerialNumber
     @usableFromInline var attCertValidityPeriod: PKIXAttributeCertificate_2009_AttCertValidityPeriod
     @usableFromInline var attributes: [PKIX_CommonTypes_2009_AttributeSet]
     @usableFromInline var issuerUniqueID: SelectedAttributeTypes_UniqueIdentifier?
     @usableFromInline var extensions: PKIX1Explicit88_Extensions?
-    @inlinable init(version: AttributeCertificateVersion1_2009_AttCertVersionV1?, subject: AttributeCertificateVersion1_2009_AttributeCertificateInfoV1_subject_Choice, issuer: PKIX1Implicit88_GeneralNames, signature: AuthenticationFramework_AlgorithmIdentifier, serialNumber: PKIX1Explicit88_CertificateSerialNumber, attCertValidityPeriod: PKIXAttributeCertificate_2009_AttCertValidityPeriod, attributes: [PKIX_CommonTypes_2009_AttributeSet], issuerUniqueID: SelectedAttributeTypes_UniqueIdentifier?, extensions: PKIX1Explicit88_Extensions?) {
+    @inlinable init(version: AttributeCertificateVersion1_2009_AttCertVersionV1?, subject: AttributeCertificateVersion1_2009_AttributeCertificateInfoV1_subject_Choice, issuer: PKIX1Implicit_2009_GeneralNames, signature: AuthenticationFramework_AlgorithmIdentifier, serialNumber: PKIX1Explicit88_CertificateSerialNumber, attCertValidityPeriod: PKIXAttributeCertificate_2009_AttCertValidityPeriod, attributes: [PKIX_CommonTypes_2009_AttributeSet], issuerUniqueID: SelectedAttributeTypes_UniqueIdentifier?, extensions: PKIX1Explicit88_Extensions?) {
         self.version = version
         self.subject = subject
         self.issuer = issuer
@@ -29,7 +29,7 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let version: AttributeCertificateVersion1_2009_AttCertVersionV1? = try AttributeCertificateVersion1_2009_AttCertVersionV1(derEncoded: &nodes)
             let subject: AttributeCertificateVersion1_2009_AttributeCertificateInfoV1_subject_Choice = try AttributeCertificateVersion1_2009_AttributeCertificateInfoV1_subject_Choice(derEncoded: &nodes)
-            let issuer: PKIX1Implicit88_GeneralNames = try PKIX1Implicit88_GeneralNames(derEncoded: &nodes)
+            let issuer: PKIX1Implicit_2009_GeneralNames = try PKIX1Implicit_2009_GeneralNames(derEncoded: &nodes)
             let signature: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let serialNumber: PKIX1Explicit88_CertificateSerialNumber = try PKIX1Explicit88_CertificateSerialNumber(derEncoded: &nodes)
             let attCertValidityPeriod: PKIXAttributeCertificate_2009_AttCertValidityPeriod = try PKIXAttributeCertificate_2009_AttCertValidityPeriod(derEncoded: &nodes)

@@ -5,13 +5,13 @@ import Foundation
 @usableFromInline indirect enum ExtendedSecurityServices_2009_ReceiptsFrom: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case allOrFirstTier(ExtendedSecurityServices_2009_AllOrFirstTier)
-    case receiptList([CertificateExtensions_GeneralNames])
+    case receiptList([PKIX1Implicit_2009_GeneralNames])
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
                 self = .allOrFirstTier(try ExtendedSecurityServices_2009_AllOrFirstTier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .receiptList(try DER.sequence(of: CertificateExtensions_GeneralNames.self, identifier: rootNode.identifier, rootNode: rootNode))
+                self = .receiptList(try DER.sequence(of: PKIX1Implicit_2009_GeneralNames.self, identifier: rootNode.identifier, rootNode: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }

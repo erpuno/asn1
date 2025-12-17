@@ -5,8 +5,8 @@ import Foundation
 @usableFromInline struct PKCS_9_SMIMECapability: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var algorithm: ASN1ObjectIdentifier
-    @usableFromInline var parameters: ASN1Any
-    @inlinable init(algorithm: ASN1ObjectIdentifier, parameters: ASN1Any) {
+    @usableFromInline var parameters: ASN1Any?
+    @inlinable init(algorithm: ASN1ObjectIdentifier, parameters: ASN1Any?) {
         self.algorithm = algorithm
         self.parameters = parameters
     }
@@ -14,7 +14,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let algorithm: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let parameters: ASN1Any = try ASN1Any(derEncoded: &nodes)
+            let parameters: ASN1Any? = nodes.next().map { ASN1Any(derEncoded: $0) }
             return PKCS_9_SMIMECapability(algorithm: algorithm, parameters: parameters)
         }
     }
@@ -22,7 +22,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(algorithm)
-            try coder.serialize(parameters)
+            if let parameters = self.parameters { if let parameters = self.parameters { try coder.serialize(parameters) } }
         }
     }
 }
