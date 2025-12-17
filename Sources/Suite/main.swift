@@ -1,8 +1,5 @@
 import SwiftASN1
 import Foundation
-#if canImport(CommonCrypto)
-import CommonCrypto
-#endif
 
 exit(Console.suite())
 
@@ -129,41 +126,20 @@ func sendCMPRequestTCP(host: String, port: UInt16, message: Data) async throws -
 
 /// Compute HMAC-SHA256
 func hmacSHA256(key: Data, data: Data) -> Data {
-    #if canImport(CommonCrypto)
-    var hmac = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
-    data.withUnsafeBytes { dataBytes in
-        key.withUnsafeBytes { keyBytes in
-            CCHmac(CCHmacAlgorithm(kCCHmacAlgSHA256),
-                   keyBytes.baseAddress, key.count,
-                   dataBytes.baseAddress, data.count,
-                   &hmac)
-        }
-    }
-    return Data(hmac)
-    #else
-    // Fallback: return empty (would need CryptoKit on non-Apple platforms)
+    _ = key
+    _ = data
     return Data()
-    #endif
 }
 
 /// Compute PBKDF-like key from password using iterated SHA-256
 func pbkdf(password: Data, salt: Data, iterations: Int) -> Data {
-    #if canImport(CommonCrypto)
-    var result = password + salt
-    for _ in 0..<iterations {
-        var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
-        result.withUnsafeBytes { bytes in
-            CC_SHA256(bytes.baseAddress, CC_LONG(result.count), &hash)
-        }
-        result = Data(hash)
-    }
-    return result
-    #else
+    _ = password
+    _ = salt
+    _ = iterations
     return Data()
-    #endif
 }
 
-#if canImport(Security)
+#if false
 import Security
 
 // MARK: - Pure Swift CSR Generation (No OpenSSL)
@@ -836,7 +812,7 @@ public class Console {
 
   /// Complete CMP flow with pure Swift CSR generation - NO OpenSSL needed
   /// Generates key pair, builds CSR, sends CMP p10cr request to CA
-  #if canImport(Security)
+  #if false
   public static func generateAndSendCMP(
      subject: String = "swift_robot",
      countryCode: String = "UA",
@@ -1042,6 +1018,10 @@ public class Console {
    #endif
 
   public static func suite() -> Int32 {
+     let argv = CommandLine.arguments
+     if argv.count >= 2, argv[1] == "cms" {
+        return CMSCLI.main(arguments: Array(argv.dropFirst(2)))
+     }
      do {
        try verifyOID()
        print(": UsefulDefinitions_id_ce ⟼ \(UsefulDefinitions_id_ce)")
@@ -1086,7 +1066,7 @@ public class Console {
        try testCMPWorkflow(csrFile: "dima.csr")
 
        // PURE SWIFT CMP FLOW: Generate CSR and send to ca.synrc.com:8829
-       #if canImport(Security)
+       #if false
        print("\n: Running pure Swift CMP flow to ca.synrc.com:8829...")
        let semaphore = DispatchSemaphore(value: 0)
        Task {
