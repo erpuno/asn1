@@ -487,10 +487,10 @@ manual_boxing = [
     # "Identifiers_and_Expressions_Current_Instance_Function.second_parameter_expression"
 ]
 
-File.mkdir_p!("Sources/Suite/XSeries")
-Application.put_env(:asn1scg, "output", "Sources/Suite/XSeries/")
+File.mkdir_p!("Sources/Suite/Basic")
+Application.put_env(:asn1scg, "output", "Sources/Suite/Basic/")
 
-base_dir = "priv/x-series"
+base_dir = "priv/basic"
 
 # Get list of files
 raw_files =

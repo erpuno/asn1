@@ -5,22 +5,22 @@ exit(Console.suite())
 
 extension String: @retroactive Error { }
 
-func testPKIStatusInfoLogic() {
-    print("TEST: Testing PKIStatusInfo decoding...")
-    // PKIStatusInfo: SEQUENCE { status INTEGER (0) }
-    // Tag 16 (Sequence) Len 3. Content: Tag 2 (Int) Len 1 Val 0.
-    // [0x30, 0x03, 0x02, 0x01, 0x00]
-    let bytes: [UInt8] = [0x30, 0x03, 0x02, 0x01, 0x00]
-    do {
-         let info = try PKIXCMP_2009_PKIStatusInfo(derEncoded: bytes)
-         print("TEST: Decoded PKIStatusInfo successfully: \(info)")
-    } catch {
-         print("TEST: FAILED to decode PKIStatusInfo: \(error)")
-    }
-}
+// func testPKIStatusInfoLogic() {
+//     print("TEST: Testing PKIStatusInfo decoding...")
+//     // PKIStatusInfo: SEQUENCE { status INTEGER (0) }
+//     // Tag 16 (Sequence) Len 3. Content: Tag 2 (Int) Len 1 Val 0.
+//     // [0x30, 0x03, 0x02, 0x01, 0x00]
+//     let bytes: [UInt8] = [0x30, 0x03, 0x02, 0x01, 0x00]
+//     do {
+//          let info = try PKIXCMP_2009_PKIStatusInfo(derEncoded: bytes)
+//          print("TEST: Decoded PKIStatusInfo successfully: \(info)")
+//     } catch {
+//          print("TEST: FAILED to decode PKIStatusInfo: \(error)")
+//     }
+// }
 
 // Call the test
-testPKIStatusInfoLogic()
+// testPKIStatusInfoLogic()
 
 // MARK: - CMP HTTP Client
 
@@ -501,521 +501,521 @@ public class Console {
   
   /// Parse and display a CSR file (PKCS#10 CertificationRequest)
   /// Test with: openssl req -new -newkey ec:<(openssl ecparam -name secp384r1) -keyout key.enc -out test.csr -subj "/CN=test"
-  public static func showCSR(file: String) throws {
-     print("Debug: showCSR")
-     let url = URL(fileURLWithPath: file)
-     if (!Console.exists(f: url.path)) { 
-        print(": CSR file not found: \(file)") 
-        return
-     }
+//   public static func showCSR(file: String) throws {
+//      print("Debug: showCSR")
+//      let url = URL(fileURLWithPath: file)
+//      if (!Console.exists(f: url.path)) { 
+//         print(": CSR file not found: \(file)") 
+//         return
+//      }
      
-     // Try to read as DER first, then as PEM
-     var data = try Data(contentsOf: url)
+//      // Try to read as DER first, then as PEM
+//      var data = try Data(contentsOf: url)
      
-     // Check if it's PEM encoded
-     if let pemString = String(data: data, encoding: .utf8), 
-        pemString.contains("-----BEGIN CERTIFICATE REQUEST-----") {
-        // Extract base64 content between PEM headers
-        let lines = pemString.components(separatedBy: .newlines)
-        var base64Data = ""
-        var inBlock = false
-        for line in lines {
-           if line.contains("-----BEGIN") { inBlock = true; continue }
-           if line.contains("-----END") { break }
-           if inBlock { base64Data += line }
-        }
-        if let decoded = Data(base64Encoded: base64Data) {
-           data = decoded
-        }
-     }
+//      // Check if it's PEM encoded
+//      if let pemString = String(data: data, encoding: .utf8), 
+//         pemString.contains("-----BEGIN CERTIFICATE REQUEST-----") {
+//         // Extract base64 content between PEM headers
+//         let lines = pemString.components(separatedBy: .newlines)
+//         var base64Data = ""
+//         var inBlock = false
+//         for line in lines {
+//            if line.contains("-----BEGIN") { inBlock = true; continue }
+//            if line.contains("-----END") { break }
+//            if inBlock { base64Data += line }
+//         }
+//         if let decoded = Data(base64Encoded: base64Data) {
+//            data = decoded
+//         }
+//      }
      
-     let csr = try PKCS_10_CertificationRequest(derEncoded: Array(data))
-     print(": CSR Subject ⟼ \(csr.certificationRequestInfo.subject)")
-     print(": CSR Algorithm ⟼ \(csr.signatureAlgorithm.algorithm)")
-     print(": CSR ⟼ \(csr)\n")
+//    //   let csr = try PKCS_10_CertificationRequest(derEncoded: Array(data))
+//    //   print(": CSR Subject ⟼ \(csr.certificationRequestInfo.subject)")
+//    //   print(": CSR Algorithm ⟼ \(csr.signatureAlgorithm.algorithm)")
+//    //   print(": CSR ⟼ \(csr)\n")
      
-     // Verify round-trip
-     var serializer = DER.Serializer()
-     try csr.serialize(into: &serializer)
-     if (Array(data) == serializer.serializedBytes) {
-        print(": [OK] CSR round-trip matches.")
-     } else {
-        print(": [WARN] CSR round-trip differs.")
-     }
-  }
+//      // Verify round-trip
+//    //   var serializer = DER.Serializer()
+//    //   try csr.serialize(into: &serializer)
+//    //   if (Array(data) == serializer.serializedBytes) {
+//    //      print(": [OK] CSR round-trip matches.")
+//    //   } else {
+//    //      print(": [WARN] CSR round-trip differs.")
+//    //   }
+//   }
   
-  /// Verify CSR by re-encoding and comparing
-  public static func verifyCSR(file: String, output: String = "verified.csr") throws {
-     print("Debug: verifyCSR")
-     let url = URL(fileURLWithPath: file)
-     if (!Console.exists(f: url.path)) { 
-        print(": CSR file not found: \(file)") 
-        return
-     }
+//   /// Verify CSR by re-encoding and comparing
+//   public static func verifyCSR(file: String, output: String = "verified.csr") throws {
+//      print("Debug: verifyCSR")
+//      let url = URL(fileURLWithPath: file)
+//      if (!Console.exists(f: url.path)) { 
+//         print(": CSR file not found: \(file)") 
+//         return
+//      }
      
-     var data = try Data(contentsOf: url)
+//      var data = try Data(contentsOf: url)
      
-     // Handle PEM encoding
-     if let pemString = String(data: data, encoding: .utf8), 
-        pemString.contains("-----BEGIN CERTIFICATE REQUEST-----") {
-        let lines = pemString.components(separatedBy: .newlines)
-        var base64Data = ""
-        var inBlock = false
-        for line in lines {
-           if line.contains("-----BEGIN") { inBlock = true; continue }
-           if line.contains("-----END") { break }
-           if inBlock { base64Data += line }
-        }
-        if let decoded = Data(base64Encoded: base64Data) {
-           data = decoded
-        }
-     }
+//      // Handle PEM encoding
+//      if let pemString = String(data: data, encoding: .utf8), 
+//         pemString.contains("-----BEGIN CERTIFICATE REQUEST-----") {
+//         let lines = pemString.components(separatedBy: .newlines)
+//         var base64Data = ""
+//         var inBlock = false
+//         for line in lines {
+//            if line.contains("-----BEGIN") { inBlock = true; continue }
+//            if line.contains("-----END") { break }
+//            if inBlock { base64Data += line }
+//         }
+//         if let decoded = Data(base64Encoded: base64Data) {
+//            data = decoded
+//         }
+//      }
      
-     let csr = try PKCS_10_CertificationRequest(derEncoded: Array(data))
-     var serializer = DER.Serializer()
-     try csr.serialize(into: &serializer)
+   //   let csr = try PKCS_10_CertificationRequest(derEncoded: Array(data))
+   //   var serializer = DER.Serializer()
+   //   try csr.serialize(into: &serializer)
      
-     let outputUrl = URL(fileURLWithPath: output)
-     try Data(serializer.serializedBytes).write(to: outputUrl)
-     print(": CSR read and re-written to \(output)")
+   //   let outputUrl = URL(fileURLWithPath: output)
+   //   try Data(serializer.serializedBytes).write(to: outputUrl)
+   //   print(": CSR read and re-written to \(output)")
      
-     if (Array(data) == serializer.serializedBytes) { 
-        print(": [OK] DER <-> CSR round trip matches.")
-     } else {
-        print(": [WARN] DER <-> CSR round trip differs.")
-     }
+   //   if (Array(data) == serializer.serializedBytes) { 
+   //      print(": [OK] DER <-> CSR round trip matches.")
+   //   } else {
+   //      print(": [WARN] DER <-> CSR round trip differs.")
+   //   }
   }
 
   /// Test CMP workflow: parse CSR, then show what would be sent in p10cr
   /// Simulates: openssl cmp -cmd p10cr -server "ca.synrc.com":8829 -secret pass:0000 -ref cmptestp10cr -certout dima.pem -csr dima.csr
-  public static func testCMPWorkflow(csrFile: String) throws {
-     print("Debug: testCMPWorkflow")
-     print(": Simulating CMP p10cr (PKCS#10 Certificate Request) workflow")
-     print(": This is what would be sent to ca.synrc.com:8829\n")
+//   public static func testCMPWorkflow(csrFile: String) throws {
+//      print("Debug: testCMPWorkflow")
+//      print(": Simulating CMP p10cr (PKCS#10 Certificate Request) workflow")
+//      print(": This is what would be sent to ca.synrc.com:8829\n")
      
-     let url = URL(fileURLWithPath: csrFile)
-     if (!Console.exists(f: url.path)) { 
-        print(": CSR file not found: \(csrFile)")
-        print(": Generate one with:")
-        print(":   openssl req -passout pass:0 -new -newkey ec:<(openssl ecparam -name secp384r1) \\")
-        print(":              -keyout dima.key.enc -out dima.csr -subj \"/C=UA/ST=Kyiv/O=SYNRC/CN=dima\"")
-        return
-     }
+//      let url = URL(fileURLWithPath: csrFile)
+//      if (!Console.exists(f: url.path)) { 
+//         print(": CSR file not found: \(csrFile)")
+//         print(": Generate one with:")
+//         print(":   openssl req -passout pass:0 -new -newkey ec:<(openssl ecparam -name secp384r1) \\")
+//         print(":              -keyout dima.key.enc -out dima.csr -subj \"/C=UA/ST=Kyiv/O=SYNRC/CN=dima\"")
+//         return
+//      }
      
-     var data = try Data(contentsOf: url)
+//      var data = try Data(contentsOf: url)
      
-     // Handle PEM encoding
-     if let pemString = String(data: data, encoding: .utf8), 
-        pemString.contains("-----BEGIN CERTIFICATE REQUEST-----") {
-        let lines = pemString.components(separatedBy: .newlines)
-        var base64Data = ""
-        var inBlock = false
-        for line in lines {
-           if line.contains("-----BEGIN") { inBlock = true; continue }
-           if line.contains("-----END") { break }
-           if inBlock { base64Data += line }
-        }
-        if let decoded = Data(base64Encoded: base64Data) {
-           data = decoded
-        }
-     }
+//      // Handle PEM encoding
+//      if let pemString = String(data: data, encoding: .utf8), 
+//         pemString.contains("-----BEGIN CERTIFICATE REQUEST-----") {
+//         let lines = pemString.components(separatedBy: .newlines)
+//         var base64Data = ""
+//         var inBlock = false
+//         for line in lines {
+//            if line.contains("-----BEGIN") { inBlock = true; continue }
+//            if line.contains("-----END") { break }
+//            if inBlock { base64Data += line }
+//         }
+//         if let decoded = Data(base64Encoded: base64Data) {
+//            data = decoded
+//         }
+//      }
      
-     // Parse the CSR
-     let csr = try PKCS_10_CertificationRequest(derEncoded: Array(data))
+//      // Parse the CSR
+//      let csr = try PKCS_10_CertificationRequest(derEncoded: Array(data))
      
-     print(": === CSR Contents ===")
-     print(": Subject: \(csr.certificationRequestInfo.subject)")
-     print(": Signature Algorithm: \(csr.signatureAlgorithm.algorithm)")
-     print(": Version: \(csr.certificationRequestInfo.version)")
+//      print(": === CSR Contents ===")
+//      print(": Subject: \(csr.certificationRequestInfo.subject)")
+//      print(": Signature Algorithm: \(csr.signatureAlgorithm.algorithm)")
+//      print(": Version: \(csr.certificationRequestInfo.version)")
      
-     // Serialize and compute size
-     var serializer = DER.Serializer()
-     try csr.serialize(into: &serializer)
-     print(": CSR DER Size: \(serializer.serializedBytes.count) bytes\n")
+//      // Serialize and compute size
+//      var serializer = DER.Serializer()
+//      try csr.serialize(into: &serializer)
+//      print(": CSR DER Size: \(serializer.serializedBytes.count) bytes\n")
      
-     print(": === CMP p10cr Request Info ===")
-     print(": Command: p10cr (PKCS#10 Certification Request)")
-     print(": Server: ca.synrc.com:8829")
-     print(": Reference: cmptestp10cr")
-     print(": MAC Protection: PBM with shared secret")
-     print(": CSR Type: PKCS_10_CertificationRequest\n")
+//      print(": === CMP p10cr Request Info ===")
+//      print(": Command: p10cr (PKCS#10 Certification Request)")
+//      print(": Server: ca.synrc.com:8829")
+//      print(": Reference: cmptestp10cr")
+//      print(": MAC Protection: PBM with shared secret")
+//      print(": CSR Type: PKCS_10_CertificationRequest\n")
      
-     print(": [OK] CSR parsed successfully - ready for CMP submission")
-  }
+//      print(": [OK] CSR parsed successfully - ready for CMP submission")
+//   }
 
   /// Build and send CMP p10cr request to CA server
   /// Usage: openssl cmp -cmd p10cr -server "ca.synrc.com":8829 -secret pass:0000 -ref cmptestp10cr
-  public static func sendCMPp10cr(csrFile: String, server: String = "ca.synrc.com", port: Int = 8829, secret: String = "0000", reference: String = "cmptestp10cr") async throws {
-     print("Debug: sendCMPp10cr")
-     print(": Building CMP p10cr request...")
-     print(": Server: \(server):\(port)")
-     print(": Reference: \(reference)\n")
+//   public static func sendCMPp10cr(csrFile: String, server: String = "ca.synrc.com", port: Int = 8829, secret: String = "0000", reference: String = "cmptestp10cr") async throws {
+//      print("Debug: sendCMPp10cr")
+//      print(": Building CMP p10cr request...")
+//      print(": Server: \(server):\(port)")
+//      print(": Reference: \(reference)\n")
      
-     let url = URL(fileURLWithPath: csrFile)
-     if (!Console.exists(f: url.path)) { 
-        throw "CSR file not found: \(csrFile)"
-     }
+//      let url = URL(fileURLWithPath: csrFile)
+//      if (!Console.exists(f: url.path)) { 
+//         throw "CSR file not found: \(csrFile)"
+//      }
      
-     // Load and parse CSR
-     var data = try Data(contentsOf: url)
-     if let pemString = String(data: data, encoding: .utf8), 
-        pemString.contains("-----BEGIN CERTIFICATE REQUEST-----") {
-        let lines = pemString.components(separatedBy: .newlines)
-        var base64Data = ""
-        var inBlock = false
-        for line in lines {
-           if line.contains("-----BEGIN") { inBlock = true; continue }
-           if line.contains("-----END") { break }
-           if inBlock { base64Data += line }
-        }
-        if let decoded = Data(base64Encoded: base64Data) {
-           data = decoded
-        }
-     }
-     let csr = try PKCS_10_CertificationRequest(derEncoded: Array(data))
-     print(": CSR Subject: \(csr.certificationRequestInfo.subject)")
+//      // Load and parse CSR
+//      var data = try Data(contentsOf: url)
+//      if let pemString = String(data: data, encoding: .utf8), 
+//         pemString.contains("-----BEGIN CERTIFICATE REQUEST-----") {
+//         let lines = pemString.components(separatedBy: .newlines)
+//         var base64Data = ""
+//         var inBlock = false
+//         for line in lines {
+//            if line.contains("-----BEGIN") { inBlock = true; continue }
+//            if line.contains("-----END") { break }
+//            if inBlock { base64Data += line }
+//         }
+//         if let decoded = Data(base64Encoded: base64Data) {
+//            data = decoded
+//         }
+//      }
+//      let csr = try PKCS_10_CertificationRequest(derEncoded: Array(data))
+//      print(": CSR Subject: \(csr.certificationRequestInfo.subject)")
      
-     // Generate salt and nonce
-     var salt = [UInt8](repeating: 0, count: 16)
-     var transactionId = [UInt8](repeating: 0, count: 16)
-     var senderNonce = [UInt8](repeating: 0, count: 16)
-     _ = SecRandomCopyBytes(kSecRandomDefault, salt.count, &salt)
-     _ = SecRandomCopyBytes(kSecRandomDefault, transactionId.count, &transactionId)
-     _ = SecRandomCopyBytes(kSecRandomDefault, senderNonce.count, &senderNonce)
+//      // Generate salt and nonce
+//      var salt = [UInt8](repeating: 0, count: 16)
+//      var transactionId = [UInt8](repeating: 0, count: 16)
+//      var senderNonce = [UInt8](repeating: 0, count: 16)
+//      _ = SecRandomCopyBytes(kSecRandomDefault, salt.count, &salt)
+//      _ = SecRandomCopyBytes(kSecRandomDefault, transactionId.count, &transactionId)
+//      _ = SecRandomCopyBytes(kSecRandomDefault, senderNonce.count, &senderNonce)
      
-     // Build PBM parameters for protection
-     // OID 1.3.6.1.5.5.8.1.2 = hmac-sha256
-     let hmacSHA256OID = try ASN1ObjectIdentifier(dotRepresentation: "1.2.840.113549.2.9")
-     // OID 2.16.840.1.101.3.4.2.1 = sha256
-     let sha256OID = try ASN1ObjectIdentifier(dotRepresentation: "2.16.840.1.101.3.4.2.1")
+//      // Build PBM parameters for protection
+//      // OID 1.3.6.1.5.5.8.1.2 = hmac-sha256
+//      let hmacSHA256OID = try ASN1ObjectIdentifier(dotRepresentation: "1.2.840.113549.2.9")
+//      // OID 2.16.840.1.101.3.4.2.1 = sha256
+//      let sha256OID = try ASN1ObjectIdentifier(dotRepresentation: "2.16.840.1.101.3.4.2.1")
      
-     let owfAlg = PKIX1Explicit88_AlgorithmIdentifier(algorithm: sha256OID, parameters: nil)
-     let macAlg = PKIX1Explicit88_AlgorithmIdentifier(algorithm: hmacSHA256OID, parameters: nil)
+//      let owfAlg = PKIX1Explicit88_AlgorithmIdentifier(algorithm: sha256OID, parameters: nil)
+//      let macAlg = PKIX1Explicit88_AlgorithmIdentifier(algorithm: hmacSHA256OID, parameters: nil)
      
-     // Iteration count = 10000
-     let iterationCount: ArraySlice<UInt8> = [0x27, 0x10]  // 10000 in big-endian
+//      // Iteration count = 10000
+//      let iterationCount: ArraySlice<UInt8> = [0x27, 0x10]  // 10000 in big-endian
      
-     let pbmParams = PKIXCMP_2009_PBMParameter(
-        salt: ASN1OctetString(contentBytes: ArraySlice(salt)),
-        owf: owfAlg,
-        iterationCount: iterationCount,
-        mac: macAlg
-     )
+//      let pbmParams = PKIXCMP_2009_PBMParameter(
+//         salt: ASN1OctetString(contentBytes: ArraySlice(salt)),
+//         owf: owfAlg,
+//         iterationCount: iterationCount,
+//         mac: macAlg
+//      )
      
-     // Serialize PBM parameters for protection algorithm
-     var pbmSerializer = DER.Serializer()
-     try pbmParams.serialize(into: &pbmSerializer)
-     let pbmDER = pbmSerializer.serializedBytes
+//      // Serialize PBM parameters for protection algorithm
+//      var pbmSerializer = DER.Serializer()
+//      try pbmParams.serialize(into: &pbmSerializer)
+//      let pbmDER = pbmSerializer.serializedBytes
      
-     // Create protection algorithm: 1.2.840.113533.7.66.13 (Password Based MAC)
-     let pbmOID = try ASN1ObjectIdentifier(dotRepresentation: "1.2.840.113533.7.66.13")
-     let protectionAlg = PKIX1Explicit88_AlgorithmIdentifier(
-        algorithm: pbmOID,
-        parameters: try ASN1Any(derEncoded: pbmDER)
-     )
+//      // Create protection algorithm: 1.2.840.113533.7.66.13 (Password Based MAC)
+//      let pbmOID = try ASN1ObjectIdentifier(dotRepresentation: "1.2.840.113533.7.66.13")
+//      let protectionAlg = PKIX1Explicit88_AlgorithmIdentifier(
+//         algorithm: pbmOID,
+//         parameters: try ASN1Any(derEncoded: pbmDER)
+//      )
      
-     // Build sender (empty directoryName) - now fixed to properly use context tag [4]
-     let emptyName = PKIX1Implicit88_GeneralName.directoryName(PKIX1Explicit88_Name.rdnSequence(PKIX1Explicit88_RDNSequence([])))
+//      // Build sender (empty directoryName) - now fixed to properly use context tag [4]
+//      let emptyName = PKIX1Implicit88_GeneralName.directoryName(PKIX1Explicit88_Name.rdnSequence(PKIX1Explicit88_RDNSequence([])))
      
-     // Build header
-     let header = PKIXCMP_2009_PKIHeader(
-        pvno: .cmp2000,
-        sender: emptyName,
-        recipient: emptyName,
-        messageTime: nil,
-        protectionAlg: protectionAlg,
-        senderKID: ASN1OctetString(contentBytes: ArraySlice(Array(reference.utf8))),  // Reference string as sender key ID
-        recipKID: nil,
-        transactionID: ASN1OctetString(contentBytes: ArraySlice(transactionId)),
-        senderNonce: ASN1OctetString(contentBytes: ArraySlice(senderNonce)),
-        recipNonce: nil,
-        freeText: nil,
-        generalInfo: nil
-     )
+//      // Build header
+//      let header = PKIXCMP_2009_PKIHeader(
+//         pvno: .cmp2000,
+//         sender: emptyName,
+//         recipient: emptyName,
+//         messageTime: nil,
+//         protectionAlg: protectionAlg,
+//         senderKID: ASN1OctetString(contentBytes: ArraySlice(Array(reference.utf8))),  // Reference string as sender key ID
+//         recipKID: nil,
+//         transactionID: ASN1OctetString(contentBytes: ArraySlice(transactionId)),
+//         senderNonce: ASN1OctetString(contentBytes: ArraySlice(senderNonce)),
+//         recipNonce: nil,
+//         freeText: nil,
+//         generalInfo: nil
+//      )
      
-     // Build body with CSR
-     let body = PKIXCMP_2009_PKIBody.p10cr(csr)
+//      // Build body with CSR
+//      let body = PKIXCMP_2009_PKIBody.p10cr(csr)
      
-     // Serialize protectedPart = SEQUENCE { header, body } per RFC 4210 section 5.1.3
-     // The MAC is computed over the DER encoding of the ProtectedPart structure
-     var protectedSerializer = DER.Serializer()
-     try protectedSerializer.appendConstructedNode(identifier: .sequence) { coder in
-         try header.serialize(into: &coder)
-         try body.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
-     }
-     let protectedBytes = protectedSerializer.serializedBytes
+//      // Serialize protectedPart = SEQUENCE { header, body } per RFC 4210 section 5.1.3
+//      // The MAC is computed over the DER encoding of the ProtectedPart structure
+//      var protectedSerializer = DER.Serializer()
+//      try protectedSerializer.appendConstructedNode(identifier: .sequence) { coder in
+//          try header.serialize(into: &coder)
+//          try body.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
+//      }
+//      let protectedBytes = protectedSerializer.serializedBytes
      
-     // Compute protection MAC
-     let passwordData = Data(secret.utf8)
-     let derivedKey = pbkdf(password: passwordData, salt: Data(salt), iterations: 10000)
-     let protectionMAC = hmacSHA256(key: derivedKey, data: Data(protectedBytes))
+//      // Compute protection MAC
+//      let passwordData = Data(secret.utf8)
+//      let derivedKey = pbkdf(password: passwordData, salt: Data(salt), iterations: 10000)
+//      let protectionMAC = hmacSHA256(key: derivedKey, data: Data(protectedBytes))
      
-     print(": Protection MAC computed: \(protectionMAC.prefix(8).map { String(format: "%02x", $0) }.joined())...")
+//      print(": Protection MAC computed: \(protectionMAC.prefix(8).map { String(format: "%02x", $0) }.joined())...")
      
-     // Build PKIMessage
-     let protection = ASN1BitString(bytes: ArraySlice(protectionMAC))
-     let pkiMessage = PKIXCMP_2009_PKIMessage(
-        header: header,
-        body: body,
-        protection: protection,
-        extraCerts: nil
-     )
+//      // Build PKIMessage
+//      let protection = ASN1BitString(bytes: ArraySlice(protectionMAC))
+//      let pkiMessage = PKIXCMP_2009_PKIMessage(
+//         header: header,
+//         body: body,
+//         protection: protection,
+//         extraCerts: nil
+//      )
      
-     // Serialize the full message
-     var msgSerializer = DER.Serializer()
-     try pkiMessage.serialize(into: &msgSerializer)
-     let messageBytes = msgSerializer.serializedBytes
+//      // Serialize the full message
+//      var msgSerializer = DER.Serializer()
+//      try pkiMessage.serialize(into: &msgSerializer)
+//      let messageBytes = msgSerializer.serializedBytes
      
-     print(": PKIMessage built: \(messageBytes.count) bytes")
+//      print(": PKIMessage built: \(messageBytes.count) bytes")
      
-     // Save request for debugging
-     let requestPath = "cmp_request.der"
-     try Data(messageBytes).write(to: URL(fileURLWithPath: requestPath))
-     print(": Request saved to \(requestPath)")
+//      // Save request for debugging
+//      let requestPath = "cmp_request.der"
+//      try Data(messageBytes).write(to: URL(fileURLWithPath: requestPath))
+//      print(": Request saved to \(requestPath)")
      
-     // Send HTTP request
-     let serverURL = URL(string: "http://\(server):\(port)/")!
-     print(": Sending to \(serverURL)...")
+//      // Send HTTP request
+//      let serverURL = URL(string: "http://\(server):\(port)/")!
+//      print(": Sending to \(serverURL)...")
      
-     do {
-        let responseData = try await sendCMPRequest(to: serverURL, message: Data(messageBytes))
-        print(": Received response: \(responseData.count) bytes")
+//      do {
+//         let responseData = try await sendCMPRequest(to: serverURL, message: Data(messageBytes))
+//         print(": Received response: \(responseData.count) bytes")
         
-        // Save response
-        try responseData.write(to: URL(fileURLWithPath: "cmp_response.der"))
-        print(": Response saved to cmp_response.der")
+//         // Save response
+//         try responseData.write(to: URL(fileURLWithPath: "cmp_response.der"))
+//         print(": Response saved to cmp_response.der")
         
-        // Parse response
-        let response = try PKIXCMP_2009_PKIMessage(derEncoded: Array(responseData))
-        print(": Response type: \(response.body)")
+//         // Parse response
+//         let response = try PKIXCMP_2009_PKIMessage(derEncoded: Array(responseData))
+//         print(": Response type: \(response.body)")
         
-        // Check for certificate in response
-        switch response.body {
-        case .cp(let certRep):
-           print(": Got certificate response!")
-           let certs = certRep.response
-           if !certs.isEmpty {
-              print(": Received \(certs.count) certificate(s)")
-           }
-        case .error(let error):
-           print(": Error response: \(error)")
-        default:
-           print(": Unexpected response type")
-        }
+//         // Check for certificate in response
+//         switch response.body {
+//         case .cp(let certRep):
+//            print(": Got certificate response!")
+//            let certs = certRep.response
+//            if !certs.isEmpty {
+//               print(": Received \(certs.count) certificate(s)")
+//            }
+//         case .error(let error):
+//            print(": Error response: \(error)")
+//         default:
+//            print(": Unexpected response type")
+//         }
         
-        print(": [OK] CMP request completed")
-     } catch {
-        print(": [ERROR] HTTP request failed: \(error)")
-        print(": Request was saved to \(requestPath) for debugging")
-     }
-  }
+//         print(": [OK] CMP request completed")
+//      } catch {
+//         print(": [ERROR] HTTP request failed: \(error)")
+//         print(": Request was saved to \(requestPath) for debugging")
+//      }
+//   }
 
-  /// Complete CMP flow with pure Swift CSR generation - NO OpenSSL needed
-  /// Generates key pair, builds CSR, sends CMP p10cr request to CA
-  #if false
-  public static func generateAndSendCMP(
-     subject: String = "swift_robot",
-     countryCode: String = "UA",
-     state: String = "Kyiv",
-     org: String = "SYNRC",
-     server: String = "ca.synrc.com",
-     port: Int = 8829,
-     secret: String = "0000",
-     reference: String = "cmptestp10cr"
-  ) async throws {
-     print("\n" + String(repeating: "=", count: 50))
-     print(": PURE SWIFT CMP FLOW (No OpenSSL Required)")
-     print(String(repeating: "=", count: 50) + "\n")
+// //   /// Complete CMP flow with pure Swift CSR generation - NO OpenSSL needed
+// //   /// Generates key pair, builds CSR, sends CMP p10cr request to CA
+// //   #if false
+// //   public static func generateAndSendCMP(
+// //      subject: String = "swift_robot",
+// //      countryCode: String = "UA",
+// //      state: String = "Kyiv",
+// //      org: String = "SYNRC",
+// //      server: String = "ca.synrc.com",
+// //      port: Int = 8829,
+// //      secret: String = "0000",
+// //      reference: String = "cmptestp10cr"
+// //   ) async throws {
+// //      print("\n" + String(repeating: "=", count: 50))
+// //      print(": PURE SWIFT CMP FLOW (No OpenSSL Required)")
+// //      print(String(repeating: "=", count: 50) + "\n")
      
-     // Step 1: Generate CSR
-     print(": Step 1: Building CSR...")
-     let (csr, _) = try buildCSR(subject: subject, countryCode: countryCode, state: state, org: org)
+// //      // Step 1: Generate CSR
+// //      print(": Step 1: Building CSR...")
+// //      let (csr, _) = try buildCSR(subject: subject, countryCode: countryCode, state: state, org: org)
      
-     // Serialize CSR and save for debugging
-     var csrSerializer = DER.Serializer()
-     try csr.serialize(into: &csrSerializer)
-     let csrDER = csrSerializer.serializedBytes
-     try Data(csrDER).write(to: URL(fileURLWithPath: "generated.csr"))
-     print(": CSR saved to generated.csr (\(csrDER.count) bytes)\n")
+// //      // Serialize CSR and save for debugging
+// //      var csrSerializer = DER.Serializer()
+// //      try csr.serialize(into: &csrSerializer)
+// //      let csrDER = csrSerializer.serializedBytes
+// //      try Data(csrDER).write(to: URL(fileURLWithPath: "generated.csr"))
+// //      print(": CSR saved to generated.csr (\(csrDER.count) bytes)\n")
      
-     // Step 2: Build CMP message
-     print(": Step 2: Building CMP p10cr message...")
+// //      // Step 2: Build CMP message
+// //      print(": Step 2: Building CMP p10cr message...")
      
-     // Generate random values
-     var salt = [UInt8](repeating: 0, count: 16)
-     var transactionId = [UInt8](repeating: 0, count: 16)
-     var senderNonce = [UInt8](repeating: 0, count: 16)
-     _ = SecRandomCopyBytes(kSecRandomDefault, salt.count, &salt)
-     _ = SecRandomCopyBytes(kSecRandomDefault, transactionId.count, &transactionId)
-     _ = SecRandomCopyBytes(kSecRandomDefault, senderNonce.count, &senderNonce)
+// //      // Generate random values
+// //      var salt = [UInt8](repeating: 0, count: 16)
+// //      var transactionId = [UInt8](repeating: 0, count: 16)
+// //      var senderNonce = [UInt8](repeating: 0, count: 16)
+// //      _ = SecRandomCopyBytes(kSecRandomDefault, salt.count, &salt)
+// //      _ = SecRandomCopyBytes(kSecRandomDefault, transactionId.count, &transactionId)
+// //      _ = SecRandomCopyBytes(kSecRandomDefault, senderNonce.count, &senderNonce)
      
-     // Build PBM parameters
-     let hmacSHA256OID = try ASN1ObjectIdentifier(dotRepresentation: "1.2.840.113549.2.9")
-     let sha256OID = try ASN1ObjectIdentifier(dotRepresentation: "2.16.840.1.101.3.4.2.1")
-     let owfAlg = PKIX1Explicit88_AlgorithmIdentifier(algorithm: sha256OID, parameters: nil)
-     let macAlg = PKIX1Explicit88_AlgorithmIdentifier(algorithm: hmacSHA256OID, parameters: nil)
-     let iterationCount: ArraySlice<UInt8> = [0x27, 0x10]
+// //      // Build PBM parameters
+// //      let hmacSHA256OID = try ASN1ObjectIdentifier(dotRepresentation: "1.2.840.113549.2.9")
+// //      let sha256OID = try ASN1ObjectIdentifier(dotRepresentation: "2.16.840.1.101.3.4.2.1")
+// //      let owfAlg = PKIX1Explicit88_AlgorithmIdentifier(algorithm: sha256OID, parameters: nil)
+// //      let macAlg = PKIX1Explicit88_AlgorithmIdentifier(algorithm: hmacSHA256OID, parameters: nil)
+// //      let iterationCount: ArraySlice<UInt8> = [0x27, 0x10]
      
-     let pbmParams = PKIXCMP_2009_PBMParameter(
-        salt: ASN1OctetString(contentBytes: ArraySlice(salt)),
-        owf: owfAlg,
-        iterationCount: iterationCount,
-        mac: macAlg
-     )
+// //      let pbmParams = PKIXCMP_2009_PBMParameter(
+// //         salt: ASN1OctetString(contentBytes: ArraySlice(salt)),
+// //         owf: owfAlg,
+// //         iterationCount: iterationCount,
+// //         mac: macAlg
+// //      )
      
-     var pbmSerializer = DER.Serializer()
-     try pbmParams.serialize(into: &pbmSerializer)
+// //      var pbmSerializer = DER.Serializer()
+// //      try pbmParams.serialize(into: &pbmSerializer)
      
-     let pbmOID = try ASN1ObjectIdentifier(dotRepresentation: "1.2.840.113533.7.66.13")
-     let protectionAlg = PKIX1Explicit88_AlgorithmIdentifier(
-        algorithm: pbmOID,
-        parameters: try ASN1Any(derEncoded: pbmSerializer.serializedBytes)
-     )
+// //      let pbmOID = try ASN1ObjectIdentifier(dotRepresentation: "1.2.840.113533.7.66.13")
+// //      let protectionAlg = PKIX1Explicit88_AlgorithmIdentifier(
+// //         algorithm: pbmOID,
+// //         parameters: try ASN1Any(derEncoded: pbmSerializer.serializedBytes)
+// //      )
      
-     // Build sender (empty directoryName) - now fixed to properly use context tag [4]
-     let emptyName = PKIX1Implicit88_GeneralName.directoryName(PKIX1Explicit88_Name.rdnSequence(PKIX1Explicit88_RDNSequence([])))
-     let header = PKIXCMP_2009_PKIHeader(
-        pvno: .cmp2000,
-        sender: emptyName,
-        recipient: emptyName,
-        messageTime: nil,
-        protectionAlg: protectionAlg,
-        senderKID: ASN1OctetString(contentBytes: ArraySlice(Array(reference.utf8))),
-        recipKID: nil,
-        transactionID: ASN1OctetString(contentBytes: ArraySlice(transactionId)),
-        senderNonce: ASN1OctetString(contentBytes: ArraySlice(senderNonce)),
-        recipNonce: nil,
-        freeText: nil,
-        generalInfo: nil
-     )
+// //      // Build sender (empty directoryName) - now fixed to properly use context tag [4]
+// //      let emptyName = PKIX1Implicit88_GeneralName.directoryName(PKIX1Explicit88_Name.rdnSequence(PKIX1Explicit88_RDNSequence([])))
+// //      let header = PKIXCMP_2009_PKIHeader(
+// //         pvno: .cmp2000,
+// //         sender: emptyName,
+// //         recipient: emptyName,
+// //         messageTime: nil,
+// //         protectionAlg: protectionAlg,
+// //         senderKID: ASN1OctetString(contentBytes: ArraySlice(Array(reference.utf8))),
+// //         recipKID: nil,
+// //         transactionID: ASN1OctetString(contentBytes: ArraySlice(transactionId)),
+// //         senderNonce: ASN1OctetString(contentBytes: ArraySlice(senderNonce)),
+// //         recipNonce: nil,
+// //         freeText: nil,
+// //         generalInfo: nil
+// //      )
      
-     let body = PKIXCMP_2009_PKIBody.p10cr(csr)
+// //      let body = PKIXCMP_2009_PKIBody.p10cr(csr)
      
-     // Serialize protectedPart = SEQUENCE { header, body } per RFC 4210 section 5.1.3
-     var protectedSerializer = DER.Serializer()
-     try protectedSerializer.appendConstructedNode(identifier: .sequence) { coder in
-         try header.serialize(into: &coder)
-         try body.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
-     }
+// //      // Serialize protectedPart = SEQUENCE { header, body } per RFC 4210 section 5.1.3
+// //      var protectedSerializer = DER.Serializer()
+// //      try protectedSerializer.appendConstructedNode(identifier: .sequence) { coder in
+// //          try header.serialize(into: &coder)
+// //          try body.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
+// //      }
      
-     let derivedKey = pbkdf(password: Data(secret.utf8), salt: Data(salt), iterations: 10000)
-     let protectionMAC = hmacSHA256(key: derivedKey, data: Data(protectedSerializer.serializedBytes))
+// //      let derivedKey = pbkdf(password: Data(secret.utf8), salt: Data(salt), iterations: 10000)
+// //      let protectionMAC = hmacSHA256(key: derivedKey, data: Data(protectedSerializer.serializedBytes))
      
-     let pkiMessage = PKIXCMP_2009_PKIMessage(
-        header: header,
-        body: body,
-        protection: ASN1BitString(bytes: ArraySlice(protectionMAC)),
-        extraCerts: nil
-     )
+// //      let pkiMessage = PKIXCMP_2009_PKIMessage(
+// //         header: header,
+// //         body: body,
+// //         protection: ASN1BitString(bytes: ArraySlice(protectionMAC)),
+// //         extraCerts: nil
+// //      )
      
-     var msgSerializer = DER.Serializer()
-     try pkiMessage.serialize(into: &msgSerializer)
-     let messageBytes = msgSerializer.serializedBytes
+// //      var msgSerializer = DER.Serializer()
+// //      try pkiMessage.serialize(into: &msgSerializer)
+// //      let messageBytes = msgSerializer.serializedBytes
      
-     try Data(messageBytes).write(to: URL(fileURLWithPath: "cmp_request.der"))
-     print(": CMP message saved to cmp_request.der (\(messageBytes.count) bytes)\n")
+// //      try Data(messageBytes).write(to: URL(fileURLWithPath: "cmp_request.der"))
+// //      print(": CMP message saved to cmp_request.der (\(messageBytes.count) bytes)\n")
      
-     // Step 3: Send to server via HTTP
-     print(": Step 3: Sending to \(server):\(port) via HTTP...")
-     let serverURL = URL(string: "http://\(server):\(port)/")!
+// //      // Step 3: Send to server via HTTP
+// //      print(": Step 3: Sending to \(server):\(port) via HTTP...")
+// //      let serverURL = URL(string: "http://\(server):\(port)/")!
      
-     do {
-        let responseData = try await sendCMPRequest(to: serverURL, message: Data(messageBytes))
-        print(": Response received: \(responseData.count) bytes")
+// //      do {
+// //         let responseData = try await sendCMPRequest(to: serverURL, message: Data(messageBytes))
+// //         print(": Response received: \(responseData.count) bytes")
         
-        try responseData.write(to: URL(fileURLWithPath: "cmp_response.der"))
-        print(": Response saved to cmp_response.der")
+// //         try responseData.write(to: URL(fileURLWithPath: "cmp_response.der"))
+// //         print(": Response saved to cmp_response.der")
         
-        let response = try PKIXCMP_2009_PKIMessage(derEncoded: Array(responseData))
+// //         let response = try PKIXCMP_2009_PKIMessage(derEncoded: Array(responseData))
         
-        switch response.body {
-        case .cp(let certRep), .ip(let certRep):
-           print(": SUCCESS! Response received (type: \(response.body))")
-           if let extraCerts = response.extraCerts {
-               print(": Extra certificates: \(extraCerts.count)")
-           }
-           if let caPubs = certRep.caPubs {
-               print(": CA Pubs: \(caPubs.count)")
-           }
-           let certs = certRep.response
-           print(": Response count: \(certs.count)")
-           for (i, certResp) in certs.enumerated() {
-               print(": Response #\(i): status=\(certResp.status.status)")
-               if let kp = certResp.certifiedKeyPair {
-                   print(":  - Certified Key Pair present")
-               }
-           }
-        case .error(let error):
-           print(": ERROR response: \(error)")
-        default:
-           print(": Response type: \(response.body)")
-        }
+// //         switch response.body {
+// //         case .cp(let certRep), .ip(let certRep):
+// //            print(": SUCCESS! Response received (type: \(response.body))")
+// //            if let extraCerts = response.extraCerts {
+// //                print(": Extra certificates: \(extraCerts.count)")
+// //            }
+// //            if let caPubs = certRep.caPubs {
+// //                print(": CA Pubs: \(caPubs.count)")
+// //            }
+// //            let certs = certRep.response
+// //            print(": Response count: \(certs.count)")
+// //            for (i, certResp) in certs.enumerated() {
+// //                print(": Response #\(i): status=\(certResp.status.status)")
+// //                if let kp = certResp.certifiedKeyPair {
+// //                    print(":  - Certified Key Pair present")
+// //                }
+// //            }
+// //         case .error(let error):
+// //            print(": ERROR response: \(error)")
+// //         default:
+// //            print(": Response type: \(response.body)")
+// //         }
         
-        print("\n" + String(repeating: "=", count: 50))
-        print(": CMP FLOW COMPLETED SUCCESSFULLY")
-     } catch {
-        print(": [NETWORK ERROR] \(error)")
-        print(": Request saved for debugging")
-        try? Console.debugDecoding()
-     }
-   }
+// //         print("\n" + String(repeating: "=", count: 50))
+// //         print(": CMP FLOW COMPLETED SUCCESSFULLY")
+// //      } catch {
+// //         print(": [NETWORK ERROR] \(error)")
+// //         print(": Request saved for debugging")
+// //         try? Console.debugDecoding()
+// //      }
+// //    }
    
-   public static func debugDecoding() throws {
-        print("\n: Debugging CMP Response decoding...")
-        let data = try Data(contentsOf: URL(fileURLWithPath: "cmp_response.der"))
-        let bytes = Array(data)
-        print(": Read \(bytes.count) bytes")
+//    public static func debugDecoding() throws {
+//         print("\n: Debugging CMP Response decoding...")
+//         let data = try Data(contentsOf: URL(fileURLWithPath: "cmp_response.der"))
+//         let bytes = Array(data)
+//         print(": Read \(bytes.count) bytes")
         
-        var der = try DER.parse(bytes)
-        print(": Root node identifier: \(der.identifier)") // Should be SEQUENCE (universal 16)
+//         var der = try DER.parse(bytes)
+//         print(": Root node identifier: \(der.identifier)") // Should be SEQUENCE (universal 16)
         
-        // Unwrap SEQUENCE
-        guard case .constructed(let nodes) = der.content else {
-            print(": Error: Root content is not constructed")
-            return
-        }
+//         // Unwrap SEQUENCE
+//         guard case .constructed(let nodes) = der.content else {
+//             print(": Error: Root content is not constructed")
+//             return
+//         }
         
-        var iterator = nodes.makeIterator()
+//         var iterator = nodes.makeIterator()
         
-        // 1. Header
-        guard let headerNode = iterator.next() else { print(": Error: Missing header"); return }
-        print(": Header node identifier: \(headerNode.identifier)")
-        let header = try PKIXCMP_2009_PKIHeader(derEncoded: headerNode)
-        print(": Header decoded successfully")
+//         // 1. Header
+//         guard let headerNode = iterator.next() else { print(": Error: Missing header"); return }
+//         print(": Header node identifier: \(headerNode.identifier)")
+//         let header = try PKIXCMP_2009_PKIHeader(derEncoded: headerNode)
+//         print(": Header decoded successfully")
         
-        // 2. Body
-        guard let bodyNode = iterator.next() else { print(": Error: Missing body"); return }
-        print(": Body node identifier: \(bodyNode.identifier)")
-        // Try decoding body manually to see if it works
-        let body = try PKIXCMP_2009_PKIBody(derEncoded: bodyNode)
-        print(": Body decoded successfully: \(body)")
+//         // 2. Body
+//         guard let bodyNode = iterator.next() else { print(": Error: Missing body"); return }
+//         print(": Body node identifier: \(bodyNode.identifier)")
+//         // Try decoding body manually to see if it works
+//         let body = try PKIXCMP_2009_PKIBody(derEncoded: bodyNode)
+//         print(": Body decoded successfully: \(body)")
         
-        // 3. Protection
-        if let protectionNode = iterator.next() {
-            print(": Protection node identifier: \(protectionNode.identifier)")
-            if protectionNode.identifier == ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific) {
-                print(": Found protection tag [0]")
-                // Manually inspect content
-                if case .constructed(let contentNodes) = protectionNode.content {
-                   var protIter = contentNodes.makeIterator()
-                   if let inner = protIter.next() {
-                       print(": Inner node: \(inner.identifier)")
-                       let bitString = try ASN1BitString(derEncoded: inner)
-                       print(": BitString decoded!")
-                   }
-                } else {
-                   print(": Content inside protection tag is PRIMITIVE? (This would be wrong for explicit tagging of BIT STRING unless constructed BIT STRING?)")
-                   print(": Content type: \(protectionNode.content)")
-                }
-            } else {
-                print(": This node is not protection (expected [0]). It is: \(protectionNode.identifier)")
-            }
-        } else {
-            print(": No protection node found")
-        }
-   }
+//         // 3. Protection
+//         if let protectionNode = iterator.next() {
+//             print(": Protection node identifier: \(protectionNode.identifier)")
+//             if protectionNode.identifier == ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific) {
+//                 print(": Found protection tag [0]")
+//                 // Manually inspect content
+//                 if case .constructed(let contentNodes) = protectionNode.content {
+//                    var protIter = contentNodes.makeIterator()
+//                    if let inner = protIter.next() {
+//                        print(": Inner node: \(inner.identifier)")
+//                        let bitString = try ASN1BitString(derEncoded: inner)
+//                        print(": BitString decoded!")
+//                    }
+//                 } else {
+//                    print(": Content inside protection tag is PRIMITIVE? (This would be wrong for explicit tagging of BIT STRING unless constructed BIT STRING?)")
+//                    print(": Content type: \(protectionNode.content)")
+//                 }
+//             } else {
+//                 print(": This node is not protection (expected [0]). It is: \(protectionNode.identifier)")
+//             }
+//         } else {
+//             print(": No protection node found")
+//         }
+//    }
    
-   #endif
+//    #endif
 
   public static func suite() -> Int32 {
      let argv = CommandLine.arguments
@@ -1098,5 +1098,3 @@ public class Console {
        return 1
      }
   }
-
-}
