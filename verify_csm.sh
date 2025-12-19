@@ -20,7 +20,7 @@ openssl enc -d -aes-128-cbc -nosalt \
   -in encrypted.bin -out decrypted.txt
 
 echo "Decrypting with Swift (AES-128-CBC)..."
-swift run -Xswiftc -suppress-warnings -j 10 chat-x509 cms aes-decrypt \
+swift run -Xswiftc -suppress-warnings -Xswiftc -Onone -j 10 chat-x509 cms aes-decrypt \
   -in encrypted.bin \
   -key "$KEY" \
   -iv "$IV" \
