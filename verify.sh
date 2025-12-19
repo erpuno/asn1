@@ -7,8 +7,7 @@ echo "--- 1. Using existing DSTU X.509 types (from Sources/Suite/ASN1SCG) ---"
 echo "  Note: DSTU.asn1 provides Certificate, Name, AlgorithmIdentifier, etc."
 
 echo "--- 2. Building and Running Swift Suite ---"
-swift run chat-x509
-swift run -Xswiftc -suppress-warnings 
+swift run -Xswiftc -suppress-warnings -j 10
 
 echo "--- 3. Verifying Output with OpenSSL ---"
 if [ ! -f "verified.der" ]; then
