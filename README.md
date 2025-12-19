@@ -6,7 +6,7 @@ Minimal (normal), full, idiomatic, correct by construction, respects equality.
 
 ```
 % ./asn1.ex
-Copyright © 1994—2024 Namdak Tönpa.
+Copyright © 1994—2026 Namdak Tönpa.
 ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 30.9.27.
 Usage: ./asn1.ex help | compile [-v] [input [output]]
 ```
@@ -36,8 +36,8 @@ Publications
 [1]. <a href="https://tonpa.guru/stream/2023/2023-08-08 ASN.1 Компілятор.htm">2023-08-08 ASN.1 Компілятор</a><br>
 [2]. <a href="https://tonpa.guru/stream/2023/2023-09-01 ASN1.EX X.680.htm">2023-09-01 ASN1.EX X.680</a><br>
 
-Author
-------
+Authors
+-------
 
 * Максим Сохацький
 * Ігор Горобець
