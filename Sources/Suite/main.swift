@@ -315,15 +315,14 @@ public class Console {
      if (data != serializer.serializedBytes) { throw "DER <-> DirectoryString lacks equality properties." }
   }
 
-  // Commented out - LDAP types were in deleted XSeries
-  // public static func showLDAPMessage(data: Array<UInt8>) throws {
-  //    let msg: LDAP_LDAPMessage? = try LDAP_LDAPMessage(derEncoded: data)
-  //    var serializer = DER.Serializer()
-  //    try msg!.serialize(into: &serializer)
-  //    print(": LDAPMessage.DER \(data)")
-  //    print(": LDAPMessage ⟼ \(msg!)\n")
-  //    if (data != serializer.serializedBytes) { throw "DER <-> LDAPMessage lacks equality properties." }
-  // }
+  public static func showLDAPMessage(data: Array<UInt8>) throws {
+     let msg: LDAP_LDAPMessage? = try LDAP_LDAPMessage(derEncoded: data)
+     var serializer = DER.Serializer()
+     try msg!.serialize(into: &serializer)
+     print(": LDAPMessage.DER \(data)")
+     print(": LDAPMessage ⟼ \(msg!)\n")
+     if (data != serializer.serializedBytes) { throw "DER <-> LDAPMessage lacks equality properties." }
+  }
 
   public static func showCHATMessage(data: Array<UInt8>) throws {
      let msg: CHAT_CHATMessage? = try CHAT_CHATMessage(derEncoded: data)
@@ -1011,7 +1010,7 @@ public class Console {
        try verifyX509(file: "generated.crt", output: "generated_verified.der")
        try showContentInfo(file: "data.bin")
        try showDirectoryString(data: [19,3,49,50,51])
-       // try showLDAPMessage(data: [48,16,2,1,1,96,9,2,1,1,4,0,128,2,49,50,160,0])
+       try showLDAPMessage(data: [48,16,2,1,1,96,9,2,1,1,4,0,128,2,49,50,160,0])
        try showCHATMessage(data: [48,27,2,1,1,48,0,160,20,4,3,53,72,84,4,7,53,72,84,46,99,115,114,4,4,48,48,48,48])
        try showName(data: [48,13,49,11,48,9,6,3,85,4,6,19,2,85,65])
        try showName(data: [48,0])
