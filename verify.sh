@@ -6,8 +6,6 @@ echo "  Note: DSTU.asn1 provides Certificate, Name, AlgorithmIdentifier, etc."
 echo "--- 1. Using existing DSTU X.509 types (from Sources/Suite/ASN1SCG) ---"
 echo "  Note: DSTU.asn1 provides Certificate, Name, AlgorithmIdentifier, etc."
 
-elixir x509.ex
-
 echo "--- 2. Building and Running Swift Suite ---"
 # swift run chat-x509
 swift run -Xswiftc -suppress-warnings 
