@@ -3,8 +3,6 @@ set -e
 
 echo "--- 1. Using existing DSTU X.509 types (from Sources/Suite/ASN1SCG) ---"
 echo "  Note: DSTU.asn1 provides Certificate, Name, AlgorithmIdentifier, etc."
-echo "--- 1. Using existing DSTU X.509 types (from Sources/Suite/ASN1SCG) ---"
-echo "  Note: DSTU.asn1 provides Certificate, Name, AlgorithmIdentifier, etc."
 elixir gen_x509.exs
 
 echo "--- 2. Building and Running Swift Suite ---"

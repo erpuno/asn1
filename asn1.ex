@@ -204,8 +204,8 @@ import Foundation
   def sequenceOf2(_,_,x) when is_atom(x), do: substituteType("#{lookup(x)}")
   def sequenceOf2(_,_,x) when is_binary(x), do: substituteType("#{lookup(x)}")
 
-  def substituteType("IssuerSerial"), do: "AuthenticationFramework_IssuerSerial"
-  def substituteType("GeneralNames"), do: "PKIX1Implicit_2009_GeneralNames"
+  def substituteType("IssuerSerial"), do: "KEP_IssuerSerial"
+  def substituteType("GeneralNames"), do: "KEP_GeneralNames"
   def substituteType("TeletexString"),     do: "ASN1TeletexString"
   def substituteType("UniversalString"),   do: "ASN1UniversalString"
   def substituteType("IA5String"),         do: "ASN1IA5String"
@@ -1809,8 +1809,8 @@ import Foundation
 
   def save(_, _, _, _), do: []
 
-  def lookup("IssuerSerial"), do: "AuthenticationFramework_IssuerSerial"
-  def lookup("GeneralNames"), do: "PKIX1Implicit_2009_GeneralNames"
+#   def lookup("IssuerSerial"), do: "AuthenticationFramework_IssuerSerial"
+#   def lookup("GeneralNames"), do: "PKIX1Implicit_2009_GeneralNames"
   def lookup(name) do
       b = bin(name)
       if b == "id-at" do

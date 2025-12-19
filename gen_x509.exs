@@ -350,34 +350,9 @@ defmodule DependencyAnalyzer do
 end
 
 
-# Set up environment variables for the compilation
-# Target ONLY the AuthenticationFramework file
-Application.put_env(:asn1scg, :SelectedAttributeTypes_DirectoryString, "PKIX1Explicit88_DirectoryString")
-Application.put_env(:asn1scg, :InformationFramework_MAPPING_BASED_MATCHING, "ASN1Any")
-Application.put_env(:asn1scg, :Attribute, "InformationFramework_Attribute")
-Application.put_env(:asn1scg, :ANSI_X9_42_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
-Application.put_env(:asn1scg, :ANSI_X9_62_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
-Application.put_env(:asn1scg, :ANSI_X9_62_FieldID, "ASN1Any")
-Application.put_env(:asn1scg, :PKCS_7_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
-Application.put_env(:asn1scg, :PKCS_7_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
-Application.put_env(:asn1scg, :PKCS_5_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
-Application.put_env(:asn1scg, :ANSI_X9_42_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
-Application.put_env(:asn1scg, :ANSI_X9_62_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
-Application.put_env(:asn1scg, :AlgorithmInformation_2009_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
-Application.put_env(:asn1scg, :PKIX1Explicit88_AttributeValue, "ASN1Any")
-Application.put_env(:asn1scg, :PKCS_9_AttributeValue, "ASN1Any") # Defensive
-Application.put_env(:asn1scg, :PKCS_7_AttributeValue, "ASN1Any") # Defensive
-Application.put_env(:asn1scg, :InformationFramework_Extension, "InformationFramework_Extension")
-Application.put_env(:asn1scg, :InformationFramework_Extensions, "InformationFramework_Extensions")
-Application.put_env(:asn1scg, :AuthenticationFramework_Extension, "AuthenticationFramework_Extension")
-Application.put_env(:asn1scg, :AuthenticationFramework_Extensions, "AuthenticationFramework_Extensions")
 
-# Fix type aliases to ensure consistent GeneralNames resolution
-Application.put_env(:asn1scg, :CertificateExtensions_GeneralNames, "PKIX1Implicit_2009_GeneralNames")
-Application.put_env(:asn1scg, :GeneralNames, "PKIX1Implicit_2009_GeneralNames")
-# Fix alternative_feature_sets type
-Application.put_env(:asn1scg, :Document_Profile_Descriptor_Document_Profile_Descriptor_Document_Characteristics_alternative_feature_sets_Element, "ASN1ObjectIdentifier")
-
+# Application.put_env(:asn1scg, :AuthenticationFramework_AlgorithmIdentigfier, "DSTU_AlgorithmIdentifier")
+Application.put_env(:asn1scg, :DSTU_AttributeValue, "ASN1Any")
 
 ptypes = %{
   "SingleAttribute" => {:sequence, [
@@ -407,10 +382,10 @@ ptypes = %{
   ]},
   "Attributes" => {:set_of, {:external, "Attribute"}},
   "Extensions" => {:sequence_of, {:external, "Extension"}},
-  "SubjectPublicKeyInfo" => {:sequence, [
-    {:algorithm, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
-    {:subjectPublicKey, :bit_string, []}
-  ]},
+  # "SubjectPublicKeyInfo" => {:sequence, [
+  #   {:algorithm, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
+  #   {:subjectPublicKey, :bit_string, []}
+  # ]},
   "DirectoryString" => {:choice, [
     {:teletexString, :TeletexString},
     {:printableString, :PrintableString},
@@ -433,19 +408,19 @@ ptypes = %{
   "SMIMECapabilities" => {:sequence_of, {:external, "SMIMECapability"}},
   "ENCRYPTED-HASH" => :bit_string,
   "ENCRYPTED" => :bit_string,
-  "HASH" => {:sequence, [
-      {:algorithmIdentifier, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
-      {:hashValue, :bit_string, []}
-  ]},
-  "SIGNATURE" => {:sequence, [
-      {:algorithmIdentifier, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
-      {:encrypted, :bit_string, []}
-  ]},
-  "SIGNED" => {:sequence, [
-      {:toBeSigned, :any, []},
-      {:algorithmIdentifier, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
-      {:encrypted, :bit_string, []}
-  ]},
+  # "HASH" => {:sequence, [
+  #     {:algorithmIdentifier, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
+  #     {:hashValue, :bit_string, []}
+  # ]},
+  # "SIGNATURE" => {:sequence, [
+  #     {:algorithmIdentifier, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
+  #     {:encrypted, :bit_string, []}
+  # ]},
+  # "SIGNED" => {:sequence, [
+  #     {:toBeSigned, :any, []},
+  #     {:algorithmIdentifier, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
+  #     {:encrypted, :bit_string, []}
+  # ]},
   "Context" => {:sequence, [
       {:contextType, :oid, []},
       {:contextValues, {:set_of, :any}, []},
