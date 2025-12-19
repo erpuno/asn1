@@ -4,16 +4,16 @@ import Foundation
 
 @usableFromInline struct KEP_IssuerSerial: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var issuer: KEP_GeneralNames
+    @usableFromInline var issuer: PKIX1Implicit_2009_GeneralNames
     @usableFromInline var serialNumber: KEP_CertificateSerialNumber
-    @inlinable init(issuer: KEP_GeneralNames, serialNumber: KEP_CertificateSerialNumber) {
+    @inlinable init(issuer: PKIX1Implicit_2009_GeneralNames, serialNumber: KEP_CertificateSerialNumber) {
         self.issuer = issuer
         self.serialNumber = serialNumber
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let issuer: KEP_GeneralNames = try KEP_GeneralNames(derEncoded: &nodes)
+            let issuer: PKIX1Implicit_2009_GeneralNames = try PKIX1Implicit_2009_GeneralNames(derEncoded: &nodes)
             let serialNumber: KEP_CertificateSerialNumber = try KEP_CertificateSerialNumber(derEncoded: &nodes)
             return KEP_IssuerSerial(issuer: issuer, serialNumber: serialNumber)
         }

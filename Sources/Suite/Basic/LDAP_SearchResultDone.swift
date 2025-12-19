@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline typealias LDAP_SearchResultDone = LDAP_LDAPResult
+@usableFromInline typealias LDAP_SearchResultDone = LDAP_Result

@@ -6,8 +6,8 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var hashAlgorithm: DSTU_AlgorithmIdentifier
     @usableFromInline var certHash: KEP_Hash
-    @usableFromInline var issuerSerial: KEP_IssuerSerial
-    @inlinable init(hashAlgorithm: DSTU_AlgorithmIdentifier, certHash: KEP_Hash, issuerSerial: KEP_IssuerSerial) {
+    @usableFromInline var issuerSerial: AuthenticationFramework_IssuerSerial
+    @inlinable init(hashAlgorithm: DSTU_AlgorithmIdentifier, certHash: KEP_Hash, issuerSerial: AuthenticationFramework_IssuerSerial) {
         self.hashAlgorithm = hashAlgorithm
         self.certHash = certHash
         self.issuerSerial = issuerSerial
@@ -17,7 +17,7 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let hashAlgorithm: DSTU_AlgorithmIdentifier = try DSTU_AlgorithmIdentifier(derEncoded: &nodes)
             let certHash: KEP_Hash = try KEP_Hash(derEncoded: &nodes)
-            let issuerSerial: KEP_IssuerSerial = try KEP_IssuerSerial(derEncoded: &nodes)
+            let issuerSerial: AuthenticationFramework_IssuerSerial = try AuthenticationFramework_IssuerSerial(derEncoded: &nodes)
             return KEP_ESSCertIDv2(hashAlgorithm: hashAlgorithm, certHash: certHash, issuerSerial: issuerSerial)
         }
     }

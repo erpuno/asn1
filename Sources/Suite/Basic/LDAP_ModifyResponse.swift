@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline typealias LDAP_ModifyResponse = LDAP_LDAPResult
+@usableFromInline typealias LDAP_ModifyResponse = LDAP_Result

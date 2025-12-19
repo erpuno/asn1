@@ -204,8 +204,8 @@ import Foundation
   def sequenceOf2(_,_,x) when is_atom(x), do: substituteType("#{lookup(x)}")
   def sequenceOf2(_,_,x) when is_binary(x), do: substituteType("#{lookup(x)}")
 
-  def substituteType("IssuerSerial"), do: "KEP_IssuerSerial"
-  def substituteType("GeneralNames"), do: "KEP_GeneralNames"
+  def substituteType("IssuerSerial"), do: "AuthenticationFramework_IssuerSerial"
+  def substituteType("GeneralNames"), do: "PKIX1Implicit_2009_GeneralNames"
   def substituteType("TeletexString"),     do: "ASN1TeletexString"
   def substituteType("UniversalString"),   do: "ASN1UniversalString"
   def substituteType("IA5String"),         do: "ASN1IA5String"
@@ -1079,6 +1079,26 @@ import Foundation
   def compileType(pos, name, typeDefinition, modname, save \\ true) do
       res = case typeDefinition do
           {:type, _, {:"INTEGER", cases}, _, _, :no} ->  setEnv(name, "Int") ; integerEnum(name, cases, modname, save)
+          {:type, _, :"INTEGER", _, _, :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = Int
+""")
+          {:type, _, :"INTEGER", _, _constraints, :no} ->
+              swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+              setEnv(name, swiftName)
+              save(save, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+@usableFromInline typealias #{swiftName} = Int
+""")
           {:type, _, {:"ENUMERATED", cases}, _, _, :no} -> enumeration(name, cases, modname, save)
           {:type, _, {:"CHOICE", cases}, _, _, :no} -> choice(name, cases, modname, save)
           {:type, _, {:"SEQUENCE", _, _, _, fields}, _, _, :no} -> sequence(name, fields, modname, save)
@@ -1527,6 +1547,18 @@ import Foundation
 
   def resolveOIDComponent(val), do: [val]
 
+  def integerValue(name, val, modname, saveFlag) do
+      swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
+      setEnv(name, swiftName)
+      save(saveFlag, modname, swiftName, """
+#{emitImprint()}
+import SwiftASN1
+import Foundation
+
+public let #{swiftName}: Int = #{val}
+""")
+  end
+
   def value(name, _type, val, modname, saveFlag) do
       swiftName = bin(normalizeName(modname)) <> "_" <> bin(normalizeName(name))
       setEnv(name, swiftName)
@@ -1570,6 +1602,7 @@ import Foundation
   end
 
   def compileValue(_pos, name, {:type, [], :'OBJECT IDENTIFIER', [], [], :no} = type, val, mod), do: value(name, type, val, mod, true)
+  def compileValue(_pos, name, {:type, _, :'INTEGER', _, _, :no}, val, mod), do: integerValue(name, val, mod, true)
   def compileValue(_pos, name, {:type, _, {:Externaltypereference, _, _, ref}, _, _, _} = type, val, mod) do
       resolved = lookup(bin(ref))
       if resolved == "ASN1ObjectIdentifier" or resolved == "OBJECT IDENTIFIER" or getEnv({:is_oid, resolved}, false) do
@@ -1725,13 +1758,18 @@ import Foundation
   defp substitute_params(other, _subs), do: other
 
   def getSwiftName(name, modname) do
-
       nname = bin(normalizeName(name))
       nmod = bin(normalizeName(modname))
-      if String.starts_with?(nname, nmod <> "_") do
-          nname
-      else
-          nmod <> "_" <> nname
+      cond do
+        String.starts_with?(nname, nmod <> "_") -> nname
+        String.starts_with?(nname, nmod) ->
+           rest = String.slice(nname, String.length(nmod)..-1//1)
+           if rest == "" do
+               nname
+           else
+               nmod <> "_" <> rest
+           end
+        true -> nmod <> "_" <> nname
       end
   end
 
@@ -1809,8 +1847,8 @@ import Foundation
 
   def save(_, _, _, _), do: []
 
-#   def lookup("IssuerSerial"), do: "AuthenticationFramework_IssuerSerial"
-#   def lookup("GeneralNames"), do: "PKIX1Implicit_2009_GeneralNames"
+  def lookup("IssuerSerial"), do: "AuthenticationFramework_IssuerSerial"
+  def lookup("GeneralNames"), do: "PKIX1Implicit_2009_GeneralNames"
   def lookup(name) do
       b = bin(name)
       if b == "id-at" do
@@ -1945,3 +1983,4 @@ case System.argv() do
        :io.format("ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 30.10.7.~n")
        :io.format("Usage: ./asn1.ex help | compile [-v] [input [output]]~n")
 end
+

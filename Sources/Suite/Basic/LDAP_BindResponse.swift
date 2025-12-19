@@ -4,12 +4,12 @@ import Foundation
 
 @usableFromInline struct LDAP_BindResponse: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var resultCode: LDAP_LDAPResult_resultCode_Enum
+    @usableFromInline var resultCode: LDAP_Result_resultCode_Enum
     @usableFromInline var matchedDN: LDAP_LDAPDN
     @usableFromInline var diagnosticMessage: LDAP_LDAPString
     @usableFromInline var referral: LDAP_Referral?
     @usableFromInline var serverSaslCreds: ASN1OctetString?
-    @inlinable init(resultCode: LDAP_LDAPResult_resultCode_Enum, matchedDN: LDAP_LDAPDN, diagnosticMessage: LDAP_LDAPString, referral: LDAP_Referral?, serverSaslCreds: ASN1OctetString?) {
+    @inlinable init(resultCode: LDAP_Result_resultCode_Enum, matchedDN: LDAP_LDAPDN, diagnosticMessage: LDAP_LDAPString, referral: LDAP_Referral?, serverSaslCreds: ASN1OctetString?) {
         self.resultCode = resultCode
         self.matchedDN = matchedDN
         self.diagnosticMessage = diagnosticMessage
@@ -19,7 +19,7 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let resultCode: LDAP_LDAPResult_resultCode_Enum = try LDAP_LDAPResult_resultCode_Enum(derEncoded: &nodes)
+            let resultCode: LDAP_Result_resultCode_Enum = try LDAP_Result_resultCode_Enum(derEncoded: &nodes)
             let matchedDN: LDAP_LDAPDN = try LDAP_LDAPDN(derEncoded: &nodes)
             let diagnosticMessage: LDAP_LDAPString = try LDAP_LDAPString(derEncoded: &nodes)
             let referral: LDAP_Referral? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
