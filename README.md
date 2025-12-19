@@ -11,7 +11,7 @@ Anyway if you application is secure enough it should support X.509 and thus ASN1
 ```
 % ./asn1.ex
 Copyright © 1994—2026 Namdak Tönpa.
-ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 31.12.19.
+ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 32.1.1.
 Usage: ./asn1.ex help | compile [-v] [input [output]]
 ```
 
