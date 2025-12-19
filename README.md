@@ -39,6 +39,7 @@ Publications
 Author
 ------
 
-* Namdak Tonpa
+* Максим Сохацький
+* Ігор Горобець
 
 OM A HUM
