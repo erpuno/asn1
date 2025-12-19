@@ -5,8 +5,8 @@ import Foundation
 @usableFromInline struct KEP_IssuerSerial: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var issuer: KEP_GeneralNames
-    @usableFromInline var serialNumber: ArraySlice<UInt8>
-    @inlinable init(issuer: KEP_GeneralNames, serialNumber: ArraySlice<UInt8>) {
+    @usableFromInline var serialNumber: KEP_CertificateSerialNumber
+    @inlinable init(issuer: KEP_GeneralNames, serialNumber: KEP_CertificateSerialNumber) {
         self.issuer = issuer
         self.serialNumber = serialNumber
     }
@@ -14,7 +14,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let issuer: KEP_GeneralNames = try KEP_GeneralNames(derEncoded: &nodes)
-            let serialNumber: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+            let serialNumber: KEP_CertificateSerialNumber = try KEP_CertificateSerialNumber(derEncoded: &nodes)
             return KEP_IssuerSerial(issuer: issuer, serialNumber: serialNumber)
         }
     }

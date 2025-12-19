@@ -4,16 +4,16 @@ import Foundation
 
 @usableFromInline struct LDAP_SubstringFilter: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var type: ASN1OctetString
+    @usableFromInline var type: LDAP_AttributeDescription
     @usableFromInline var substrings: [LDAP_SubstringFilter_substrings_Choice]
-    @inlinable init(type: ASN1OctetString, substrings: [LDAP_SubstringFilter_substrings_Choice]) {
+    @inlinable init(type: LDAP_AttributeDescription, substrings: [LDAP_SubstringFilter_substrings_Choice]) {
         self.type = type
         self.substrings = substrings
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let type: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let type: LDAP_AttributeDescription = try LDAP_AttributeDescription(derEncoded: &nodes)
             let substrings: [LDAP_SubstringFilter_substrings_Choice] = try DER.sequence(of: LDAP_SubstringFilter_substrings_Choice.self, identifier: .sequence, nodes: &nodes)
             return LDAP_SubstringFilter(type: type, substrings: substrings)
         }

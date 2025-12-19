@@ -24,9 +24,9 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let crlids = self.crlids { try coder.serializeOptionalImplicitlyTagged(crlids, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
-            if let ocspids = self.ocspids { try coder.serializeOptionalImplicitlyTagged(ocspids, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
-            if let otherRev = self.otherRev { try coder.serializeOptionalImplicitlyTagged(otherRev, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let crlids = self.crlids { if let crlids = self.crlids { try coder.serializeOptionalImplicitlyTagged(crlids, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let ocspids = self.ocspids { if let ocspids = self.ocspids { try coder.serializeOptionalImplicitlyTagged(ocspids, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let otherRev = self.otherRev { if let otherRev = self.otherRev { try coder.serializeOptionalImplicitlyTagged(otherRev, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
         }
     }
 }

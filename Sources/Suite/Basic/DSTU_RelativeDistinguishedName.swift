@@ -7,9 +7,9 @@ import Foundation
     @usableFromInline var value: [DSTU_AttributeTypeAndValue]
     @inlinable public init(_ value: [DSTU_AttributeTypeAndValue]) { self.value = value }
     @inlinable public init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
-        self.value = try DER.sequence(of: DSTU_AttributeTypeAndValue.self, identifier: identifier, rootNode: rootNode)
+        self.value = try DER.set(of: DSTU_AttributeTypeAndValue.self, identifier: identifier, rootNode: rootNode)
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
-        try coder.serializeSequenceOf(value, identifier: identifier)
+        try coder.serializeSetOf(value, identifier: identifier)
     }
 }

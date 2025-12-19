@@ -7,9 +7,9 @@ import Foundation
     @usableFromInline var value: [KEP_SignerInfo]
     @inlinable public init(_ value: [KEP_SignerInfo]) { self.value = value }
     @inlinable public init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
-        self.value = try DER.sequence(of: KEP_SignerInfo.self, identifier: identifier, rootNode: rootNode)
+        self.value = try DER.set(of: KEP_SignerInfo.self, identifier: identifier, rootNode: rootNode)
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
-        try coder.serializeSequenceOf(value, identifier: identifier)
+        try coder.serializeSetOf(value, identifier: identifier)
     }
 }

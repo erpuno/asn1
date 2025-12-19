@@ -5,13 +5,13 @@ import Foundation
 @usableFromInline indirect enum KEP_ResponderID: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case byName(DSTU_Name)
-    case byKey(ASN1OctetString)
+    case byKey(KEP_KeyHash)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
                 self = .byName(try DSTU_Name(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .byKey(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .byKey(try KEP_KeyHash(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }

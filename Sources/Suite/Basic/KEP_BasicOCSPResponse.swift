@@ -30,7 +30,7 @@ import Foundation
             try coder.serialize(tbsResponseData)
             try coder.serialize(signatureAlgorithm)
             try coder.serialize(signature)
-            if let certs = self.certs { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(certs) } }
+            if let certs = self.certs { if let certs = self.certs { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(certs) } } }
         }
     }
 }

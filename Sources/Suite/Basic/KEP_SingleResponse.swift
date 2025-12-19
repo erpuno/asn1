@@ -33,8 +33,8 @@ import Foundation
             try coder.serialize(certID)
             try coder.serialize(certStatus)
             try coder.serialize(thisUpdate)
-            if let nextUpdate = self.nextUpdate { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(nextUpdate) } }
-            if let singleExtensions = self.singleExtensions { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(singleExtensions) } }
+            if let nextUpdate = self.nextUpdate { if let nextUpdate = self.nextUpdate { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(nextUpdate) } } }
+            if let singleExtensions = self.singleExtensions { if let singleExtensions = self.singleExtensions { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(singleExtensions) } } }
         }
     }
 }

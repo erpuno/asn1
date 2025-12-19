@@ -36,8 +36,8 @@ import Foundation
             try coder.serialize(version)
             try coder.serialize(digestAlgorithms)
             try coder.serialize(encapContentInfo)
-            if let certificates = self.certificates { try coder.serializeOptionalImplicitlyTagged(certificates, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
-            if let crls = self.crls { try coder.serializeOptionalImplicitlyTagged(crls, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let certificates = self.certificates { if let certificates = self.certificates { try coder.serializeOptionalImplicitlyTagged(certificates, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let crls = self.crls { if let crls = self.crls { try coder.serializeOptionalImplicitlyTagged(crls, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
             try coder.serialize(signerInfos)
         }
     }

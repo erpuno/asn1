@@ -6,7 +6,7 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case good(ASN1Null)
     case revoked(KEP_RevokedInfo)
-    case unknown(ASN1Null)
+    case unknown(KEP_UnknownInfo)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
@@ -14,7 +14,7 @@ import Foundation
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
                 self = .revoked(try KEP_RevokedInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .unknown(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .unknown(try KEP_UnknownInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }

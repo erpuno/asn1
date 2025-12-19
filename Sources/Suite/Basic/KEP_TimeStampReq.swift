@@ -6,11 +6,11 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: KEP_TimeStampReq_version_IntEnum
     @usableFromInline var messageImprint: KEP_MessageImprint
-    @usableFromInline var reqPolicy: ASN1ObjectIdentifier?
+    @usableFromInline var reqPolicy: KEP_TSAPolicyId?
     @usableFromInline var nonce: ArraySlice<UInt8>?
-    @usableFromInline var certReq: Bool
+    @usableFromInline var certReq: Bool?
     @usableFromInline var extensions: DSTU_Extensions?
-    @inlinable init(version: KEP_TimeStampReq_version_IntEnum, messageImprint: KEP_MessageImprint, reqPolicy: ASN1ObjectIdentifier?, nonce: ArraySlice<UInt8>?, certReq: Bool, extensions: DSTU_Extensions?) {
+    @inlinable init(version: KEP_TimeStampReq_version_IntEnum, messageImprint: KEP_MessageImprint, reqPolicy: KEP_TSAPolicyId?, nonce: ArraySlice<UInt8>?, certReq: Bool?, extensions: DSTU_Extensions?) {
         self.version = version
         self.messageImprint = messageImprint
         self.reqPolicy = reqPolicy
@@ -23,8 +23,16 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let version = try KEP_TimeStampReq_version_IntEnum(rawValue: Int(derEncoded: &nodes))
             let messageImprint: KEP_MessageImprint = try KEP_MessageImprint(derEncoded: &nodes)
-            let reqPolicy: ASN1ObjectIdentifier? = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let nonce: ArraySlice<UInt8>? = try ArraySlice<UInt8>(derEncoded: &nodes)
+            var reqPolicy: KEP_TSAPolicyId? = nil
+var peek_reqPolicy = nodes
+if let next = peek_reqPolicy.next(), next.identifier == KEP_TSAPolicyId.defaultIdentifier {
+    reqPolicy = try KEP_TSAPolicyId(derEncoded: &nodes)
+}
+            var nonce: ArraySlice<UInt8>? = nil
+var peek_nonce = nodes
+if let next = peek_nonce.next(), next.identifier == ArraySlice<UInt8>.defaultIdentifier {
+    nonce = try ArraySlice<UInt8>(derEncoded: &nodes)
+}
             let certReq: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
             let extensions: DSTU_Extensions? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             return KEP_TimeStampReq(version: version, messageImprint: messageImprint, reqPolicy: reqPolicy, nonce: nonce, certReq: certReq, extensions: extensions)
@@ -35,10 +43,10 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(version.rawValue)
             try coder.serialize(messageImprint)
-            if let reqPolicy = self.reqPolicy { try coder.serialize(reqPolicy) }
-            if let nonce = self.nonce { try coder.serialize(nonce) }
-            if certReq { try coder.serialize(certReq) }
-            if let extensions = self.extensions { try coder.serializeOptionalImplicitlyTagged(extensions, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let reqPolicy = self.reqPolicy { if let reqPolicy = self.reqPolicy { try coder.serialize(reqPolicy) } }
+            if let nonce = self.nonce { if let nonce = self.nonce { try coder.serialize(nonce) } }
+            if let certReq = self.certReq { if let certReq = self.certReq { try coder.serialize(certReq) } }
+            if let extensions = self.extensions { if let extensions = self.extensions { try coder.serializeOptionalImplicitlyTagged(extensions, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
         }
     }
 }

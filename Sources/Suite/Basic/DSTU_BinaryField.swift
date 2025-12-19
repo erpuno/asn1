@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let m: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let p: DSTU_BinaryField_p_Choice? = try DSTU_BinaryField_p_Choice(derEncoded: &nodes)
+            var p: DSTU_BinaryField_p_Choice? = nil
+var peek_p = nodes
+if let next = peek_p.next(), next.identifier == DSTU_BinaryField_p_Choice.defaultIdentifier {
+    p = try DSTU_BinaryField_p_Choice(derEncoded: &nodes)
+}
             return DSTU_BinaryField(m: m, p: p)
         }
     }
@@ -22,7 +26,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(m)
-            if let p = self.p { try coder.serialize(p) }
+            if let p = self.p { if let p = self.p { try coder.serialize(p) } }
         }
     }
 }

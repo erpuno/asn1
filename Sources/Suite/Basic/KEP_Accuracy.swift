@@ -15,7 +15,11 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let seconds: ArraySlice<UInt8>? = try ArraySlice<UInt8>(derEncoded: &nodes)
+            var seconds: ArraySlice<UInt8>? = nil
+var peek_seconds = nodes
+if let next = peek_seconds.next(), next.identifier == ArraySlice<UInt8>.defaultIdentifier {
+    seconds = try ArraySlice<UInt8>(derEncoded: &nodes)
+}
             let millis: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let micros: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             return KEP_Accuracy(seconds: seconds, millis: millis, micros: micros)
@@ -24,9 +28,9 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let seconds = self.seconds { try coder.serialize(seconds) }
-            if let millis = self.millis { try coder.serializeOptionalImplicitlyTagged(millis, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
-            if let micros = self.micros { try coder.serializeOptionalImplicitlyTagged(micros, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let seconds = self.seconds { if let seconds = self.seconds { try coder.serialize(seconds) } }
+            if let millis = self.millis { if let millis = self.millis { try coder.serializeOptionalImplicitlyTagged(millis, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let micros = self.micros { if let micros = self.micros { try coder.serializeOptionalImplicitlyTagged(micros, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
         }
     }
 }

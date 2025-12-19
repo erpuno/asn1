@@ -400,28 +400,6 @@ public class Console {
      if (data != serializer.serializedBytes) { throw "DER <-> Pentanomial lacks equality properties." }
   }
 
-  // Commented out - LDAP types were in deleted XSeries
-  // public static func showAttributeValueAssertion(data: Array<UInt8>) throws {
-  //    print("Debug: showAttributeValueAssertion")
-  //    let val: LDAP_AttributeValueAssertion? = try LDAP_AttributeValueAssertion(derEncoded: data)
-  //    var serializer = DER.Serializer()
-  //    try val!.serialize(into: &serializer)
-  //    print(": AttributeValueAssertion.DER \(data)")
-  //    print(": AttributeValueAssertion ⟼ \(val!)\n")
-  //    if (data != serializer.serializedBytes) { throw "DER <-> AttributeValueAssertion lacks equality properties." }
-  // }
-
-
-  public static func showIntMatrix(data: Array<UInt8>) throws {
-     print("Debug: showIntMatrix")
-     let val: Nested_IntMatrix? = try Nested_IntMatrix(derEncoded: data)
-     var serializer = DER.Serializer()
-     try val!.serialize(into: &serializer)
-     print(": IntMatrix.DER \(data)")
-     print(": IntMatrix ⟼ \(val!)\n")
-     if (data != serializer.serializedBytes) { throw "DER <-> IntMatrix lacks equality properties." }
-  }
-
   public static func showCertificateData(data: Array<UInt8>) throws {
      print("Debug: showCertificateData")
      let val: DSTU_Certificate? = try DSTU_Certificate(derEncoded: data)
@@ -1026,12 +1004,7 @@ public class Console {
        try verifyOID()
        print(": UsefulDefinitions_id_ce ⟼ \(UsefulDefinitions_id_ce)")
        try showPentanomial(data: [48, 9, 2, 1, 1, 2, 1, 2, 2, 1, 3])
-       // try showAttributeValueAssertion(data: [48, 14, 4, 2, 99, 110, 4, 8, 74, 111, 104, 110, 32, 68, 111, 101])
-       try showIntMatrix(data: [48, 22, 48, 9, 2, 1, 1, 2, 1, 2, 2, 1, 3, 48, 9, 2, 1, 4, 2, 1, 5, 2, 1, 6])
-       // Generated test vector for dummy Certificate
        try showCertificateData(data: [48, 129, 129, 48, 107, 160, 3, 2, 1, 2, 2, 3, 1, 226, 64, 48, 10, 6, 8, 42, 134, 72, 206, 61, 4, 3, 2, 48, 13, 49, 11, 48, 9, 6, 3, 85, 4, 3, 19, 2, 67, 65, 48, 30, 23, 13, 50, 51, 48, 49, 48, 49, 49, 50, 48, 48, 48, 48, 90, 23, 13, 51, 48, 48, 49, 48, 49, 49, 50, 48, 48, 48, 48, 90, 48, 15, 49, 13, 48, 11, 6, 3, 85, 4, 3, 19, 4, 85, 115, 101, 114, 48, 19, 48, 9, 6, 7, 42, 134, 72, 206, 61, 2, 1, 3, 6, 0, 4, 0, 0, 0, 0, 48, 10, 6, 8, 42, 134, 72, 206, 61, 4, 3, 2, 3, 6, 0, 1, 2, 3, 4, 5])
-
-
        try showCertificate(file: "ca.crt")
        try verifyX509(file: "ca.crt", output: "verified.der")
        try generateX509()

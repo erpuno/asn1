@@ -4,12 +4,12 @@ import Foundation
 
 @usableFromInline indirect enum KEP_OtherHash: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
-        case sha1Hash(ASN1OctetString)
+        case sha1Hash(KEP_OtherHashValue)
     case otherHash(KEP_OtherHashAlgAndValue)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1OctetString.defaultIdentifier:
-                self = .sha1Hash(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+            case KEP_OtherHashValue.defaultIdentifier:
+                self = .sha1Hash(try KEP_OtherHashValue(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case KEP_OtherHashAlgAndValue.defaultIdentifier:
                 self = .otherHash(try KEP_OtherHashAlgAndValue(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
@@ -17,8 +17,22 @@ import Foundation
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .sha1Hash(let sha1Hash): try coder.serialize(sha1Hash)
-            case .otherHash(let otherHash): try coder.serialize(otherHash)
+            case .sha1Hash(let sha1Hash):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(sha1Hash)
+                                }
+                            } else {
+                                try coder.serialize(sha1Hash)
+                            }
+            case .otherHash(let otherHash):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(otherHash)
+                                }
+                            } else {
+                                try coder.serialize(otherHash)
+                            }
         }
     }
 

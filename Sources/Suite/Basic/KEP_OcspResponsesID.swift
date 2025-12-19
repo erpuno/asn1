@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let ocspIdentifier: KEP_OcspIdentifier = try KEP_OcspIdentifier(derEncoded: &nodes)
-            let ocspRepHash: KEP_OtherHash? = try KEP_OtherHash(derEncoded: &nodes)
+            var ocspRepHash: KEP_OtherHash? = nil
+var peek_ocspRepHash = nodes
+if let next = peek_ocspRepHash.next(), next.identifier == KEP_OtherHash.defaultIdentifier {
+    ocspRepHash = try KEP_OtherHash(derEncoded: &nodes)
+}
             return KEP_OcspResponsesID(ocspIdentifier: ocspIdentifier, ocspRepHash: ocspRepHash)
         }
     }
@@ -22,7 +26,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(ocspIdentifier)
-            if let ocspRepHash = self.ocspRepHash { try coder.serialize(ocspRepHash) }
+            if let ocspRepHash = self.ocspRepHash { if let ocspRepHash = self.ocspRepHash { try coder.serialize(ocspRepHash) } }
         }
     }
 }

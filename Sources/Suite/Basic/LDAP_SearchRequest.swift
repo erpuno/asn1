@@ -4,15 +4,15 @@ import Foundation
 
 @usableFromInline struct LDAP_SearchRequest: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var baseObject: ASN1OctetString
+    @usableFromInline var baseObject: LDAP_LDAPDN
     @usableFromInline var scope: LDAP_SearchRequest_scope_Enum
     @usableFromInline var derefAliases: LDAP_SearchRequest_derefAliases_Enum
     @usableFromInline var sizeLimit: ArraySlice<UInt8>
     @usableFromInline var timeLimit: ArraySlice<UInt8>
     @usableFromInline var typesOnly: Bool
-    @usableFromInline var filter: LDAP_Filter
+    @usableFromInline var filter: Box<LDAP_Filter>
     @usableFromInline var attributes: LDAP_AttributeSelection
-    @inlinable init(baseObject: ASN1OctetString, scope: LDAP_SearchRequest_scope_Enum, derefAliases: LDAP_SearchRequest_derefAliases_Enum, sizeLimit: ArraySlice<UInt8>, timeLimit: ArraySlice<UInt8>, typesOnly: Bool, filter: LDAP_Filter, attributes: LDAP_AttributeSelection) {
+    @inlinable init(baseObject: LDAP_LDAPDN, scope: LDAP_SearchRequest_scope_Enum, derefAliases: LDAP_SearchRequest_derefAliases_Enum, sizeLimit: ArraySlice<UInt8>, timeLimit: ArraySlice<UInt8>, typesOnly: Bool, filter: Box<LDAP_Filter>, attributes: LDAP_AttributeSelection) {
         self.baseObject = baseObject
         self.scope = scope
         self.derefAliases = derefAliases
@@ -25,13 +25,13 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let baseObject: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let baseObject: LDAP_LDAPDN = try LDAP_LDAPDN(derEncoded: &nodes)
             let scope: LDAP_SearchRequest_scope_Enum = try LDAP_SearchRequest_scope_Enum(derEncoded: &nodes)
             let derefAliases: LDAP_SearchRequest_derefAliases_Enum = try LDAP_SearchRequest_derefAliases_Enum(derEncoded: &nodes)
             let sizeLimit: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let timeLimit: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let typesOnly: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
-            let filter: LDAP_Filter = try LDAP_Filter(derEncoded: &nodes)
+            let filter: Box<LDAP_Filter> = Box(try LDAP_Filter(derEncoded: &nodes))
             let attributes: LDAP_AttributeSelection = try LDAP_AttributeSelection(derEncoded: &nodes)
             return LDAP_SearchRequest(baseObject: baseObject, scope: scope, derefAliases: derefAliases, sizeLimit: sizeLimit, timeLimit: timeLimit, typesOnly: typesOnly, filter: filter, attributes: attributes)
         }
@@ -44,8 +44,8 @@ import Foundation
             try coder.serialize(derefAliases)
             try coder.serialize(sizeLimit)
             try coder.serialize(timeLimit)
-            if typesOnly { try coder.serialize(typesOnly) }
-            try coder.serialize(filter)
+            try coder.serialize(typesOnly)
+            try coder.serialize(filter.value)
             try coder.serialize(attributes)
         }
     }

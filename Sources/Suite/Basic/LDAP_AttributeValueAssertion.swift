@@ -4,17 +4,17 @@ import Foundation
 
 @usableFromInline struct LDAP_AttributeValueAssertion: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var attributeDesc: ASN1OctetString
-    @usableFromInline var assertionValue: ASN1OctetString
-    @inlinable init(attributeDesc: ASN1OctetString, assertionValue: ASN1OctetString) {
+    @usableFromInline var attributeDesc: LDAP_AttributeDescription
+    @usableFromInline var assertionValue: LDAP_AssertionValue
+    @inlinable init(attributeDesc: LDAP_AttributeDescription, assertionValue: LDAP_AssertionValue) {
         self.attributeDesc = attributeDesc
         self.assertionValue = assertionValue
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let attributeDesc: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
-            let assertionValue: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let attributeDesc: LDAP_AttributeDescription = try LDAP_AttributeDescription(derEncoded: &nodes)
+            let assertionValue: LDAP_AssertionValue = try LDAP_AssertionValue(derEncoded: &nodes)
             return LDAP_AttributeValueAssertion(attributeDesc: attributeDesc, assertionValue: assertionValue)
         }
     }

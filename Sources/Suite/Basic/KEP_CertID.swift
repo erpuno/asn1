@@ -7,8 +7,8 @@ import Foundation
     @usableFromInline var hashAlgorithm: DSTU_AlgorithmIdentifier
     @usableFromInline var issuerNameHash: ASN1OctetString
     @usableFromInline var issuerKeyHash: ASN1OctetString
-    @usableFromInline var serialNumber: ArraySlice<UInt8>
-    @inlinable init(hashAlgorithm: DSTU_AlgorithmIdentifier, issuerNameHash: ASN1OctetString, issuerKeyHash: ASN1OctetString, serialNumber: ArraySlice<UInt8>) {
+    @usableFromInline var serialNumber: KEP_CertificateSerialNumber
+    @inlinable init(hashAlgorithm: DSTU_AlgorithmIdentifier, issuerNameHash: ASN1OctetString, issuerKeyHash: ASN1OctetString, serialNumber: KEP_CertificateSerialNumber) {
         self.hashAlgorithm = hashAlgorithm
         self.issuerNameHash = issuerNameHash
         self.issuerKeyHash = issuerKeyHash
@@ -20,7 +20,7 @@ import Foundation
             let hashAlgorithm: DSTU_AlgorithmIdentifier = try DSTU_AlgorithmIdentifier(derEncoded: &nodes)
             let issuerNameHash: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let issuerKeyHash: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
-            let serialNumber: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+            let serialNumber: KEP_CertificateSerialNumber = try KEP_CertificateSerialNumber(derEncoded: &nodes)
             return KEP_CertID(hashAlgorithm: hashAlgorithm, issuerNameHash: issuerNameHash, issuerKeyHash: issuerKeyHash, serialNumber: serialNumber)
         }
     }

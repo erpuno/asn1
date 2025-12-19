@@ -4,17 +4,21 @@ import Foundation
 
 @usableFromInline struct LDAP_SaslCredentials: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var mechanism: ASN1OctetString
+    @usableFromInline var mechanism: LDAP_LDAPString
     @usableFromInline var credentials: ASN1OctetString?
-    @inlinable init(mechanism: ASN1OctetString, credentials: ASN1OctetString?) {
+    @inlinable init(mechanism: LDAP_LDAPString, credentials: ASN1OctetString?) {
         self.mechanism = mechanism
         self.credentials = credentials
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let mechanism: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
-            let credentials: ASN1OctetString? = try ASN1OctetString(derEncoded: &nodes)
+            let mechanism: LDAP_LDAPString = try LDAP_LDAPString(derEncoded: &nodes)
+            var credentials: ASN1OctetString? = nil
+var peek_credentials = nodes
+if let next = peek_credentials.next(), next.identifier == ASN1OctetString.defaultIdentifier {
+    credentials = try ASN1OctetString(derEncoded: &nodes)
+}
             return LDAP_SaslCredentials(mechanism: mechanism, credentials: credentials)
         }
     }
@@ -22,7 +26,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(mechanism)
-            if let credentials = self.credentials { try coder.serialize(credentials) }
+            if let credentials = self.credentials { if let credentials = self.credentials { try coder.serialize(credentials) } }
         }
     }
 }

@@ -4,12 +4,12 @@ import Foundation
 
 @usableFromInline struct KEP_ResponseData: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var version: DSTU_Version
+    @usableFromInline var version: DSTU_Version?
     @usableFromInline var responderID: KEP_ResponderID
     @usableFromInline var producedAt: GeneralizedTime
     @usableFromInline var responses: [KEP_SingleResponse]
     @usableFromInline var responseExtensions: DSTU_Extensions?
-    @inlinable init(version: DSTU_Version, responderID: KEP_ResponderID, producedAt: GeneralizedTime, responses: [KEP_SingleResponse], responseExtensions: DSTU_Extensions?) {
+    @inlinable init(version: DSTU_Version?, responderID: KEP_ResponderID, producedAt: GeneralizedTime, responses: [KEP_SingleResponse], responseExtensions: DSTU_Extensions?) {
         self.version = version
         self.responderID = responderID
         self.producedAt = producedAt
@@ -30,11 +30,11 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) }
+            if let version = self.version { if let version = self.version { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) } } }
             try coder.serialize(responderID)
             try coder.serialize(producedAt)
             try coder.serializeSequenceOf(responses)
-            if let responseExtensions = self.responseExtensions { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(responseExtensions) } }
+            if let responseExtensions = self.responseExtensions { if let responseExtensions = self.responseExtensions { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(responseExtensions) } } }
         }
     }
 }

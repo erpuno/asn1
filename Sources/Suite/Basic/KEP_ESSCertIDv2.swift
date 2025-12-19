@@ -5,9 +5,9 @@ import Foundation
 @usableFromInline struct KEP_ESSCertIDv2: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var hashAlgorithm: DSTU_AlgorithmIdentifier
-    @usableFromInline var certHash: ASN1OctetString
+    @usableFromInline var certHash: KEP_Hash
     @usableFromInline var issuerSerial: KEP_IssuerSerial
-    @inlinable init(hashAlgorithm: DSTU_AlgorithmIdentifier, certHash: ASN1OctetString, issuerSerial: KEP_IssuerSerial) {
+    @inlinable init(hashAlgorithm: DSTU_AlgorithmIdentifier, certHash: KEP_Hash, issuerSerial: KEP_IssuerSerial) {
         self.hashAlgorithm = hashAlgorithm
         self.certHash = certHash
         self.issuerSerial = issuerSerial
@@ -16,7 +16,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let hashAlgorithm: DSTU_AlgorithmIdentifier = try DSTU_AlgorithmIdentifier(derEncoded: &nodes)
-            let certHash: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let certHash: KEP_Hash = try KEP_Hash(derEncoded: &nodes)
             let issuerSerial: KEP_IssuerSerial = try KEP_IssuerSerial(derEncoded: &nodes)
             return KEP_ESSCertIDv2(hashAlgorithm: hashAlgorithm, certHash: certHash, issuerSerial: issuerSerial)
         }

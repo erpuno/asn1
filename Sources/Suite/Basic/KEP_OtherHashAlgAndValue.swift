@@ -5,8 +5,8 @@ import Foundation
 @usableFromInline struct KEP_OtherHashAlgAndValue: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var hashAlgorithm: DSTU_AlgorithmIdentifier
-    @usableFromInline var hashVal: ASN1OctetString
-    @inlinable init(hashAlgorithm: DSTU_AlgorithmIdentifier, hashVal: ASN1OctetString) {
+    @usableFromInline var hashVal: KEP_OtherHashValue
+    @inlinable init(hashAlgorithm: DSTU_AlgorithmIdentifier, hashVal: KEP_OtherHashValue) {
         self.hashAlgorithm = hashAlgorithm
         self.hashVal = hashVal
     }
@@ -14,7 +14,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let hashAlgorithm: DSTU_AlgorithmIdentifier = try DSTU_AlgorithmIdentifier(derEncoded: &nodes)
-            let hashVal: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let hashVal: KEP_OtherHashValue = try KEP_OtherHashValue(derEncoded: &nodes)
             return KEP_OtherHashAlgAndValue(hashAlgorithm: hashAlgorithm, hashVal: hashVal)
         }
     }

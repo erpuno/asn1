@@ -6,22 +6,22 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case bindRequest(LDAP_BindRequest)
     case bindResponse(LDAP_BindResponse)
-    case unbindRequest(ASN1Null)
+    case unbindRequest(LDAP_UnbindRequest)
     case searchRequest(LDAP_SearchRequest)
     case searchResEntry(LDAP_SearchResultEntry)
-    case searchResDone(LDAP_LDAPResult)
+    case searchResDone(LDAP_SearchResultDone)
     case searchResRef(LDAP_SearchResultReference)
     case modifyRequest(LDAP_ModifyRequest)
-    case modifyResponse(LDAP_LDAPResult)
+    case modifyResponse(LDAP_ModifyResponse)
     case addRequest(LDAP_AddRequest)
-    case addResponse(LDAP_LDAPResult)
-    case delRequest(ASN1OctetString)
-    case delResponse(LDAP_LDAPResult)
+    case addResponse(LDAP_AddResponse)
+    case delRequest(LDAP_DelRequest)
+    case delResponse(LDAP_DelResponse)
     case modDNRequest(LDAP_ModifyDNRequest)
-    case modDNResponse(LDAP_LDAPResult)
+    case modDNResponse(LDAP_ModifyDNResponse)
     case compareRequest(LDAP_CompareRequest)
-    case compareResponse(LDAP_LDAPResult)
-    case abandonRequest(ArraySlice<UInt8>)
+    case compareResponse(LDAP_CompareResponse)
+    case abandonRequest(LDAP_AbandonRequest)
     case extendedReq(LDAP_ExtendedRequest)
     case extendedResp(LDAP_ExtendedResponse)
     case intermediateResponse(LDAP_IntermediateResponse)
@@ -32,37 +32,37 @@ import Foundation
             case ASN1Identifier(tagWithNumber: 1, tagClass: .application):
                 self = .bindResponse(try LDAP_BindResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 2, tagClass: .application):
-                self = .unbindRequest(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .unbindRequest(try LDAP_UnbindRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 3, tagClass: .application):
                 self = .searchRequest(try LDAP_SearchRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 4, tagClass: .application):
                 self = .searchResEntry(try LDAP_SearchResultEntry(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 5, tagClass: .application):
-                self = .searchResDone(try LDAP_LDAPResult(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .searchResDone(try LDAP_SearchResultDone(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 6, tagClass: .application):
                 self = .searchResRef(try LDAP_SearchResultReference(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 7, tagClass: .application):
                 self = .modifyRequest(try LDAP_ModifyRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 8, tagClass: .application):
-                self = .modifyResponse(try LDAP_LDAPResult(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .modifyResponse(try LDAP_ModifyResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 9, tagClass: .application):
                 self = .addRequest(try LDAP_AddRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 10, tagClass: .application):
-                self = .addResponse(try LDAP_LDAPResult(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .addResponse(try LDAP_AddResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 11, tagClass: .application):
-                self = .delRequest(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .delRequest(try LDAP_DelRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 12, tagClass: .application):
-                self = .delResponse(try LDAP_LDAPResult(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .delResponse(try LDAP_DelResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 13, tagClass: .application):
                 self = .modDNRequest(try LDAP_ModifyDNRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 14, tagClass: .application):
-                self = .modDNResponse(try LDAP_LDAPResult(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .modDNResponse(try LDAP_ModifyDNResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 15, tagClass: .application):
                 self = .compareRequest(try LDAP_CompareRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 16, tagClass: .application):
-                self = .compareResponse(try LDAP_LDAPResult(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .compareResponse(try LDAP_CompareResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 17, tagClass: .application):
-                self = .abandonRequest(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .abandonRequest(try LDAP_AbandonRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 18, tagClass: .application):
                 self = .extendedReq(try LDAP_ExtendedRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 19, tagClass: .application):

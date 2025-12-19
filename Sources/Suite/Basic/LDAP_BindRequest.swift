@@ -5,9 +5,9 @@ import Foundation
 @usableFromInline struct LDAP_BindRequest: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: ArraySlice<UInt8>
-    @usableFromInline var name: ASN1OctetString
+    @usableFromInline var name: LDAP_LDAPDN
     @usableFromInline var authentication: LDAP_AuthenticationChoice
-    @inlinable init(version: ArraySlice<UInt8>, name: ASN1OctetString, authentication: LDAP_AuthenticationChoice) {
+    @inlinable init(version: ArraySlice<UInt8>, name: LDAP_LDAPDN, authentication: LDAP_AuthenticationChoice) {
         self.version = version
         self.name = name
         self.authentication = authentication
@@ -16,7 +16,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let version: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let name: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let name: LDAP_LDAPDN = try LDAP_LDAPDN(derEncoded: &nodes)
             let authentication: LDAP_AuthenticationChoice = try LDAP_AuthenticationChoice(derEncoded: &nodes)
             return LDAP_BindRequest(version: version, name: name, authentication: authentication)
         }

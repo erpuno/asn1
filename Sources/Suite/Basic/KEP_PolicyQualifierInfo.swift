@@ -22,7 +22,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(policyQualifierId)
-            if let qualifier = self.qualifier { try coder.serialize(qualifier) }
+            if let qualifier = self.qualifier { if let qualifier = self.qualifier { try coder.serialize(qualifier) } }
         }
     }
 }

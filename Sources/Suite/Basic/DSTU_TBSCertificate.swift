@@ -4,17 +4,17 @@ import Foundation
 
 @usableFromInline struct DSTU_TBSCertificate: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var version: DSTU_Version
+    @usableFromInline var version: DSTU_Version?
     @usableFromInline var serialNumber: ArraySlice<UInt8>
     @usableFromInline var signature: DSTU_AlgorithmIdentifier
     @usableFromInline var issuer: DSTU_Name
     @usableFromInline var validity: DSTU_Validity
     @usableFromInline var subject: DSTU_Name
     @usableFromInline var subjectPublicKeyInfo: DSTU_SubjectPublicKeyInfo
-    @usableFromInline var issuerUniqueID: ASN1BitString?
-    @usableFromInline var subjectUniqueID: ASN1BitString?
+    @usableFromInline var issuerUniqueID: DSTU_UniqueIdentifier?
+    @usableFromInline var subjectUniqueID: DSTU_UniqueIdentifier?
     @usableFromInline var extensions: DSTU_Extensions?
-    @inlinable init(version: DSTU_Version, serialNumber: ArraySlice<UInt8>, signature: DSTU_AlgorithmIdentifier, issuer: DSTU_Name, validity: DSTU_Validity, subject: DSTU_Name, subjectPublicKeyInfo: DSTU_SubjectPublicKeyInfo, issuerUniqueID: ASN1BitString?, subjectUniqueID: ASN1BitString?, extensions: DSTU_Extensions?) {
+    @inlinable init(version: DSTU_Version?, serialNumber: ArraySlice<UInt8>, signature: DSTU_AlgorithmIdentifier, issuer: DSTU_Name, validity: DSTU_Validity, subject: DSTU_Name, subjectPublicKeyInfo: DSTU_SubjectPublicKeyInfo, issuerUniqueID: DSTU_UniqueIdentifier?, subjectUniqueID: DSTU_UniqueIdentifier?, extensions: DSTU_Extensions?) {
         self.version = version
         self.serialNumber = serialNumber
         self.signature = signature
@@ -36,8 +36,8 @@ import Foundation
             let validity: DSTU_Validity = try DSTU_Validity(derEncoded: &nodes)
             let subject: DSTU_Name = try DSTU_Name(derEncoded: &nodes)
             let subjectPublicKeyInfo: DSTU_SubjectPublicKeyInfo = try DSTU_SubjectPublicKeyInfo(derEncoded: &nodes)
-            let issuerUniqueID: ASN1BitString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            let subjectUniqueID: ASN1BitString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+            let issuerUniqueID: DSTU_UniqueIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+            let subjectUniqueID: DSTU_UniqueIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let extensions: DSTU_Extensions? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try DSTU_Extensions(derEncoded: node) }
             return DSTU_TBSCertificate(version: version, serialNumber: serialNumber, signature: signature, issuer: issuer, validity: validity, subject: subject, subjectPublicKeyInfo: subjectPublicKeyInfo, issuerUniqueID: issuerUniqueID, subjectUniqueID: subjectUniqueID, extensions: extensions)
         }
@@ -45,16 +45,16 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) }
+            if let version = self.version { if let version = self.version { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) } } }
             try coder.serialize(serialNumber)
             try coder.serialize(signature)
             try coder.serialize(issuer)
             try coder.serialize(validity)
             try coder.serialize(subject)
             try coder.serialize(subjectPublicKeyInfo)
-            if let issuerUniqueID = self.issuerUniqueID { try coder.serializeOptionalImplicitlyTagged(issuerUniqueID, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
-            if let subjectUniqueID = self.subjectUniqueID { try coder.serializeOptionalImplicitlyTagged(subjectUniqueID, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
-            if let extensions = self.extensions { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(extensions) } }
+            if let issuerUniqueID = self.issuerUniqueID { if let issuerUniqueID = self.issuerUniqueID { try coder.serializeOptionalImplicitlyTagged(issuerUniqueID, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let subjectUniqueID = self.subjectUniqueID { if let subjectUniqueID = self.subjectUniqueID { try coder.serializeOptionalImplicitlyTagged(subjectUniqueID, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let extensions = self.extensions { if let extensions = self.extensions { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(extensions) } } }
         }
     }
 }

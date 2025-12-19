@@ -5,8 +5,8 @@ import Foundation
 @usableFromInline struct KEP_TimeStampResp: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var status: KEP_PKIStatusInfo
-    @usableFromInline var timeStampToken: KEP_ContentInfo?
-    @inlinable init(status: KEP_PKIStatusInfo, timeStampToken: KEP_ContentInfo?) {
+    @usableFromInline var timeStampToken: KEP_TimeStampToken?
+    @inlinable init(status: KEP_PKIStatusInfo, timeStampToken: KEP_TimeStampToken?) {
         self.status = status
         self.timeStampToken = timeStampToken
     }
@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let status: KEP_PKIStatusInfo = try KEP_PKIStatusInfo(derEncoded: &nodes)
-            let timeStampToken: KEP_ContentInfo? = try KEP_ContentInfo(derEncoded: &nodes)
+            var timeStampToken: KEP_TimeStampToken? = nil
+var peek_timeStampToken = nodes
+if let next = peek_timeStampToken.next(), next.identifier == KEP_TimeStampToken.defaultIdentifier {
+    timeStampToken = try KEP_TimeStampToken(derEncoded: &nodes)
+}
             return KEP_TimeStampResp(status: status, timeStampToken: timeStampToken)
         }
     }
@@ -22,7 +26,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(status)
-            if let timeStampToken = self.timeStampToken { try coder.serialize(timeStampToken) }
+            if let timeStampToken = self.timeStampToken { if let timeStampToken = self.timeStampToken { try coder.serialize(timeStampToken) } }
         }
     }
 }

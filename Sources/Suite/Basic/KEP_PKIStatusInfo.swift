@@ -6,8 +6,8 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var status: KEP_PKIStatus
     @usableFromInline var statusString: KEP_PKIFreeText?
-    @usableFromInline var failInfo: ASN1BitString?
-    @inlinable init(status: KEP_PKIStatus, statusString: KEP_PKIFreeText?, failInfo: ASN1BitString?) {
+    @usableFromInline var failInfo: KEP_PKIFailureInfo?
+    @inlinable init(status: KEP_PKIStatus, statusString: KEP_PKIFreeText?, failInfo: KEP_PKIFailureInfo?) {
         self.status = status
         self.statusString = statusString
         self.failInfo = failInfo
@@ -16,8 +16,16 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let status: KEP_PKIStatus = try KEP_PKIStatus(derEncoded: &nodes)
-            let statusString: KEP_PKIFreeText? = try KEP_PKIFreeText(derEncoded: &nodes)
-            let failInfo: ASN1BitString? = try ASN1BitString(derEncoded: &nodes)
+            var statusString: KEP_PKIFreeText? = nil
+var peek_statusString = nodes
+if let next = peek_statusString.next(), next.identifier == KEP_PKIFreeText.defaultIdentifier {
+    statusString = try KEP_PKIFreeText(derEncoded: &nodes)
+}
+            var failInfo: KEP_PKIFailureInfo? = nil
+var peek_failInfo = nodes
+if let next = peek_failInfo.next(), next.identifier == KEP_PKIFailureInfo.defaultIdentifier {
+    failInfo = try KEP_PKIFailureInfo(derEncoded: &nodes)
+}
             return KEP_PKIStatusInfo(status: status, statusString: statusString, failInfo: failInfo)
         }
     }
@@ -25,8 +33,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(status)
-            if let statusString = self.statusString { try coder.serialize(statusString) }
-            if let failInfo = self.failInfo { try coder.serialize(failInfo) }
+            if let statusString = self.statusString { if let statusString = self.statusString { try coder.serialize(statusString) } }
+            if let failInfo = self.failInfo { if let failInfo = self.failInfo { try coder.serialize(failInfo) } }
         }
     }
 }

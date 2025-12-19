@@ -4,12 +4,12 @@ import Foundation
 
 @usableFromInline indirect enum DSTU_BinaryField_p_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
-        case t(ArraySlice<UInt8>)
+        case t(DSTU_Trinomial)
     case p(DSTU_Pentanomial)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .application):
-                self = .t(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .t(try DSTU_Trinomial(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .application):
                 self = .p(try DSTU_Pentanomial(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)

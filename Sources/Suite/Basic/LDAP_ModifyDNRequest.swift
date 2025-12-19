@@ -4,11 +4,11 @@ import Foundation
 
 @usableFromInline struct LDAP_ModifyDNRequest: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var entry: ASN1OctetString
-    @usableFromInline var newrdn: ASN1OctetString
+    @usableFromInline var entry: LDAP_LDAPDN
+    @usableFromInline var newrdn: LDAP_RelativeLDAPDN
     @usableFromInline var deleteoldrdn: Bool
-    @usableFromInline var newSuperior: ASN1OctetString?
-    @inlinable init(entry: ASN1OctetString, newrdn: ASN1OctetString, deleteoldrdn: Bool, newSuperior: ASN1OctetString?) {
+    @usableFromInline var newSuperior: LDAP_LDAPDN?
+    @inlinable init(entry: LDAP_LDAPDN, newrdn: LDAP_RelativeLDAPDN, deleteoldrdn: Bool, newSuperior: LDAP_LDAPDN?) {
         self.entry = entry
         self.newrdn = newrdn
         self.deleteoldrdn = deleteoldrdn
@@ -17,10 +17,10 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let entry: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
-            let newrdn: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let entry: LDAP_LDAPDN = try LDAP_LDAPDN(derEncoded: &nodes)
+            let newrdn: LDAP_RelativeLDAPDN = try LDAP_RelativeLDAPDN(derEncoded: &nodes)
             let deleteoldrdn: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
-            let newSuperior: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+            let newSuperior: LDAP_LDAPDN? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             return LDAP_ModifyDNRequest(entry: entry, newrdn: newrdn, deleteoldrdn: deleteoldrdn, newSuperior: newSuperior)
         }
     }
@@ -29,8 +29,8 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(entry)
             try coder.serialize(newrdn)
-            if deleteoldrdn { try coder.serialize(deleteoldrdn) }
-            if let newSuperior = self.newSuperior { try coder.serializeOptionalImplicitlyTagged(newSuperior, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            try coder.serialize(deleteoldrdn)
+            if let newSuperior = self.newSuperior { if let newSuperior = self.newSuperior { try coder.serializeOptionalImplicitlyTagged(newSuperior, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
         }
     }
 }

@@ -4,10 +4,10 @@ import Foundation
 
 @usableFromInline struct KEP_TBSCertList_revokedCertificates_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var userCertificate: ArraySlice<UInt8>
+    @usableFromInline var userCertificate: KEP_CertificateSerialNumber
     @usableFromInline var revocationDate: DSTU_Time
     @usableFromInline var crlEntryExtensions: DSTU_Extensions?
-    @inlinable init(userCertificate: ArraySlice<UInt8>, revocationDate: DSTU_Time, crlEntryExtensions: DSTU_Extensions?) {
+    @inlinable init(userCertificate: KEP_CertificateSerialNumber, revocationDate: DSTU_Time, crlEntryExtensions: DSTU_Extensions?) {
         self.userCertificate = userCertificate
         self.revocationDate = revocationDate
         self.crlEntryExtensions = crlEntryExtensions
@@ -15,9 +15,13 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let userCertificate: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+            let userCertificate: KEP_CertificateSerialNumber = try KEP_CertificateSerialNumber(derEncoded: &nodes)
             let revocationDate: DSTU_Time = try DSTU_Time(derEncoded: &nodes)
-            let crlEntryExtensions: DSTU_Extensions? = try DSTU_Extensions(derEncoded: &nodes)
+            var crlEntryExtensions: DSTU_Extensions? = nil
+var peek_crlEntryExtensions = nodes
+if let next = peek_crlEntryExtensions.next(), next.identifier == DSTU_Extensions.defaultIdentifier {
+    crlEntryExtensions = try DSTU_Extensions(derEncoded: &nodes)
+}
             return KEP_TBSCertList_revokedCertificates_Sequence(userCertificate: userCertificate, revocationDate: revocationDate, crlEntryExtensions: crlEntryExtensions)
         }
     }
@@ -26,7 +30,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(userCertificate)
             try coder.serialize(revocationDate)
-            if let crlEntryExtensions = self.crlEntryExtensions { try coder.serialize(crlEntryExtensions) }
+            if let crlEntryExtensions = self.crlEntryExtensions { if let crlEntryExtensions = self.crlEntryExtensions { try coder.serialize(crlEntryExtensions) } }
         }
     }
 }

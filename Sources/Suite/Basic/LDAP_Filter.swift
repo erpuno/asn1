@@ -11,7 +11,7 @@ import Foundation
     case substrings(LDAP_SubstringFilter)
     case greaterOrEqual(LDAP_AttributeValueAssertion)
     case lessOrEqual(LDAP_AttributeValueAssertion)
-    case present(ASN1OctetString)
+    case present(LDAP_AttributeDescription)
     case approxMatch(LDAP_AttributeValueAssertion)
     case extensibleMatch(LDAP_MatchingRuleAssertion)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
@@ -31,7 +31,7 @@ import Foundation
             case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
                 self = .lessOrEqual(try LDAP_AttributeValueAssertion(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
-                self = .present(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .present(try LDAP_AttributeDescription(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific):
                 self = .approxMatch(try LDAP_AttributeValueAssertion(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific):

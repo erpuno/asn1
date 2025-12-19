@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let crlHash: KEP_OtherHash = try KEP_OtherHash(derEncoded: &nodes)
-            let crlIdentifier: KEP_CrlIdentifier? = try KEP_CrlIdentifier(derEncoded: &nodes)
+            var crlIdentifier: KEP_CrlIdentifier? = nil
+var peek_crlIdentifier = nodes
+if let next = peek_crlIdentifier.next(), next.identifier == KEP_CrlIdentifier.defaultIdentifier {
+    crlIdentifier = try KEP_CrlIdentifier(derEncoded: &nodes)
+}
             return KEP_CrlValidatedID(crlHash: crlHash, crlIdentifier: crlIdentifier)
         }
     }
@@ -22,7 +26,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(crlHash)
-            if let crlIdentifier = self.crlIdentifier { try coder.serialize(crlIdentifier) }
+            if let crlIdentifier = self.crlIdentifier { if let crlIdentifier = self.crlIdentifier { try coder.serialize(crlIdentifier) } }
         }
     }
 }

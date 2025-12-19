@@ -29,7 +29,14 @@ default:
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .signaturePolicy(let signaturePolicy): try coder.serialize(signaturePolicy)
+            case .signaturePolicy(let signaturePolicy):
+                            if identifier != Self.defaultIdentifier {
+                                try coder.appendConstructedNode(identifier: identifier) { coder in
+                                    try coder.serialize(signaturePolicy)
+                                }
+                            } else {
+                                try coder.serialize(signaturePolicy)
+                            }
         }
     }
 

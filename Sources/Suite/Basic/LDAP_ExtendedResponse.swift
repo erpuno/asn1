@@ -5,12 +5,12 @@ import Foundation
 @usableFromInline struct LDAP_ExtendedResponse: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var resultCode: LDAP_LDAPResult_resultCode_Enum
-    @usableFromInline var matchedDN: ASN1OctetString
-    @usableFromInline var diagnosticMessage: ASN1OctetString
+    @usableFromInline var matchedDN: LDAP_LDAPDN
+    @usableFromInline var diagnosticMessage: LDAP_LDAPString
     @usableFromInline var referral: LDAP_Referral?
-    @usableFromInline var responseName: ASN1OctetString?
+    @usableFromInline var responseName: LDAP_LDAPOID?
     @usableFromInline var responseValue: ASN1OctetString?
-    @inlinable init(resultCode: LDAP_LDAPResult_resultCode_Enum, matchedDN: ASN1OctetString, diagnosticMessage: ASN1OctetString, referral: LDAP_Referral?, responseName: ASN1OctetString?, responseValue: ASN1OctetString?) {
+    @inlinable init(resultCode: LDAP_LDAPResult_resultCode_Enum, matchedDN: LDAP_LDAPDN, diagnosticMessage: LDAP_LDAPString, referral: LDAP_Referral?, responseName: LDAP_LDAPOID?, responseValue: ASN1OctetString?) {
         self.resultCode = resultCode
         self.matchedDN = matchedDN
         self.diagnosticMessage = diagnosticMessage
@@ -22,10 +22,10 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let resultCode: LDAP_LDAPResult_resultCode_Enum = try LDAP_LDAPResult_resultCode_Enum(derEncoded: &nodes)
-            let matchedDN: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
-            let diagnosticMessage: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let matchedDN: LDAP_LDAPDN = try LDAP_LDAPDN(derEncoded: &nodes)
+            let diagnosticMessage: LDAP_LDAPString = try LDAP_LDAPString(derEncoded: &nodes)
             let referral: LDAP_Referral? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
-            let responseName: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
+            let responseName: LDAP_LDAPOID? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
             let responseValue: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific))
             return LDAP_ExtendedResponse(resultCode: resultCode, matchedDN: matchedDN, diagnosticMessage: diagnosticMessage, referral: referral, responseName: responseName, responseValue: responseValue)
         }
@@ -36,9 +36,9 @@ import Foundation
             try coder.serialize(resultCode)
             try coder.serialize(matchedDN)
             try coder.serialize(diagnosticMessage)
-            if let referral = self.referral { try coder.serializeOptionalImplicitlyTagged(referral, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
-            if let responseName = self.responseName { try coder.serializeOptionalImplicitlyTagged(responseName, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) }
-            if let responseValue = self.responseValue { try coder.serializeOptionalImplicitlyTagged(responseValue, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) }
+            if let referral = self.referral { if let referral = self.referral { try coder.serializeOptionalImplicitlyTagged(referral, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
+            if let responseName = self.responseName { if let responseName = self.responseName { try coder.serializeOptionalImplicitlyTagged(responseName, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) } }
+            if let responseValue = self.responseValue { if let responseValue = self.responseValue { try coder.serializeOptionalImplicitlyTagged(responseValue, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) } }
         }
     }
 }

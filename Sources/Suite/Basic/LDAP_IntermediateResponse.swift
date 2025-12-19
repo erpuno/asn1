@@ -4,16 +4,16 @@ import Foundation
 
 @usableFromInline struct LDAP_IntermediateResponse: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var responseName: ASN1OctetString?
+    @usableFromInline var responseName: LDAP_LDAPOID?
     @usableFromInline var responseValue: ASN1OctetString?
-    @inlinable init(responseName: ASN1OctetString?, responseValue: ASN1OctetString?) {
+    @inlinable init(responseName: LDAP_LDAPOID?, responseValue: ASN1OctetString?) {
         self.responseName = responseName
         self.responseValue = responseValue
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let responseName: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+            let responseName: LDAP_LDAPOID? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let responseValue: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             return LDAP_IntermediateResponse(responseName: responseName, responseValue: responseValue)
         }
@@ -21,8 +21,8 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let responseName = self.responseName { try coder.serializeOptionalImplicitlyTagged(responseName, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
-            if let responseValue = self.responseValue { try coder.serializeOptionalImplicitlyTagged(responseValue, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let responseName = self.responseName { if let responseName = self.responseName { try coder.serializeOptionalImplicitlyTagged(responseName, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let responseValue = self.responseValue { if let responseValue = self.responseValue { try coder.serializeOptionalImplicitlyTagged(responseValue, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
         }
     }
 }

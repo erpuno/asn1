@@ -22,7 +22,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(revocationTime)
-            if let revocationReason = self.revocationReason { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(revocationReason) } }
+            if let revocationReason = self.revocationReason { if let revocationReason = self.revocationReason { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(revocationReason) } } }
         }
     }
 }

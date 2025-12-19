@@ -4,17 +4,17 @@ import Foundation
 
 @usableFromInline struct LDAP_PartialAttribute: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var type: ASN1OctetString
-    @usableFromInline var vals: [ASN1OctetString]
-    @inlinable init(type: ASN1OctetString, vals: [ASN1OctetString]) {
+    @usableFromInline var type: LDAP_AttributeDescription
+    @usableFromInline var vals: [LDAP_AttributeValue]
+    @inlinable init(type: LDAP_AttributeDescription, vals: [LDAP_AttributeValue]) {
         self.type = type
         self.vals = vals
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let type: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
-            let vals: [ASN1OctetString] = try DER.set(of: ASN1OctetString.self, identifier: .set, nodes: &nodes)
+            let type: LDAP_AttributeDescription = try LDAP_AttributeDescription(derEncoded: &nodes)
+            let vals: [LDAP_AttributeValue] = try DER.set(of: LDAP_AttributeValue.self, identifier: .set, nodes: &nodes)
             return LDAP_PartialAttribute(type: type, vals: vals)
         }
     }

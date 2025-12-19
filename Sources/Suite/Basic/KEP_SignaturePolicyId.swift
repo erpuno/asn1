@@ -4,17 +4,21 @@ import Foundation
 
 @usableFromInline struct KEP_SignaturePolicyId: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var sigPolicyId: ASN1ObjectIdentifier
-    @usableFromInline var sigPolicyHash: KEP_OtherHashAlgAndValue?
-    @inlinable init(sigPolicyId: ASN1ObjectIdentifier, sigPolicyHash: KEP_OtherHashAlgAndValue?) {
+    @usableFromInline var sigPolicyId: KEP_SigPolicyId
+    @usableFromInline var sigPolicyHash: KEP_SigPolicyHash?
+    @inlinable init(sigPolicyId: KEP_SigPolicyId, sigPolicyHash: KEP_SigPolicyHash?) {
         self.sigPolicyId = sigPolicyId
         self.sigPolicyHash = sigPolicyHash
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let sigPolicyId: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let sigPolicyHash: KEP_OtherHashAlgAndValue? = try KEP_OtherHashAlgAndValue(derEncoded: &nodes)
+            let sigPolicyId: KEP_SigPolicyId = try KEP_SigPolicyId(derEncoded: &nodes)
+            var sigPolicyHash: KEP_SigPolicyHash? = nil
+var peek_sigPolicyHash = nodes
+if let next = peek_sigPolicyHash.next(), next.identifier == KEP_SigPolicyHash.defaultIdentifier {
+    sigPolicyHash = try KEP_SigPolicyHash(derEncoded: &nodes)
+}
             return KEP_SignaturePolicyId(sigPolicyId: sigPolicyId, sigPolicyHash: sigPolicyHash)
         }
     }
@@ -22,7 +26,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(sigPolicyId)
-            if let sigPolicyHash = self.sigPolicyHash { try coder.serialize(sigPolicyHash) }
+            if let sigPolicyHash = self.sigPolicyHash { if let sigPolicyHash = self.sigPolicyHash { try coder.serialize(sigPolicyHash) } }
         }
     }
 }

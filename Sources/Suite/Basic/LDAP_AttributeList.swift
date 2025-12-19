@@ -4,10 +4,10 @@ import Foundation
 
 @usableFromInline struct LDAP_AttributeList: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var value: [LDAP_PartialAttribute]
-    @inlinable public init(_ value: [LDAP_PartialAttribute]) { self.value = value }
+    @usableFromInline var value: [LDAP_Attribute]
+    @inlinable public init(_ value: [LDAP_Attribute]) { self.value = value }
     @inlinable public init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
-        self.value = try DER.sequence(of: LDAP_PartialAttribute.self, identifier: identifier, rootNode: rootNode)
+        self.value = try DER.sequence(of: LDAP_Attribute.self, identifier: identifier, rootNode: rootNode)
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         try coder.serializeSequenceOf(value, identifier: identifier)

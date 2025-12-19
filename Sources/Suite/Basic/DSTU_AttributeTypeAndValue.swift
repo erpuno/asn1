@@ -4,16 +4,16 @@ import Foundation
 
 @usableFromInline struct DSTU_AttributeTypeAndValue: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var type: ASN1ObjectIdentifier
+    @usableFromInline var type: DSTU_AttributeType
     @usableFromInline var value: ASN1Any
-    @inlinable init(type: ASN1ObjectIdentifier, value: ASN1Any) {
+    @inlinable init(type: DSTU_AttributeType, value: ASN1Any) {
         self.type = type
         self.value = value
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let type: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
+            let type: DSTU_AttributeType = try DSTU_AttributeType(derEncoded: &nodes)
             let value: ASN1Any = try ASN1Any(derEncoded: &nodes)
             return DSTU_AttributeTypeAndValue(type: type, value: value)
         }

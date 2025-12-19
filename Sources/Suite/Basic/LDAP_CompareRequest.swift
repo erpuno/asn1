@@ -4,16 +4,16 @@ import Foundation
 
 @usableFromInline struct LDAP_CompareRequest: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var entry: ASN1OctetString
+    @usableFromInline var entry: LDAP_LDAPDN
     @usableFromInline var ava: LDAP_AttributeValueAssertion
-    @inlinable init(entry: ASN1OctetString, ava: LDAP_AttributeValueAssertion) {
+    @inlinable init(entry: LDAP_LDAPDN, ava: LDAP_AttributeValueAssertion) {
         self.entry = entry
         self.ava = ava
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let entry: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let entry: LDAP_LDAPDN = try LDAP_LDAPDN(derEncoded: &nodes)
             let ava: LDAP_AttributeValueAssertion = try LDAP_AttributeValueAssertion(derEncoded: &nodes)
             return LDAP_CompareRequest(entry: entry, ava: ava)
         }

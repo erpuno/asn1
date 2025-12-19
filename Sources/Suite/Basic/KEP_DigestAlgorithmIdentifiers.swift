@@ -4,12 +4,12 @@ import Foundation
 
 @usableFromInline struct KEP_DigestAlgorithmIdentifiers: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
-    @usableFromInline var value: [DSTU_AlgorithmIdentifier]
-    @inlinable public init(_ value: [DSTU_AlgorithmIdentifier]) { self.value = value }
+    @usableFromInline var value: [KEP_DigestAlgorithmIdentifier]
+    @inlinable public init(_ value: [KEP_DigestAlgorithmIdentifier]) { self.value = value }
     @inlinable public init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
-        self.value = try DER.sequence(of: DSTU_AlgorithmIdentifier.self, identifier: identifier, rootNode: rootNode)
+        self.value = try DER.set(of: KEP_DigestAlgorithmIdentifier.self, identifier: identifier, rootNode: rootNode)
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
-        try coder.serializeSequenceOf(value, identifier: identifier)
+        try coder.serializeSetOf(value, identifier: identifier)
     }
 }

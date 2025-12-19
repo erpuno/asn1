@@ -4,16 +4,16 @@ import Foundation
 
 @usableFromInline struct LDAP_ExtendedRequest: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var requestName: ASN1OctetString
+    @usableFromInline var requestName: LDAP_LDAPOID
     @usableFromInline var requestValue: ASN1OctetString?
-    @inlinable init(requestName: ASN1OctetString, requestValue: ASN1OctetString?) {
+    @inlinable init(requestName: LDAP_LDAPOID, requestValue: ASN1OctetString?) {
         self.requestName = requestName
         self.requestValue = requestValue
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let requestName: ASN1OctetString = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
+            let requestName: LDAP_LDAPOID = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let requestValue: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             return LDAP_ExtendedRequest(requestName: requestName, requestValue: requestValue)
         }
@@ -22,7 +22,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(requestName, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            if let requestValue = self.requestValue { try coder.serializeOptionalImplicitlyTagged(requestValue, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let requestValue = self.requestValue { if let requestValue = self.requestValue { try coder.serializeOptionalImplicitlyTagged(requestValue, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
         }
     }
 }

@@ -4,13 +4,13 @@ import Foundation
 
 @usableFromInline struct DSTU_ECBinary: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var version: ArraySlice<UInt8>
+    @usableFromInline var version: ArraySlice<UInt8>?
     @usableFromInline var f: DSTU_BinaryField
     @usableFromInline var a: ArraySlice<UInt8>
     @usableFromInline var b: ASN1OctetString
     @usableFromInline var n: ArraySlice<UInt8>
     @usableFromInline var bp: ASN1OctetString
-    @inlinable init(version: ArraySlice<UInt8>, f: DSTU_BinaryField, a: ArraySlice<UInt8>, b: ASN1OctetString, n: ArraySlice<UInt8>, bp: ASN1OctetString) {
+    @inlinable init(version: ArraySlice<UInt8>?, f: DSTU_BinaryField, a: ArraySlice<UInt8>, b: ASN1OctetString, n: ArraySlice<UInt8>, bp: ASN1OctetString) {
         self.version = version
         self.f = f
         self.a = a
@@ -33,7 +33,7 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) }
+            if let version = self.version { if let version = self.version { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) } } }
             try coder.serialize(f)
             try coder.serialize(a)
             try coder.serialize(b)

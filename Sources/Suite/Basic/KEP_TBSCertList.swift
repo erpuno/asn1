@@ -23,11 +23,19 @@ import Foundation
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let version: DSTU_Version? = try DSTU_Version(derEncoded: &nodes)
+            var version: DSTU_Version? = nil
+var peek_version = nodes
+if let next = peek_version.next(), next.identifier == DSTU_Version.defaultIdentifier {
+    version = try DSTU_Version(derEncoded: &nodes)
+}
             let signature: DSTU_AlgorithmIdentifier = try DSTU_AlgorithmIdentifier(derEncoded: &nodes)
             let issuer: DSTU_Name = try DSTU_Name(derEncoded: &nodes)
             let thisUpdate: DSTU_Time = try DSTU_Time(derEncoded: &nodes)
-            let nextUpdate: DSTU_Time? = try DSTU_Time(derEncoded: &nodes)
+            var nextUpdate: DSTU_Time? = nil
+var peek_nextUpdate = nodes
+if let next = peek_nextUpdate.next(), next.identifier == DSTU_Time.defaultIdentifier {
+    nextUpdate = try DSTU_Time(derEncoded: &nodes)
+}
             let revokedCertificates: [KEP_TBSCertList_revokedCertificates_Sequence]? = try DER.sequence(of: KEP_TBSCertList_revokedCertificates_Sequence.self, identifier: .sequence, nodes: &nodes)
             let crlExtensions: DSTU_Extensions? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             return KEP_TBSCertList(version: version, signature: signature, issuer: issuer, thisUpdate: thisUpdate, nextUpdate: nextUpdate, revokedCertificates: revokedCertificates, crlExtensions: crlExtensions)
@@ -36,13 +44,13 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let version = self.version { try coder.serialize(version) }
+            if let version = self.version { if let version = self.version { try coder.serialize(version) } }
             try coder.serialize(signature)
             try coder.serialize(issuer)
             try coder.serialize(thisUpdate)
-            if let nextUpdate = self.nextUpdate { try coder.serialize(nextUpdate) }
-            if let revokedCertificates = self.revokedCertificates { try coder.serializeSequenceOf(revokedCertificates) }
-            if let crlExtensions = self.crlExtensions { try coder.serializeOptionalImplicitlyTagged(crlExtensions, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let nextUpdate = self.nextUpdate { if let nextUpdate = self.nextUpdate { try coder.serialize(nextUpdate) } }
+            if let revokedCertificates = self.revokedCertificates { if let revokedCertificates = self.revokedCertificates { try coder.serializeSequenceOf(revokedCertificates) } }
+            if let crlExtensions = self.crlExtensions { if let crlExtensions = self.crlExtensions { try coder.serializeOptionalImplicitlyTagged(crlExtensions, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
         }
     }
 }

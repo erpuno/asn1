@@ -17,7 +17,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let crlissuer: DSTU_Name = try DSTU_Name(derEncoded: &nodes)
             let crlIssuedTime: UTCTime = try UTCTime(derEncoded: &nodes)
-            let crlNumber: ArraySlice<UInt8>? = try ArraySlice<UInt8>(derEncoded: &nodes)
+            var crlNumber: ArraySlice<UInt8>? = nil
+var peek_crlNumber = nodes
+if let next = peek_crlNumber.next(), next.identifier == ArraySlice<UInt8>.defaultIdentifier {
+    crlNumber = try ArraySlice<UInt8>(derEncoded: &nodes)
+}
             return KEP_CrlIdentifier(crlissuer: crlissuer, crlIssuedTime: crlIssuedTime, crlNumber: crlNumber)
         }
     }
@@ -26,7 +30,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(crlissuer)
             try coder.serialize(crlIssuedTime)
-            if let crlNumber = self.crlNumber { try coder.serialize(crlNumber) }
+            if let crlNumber = self.crlNumber { if let crlNumber = self.crlNumber { try coder.serialize(crlNumber) } }
         }
     }
 }

@@ -4,17 +4,17 @@ import Foundation
 
 @usableFromInline indirect enum LDAP_SubstringFilter_substrings_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
-        case initial(ASN1OctetString)
-    case any(ASN1OctetString)
-    case final(ASN1OctetString)
+        case initial(LDAP_AssertionValue)
+    case any(LDAP_AssertionValue)
+    case `final`(LDAP_AssertionValue)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
             case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .initial(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .initial(try LDAP_AssertionValue(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .any(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .any(try LDAP_AssertionValue(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .final(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+                self = .`final`(try LDAP_AssertionValue(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
@@ -22,7 +22,7 @@ import Foundation
         switch self {
             case .initial(let initial): try initial.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             case .any(let any): try any.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            case .final(let final): try final.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+            case .`final`(let `final`): try `final`.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
         }
     }
 

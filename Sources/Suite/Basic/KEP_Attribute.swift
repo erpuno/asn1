@@ -4,25 +4,25 @@ import Foundation
 
 @usableFromInline struct KEP_Attribute: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var attrType: ASN1ObjectIdentifier
-    @usableFromInline var attrValues: [ASN1Any]
-    @inlinable init(attrType: ASN1ObjectIdentifier, attrValues: [ASN1Any]) {
-        self.attrType = attrType
-        self.attrValues = attrValues
+    @usableFromInline var type: ASN1ObjectIdentifier
+    @usableFromInline var values: [ASN1Any]
+    @inlinable init(type: ASN1ObjectIdentifier, values: [ASN1Any]) {
+        self.type = type
+        self.values = values
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let attrType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let attrValues: [ASN1Any] = try DER.set(of: ASN1Any.self, identifier: .set, nodes: &nodes)
-            return KEP_Attribute(attrType: attrType, attrValues: attrValues)
+            let type: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
+            let values: [ASN1Any] = try DER.set(of: ASN1Any.self, identifier: .set, nodes: &nodes)
+            return KEP_Attribute(type: type, values: values)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(attrType)
-            try coder.serializeSetOf(attrValues)
+            try coder.serialize(type)
+            try coder.serializeSetOf(values)
         }
     }
 }

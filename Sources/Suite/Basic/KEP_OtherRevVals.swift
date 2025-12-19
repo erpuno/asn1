@@ -4,14 +4,14 @@ import Foundation
 
 @usableFromInline struct KEP_OtherRevVals: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var otherRevValType: ASN1ObjectIdentifier
-    @inlinable init(otherRevValType: ASN1ObjectIdentifier) {
+    @usableFromInline var otherRevValType: KEP_OtherRevValType
+    @inlinable init(otherRevValType: KEP_OtherRevValType) {
         self.otherRevValType = otherRevValType
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let otherRevValType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
+            let otherRevValType: KEP_OtherRevValType = try KEP_OtherRevValType(derEncoded: &nodes)
             return KEP_OtherRevVals(otherRevValType: otherRevValType)
         }
     }

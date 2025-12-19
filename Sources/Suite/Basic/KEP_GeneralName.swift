@@ -35,7 +35,7 @@ import Foundation
             case .otherName(let otherName): try otherName.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             case .rfc822Name(let rfc822Name): try rfc822Name.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             case .dNSName(let dNSName): try dNSName.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
-            case .directoryName(let directoryName): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) { coder in try directoryName.serialize(into: &coder) }
+            case .directoryName(let directoryName): try directoryName.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
             case .uniformResourceIdentifier(let uniformResourceIdentifier): try uniformResourceIdentifier.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
             case .iPAddress(let iPAddress): try iPAddress.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific))
             case .registeredID(let registeredID): try registeredID.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific))

@@ -4,16 +4,16 @@ import Foundation
 
 @usableFromInline struct LDAP_ModifyRequest: DERImplicitlyTaggable, Hashable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var object: ASN1OctetString
+    @usableFromInline var object: LDAP_LDAPDN
     @usableFromInline var changes: [LDAP_ModifyRequest_changes_Sequence]
-    @inlinable init(object: ASN1OctetString, changes: [LDAP_ModifyRequest_changes_Sequence]) {
+    @inlinable init(object: LDAP_LDAPDN, changes: [LDAP_ModifyRequest_changes_Sequence]) {
         self.object = object
         self.changes = changes
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let object: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+            let object: LDAP_LDAPDN = try LDAP_LDAPDN(derEncoded: &nodes)
             let changes: [LDAP_ModifyRequest_changes_Sequence] = try DER.sequence(of: LDAP_ModifyRequest_changes_Sequence.self, identifier: .sequence, nodes: &nodes)
             return LDAP_ModifyRequest(object: object, changes: changes)
         }

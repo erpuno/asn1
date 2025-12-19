@@ -14,7 +14,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let definition: DSTU_DSTU4145Params_definition_Choice = try DSTU_DSTU4145Params_definition_Choice(derEncoded: &nodes)
-            let dke: ASN1OctetString? = try ASN1OctetString(derEncoded: &nodes)
+            var dke: ASN1OctetString? = nil
+var peek_dke = nodes
+if let next = peek_dke.next(), next.identifier == ASN1OctetString.defaultIdentifier {
+    dke = try ASN1OctetString(derEncoded: &nodes)
+}
             return DSTU_DSTU4145Params(definition: definition, dke: dke)
         }
     }
@@ -22,7 +26,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(definition)
-            if let dke = self.dke { try coder.serialize(dke) }
+            if let dke = self.dke { if let dke = self.dke { try coder.serialize(dke) } }
         }
     }
 }

@@ -6,12 +6,12 @@ import Foundation
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: KEP_CMSVersion
     @usableFromInline var sid: KEP_SignerIdentifier
-    @usableFromInline var digestAlgorithm: DSTU_AlgorithmIdentifier
+    @usableFromInline var digestAlgorithm: KEP_DigestAlgorithmIdentifier
     @usableFromInline var signedAttrs: KEP_SignedAttributes?
-    @usableFromInline var signatureAlgorithm: DSTU_AlgorithmIdentifier
+    @usableFromInline var signatureAlgorithm: KEP_SignatureAlgorithmIdentifier
     @usableFromInline var signature: ASN1OctetString
     @usableFromInline var unsignedAttrs: KEP_UnsignedAttributes?
-    @inlinable init(version: KEP_CMSVersion, sid: KEP_SignerIdentifier, digestAlgorithm: DSTU_AlgorithmIdentifier, signedAttrs: KEP_SignedAttributes?, signatureAlgorithm: DSTU_AlgorithmIdentifier, signature: ASN1OctetString, unsignedAttrs: KEP_UnsignedAttributes?) {
+    @inlinable init(version: KEP_CMSVersion, sid: KEP_SignerIdentifier, digestAlgorithm: KEP_DigestAlgorithmIdentifier, signedAttrs: KEP_SignedAttributes?, signatureAlgorithm: KEP_SignatureAlgorithmIdentifier, signature: ASN1OctetString, unsignedAttrs: KEP_UnsignedAttributes?) {
         self.version = version
         self.sid = sid
         self.digestAlgorithm = digestAlgorithm
@@ -25,9 +25,9 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let version: KEP_CMSVersion = try KEP_CMSVersion(derEncoded: &nodes)
             let sid: KEP_SignerIdentifier = try KEP_SignerIdentifier(derEncoded: &nodes)
-            let digestAlgorithm: DSTU_AlgorithmIdentifier = try DSTU_AlgorithmIdentifier(derEncoded: &nodes)
+            let digestAlgorithm: KEP_DigestAlgorithmIdentifier = try KEP_DigestAlgorithmIdentifier(derEncoded: &nodes)
             let signedAttrs: KEP_SignedAttributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            let signatureAlgorithm: DSTU_AlgorithmIdentifier = try DSTU_AlgorithmIdentifier(derEncoded: &nodes)
+            let signatureAlgorithm: KEP_SignatureAlgorithmIdentifier = try KEP_SignatureAlgorithmIdentifier(derEncoded: &nodes)
             let signature: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let unsignedAttrs: KEP_UnsignedAttributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             return KEP_SignerInfo(version: version, sid: sid, digestAlgorithm: digestAlgorithm, signedAttrs: signedAttrs, signatureAlgorithm: signatureAlgorithm, signature: signature, unsignedAttrs: unsignedAttrs)
@@ -39,10 +39,10 @@ import Foundation
             try coder.serialize(version)
             try coder.serialize(sid)
             try coder.serialize(digestAlgorithm)
-            if let signedAttrs = self.signedAttrs { try coder.serializeOptionalImplicitlyTagged(signedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let signedAttrs = self.signedAttrs { if let signedAttrs = self.signedAttrs { try coder.serializeOptionalImplicitlyTagged(signedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
             try coder.serialize(signatureAlgorithm)
             try coder.serialize(signature)
-            if let unsignedAttrs = self.unsignedAttrs { try coder.serializeOptionalImplicitlyTagged(unsignedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let unsignedAttrs = self.unsignedAttrs { if let unsignedAttrs = self.unsignedAttrs { try coder.serializeOptionalImplicitlyTagged(unsignedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
         }
     }
 }
