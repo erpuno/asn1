@@ -1,8 +1,0 @@
-Nested DEFINITIONS IMPLICIT TAGS ::=
-BEGIN
-
-IntMatrix ::= SEQUENCE OF IntRow
-
-IntRow ::= SEQUENCE OF INTEGER
-
-END
