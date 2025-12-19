@@ -1,13 +1,17 @@
 SYNRC 💬 ASN.1
 ==============
 
-ASN.1 Swift Code Generation DER Compiler.
-Minimal (normal), full, idiomatic, correct by construction, respects equality.
+ASN.1 Swift Code Generation DER Compiler is
+Minimal (normal), full, idiomatic, correct by construction compiler that
+supports full set of X-Series ITU definitions.
+
+You don't need Cap&Proto, Protobuf, Thrift, you need ASN.1!
+Anyway if you application is secure enough it should support X.509 and thus ASN1.
 
 ```
 % ./asn1.ex
 Copyright © 1994—2026 Namdak Tönpa.
-ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 30.9.27.
+ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 31.12.19.
 Usage: ./asn1.ex help | compile [-v] [input [output]]
 ```
 
