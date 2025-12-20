@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Style_Descriptors_Layout_Style_Descriptor: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Style_Descriptors_Layout_Style_Descriptor: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var style_identifier: Identifiers_and_Expressions_Style_Identifier
     @usableFromInline var user_readable_comments: Layout_Descriptors_Comment_String?
@@ -19,6 +19,7 @@ import Foundation
         self.layout_directives = layout_directives
         self.sealed = sealed
         self.derived_from = derived_from
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -30,6 +31,7 @@ import Foundation
             let layout_directives: Style_Descriptors_Layout_Directives? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
             let sealed: Layout_Descriptors_Sealed? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
             let derived_from: Identifiers_and_Expressions_Style_Identifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific))
+
             return Style_Descriptors_Layout_Style_Descriptor(style_identifier: style_identifier, user_readable_comments: user_readable_comments, user_visible_name: user_visible_name, application_comments: application_comments, layout_directives: layout_directives, sealed: sealed, derived_from: derived_from)
         }
     }
@@ -37,12 +39,13 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(style_identifier)
-            if let user_readable_comments = self.user_readable_comments { if let user_readable_comments = self.user_readable_comments { try coder.serializeOptionalImplicitlyTagged(user_readable_comments, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let user_visible_name = self.user_visible_name { if let user_visible_name = self.user_visible_name { try coder.serializeOptionalImplicitlyTagged(user_visible_name, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let application_comments = self.application_comments { if let application_comments = self.application_comments { try coder.serializeOptionalImplicitlyTagged(application_comments, withIdentifier: ASN1Identifier(tagWithNumber: 25, tagClass: .contextSpecific)) } }
-            if let layout_directives = self.layout_directives { if let layout_directives = self.layout_directives { try coder.serializeOptionalImplicitlyTagged(layout_directives, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let sealed = self.sealed { if let sealed = self.sealed { try coder.serializeOptionalImplicitlyTagged(sealed, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let derived_from = self.derived_from { if let derived_from = self.derived_from { try coder.serializeOptionalImplicitlyTagged(derived_from, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) } }
+            if let user_readable_comments = self.user_readable_comments { try coder.serializeOptionalImplicitlyTagged(user_readable_comments, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let user_visible_name = self.user_visible_name { try coder.serializeOptionalImplicitlyTagged(user_visible_name, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let application_comments = self.application_comments { try coder.serializeOptionalImplicitlyTagged(application_comments, withIdentifier: ASN1Identifier(tagWithNumber: 25, tagClass: .contextSpecific)) }
+            if let layout_directives = self.layout_directives { try coder.serializeOptionalImplicitlyTagged(layout_directives, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let sealed = self.sealed { try coder.serializeOptionalImplicitlyTagged(sealed, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+            if let derived_from = self.derived_from { try coder.serializeOptionalImplicitlyTagged(derived_from, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) }
+
         }
     }
 }

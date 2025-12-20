@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CertificateExtensions_CertificateExactAssertion: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CertificateExtensions_CertificateExactAssertion: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var serialNumber: AuthenticationFramework_CertificateSerialNumber
     @usableFromInline var issuer: PKIX1Explicit88_Name
     @inlinable init(serialNumber: AuthenticationFramework_CertificateSerialNumber, issuer: PKIX1Explicit88_Name) {
         self.serialNumber = serialNumber
         self.issuer = issuer
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let serialNumber: AuthenticationFramework_CertificateSerialNumber = try AuthenticationFramework_CertificateSerialNumber(derEncoded: &nodes)
             let issuer: PKIX1Explicit88_Name = try PKIX1Explicit88_Name(derEncoded: &nodes)
+
             return CertificateExtensions_CertificateExactAssertion(serialNumber: serialNumber, issuer: issuer)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(serialNumber)
             try coder.serialize(issuer)
+
         }
     }
 }

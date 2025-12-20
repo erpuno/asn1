@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_AttributeValueAssertion: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_AttributeValueAssertion: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var type: ASN1ObjectIdentifier
     @usableFromInline var assertion: ASN1Any
@@ -11,6 +11,7 @@ import Foundation
         self.type = type
         self.assertion = assertion
         self.assertedContexts = assertedContexts
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ var peek_assertedContexts = nodes
 if let next = peek_assertedContexts.next(), next.identifier == InformationFramework_AttributeValueAssertion_assertedContexts_Choice.defaultIdentifier {
     assertedContexts = try InformationFramework_AttributeValueAssertion_assertedContexts_Choice(derEncoded: &nodes)
 }
+
             return InformationFramework_AttributeValueAssertion(type: type, assertion: assertion, assertedContexts: assertedContexts)
         }
     }
@@ -30,7 +32,8 @@ if let next = peek_assertedContexts.next(), next.identifier == InformationFramew
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(type)
             try coder.serialize(assertion)
-            if let assertedContexts = self.assertedContexts { if let assertedContexts = self.assertedContexts { try coder.serialize(assertedContexts) } }
+            if let assertedContexts = self.assertedContexts { try coder.serialize(assertedContexts) }
+
         }
     }
 }

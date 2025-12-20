@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Explicit88_BuiltInDomainDefinedAttribute: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Explicit88_BuiltInDomainDefinedAttribute: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var type: ASN1PrintableString
     @usableFromInline var value: ASN1PrintableString
     @inlinable init(type: ASN1PrintableString, value: ASN1PrintableString) {
         self.type = type
         self.value = value
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let type: ASN1PrintableString = try ASN1PrintableString(derEncoded: &nodes)
             let value: ASN1PrintableString = try ASN1PrintableString(derEncoded: &nodes)
+
             return PKIX1Explicit88_BuiltInDomainDefinedAttribute(type: type, value: value)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(type)
             try coder.serialize(value)
+
         }
     }
 }

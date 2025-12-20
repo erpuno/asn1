@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCRMF_2009_CertRequest: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCRMF_2009_CertRequest: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var certReqId: ArraySlice<UInt8>
     @usableFromInline var certTemplate: PKIXCRMF_2009_CertTemplate
@@ -11,6 +11,7 @@ import Foundation
         self.certReqId = certReqId
         self.certTemplate = certTemplate
         self.controls = controls
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ var peek_controls = nodes
 if let next = peek_controls.next(), next.identifier == PKIXCRMF_2009_Controls.defaultIdentifier {
     controls = try PKIXCRMF_2009_Controls(derEncoded: &nodes)
 }
+
             return PKIXCRMF_2009_CertRequest(certReqId: certReqId, certTemplate: certTemplate, controls: controls)
         }
     }
@@ -30,7 +32,8 @@ if let next = peek_controls.next(), next.identifier == PKIXCRMF_2009_Controls.de
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(certReqId)
             try coder.serialize(certTemplate)
-            if let controls = self.controls { if let controls = self.controls { try coder.serialize(controls) } }
+            if let controls = self.controls { try coder.serialize(controls) }
+
         }
     }
 }

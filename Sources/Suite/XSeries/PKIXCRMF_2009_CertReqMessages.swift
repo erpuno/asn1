@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCRMF_2009_CertReqMessages: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct PKIXCRMF_2009_CertReqMessages: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var value: [PKIXCRMF_2009_CertReqMsg]
     @inlinable public init(_ value: [PKIXCRMF_2009_CertReqMsg]) { self.value = value }

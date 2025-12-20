@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_MatchingRuleAssertion: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_MatchingRuleAssertion: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var matchingRule: [ASN1ObjectIdentifier]
     @usableFromInline var type: PKIX1Explicit88_AttributeType?
@@ -13,6 +13,7 @@ import Foundation
         self.type = type
         self.matchValue = matchValue
         self.dnAttributes = dnAttributes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let type: PKIX1Explicit88_AttributeType? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try PKIX1Explicit88_AttributeType(derEncoded: node) }
             let matchValue: ASN1Any = try DER.explicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try ASN1Any(derEncoded: node) }
             let dnAttributes: Bool = try DER.explicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in return try Bool(derEncoded: node) }
+
             return DirectoryAbstractService_MatchingRuleAssertion(matchingRule: matchingRule, type: type, matchValue: matchValue, dnAttributes: dnAttributes)
         }
     }
@@ -28,9 +30,10 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(matchingRule) }
-            if let type = self.type { if let type = self.type { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(type) } } }
+            if let type = self.type { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(type) } }
             try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(matchValue) }
-            if let dnAttributes = self.dnAttributes { if let dnAttributes = self.dnAttributes { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(dnAttributes) } } }
+            if let dnAttributes = self.dnAttributes { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(dnAttributes) } }
+
         }
     }
 }

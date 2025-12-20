@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_TimeStampResp: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_TimeStampResp: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var status: KEP_PKIStatusInfo
     @usableFromInline var timeStampToken: KEP_TimeStampToken?
     @inlinable init(status: KEP_PKIStatusInfo, timeStampToken: KEP_TimeStampToken?) {
         self.status = status
         self.timeStampToken = timeStampToken
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,6 +20,7 @@ var peek_timeStampToken = nodes
 if let next = peek_timeStampToken.next(), next.identifier == KEP_TimeStampToken.defaultIdentifier {
     timeStampToken = try KEP_TimeStampToken(derEncoded: &nodes)
 }
+
             return KEP_TimeStampResp(status: status, timeStampToken: timeStampToken)
         }
     }
@@ -26,7 +28,8 @@ if let next = peek_timeStampToken.next(), next.identifier == KEP_TimeStampToken.
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(status)
-            if let timeStampToken = self.timeStampToken { if let timeStampToken = self.timeStampToken { try coder.serialize(timeStampToken) } }
+            if let timeStampToken = self.timeStampToken { try coder.serialize(timeStampToken) }
+
         }
     }
 }

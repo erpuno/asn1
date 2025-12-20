@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct DirectoryAbstractService_ErrorProtectionRequest : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct DirectoryAbstractService_ErrorProtectionRequest : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: DirectoryAbstractService_ErrorProtectionRequest, rhs: DirectoryAbstractService_ErrorProtectionRequest) -> Bool { lhs.rawValue < rhs.rawValue }

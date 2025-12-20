@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct LDAP_MatchingRuleAssertion: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct LDAP_MatchingRuleAssertion: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var matchingRule: LDAP_MatchingRuleId?
     @usableFromInline var type: LDAP_AttributeDescription?
@@ -13,6 +13,7 @@ import Foundation
         self.type = type
         self.matchValue = matchValue
         self.dnAttributes = dnAttributes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let type: LDAP_AttributeDescription? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let matchValue: LDAP_AssertionValue = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)))!
             let dnAttributes: Bool = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)))!
+
             return LDAP_MatchingRuleAssertion(matchingRule: matchingRule, type: type, matchValue: matchValue, dnAttributes: dnAttributes)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let matchingRule = self.matchingRule { if let matchingRule = self.matchingRule { try coder.serializeOptionalImplicitlyTagged(matchingRule, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let type = self.type { if let type = self.type { try coder.serializeOptionalImplicitlyTagged(type, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let matchingRule = self.matchingRule { try coder.serializeOptionalImplicitlyTagged(matchingRule, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let type = self.type { try coder.serializeOptionalImplicitlyTagged(type, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
             try coder.serializeOptionalImplicitlyTagged(matchValue, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
-            if let dnAttributes = self.dnAttributes { if let dnAttributes = self.dnAttributes { try coder.serializeOptionalImplicitlyTagged(dnAttributes, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
+            if let dnAttributes = self.dnAttributes { try coder.serializeOptionalImplicitlyTagged(dnAttributes, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+
         }
     }
 }

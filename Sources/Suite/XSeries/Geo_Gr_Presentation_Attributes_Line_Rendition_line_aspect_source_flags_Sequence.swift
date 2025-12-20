@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Line_Rendition_line_aspect_source_flags_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Line_Rendition_line_aspect_source_flags_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var line_type_asf: Geo_Gr_Presentation_Attributes_ASF_Type
     @usableFromInline var line_width_asf: Geo_Gr_Presentation_Attributes_ASF_Type
@@ -11,6 +11,7 @@ import Foundation
         self.line_type_asf = line_type_asf
         self.line_width_asf = line_width_asf
         self.line_colour_asf = line_colour_asf
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let line_type_asf: Geo_Gr_Presentation_Attributes_ASF_Type = try Geo_Gr_Presentation_Attributes_ASF_Type(derEncoded: &nodes)
             let line_width_asf: Geo_Gr_Presentation_Attributes_ASF_Type = try Geo_Gr_Presentation_Attributes_ASF_Type(derEncoded: &nodes)
             let line_colour_asf: Geo_Gr_Presentation_Attributes_ASF_Type = try Geo_Gr_Presentation_Attributes_ASF_Type(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Line_Rendition_line_aspect_source_flags_Sequence(line_type_asf: line_type_asf, line_width_asf: line_width_asf, line_colour_asf: line_colour_asf)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(line_type_asf)
             try coder.serialize(line_width_asf)
             try coder.serialize(line_colour_asf)
+
         }
     }
 }

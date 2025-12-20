@@ -2,23 +2,24 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Layout_Descriptors_Layout_Class_Descriptor_Body_position_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Layout_Descriptors_Layout_Class_Descriptor_Body_position_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case fixed_position(Layout_Descriptors_Measure_Pair)
     case variable_position(Layout_Descriptors_Position_Spec)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .fixed_position(try Layout_Descriptors_Measure_Pair(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 26, tagClass: .contextSpecific):
-                self = .variable_position(try Layout_Descriptors_Position_Spec(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
+            self = .fixed_position(try Layout_Descriptors_Measure_Pair(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 26, tagClass: .contextSpecific):
+            self = .variable_position(try Layout_Descriptors_Position_Spec(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .fixed_position(let fixed_position): try fixed_position.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
-            case .variable_position(let variable_position): try variable_position.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 26, tagClass: .contextSpecific))
+        case .fixed_position(let fixed_position): try fixed_position.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+        case .variable_position(let variable_position): try variable_position.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 26, tagClass: .contextSpecific))
+
         }
     }
 

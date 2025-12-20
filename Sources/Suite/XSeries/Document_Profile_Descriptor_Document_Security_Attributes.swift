@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Document_Security_Attributes: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Document_Security_Attributes: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var sealed_info_encoding: ASN1ObjectIdentifier?
     @usableFromInline var oda_security_label: Document_Profile_Descriptor_Oda_Security_Label?
@@ -23,6 +23,7 @@ import Foundation
         self.preenciphered_doc_bodyparts = preenciphered_doc_bodyparts
         self.postenciphered_doc_bodyparts = postenciphered_doc_bodyparts
         self.sealed_links = sealed_links
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -36,21 +37,23 @@ import Foundation
             let preenciphered_doc_bodyparts: Document_Profile_Descriptor_Protected_Doc_Parts? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
             let postenciphered_doc_bodyparts: Document_Profile_Descriptor_Protected_Doc_Parts? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
             let sealed_links: Document_Profile_Descriptor_Sealed_Doc_Bodyparts? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific))
+
             return Document_Profile_Descriptor_Document_Security_Attributes(sealed_info_encoding: sealed_info_encoding, oda_security_label: oda_security_label, sealed_doc_profiles: sealed_doc_profiles, presealed_doc_bodyparts: presealed_doc_bodyparts, postsealed_doc_bodyparts: postsealed_doc_bodyparts, enciphered_doc_profiles: enciphered_doc_profiles, preenciphered_doc_bodyparts: preenciphered_doc_bodyparts, postenciphered_doc_bodyparts: postenciphered_doc_bodyparts, sealed_links: sealed_links)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let sealed_info_encoding = self.sealed_info_encoding { if let sealed_info_encoding = self.sealed_info_encoding { try coder.serializeOptionalImplicitlyTagged(sealed_info_encoding, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) } }
-            if let oda_security_label = self.oda_security_label { if let oda_security_label = self.oda_security_label { try coder.serializeOptionalImplicitlyTagged(oda_security_label, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let sealed_doc_profiles = self.sealed_doc_profiles { if let sealed_doc_profiles = self.sealed_doc_profiles { try coder.serializeOptionalImplicitlyTagged(sealed_doc_profiles, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let presealed_doc_bodyparts = self.presealed_doc_bodyparts { if let presealed_doc_bodyparts = self.presealed_doc_bodyparts { try coder.serializeOptionalImplicitlyTagged(presealed_doc_bodyparts, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let postsealed_doc_bodyparts = self.postsealed_doc_bodyparts { if let postsealed_doc_bodyparts = self.postsealed_doc_bodyparts { try coder.serializeOptionalImplicitlyTagged(postsealed_doc_bodyparts, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let enciphered_doc_profiles = self.enciphered_doc_profiles { if let enciphered_doc_profiles = self.enciphered_doc_profiles { try coder.serializeOptionalImplicitlyTagged(enciphered_doc_profiles, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let preenciphered_doc_bodyparts = self.preenciphered_doc_bodyparts { if let preenciphered_doc_bodyparts = self.preenciphered_doc_bodyparts { try coder.serializeOptionalImplicitlyTagged(preenciphered_doc_bodyparts, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let postenciphered_doc_bodyparts = self.postenciphered_doc_bodyparts { if let postenciphered_doc_bodyparts = self.postenciphered_doc_bodyparts { try coder.serializeOptionalImplicitlyTagged(postenciphered_doc_bodyparts, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let sealed_links = self.sealed_links { if let sealed_links = self.sealed_links { try coder.serializeOptionalImplicitlyTagged(sealed_links, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) } }
+            if let sealed_info_encoding = self.sealed_info_encoding { try coder.serializeOptionalImplicitlyTagged(sealed_info_encoding, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) }
+            if let oda_security_label = self.oda_security_label { try coder.serializeOptionalImplicitlyTagged(oda_security_label, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let sealed_doc_profiles = self.sealed_doc_profiles { try coder.serializeOptionalImplicitlyTagged(sealed_doc_profiles, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let presealed_doc_bodyparts = self.presealed_doc_bodyparts { try coder.serializeOptionalImplicitlyTagged(presealed_doc_bodyparts, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let postsealed_doc_bodyparts = self.postsealed_doc_bodyparts { try coder.serializeOptionalImplicitlyTagged(postsealed_doc_bodyparts, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let enciphered_doc_profiles = self.enciphered_doc_profiles { try coder.serializeOptionalImplicitlyTagged(enciphered_doc_profiles, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let preenciphered_doc_bodyparts = self.preenciphered_doc_bodyparts { try coder.serializeOptionalImplicitlyTagged(preenciphered_doc_bodyparts, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let postenciphered_doc_bodyparts = self.postenciphered_doc_bodyparts { try coder.serializeOptionalImplicitlyTagged(postenciphered_doc_bodyparts, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+            if let sealed_links = self.sealed_links { try coder.serializeOptionalImplicitlyTagged(sealed_links, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) }
+
         }
     }
 }

@@ -2,37 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum ExtendedSecurityServices_2009_ESSPrivacyMark: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum ExtendedSecurityServices_2009_ESSPrivacyMark: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case pString(ASN1PrintableString)
     case utf8String(ASN1UTF8String)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1PrintableString.defaultIdentifier:
-                self = .pString(try ASN1PrintableString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1UTF8String.defaultIdentifier:
-                self = .utf8String(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1PrintableString.defaultIdentifier:
+            self = .pString(try ASN1PrintableString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1UTF8String.defaultIdentifier:
+            self = .utf8String(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .pString(let pString):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(pString)
-                                }
-                            } else {
+        case .pString(let pString):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(pString)
                             }
-            case .utf8String(let utf8String):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(utf8String)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(pString)
+                        }
+        case .utf8String(let utf8String):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(utf8String)
                             }
+                        } else {
+                            try coder.serialize(utf8String)
+                        }
+
         }
     }
 

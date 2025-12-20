@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_AttributeTypeAndDistinguishedValue_valuesWithContext_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_AttributeTypeAndDistinguishedValue_valuesWithContext_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var distingAttrValue: ASN1Any?
     @usableFromInline var contextList: [InformationFramework_Context]
     @inlinable init(distingAttrValue: ASN1Any?, contextList: [InformationFramework_Context]) {
         self.distingAttrValue = distingAttrValue
         self.contextList = contextList
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let distingAttrValue: ASN1Any? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ASN1Any(derEncoded: node) }
             let contextList: [InformationFramework_Context] = try DER.set(of: InformationFramework_Context.self, identifier: .set, nodes: &nodes)
+
             return InformationFramework_AttributeTypeAndDistinguishedValue_valuesWithContext_Sequence(distingAttrValue: distingAttrValue, contextList: contextList)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let distingAttrValue = self.distingAttrValue { if let distingAttrValue = self.distingAttrValue { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(distingAttrValue) } } }
+            if let distingAttrValue = self.distingAttrValue { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(distingAttrValue) } }
             try coder.serializeSetOf(contextList)
+
         }
     }
 }

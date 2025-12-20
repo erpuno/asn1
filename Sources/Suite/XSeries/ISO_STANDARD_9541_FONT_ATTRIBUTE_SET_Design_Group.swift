@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Design_Group: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Design_Group: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var group_code: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Code
     @usableFromInline var subgroup_code: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Code
@@ -11,6 +11,7 @@ import Foundation
         self.group_code = group_code
         self.subgroup_code = subgroup_code
         self.specific_group_code = specific_group_code
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let group_code: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Code = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let subgroup_code: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Code = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
             let specific_group_code: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Code = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)))!
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Design_Group(group_code: group_code, subgroup_code: subgroup_code, specific_group_code: specific_group_code)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serializeOptionalImplicitlyTagged(group_code, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(subgroup_code, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(specific_group_code, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
         }
     }
 }

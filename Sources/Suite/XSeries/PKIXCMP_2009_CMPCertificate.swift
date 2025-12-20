@@ -2,27 +2,27 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum PKIXCMP_2009_CMPCertificate: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum PKIXCMP_2009_CMPCertificate: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case x509v3PKCert(PKIX1Explicit88_Certificate)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case PKIX1Explicit88_Certificate.defaultIdentifier:
-                self = .x509v3PKCert(try PKIX1Explicit88_Certificate(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case PKIX1Explicit88_Certificate.defaultIdentifier:
+            self = .x509v3PKCert(try PKIX1Explicit88_Certificate(derEncoded: rootNode, withIdentifier: rootNode.identifier))
 
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .x509v3PKCert(let x509v3PKCert):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(x509v3PKCert)
-                                }
-                            } else {
+        case .x509v3PKCert(let x509v3PKCert):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(x509v3PKCert)
                             }
+                        } else {
+                            try coder.serialize(x509v3PKCert)
+                        }
 
         }
     }

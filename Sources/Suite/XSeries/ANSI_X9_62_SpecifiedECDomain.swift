@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ANSI_X9_62_SpecifiedECDomain: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ANSI_X9_62_SpecifiedECDomain: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: ANSI_X9_62_SpecifiedECDomainVersion
     @usableFromInline var fieldID: ASN1Any
@@ -51,8 +51,8 @@ if let next = peek_hash.next(), next.identifier == ANSI_X9_62_HashAlgorithm.defa
             try coder.serialize(curve)
             try coder.serialize(base)
             try coder.serialize(order)
-            if let cofactor = self.cofactor { if let cofactor = self.cofactor { try coder.serialize(cofactor) } }
-            if let hash = self.hash { if let hash = self.hash { try coder.serialize(hash) } }
+            if let cofactor = self.cofactor { try coder.serialize(cofactor) }
+            if let hash = self.hash { try coder.serialize(hash) }
 
         }
     }

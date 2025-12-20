@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2010_IssuerAndSerialNumber: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2010_IssuerAndSerialNumber: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var issuer: PKIX1Explicit88_Name
     @usableFromInline var serialNumber: AuthenticationFramework_CertificateSerialNumber
     @inlinable init(issuer: PKIX1Explicit88_Name, serialNumber: AuthenticationFramework_CertificateSerialNumber) {
         self.issuer = issuer
         self.serialNumber = serialNumber
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let issuer: PKIX1Explicit88_Name = try PKIX1Explicit88_Name(derEncoded: &nodes)
             let serialNumber: AuthenticationFramework_CertificateSerialNumber = try AuthenticationFramework_CertificateSerialNumber(derEncoded: &nodes)
+
             return CryptographicMessageSyntax_2010_IssuerAndSerialNumber(issuer: issuer, serialNumber: serialNumber)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(issuer)
             try coder.serialize(serialNumber)
+
         }
     }
 }

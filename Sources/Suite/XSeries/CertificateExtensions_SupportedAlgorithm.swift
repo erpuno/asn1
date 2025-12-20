@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CertificateExtensions_SupportedAlgorithm: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CertificateExtensions_SupportedAlgorithm: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier
     @usableFromInline var intendedUsage: CertificateExtensions_KeyUsage?
@@ -11,6 +11,7 @@ import Foundation
         self.algorithmIdentifier = algorithmIdentifier
         self.intendedUsage = intendedUsage
         self.intendedCertificatePolicies = intendedCertificatePolicies
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let intendedUsage: CertificateExtensions_KeyUsage? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let intendedCertificatePolicies: CertificateExtensions_CertificatePoliciesSyntax? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return CertificateExtensions_SupportedAlgorithm(algorithmIdentifier: algorithmIdentifier, intendedUsage: intendedUsage, intendedCertificatePolicies: intendedCertificatePolicies)
         }
     }
@@ -25,8 +27,9 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(algorithmIdentifier)
-            if let intendedUsage = self.intendedUsage { if let intendedUsage = self.intendedUsage { try coder.serializeOptionalImplicitlyTagged(intendedUsage, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let intendedCertificatePolicies = self.intendedCertificatePolicies { if let intendedCertificatePolicies = self.intendedCertificatePolicies { try coder.serializeOptionalImplicitlyTagged(intendedCertificatePolicies, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let intendedUsage = self.intendedUsage { try coder.serializeOptionalImplicitlyTagged(intendedUsage, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let intendedCertificatePolicies = self.intendedCertificatePolicies { try coder.serializeOptionalImplicitlyTagged(intendedCertificatePolicies, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

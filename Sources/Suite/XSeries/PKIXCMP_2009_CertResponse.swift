@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_CertResponse: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_CertResponse: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var certReqId: ArraySlice<UInt8>
     @usableFromInline var status: PKIXCMP_2009_PKIStatusInfo
@@ -13,6 +13,7 @@ import Foundation
         self.status = status
         self.certifiedKeyPair = certifiedKeyPair
         self.rspInfo = rspInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -29,6 +30,7 @@ var peek_rspInfo = nodes
 if let next = peek_rspInfo.next(), next.identifier == ASN1OctetString.defaultIdentifier {
     rspInfo = try ASN1OctetString(derEncoded: &nodes)
 }
+
             return PKIXCMP_2009_CertResponse(certReqId: certReqId, status: status, certifiedKeyPair: certifiedKeyPair, rspInfo: rspInfo)
         }
     }
@@ -37,8 +39,9 @@ if let next = peek_rspInfo.next(), next.identifier == ASN1OctetString.defaultIde
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(certReqId)
             try coder.serialize(status)
-            if let certifiedKeyPair = self.certifiedKeyPair { if let certifiedKeyPair = self.certifiedKeyPair { try coder.serialize(certifiedKeyPair) } }
-            if let rspInfo = self.rspInfo { if let rspInfo = self.rspInfo { try coder.serialize(rspInfo) } }
+            if let certifiedKeyPair = self.certifiedKeyPair { try coder.serialize(certifiedKeyPair) }
+            if let rspInfo = self.rspInfo { try coder.serialize(rspInfo) }
+
         }
     }
 }

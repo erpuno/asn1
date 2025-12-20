@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Link_Descriptors_Enciphered_Link_Descriptor: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Link_Descriptors_Enciphered_Link_Descriptor: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var protected_part_identifier: Identifiers_and_Expressions_Protected_Part_Identifier
     @usableFromInline var enciphered_information: ASN1OctetString
     @inlinable init(protected_part_identifier: Identifiers_and_Expressions_Protected_Part_Identifier, enciphered_information: ASN1OctetString) {
         self.protected_part_identifier = protected_part_identifier
         self.enciphered_information = enciphered_information
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let protected_part_identifier: Identifiers_and_Expressions_Protected_Part_Identifier = try Identifiers_and_Expressions_Protected_Part_Identifier(derEncoded: &nodes)
             let enciphered_information: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return Link_Descriptors_Enciphered_Link_Descriptor(protected_part_identifier: protected_part_identifier, enciphered_information: enciphered_information)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(protected_part_identifier)
             try coder.serialize(enciphered_information)
+
         }
     }
 }

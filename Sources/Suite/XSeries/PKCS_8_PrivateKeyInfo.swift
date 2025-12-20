@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_8_PrivateKeyInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_8_PrivateKeyInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: PKCS_8_Version
     @usableFromInline var privateKeyAlgorithm: AuthenticationFramework_AlgorithmIdentifier
@@ -13,6 +13,7 @@ import Foundation
         self.privateKeyAlgorithm = privateKeyAlgorithm
         self.privateKey = privateKey
         self.attributes = attributes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let privateKeyAlgorithm: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let privateKey: PKCS_8_PrivateKey = try PKCS_8_PrivateKey(derEncoded: &nodes)
             let attributes: PKCS_8_Attributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+
             return PKCS_8_PrivateKeyInfo(version: version, privateKeyAlgorithm: privateKeyAlgorithm, privateKey: privateKey, attributes: attributes)
         }
     }
@@ -30,7 +32,8 @@ import Foundation
             try coder.serialize(version)
             try coder.serialize(privateKeyAlgorithm)
             try coder.serialize(privateKey)
-            if let attributes = self.attributes { if let attributes = self.attributes { try coder.serializeOptionalImplicitlyTagged(attributes, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let attributes = self.attributes { try coder.serializeOptionalImplicitlyTagged(attributes, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+
         }
     }
 }

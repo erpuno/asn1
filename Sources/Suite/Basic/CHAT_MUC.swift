@@ -2,16 +2,18 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CHAT_MUC: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CHAT_MUC: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var room: ASN1OctetString
     @inlinable init(room: ASN1OctetString) {
         self.room = room
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let room: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return CHAT_MUC(room: room)
         }
     }
@@ -19,6 +21,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(room)
+
         }
     }
 }

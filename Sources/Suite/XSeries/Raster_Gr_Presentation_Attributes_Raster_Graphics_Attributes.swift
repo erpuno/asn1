@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Raster_Gr_Presentation_Attributes_Raster_Graphics_Attributes: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Raster_Gr_Presentation_Attributes_Raster_Graphics_Attributes: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var pel_path: Raster_Gr_Presentation_Attributes_One_Of_Four_Angles?
     @usableFromInline var line_progression: Raster_Gr_Presentation_Attributes_One_Of_Two_Angles?
@@ -21,6 +21,7 @@ import Foundation
         self.pel_spacing = pel_spacing
         self.spacing_ratio = spacing_ratio
         self.image_dimensions = image_dimensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -33,20 +34,22 @@ import Foundation
             let pel_spacing: Raster_Gr_Presentation_Attributes_Pel_Spacing? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 5, tagClass: .contextSpecific) { node in return try Raster_Gr_Presentation_Attributes_Pel_Spacing(derEncoded: node) }
             let spacing_ratio: Raster_Gr_Presentation_Attributes_Spacing_Ratio? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
             let image_dimensions: Raster_Gr_Presentation_Attributes_Image_Dimensions? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 7, tagClass: .contextSpecific) { node in return try Raster_Gr_Presentation_Attributes_Image_Dimensions(derEncoded: node) }
+
             return Raster_Gr_Presentation_Attributes_Raster_Graphics_Attributes(pel_path: pel_path, line_progression: line_progression, pel_transmission_density: pel_transmission_density, initial_offset: initial_offset, clipping: clipping, pel_spacing: pel_spacing, spacing_ratio: spacing_ratio, image_dimensions: image_dimensions)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let pel_path = self.pel_path { if let pel_path = self.pel_path { try coder.serializeOptionalImplicitlyTagged(pel_path, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let line_progression = self.line_progression { if let line_progression = self.line_progression { try coder.serializeOptionalImplicitlyTagged(line_progression, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let pel_transmission_density = self.pel_transmission_density { if let pel_transmission_density = self.pel_transmission_density { try coder.serializeOptionalImplicitlyTagged(pel_transmission_density, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let initial_offset = self.initial_offset { if let initial_offset = self.initial_offset { try coder.serializeOptionalImplicitlyTagged(initial_offset, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let clipping = self.clipping { if let clipping = self.clipping { try coder.serializeOptionalImplicitlyTagged(clipping, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let pel_spacing = self.pel_spacing { if let pel_spacing = self.pel_spacing { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serialize(pel_spacing) } } }
-            if let spacing_ratio = self.spacing_ratio { if let spacing_ratio = self.spacing_ratio { try coder.serializeOptionalImplicitlyTagged(spacing_ratio, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let image_dimensions = self.image_dimensions { if let image_dimensions = self.image_dimensions { try coder.serialize(explicitlyTaggedWithTagNumber: 7, tagClass: .contextSpecific) { codec in try codec.serialize(image_dimensions) } } }
+            if let pel_path = self.pel_path { try coder.serializeOptionalImplicitlyTagged(pel_path, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let line_progression = self.line_progression { try coder.serializeOptionalImplicitlyTagged(line_progression, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let pel_transmission_density = self.pel_transmission_density { try coder.serializeOptionalImplicitlyTagged(pel_transmission_density, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let initial_offset = self.initial_offset { try coder.serializeOptionalImplicitlyTagged(initial_offset, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let clipping = self.clipping { try coder.serializeOptionalImplicitlyTagged(clipping, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let pel_spacing = self.pel_spacing { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serialize(pel_spacing) } }
+            if let spacing_ratio = self.spacing_ratio { try coder.serializeOptionalImplicitlyTagged(spacing_ratio, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+            if let image_dimensions = self.image_dimensions { try coder.serialize(explicitlyTaggedWithTagNumber: 7, tagClass: .contextSpecific) { codec in try codec.serialize(image_dimensions) } }
+
         }
     }
 }

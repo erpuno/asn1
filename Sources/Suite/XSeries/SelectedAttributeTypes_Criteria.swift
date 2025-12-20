@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum SelectedAttributeTypes_Criteria: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum SelectedAttributeTypes_Criteria: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case type(SelectedAttributeTypes_CriteriaItem)
     case and([SelectedAttributeTypes_Criteria])
@@ -10,25 +10,26 @@ import Foundation
     case not(SelectedAttributeTypes_Criteria)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .type(try SelectedAttributeTypes_CriteriaItem(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .and(try DER.set(of: SelectedAttributeTypes_Criteria.self, identifier: rootNode.identifier, rootNode: rootNode))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .or(try DER.set(of: SelectedAttributeTypes_Criteria.self, identifier: rootNode.identifier, rootNode: rootNode))
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .not(try SelectedAttributeTypes_Criteria(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .type(try SelectedAttributeTypes_CriteriaItem(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .and(try DER.set(of: SelectedAttributeTypes_Criteria.self, identifier: rootNode.identifier, rootNode: rootNode))
+        case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+            self = .or(try DER.set(of: SelectedAttributeTypes_Criteria.self, identifier: rootNode.identifier, rootNode: rootNode))
+        case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .not(try SelectedAttributeTypes_Criteria(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .type(let type): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try type.serialize(into: &coder) }
-            case .and(let and): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try coder.serializeSetOf(and) }
-            case .or(let or): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) { coder in try coder.serializeSetOf(or) }
-            case .not(let not): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) { coder in try not.serialize(into: &coder) }
+        case .type(let type): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try type.serialize(into: &coder) }
+        case .and(let and): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try coder.serializeSetOf(and) }
+        case .or(let or): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) { coder in try coder.serializeSetOf(or) }
+        case .not(let not): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) { coder in try not.serialize(into: &coder) }
+
         }
     }
 

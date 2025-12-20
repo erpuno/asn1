@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXAlgs_2009_DomainParameters: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXAlgs_2009_DomainParameters: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var p: ArraySlice<UInt8>
     @usableFromInline var g: ArraySlice<UInt8>
@@ -15,6 +15,7 @@ import Foundation
         self.q = q
         self.j = j
         self.validationParams = validationParams
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -32,6 +33,7 @@ var peek_validationParams = nodes
 if let next = peek_validationParams.next(), next.identifier == PKIXAlgs_2009_ValidationParams.defaultIdentifier {
     validationParams = try PKIXAlgs_2009_ValidationParams(derEncoded: &nodes)
 }
+
             return PKIXAlgs_2009_DomainParameters(p: p, g: g, q: q, j: j, validationParams: validationParams)
         }
     }
@@ -41,8 +43,9 @@ if let next = peek_validationParams.next(), next.identifier == PKIXAlgs_2009_Val
             try coder.serialize(p)
             try coder.serialize(g)
             try coder.serialize(q)
-            if let j = self.j { if let j = self.j { try coder.serialize(j) } }
-            if let validationParams = self.validationParams { if let validationParams = self.validationParams { try coder.serialize(validationParams) } }
+            if let j = self.j { try coder.serialize(j) }
+            if let validationParams = self.validationParams { try coder.serialize(validationParams) }
+
         }
     }
 }

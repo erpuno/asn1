@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Max_Extents: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Max_Extents: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var max_minx: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational
     @usableFromInline var max_miny: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational
@@ -13,6 +13,7 @@ import Foundation
         self.max_miny = max_miny
         self.max_maxx = max_maxx
         self.max_maxy = max_maxy
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let max_miny: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
             let max_maxx: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)))!
             let max_maxy: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)))!
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Max_Extents(max_minx: max_minx, max_miny: max_miny, max_maxx: max_maxx, max_maxy: max_maxy)
         }
     }
@@ -31,6 +33,7 @@ import Foundation
             try coder.serializeOptionalImplicitlyTagged(max_miny, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(max_maxx, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(max_maxy, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
         }
     }
 }

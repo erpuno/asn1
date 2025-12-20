@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_CommonResults: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_CommonResults: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var securityParameters: DirectoryAbstractService_SecurityParameters?
     @usableFromInline var performer: PKIX1Explicit88_DistinguishedName?
@@ -13,6 +13,7 @@ import Foundation
         self.performer = performer
         self.aliasDereferenced = aliasDereferenced
         self.notification = notification
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let performer: PKIX1Explicit88_DistinguishedName? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 29, tagClass: .contextSpecific) { node in return try PKIX1Explicit88_DistinguishedName(derEncoded: node) }
             let aliasDereferenced: Bool = try DER.explicitlyTagged(&nodes, tagNumber: 28, tagClass: .contextSpecific) { node in return try Bool(derEncoded: node) }
             let notification: [Default_Value_Lists_Attribute]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 27, tagClass: .contextSpecific) { node in try DER.sequence(of: Default_Value_Lists_Attribute.self, identifier: .sequence, rootNode: node) }
+
             return DirectoryAbstractService_CommonResults(securityParameters: securityParameters, performer: performer, aliasDereferenced: aliasDereferenced, notification: notification)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let securityParameters = self.securityParameters { if let securityParameters = self.securityParameters { try coder.serialize(explicitlyTaggedWithTagNumber: 30, tagClass: .contextSpecific) { codec in try codec.serialize(securityParameters) } } }
-            if let performer = self.performer { if let performer = self.performer { try coder.serialize(explicitlyTaggedWithTagNumber: 29, tagClass: .contextSpecific) { codec in try codec.serialize(performer) } } }
-            if let aliasDereferenced = self.aliasDereferenced { if let aliasDereferenced = self.aliasDereferenced { try coder.serialize(explicitlyTaggedWithTagNumber: 28, tagClass: .contextSpecific) { codec in try codec.serialize(aliasDereferenced) } } }
-            if let notification = self.notification { if let notification = self.notification { try coder.serialize(explicitlyTaggedWithTagNumber: 27, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(notification) } } }
+            if let securityParameters = self.securityParameters { try coder.serialize(explicitlyTaggedWithTagNumber: 30, tagClass: .contextSpecific) { codec in try codec.serialize(securityParameters) } }
+            if let performer = self.performer { try coder.serialize(explicitlyTaggedWithTagNumber: 29, tagClass: .contextSpecific) { codec in try codec.serialize(performer) } }
+            if let aliasDereferenced = self.aliasDereferenced { try coder.serialize(explicitlyTaggedWithTagNumber: 28, tagClass: .contextSpecific) { codec in try codec.serialize(aliasDereferenced) } }
+            if let notification = self.notification { try coder.serialize(explicitlyTaggedWithTagNumber: 27, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(notification) } }
+
         }
     }
 }

@@ -2,23 +2,24 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Document_Profile_Descriptor_Security_Information_authorization_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Document_Profile_Descriptor_Security_Information_authorization_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case person(Document_Profile_Descriptor_Personal_Name)
     case organization(Document_Profile_Descriptor_Character_Data)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .person(try Document_Profile_Descriptor_Personal_Name(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                self = .organization(try Document_Profile_Descriptor_Character_Data(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .person(try Document_Profile_Descriptor_Personal_Name(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
+            self = .organization(try Document_Profile_Descriptor_Character_Data(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .person(let person): try person.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .organization(let organization): try organization.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
+        case .person(let person): try person.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+        case .organization(let organization): try organization.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
+
         }
     }
 

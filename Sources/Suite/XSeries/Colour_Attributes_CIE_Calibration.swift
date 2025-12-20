@@ -2,16 +2,18 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_CIE_Calibration: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_CIE_Calibration: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var reference_white: Colour_Attributes_CIE_Ref
     @inlinable init(reference_white: Colour_Attributes_CIE_Ref) {
         self.reference_white = reference_white
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let reference_white: Colour_Attributes_CIE_Ref = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
+
             return Colour_Attributes_CIE_Calibration(reference_white: reference_white)
         }
     }
@@ -19,6 +21,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(reference_white, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+
         }
     }
 }

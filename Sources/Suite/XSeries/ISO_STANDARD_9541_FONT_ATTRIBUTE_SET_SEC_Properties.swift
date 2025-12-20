@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_SEC_Properties: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_SEC_Properties: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var iso_standard_9541_secx: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_SEC_Properties_iso_standard_9541_secx_Sequence]?
     @usableFromInline var iso_standard_9541_secy: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_SEC_Properties_iso_standard_9541_secy_Sequence]?
@@ -11,6 +11,7 @@ import Foundation
         self.iso_standard_9541_secx = iso_standard_9541_secx
         self.iso_standard_9541_secy = iso_standard_9541_secy
         self.non_iso_properties = non_iso_properties
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let iso_standard_9541_secx: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_SEC_Properties_iso_standard_9541_secx_Sequence]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in try DER.sequence(of: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_SEC_Properties_iso_standard_9541_secx_Sequence.self, identifier: .sequence, rootNode: node) }
             let iso_standard_9541_secy: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_SEC_Properties_iso_standard_9541_secy_Sequence]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.sequence(of: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_SEC_Properties_iso_standard_9541_secy_Sequence.self, identifier: .sequence, rootNode: node) }
             let non_iso_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_SEC_Properties(iso_standard_9541_secx: iso_standard_9541_secx, iso_standard_9541_secy: iso_standard_9541_secy, non_iso_properties: non_iso_properties)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let iso_standard_9541_secx = self.iso_standard_9541_secx { if let iso_standard_9541_secx = self.iso_standard_9541_secx { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_secx) } } }
-            if let iso_standard_9541_secy = self.iso_standard_9541_secy { if let iso_standard_9541_secy = self.iso_standard_9541_secy { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_secy) } } }
-            if let non_iso_properties = self.non_iso_properties { if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let iso_standard_9541_secx = self.iso_standard_9541_secx { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_secx) } }
+            if let iso_standard_9541_secy = self.iso_standard_9541_secy { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_secy) } }
+            if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

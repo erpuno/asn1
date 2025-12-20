@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLMember: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLMember: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var glMemberName: PKIX1Implicit88_GeneralName
     @usableFromInline var glMemberAddress: PKIX1Implicit88_GeneralName?
@@ -11,6 +11,7 @@ import Foundation
         self.glMemberName = glMemberName
         self.glMemberAddress = glMemberAddress
         self.certificates = certificates
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -26,6 +27,7 @@ var peek_certificates = nodes
 if let next = peek_certificates.next(), next.identifier == SMIMESymmetricKeyDistribution_2009_Certificates.defaultIdentifier {
     certificates = try SMIMESymmetricKeyDistribution_2009_Certificates(derEncoded: &nodes)
 }
+
             return SMIMESymmetricKeyDistribution_2009_GLMember(glMemberName: glMemberName, glMemberAddress: glMemberAddress, certificates: certificates)
         }
     }
@@ -33,8 +35,9 @@ if let next = peek_certificates.next(), next.identifier == SMIMESymmetricKeyDist
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(glMemberName)
-            if let glMemberAddress = self.glMemberAddress { if let glMemberAddress = self.glMemberAddress { try coder.serialize(glMemberAddress) } }
-            if let certificates = self.certificates { if let certificates = self.certificates { try coder.serialize(certificates) } }
+            if let glMemberAddress = self.glMemberAddress { try coder.serialize(glMemberAddress) }
+            if let certificates = self.certificates { try coder.serialize(certificates) }
+
         }
     }
 }

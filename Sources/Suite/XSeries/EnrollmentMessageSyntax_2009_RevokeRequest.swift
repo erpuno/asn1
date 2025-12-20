@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_RevokeRequest: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_RevokeRequest: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var issuerName: PKIX1Explicit88_Name
     @usableFromInline var serialNumber: ArraySlice<UInt8>
@@ -17,6 +17,7 @@ import Foundation
         self.invalidityDate = invalidityDate
         self.passphrase = passphrase
         self.comment = comment
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -39,6 +40,7 @@ var peek_comment = nodes
 if let next = peek_comment.next(), next.identifier == ASN1UTF8String.defaultIdentifier {
     comment = try ASN1UTF8String(derEncoded: &nodes)
 }
+
             return EnrollmentMessageSyntax_2009_RevokeRequest(issuerName: issuerName, serialNumber: serialNumber, reason: reason, invalidityDate: invalidityDate, passphrase: passphrase, comment: comment)
         }
     }
@@ -48,9 +50,10 @@ if let next = peek_comment.next(), next.identifier == ASN1UTF8String.defaultIden
             try coder.serialize(issuerName)
             try coder.serialize(serialNumber)
             try coder.serialize(reason)
-            if let invalidityDate = self.invalidityDate { if let invalidityDate = self.invalidityDate { try coder.serialize(invalidityDate) } }
-            if let passphrase = self.passphrase { if let passphrase = self.passphrase { try coder.serialize(passphrase) } }
-            if let comment = self.comment { if let comment = self.comment { try coder.serialize(comment) } }
+            if let invalidityDate = self.invalidityDate { try coder.serialize(invalidityDate) }
+            if let passphrase = self.passphrase { try coder.serialize(passphrase) }
+            if let comment = self.comment { try coder.serialize(comment) }
+
         }
     }
 }

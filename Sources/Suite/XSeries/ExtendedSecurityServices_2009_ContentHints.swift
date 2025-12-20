@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ExtendedSecurityServices_2009_ContentHints: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ExtendedSecurityServices_2009_ContentHints: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var contentDescription: ASN1UTF8String?
     @usableFromInline var contentType: CryptographicMessageSyntax_2010_ContentType
     @inlinable init(contentDescription: ASN1UTF8String?, contentType: CryptographicMessageSyntax_2010_ContentType) {
         self.contentDescription = contentDescription
         self.contentType = contentType
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,14 +20,16 @@ if let next = peek_contentDescription.next(), next.identifier == ASN1UTF8String.
     contentDescription = try ASN1UTF8String(derEncoded: &nodes)
 }
             let contentType: CryptographicMessageSyntax_2010_ContentType = try CryptographicMessageSyntax_2010_ContentType(derEncoded: &nodes)
+
             return ExtendedSecurityServices_2009_ContentHints(contentDescription: contentDescription, contentType: contentType)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let contentDescription = self.contentDescription { if let contentDescription = self.contentDescription { try coder.serialize(contentDescription) } }
+            if let contentDescription = self.contentDescription { try coder.serialize(contentDescription) }
             try coder.serialize(contentType)
+
         }
     }
 }

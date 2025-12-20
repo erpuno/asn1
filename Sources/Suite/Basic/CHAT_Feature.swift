@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CHAT_Feature: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CHAT_Feature: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var id: ASN1OctetString
     @usableFromInline var key: ASN1OctetString
@@ -13,6 +13,7 @@ import Foundation
         self.key = key
         self.value = value
         self.group = group
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let key: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let value: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let group: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return CHAT_Feature(id: id, key: key, value: value, group: group)
         }
     }
@@ -31,6 +33,7 @@ import Foundation
             try coder.serialize(key)
             try coder.serialize(value)
             try coder.serialize(group)
+
         }
     }
 }

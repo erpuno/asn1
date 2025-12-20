@@ -2,31 +2,28 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct AuthenticationFramework_Extension: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct AuthenticationFramework_Extension: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var extnID: ASN1ObjectIdentifier
-    @usableFromInline var critical: Bool?
-    @usableFromInline var extnValue: ASN1OctetString
-    @inlinable init(extnID: ASN1ObjectIdentifier, critical: Bool?, extnValue: ASN1OctetString) {
-        self.extnID = extnID
-        self.critical = critical
-        self.extnValue = extnValue
+    @usableFromInline var algorithm: ASN1ObjectIdentifier
+    @usableFromInline var parameters: ASN1Any?
+    @inlinable init(algorithm: ASN1ObjectIdentifier, parameters: ASN1Any? = nil) {
+        self.algorithm = algorithm
+        self.parameters = parameters
     }
-    @inlinable init(derEncoded root: ASN1Node,
-        withIdentifier identifier: ASN1Identifier) throws {
+    @inlinable init(derEncoded root: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let extnID: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let critical: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
-            let extnValue: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
-            return AuthenticationFramework_Extension(extnID: extnID, critical: critical, extnValue: extnValue)
+            let algorithm = try ASN1ObjectIdentifier(derEncoded: &nodes)
+            var parameters: ASN1Any? = nil
+            if let nextNode = nodes.next() {
+                parameters = try ASN1Any(derEncoded: nextNode)
+            }
+            return AuthenticationFramework_Extension(algorithm: algorithm, parameters: parameters)
         }
     }
-    @inlinable func serialize(into coder: inout DER.Serializer,
-        withIdentifier identifier: ASN1Identifier) throws {
+    @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(extnID)
-            if let critical = self.critical { if let critical = self.critical { try coder.serialize(critical) } }
-            try coder.serialize(extnValue)
+            try coder.serialize(algorithm)
+            if let parameters = parameters { try coder.serialize(parameters) }
         }
     }
 }

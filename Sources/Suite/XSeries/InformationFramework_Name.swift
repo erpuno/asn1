@@ -2,13 +2,13 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum InformationFramework_Name: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum InformationFramework_Name: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { InformationFramework_RDNSequence.defaultIdentifier }
         case rdnSequence(InformationFramework_RDNSequence)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case InformationFramework_RDNSequence.defaultIdentifier:
-                self = .rdnSequence(try InformationFramework_RDNSequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case InformationFramework_RDNSequence.defaultIdentifier:
+            self = .rdnSequence(try InformationFramework_RDNSequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
 default:
     if identifier == rootNode.identifier {
         if case .constructed(let nodes) = rootNode.content {
@@ -29,14 +29,15 @@ default:
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .rdnSequence(let rdnSequence):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(rdnSequence)
-                                }
-                            } else {
+        case .rdnSequence(let rdnSequence):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(rdnSequence)
                             }
+                        } else {
+                            try coder.serialize(rdnSequence)
+                        }
+
         }
     }
 

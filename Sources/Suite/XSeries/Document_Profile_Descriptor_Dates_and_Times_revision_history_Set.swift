@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Dates_and_Times_revision_history_Set: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Dates_and_Times_revision_history_Set: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var revision_date_and_time: Document_Profile_Descriptor_Date_and_Time?
     @usableFromInline var version_identifier: Document_Profile_Descriptor_Character_Data?
@@ -15,6 +15,7 @@ import Foundation
         self.revisers = revisers
         self.version_reference = version_reference
         self.user_comments = user_comments
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,17 +25,19 @@ import Foundation
             let revisers: [Document_Profile_Descriptor_Dates_and_Times_revision_history_Set_revisers_Set]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.set(of: Document_Profile_Descriptor_Dates_and_Times_revision_history_Set_revisers_Set.self, identifier: node.identifier, rootNode: node) }
             let version_reference: Document_Profile_Descriptor_Document_Reference? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try Document_Profile_Descriptor_Document_Reference(derEncoded: node) }
             let user_comments: Document_Profile_Descriptor_Character_Data? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
+
             return Document_Profile_Descriptor_Dates_and_Times_revision_history_Set(revision_date_and_time: revision_date_and_time, version_identifier: version_identifier, revisers: revisers, version_reference: version_reference, user_comments: user_comments)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let revision_date_and_time = self.revision_date_and_time { if let revision_date_and_time = self.revision_date_and_time { try coder.serializeOptionalImplicitlyTagged(revision_date_and_time, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let version_identifier = self.version_identifier { if let version_identifier = self.version_identifier { try coder.serializeOptionalImplicitlyTagged(version_identifier, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let revisers = self.revisers { if let revisers = self.revisers { try coder.serializeSetOf(revisers, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let version_reference = self.version_reference { if let version_reference = self.version_reference { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(version_reference) } } }
-            if let user_comments = self.user_comments { if let user_comments = self.user_comments { try coder.serializeOptionalImplicitlyTagged(user_comments, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
+            if let revision_date_and_time = self.revision_date_and_time { try coder.serializeOptionalImplicitlyTagged(revision_date_and_time, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let version_identifier = self.version_identifier { try coder.serializeOptionalImplicitlyTagged(version_identifier, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let revisers = self.revisers { try coder.serializeSetOf(revisers, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let version_reference = self.version_reference { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(version_reference) } }
+            if let user_comments = self.user_comments { try coder.serializeOptionalImplicitlyTagged(user_comments, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+
         }
     }
 }

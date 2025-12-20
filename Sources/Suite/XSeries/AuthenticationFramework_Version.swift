@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct AuthenticationFramework_Version : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct AuthenticationFramework_Version : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: AuthenticationFramework_Version, rhs: AuthenticationFramework_Version) -> Bool { lhs.rawValue < rhs.rawValue }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2009_EnvelopedData: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2009_EnvelopedData: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: CryptographicMessageSyntax_2009_CMSVersion
     @usableFromInline var originatorInfo: CryptographicMessageSyntax_2009_OriginatorInfo?
@@ -14,8 +14,6 @@ import Foundation
         self.originatorInfo = originatorInfo
         self.recipientInfos = recipientInfos
         self.encryptedContentInfo = encryptedContentInfo
-
-
         self.unprotectedAttrs = unprotectedAttrs
 
     }
@@ -26,8 +24,6 @@ import Foundation
             let originatorInfo: CryptographicMessageSyntax_2009_OriginatorInfo? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let recipientInfos: CryptographicMessageSyntax_2009_RecipientInfos = try CryptographicMessageSyntax_2009_RecipientInfos(derEncoded: &nodes)
             let encryptedContentInfo: CryptographicMessageSyntax_2009_EncryptedContentInfo = try CryptographicMessageSyntax_2009_EncryptedContentInfo(derEncoded: &nodes)
-
-
             let unprotectedAttrs: CryptographicMessageSyntax_2009_Attributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
 
             return CryptographicMessageSyntax_2009_EnvelopedData(version: version, originatorInfo: originatorInfo, recipientInfos: recipientInfos, encryptedContentInfo: encryptedContentInfo, unprotectedAttrs: unprotectedAttrs)
@@ -37,12 +33,10 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(version)
-            if let originatorInfo = self.originatorInfo { if let originatorInfo = self.originatorInfo { try coder.serializeOptionalImplicitlyTagged(originatorInfo, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let originatorInfo = self.originatorInfo { try coder.serializeOptionalImplicitlyTagged(originatorInfo, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
             try coder.serialize(recipientInfos)
             try coder.serialize(encryptedContentInfo)
-
-
-            if let unprotectedAttrs = self.unprotectedAttrs { if let unprotectedAttrs = self.unprotectedAttrs { try coder.serializeOptionalImplicitlyTagged(unprotectedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let unprotectedAttrs = self.unprotectedAttrs { try coder.serializeOptionalImplicitlyTagged(unprotectedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
 
         }
     }

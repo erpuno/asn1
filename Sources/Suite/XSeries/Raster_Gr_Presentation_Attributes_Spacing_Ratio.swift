@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Raster_Gr_Presentation_Attributes_Spacing_Ratio: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Raster_Gr_Presentation_Attributes_Spacing_Ratio: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var line_spacing_value: ArraySlice<UInt8>
     @usableFromInline var pel_spacing_value: ArraySlice<UInt8>
     @inlinable init(line_spacing_value: ArraySlice<UInt8>, pel_spacing_value: ArraySlice<UInt8>) {
         self.line_spacing_value = line_spacing_value
         self.pel_spacing_value = pel_spacing_value
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let line_spacing_value: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let pel_spacing_value: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return Raster_Gr_Presentation_Attributes_Spacing_Ratio(line_spacing_value: line_spacing_value, pel_spacing_value: pel_spacing_value)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(line_spacing_value)
             try coder.serialize(pel_spacing_value)
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct Raster_Gr_Coding_Attributes_Compression : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct Raster_Gr_Coding_Attributes_Compression : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: Raster_Gr_Coding_Attributes_Compression, rhs: Raster_Gr_Coding_Attributes_Compression) -> Bool { lhs.rawValue < rhs.rawValue }

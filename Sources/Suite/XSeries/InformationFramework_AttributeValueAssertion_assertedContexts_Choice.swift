@@ -2,24 +2,25 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum InformationFramework_AttributeValueAssertion_assertedContexts_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum InformationFramework_AttributeValueAssertion_assertedContexts_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case allContexts(ASN1Null)
     case selectedContexts([InformationFramework_ContextAssertion])
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .allContexts(try ASN1Null(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .selectedContexts(try DER.set(of: InformationFramework_ContextAssertion.self, identifier: rootNode.identifier, rootNode: rootNode))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .allContexts(try ASN1Null(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .selectedContexts(try DER.set(of: InformationFramework_ContextAssertion.self, identifier: rootNode.identifier, rootNode: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .allContexts(let allContexts): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try allContexts.serialize(into: &coder) }
-            case .selectedContexts(let selectedContexts): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try coder.serializeSetOf(selectedContexts) }
+        case .allContexts(let allContexts): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try allContexts.serialize(into: &coder) }
+        case .selectedContexts(let selectedContexts): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try coder.serializeSetOf(selectedContexts) }
+
         }
     }
 

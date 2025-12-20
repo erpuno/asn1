@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXAttributeCertificate_2009_TargetCert: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXAttributeCertificate_2009_TargetCert: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var targetCertificate: AuthenticationFramework_IssuerSerial
     @usableFromInline var targetName: PKIX1Implicit88_GeneralName?
@@ -11,6 +11,7 @@ import Foundation
         self.targetCertificate = targetCertificate
         self.targetName = targetName
         self.certDigestInfo = certDigestInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -26,6 +27,7 @@ var peek_certDigestInfo = nodes
 if let next = peek_certDigestInfo.next(), next.identifier == PKIXAttributeCertificate_2009_ObjectDigestInfo.defaultIdentifier {
     certDigestInfo = try PKIXAttributeCertificate_2009_ObjectDigestInfo(derEncoded: &nodes)
 }
+
             return PKIXAttributeCertificate_2009_TargetCert(targetCertificate: targetCertificate, targetName: targetName, certDigestInfo: certDigestInfo)
         }
     }
@@ -33,8 +35,9 @@ if let next = peek_certDigestInfo.next(), next.identifier == PKIXAttributeCertif
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(targetCertificate)
-            if let targetName = self.targetName { if let targetName = self.targetName { try coder.serialize(targetName) } }
-            if let certDigestInfo = self.certDigestInfo { if let certDigestInfo = self.certDigestInfo { try coder.serialize(certDigestInfo) } }
+            if let targetName = self.targetName { try coder.serialize(targetName) }
+            if let certDigestInfo = self.certDigestInfo { try coder.serialize(certDigestInfo) }
+
         }
     }
 }

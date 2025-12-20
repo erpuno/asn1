@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_BodyPartList: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_BodyPartList: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var value: [EnrollmentMessageSyntax_2009_BodyPartID]
     @inlinable public init(_ value: [EnrollmentMessageSyntax_2009_BodyPartID]) { self.value = value }

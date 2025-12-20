@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_POPODecKeyRespContent: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_POPODecKeyRespContent: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var value: [ArraySlice<UInt8>]
     @inlinable public init(_ value: [ArraySlice<UInt8>]) { self.value = value }

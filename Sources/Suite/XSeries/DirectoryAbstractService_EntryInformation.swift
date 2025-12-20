@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_EntryInformation: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_EntryInformation: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var name: PKIX1Explicit88_Name
     @usableFromInline var fromEntry: Bool?
@@ -15,6 +15,7 @@ import Foundation
         self.information = information
         self.incompleteEntry = incompleteEntry
         self.partialNameResolution = partialNameResolution
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,6 +25,7 @@ import Foundation
             let information: [DirectoryAbstractService_EntryInformation_information_Choice]? = try DER.set(of: DirectoryAbstractService_EntryInformation_information_Choice.self, identifier: .set, nodes: &nodes)
             let incompleteEntry: Bool = try DER.explicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try Bool(derEncoded: node) }
             let partialNameResolution: Bool = try DER.explicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in return try Bool(derEncoded: node) }
+
             return DirectoryAbstractService_EntryInformation(name: name, fromEntry: fromEntry, information: information, incompleteEntry: incompleteEntry, partialNameResolution: partialNameResolution)
         }
     }
@@ -31,10 +33,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(name)
-            if let fromEntry = self.fromEntry { if let fromEntry = self.fromEntry { try coder.serialize(fromEntry) } }
-            if let information = self.information { if let information = self.information { try coder.serializeSetOf(information) } }
-            if let incompleteEntry = self.incompleteEntry { if let incompleteEntry = self.incompleteEntry { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(incompleteEntry) } } }
-            if let partialNameResolution = self.partialNameResolution { if let partialNameResolution = self.partialNameResolution { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(partialNameResolution) } } }
+            if let fromEntry = self.fromEntry { try coder.serialize(fromEntry) }
+            if let information = self.information { try coder.serializeSetOf(information) }
+            if let incompleteEntry = self.incompleteEntry { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(incompleteEntry) } }
+            if let partialNameResolution = self.partialNameResolution { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(partialNameResolution) } }
+
         }
     }
 }

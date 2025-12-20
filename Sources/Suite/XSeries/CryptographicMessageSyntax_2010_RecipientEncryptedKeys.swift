@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2010_RecipientEncryptedKeys: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2010_RecipientEncryptedKeys: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var value: [CryptographicMessageSyntax_2010_RecipientEncryptedKey]
     @inlinable public init(_ value: [CryptographicMessageSyntax_2010_RecipientEncryptedKey]) { self.value = value }

@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_SortKey: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_SortKey: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var type: PKIX1Explicit88_AttributeType
     @usableFromInline var orderingRule: ASN1ObjectIdentifier?
     @inlinable init(type: PKIX1Explicit88_AttributeType, orderingRule: ASN1ObjectIdentifier?) {
         self.type = type
         self.orderingRule = orderingRule
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,6 +20,7 @@ var peek_orderingRule = nodes
 if let next = peek_orderingRule.next(), next.identifier == ASN1ObjectIdentifier.defaultIdentifier {
     orderingRule = try ASN1ObjectIdentifier(derEncoded: &nodes)
 }
+
             return DirectoryAbstractService_SortKey(type: type, orderingRule: orderingRule)
         }
     }
@@ -26,7 +28,8 @@ if let next = peek_orderingRule.next(), next.identifier == ASN1ObjectIdentifier.
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(type)
-            if let orderingRule = self.orderingRule { if let orderingRule = self.orderingRule { try coder.serialize(orderingRule) } }
+            if let orderingRule = self.orderingRule { try coder.serialize(orderingRule) }
+
         }
     }
 }

@@ -2,48 +2,49 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum PKIXAttributeCertificate_2009_IetfAttrSyntax_values_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum PKIXAttributeCertificate_2009_IetfAttrSyntax_values_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case octets(ASN1OctetString)
     case oid(ASN1ObjectIdentifier)
     case string(ASN1UTF8String)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1OctetString.defaultIdentifier:
-                self = .octets(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1ObjectIdentifier.defaultIdentifier:
-                self = .oid(try ASN1ObjectIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1UTF8String.defaultIdentifier:
-                self = .string(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1OctetString.defaultIdentifier:
+            self = .octets(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1ObjectIdentifier.defaultIdentifier:
+            self = .oid(try ASN1ObjectIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1UTF8String.defaultIdentifier:
+            self = .string(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .octets(let octets):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(octets)
-                                }
-                            } else {
+        case .octets(let octets):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(octets)
                             }
-            case .oid(let oid):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(oid)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(octets)
+                        }
+        case .oid(let oid):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(oid)
                             }
-            case .string(let string):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(string)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(oid)
+                        }
+        case .string(let string):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(string)
                             }
+                        } else {
+                            try coder.serialize(string)
+                        }
+
         }
     }
 

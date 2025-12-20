@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Raster_Gr_Presentation_Attributes_Image_Dimensions_height_controlled_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Raster_Gr_Presentation_Attributes_Image_Dimensions_height_controlled_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var minimum_height: ArraySlice<UInt8>
     @usableFromInline var preferred_height: ArraySlice<UInt8>
     @inlinable init(minimum_height: ArraySlice<UInt8>, preferred_height: ArraySlice<UInt8>) {
         self.minimum_height = minimum_height
         self.preferred_height = preferred_height
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let minimum_height: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let preferred_height: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return Raster_Gr_Presentation_Attributes_Image_Dimensions_height_controlled_Sequence(minimum_height: minimum_height, preferred_height: preferred_height)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(minimum_height)
             try coder.serialize(preferred_height)
+
         }
     }
 }

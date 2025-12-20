@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct BasicAccessControl_AuthenticationLevel_basicLevels_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct BasicAccessControl_AuthenticationLevel_basicLevels_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var level: BasicAccessControl_AuthenticationLevel_basicLevels_Sequence_level_Enum
     @usableFromInline var localQualifier: ArraySlice<UInt8>?
@@ -11,6 +11,7 @@ import Foundation
         self.level = level
         self.localQualifier = localQualifier
         self.signed = signed
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ if let next = peek_localQualifier.next(), next.identifier == ArraySlice<UInt8>.d
     localQualifier = try ArraySlice<UInt8>(derEncoded: &nodes)
 }
             let signed: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
+
             return BasicAccessControl_AuthenticationLevel_basicLevels_Sequence(level: level, localQualifier: localQualifier, signed: signed)
         }
     }
@@ -29,8 +31,9 @@ if let next = peek_localQualifier.next(), next.identifier == ArraySlice<UInt8>.d
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(level)
-            if let localQualifier = self.localQualifier { if let localQualifier = self.localQualifier { try coder.serialize(localQualifier) } }
-            if let signed = self.signed { if let signed = self.signed { try coder.serialize(signed) } }
+            if let localQualifier = self.localQualifier { try coder.serialize(localQualifier) }
+            if let signed = self.signed { try coder.serialize(signed) }
+
         }
     }
 }

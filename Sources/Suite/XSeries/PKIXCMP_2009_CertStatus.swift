@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_CertStatus: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_CertStatus: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var certHash: ASN1OctetString
     @usableFromInline var certReqId: ArraySlice<UInt8>
@@ -11,6 +11,7 @@ import Foundation
         self.certHash = certHash
         self.certReqId = certReqId
         self.statusInfo = statusInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ var peek_statusInfo = nodes
 if let next = peek_statusInfo.next(), next.identifier == PKIXCMP_2009_PKIStatusInfo.defaultIdentifier {
     statusInfo = try PKIXCMP_2009_PKIStatusInfo(derEncoded: &nodes)
 }
+
             return PKIXCMP_2009_CertStatus(certHash: certHash, certReqId: certReqId, statusInfo: statusInfo)
         }
     }
@@ -30,7 +32,8 @@ if let next = peek_statusInfo.next(), next.identifier == PKIXCMP_2009_PKIStatusI
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(certHash)
             try coder.serialize(certReqId)
-            if let statusInfo = self.statusInfo { if let statusInfo = self.statusInfo { try coder.serialize(statusInfo) } }
+            if let statusInfo = self.statusInfo { try coder.serialize(statusInfo) }
+
         }
     }
 }

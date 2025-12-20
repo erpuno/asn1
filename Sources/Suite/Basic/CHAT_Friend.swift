@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CHAT_Friend: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CHAT_Friend: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var nickname: ASN1OctetString
     @usableFromInline var friend: ASN1OctetString
@@ -11,6 +11,7 @@ import Foundation
         self.nickname = nickname
         self.friend = friend
         self.type = type
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let nickname: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let friend: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let type: CHAT_Friendship = try CHAT_Friendship(derEncoded: &nodes)
+
             return CHAT_Friend(nickname: nickname, friend: friend, type: type)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(nickname)
             try coder.serialize(friend)
             try coder.serialize(type)
+
         }
     }
 }

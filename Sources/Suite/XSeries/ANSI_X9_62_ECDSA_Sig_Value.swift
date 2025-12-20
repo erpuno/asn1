@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ANSI_X9_62_ECDSA_Sig_Value: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ANSI_X9_62_ECDSA_Sig_Value: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var r: ArraySlice<UInt8>
     @usableFromInline var s: ArraySlice<UInt8>
     @inlinable init(r: ArraySlice<UInt8>, s: ArraySlice<UInt8>) {
         self.r = r
         self.s = s
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let r: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let s: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return ANSI_X9_62_ECDSA_Sig_Value(r: r, s: s)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(r)
             try coder.serialize(s)
+
         }
     }
 }

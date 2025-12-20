@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct Colour_Attributes_Colour_Modes_Present : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct Colour_Attributes_Colour_Modes_Present : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: Colour_Attributes_Colour_Modes_Present, rhs: Colour_Attributes_Colour_Modes_Present) -> Bool { lhs.rawValue < rhs.rawValue }

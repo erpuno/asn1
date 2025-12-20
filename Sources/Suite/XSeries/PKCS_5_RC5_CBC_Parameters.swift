@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_5_RC5_CBC_Parameters: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_5_RC5_CBC_Parameters: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: PKCS_5_RC5_CBC_Parameters_version_IntEnum
     @usableFromInline var rounds: ArraySlice<UInt8>
@@ -13,6 +13,7 @@ import Foundation
         self.rounds = rounds
         self.blockSizeInBits = blockSizeInBits
         self.iv = iv
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -25,16 +26,18 @@ var peek_iv = nodes
 if let next = peek_iv.next(), next.identifier == ASN1OctetString.defaultIdentifier {
     iv = try ASN1OctetString(derEncoded: &nodes)
 }
+
             return PKCS_5_RC5_CBC_Parameters(version: version, rounds: rounds, blockSizeInBits: blockSizeInBits, iv: iv)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(version.rawValue)
+            try version.serialize(into: &coder, withIdentifier: identifier)
             try coder.serialize(rounds)
             try coder.serialize(blockSizeInBits)
-            if let iv = self.iv { if let iv = self.iv { try coder.serialize(iv) } }
+            if let iv = self.iv { try coder.serialize(iv) }
+
         }
     }
 }

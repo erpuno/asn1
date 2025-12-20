@@ -2,37 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum BasicAccessControl_AuthenticationLevel: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum BasicAccessControl_AuthenticationLevel: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case basicLevels(BasicAccessControl_AuthenticationLevel_basicLevels_Sequence)
     case other(EXTERNAL)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case BasicAccessControl_AuthenticationLevel_basicLevels_Sequence.defaultIdentifier:
-                self = .basicLevels(try BasicAccessControl_AuthenticationLevel_basicLevels_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case EXTERNAL.defaultIdentifier:
-                self = .other(try EXTERNAL(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case BasicAccessControl_AuthenticationLevel_basicLevels_Sequence.defaultIdentifier:
+            self = .basicLevels(try BasicAccessControl_AuthenticationLevel_basicLevels_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case EXTERNAL.defaultIdentifier:
+            self = .other(try EXTERNAL(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .basicLevels(let basicLevels):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(basicLevels)
-                                }
-                            } else {
+        case .basicLevels(let basicLevels):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(basicLevels)
                             }
-            case .other(let other):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(other)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(basicLevels)
+                        }
+        case .other(let other):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(other)
                             }
+                        } else {
+                            try coder.serialize(other)
+                        }
+
         }
     }
 

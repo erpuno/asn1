@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Raster_Gr_Presentation_Attributes_Pel_Spacing_spacing_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Raster_Gr_Presentation_Attributes_Pel_Spacing_spacing_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var length: ArraySlice<UInt8>
     @usableFromInline var pel_spaces: ArraySlice<UInt8>
     @inlinable init(length: ArraySlice<UInt8>, pel_spaces: ArraySlice<UInt8>) {
         self.length = length
         self.pel_spaces = pel_spaces
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let length: ArraySlice<UInt8> = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
             let pel_spaces: ArraySlice<UInt8> = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
+
             return Raster_Gr_Presentation_Attributes_Pel_Spacing_spacing_Sequence(length: length, pel_spaces: pel_spaces)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(length) }
             try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(pel_spaces) }
+
         }
     }
 }

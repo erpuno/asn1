@@ -2,48 +2,49 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum ANSI_X9_62_ECDomainParameters: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum ANSI_X9_62_ECDomainParameters: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case specified(ANSI_X9_62_SpecifiedECDomain)
     case named(ASN1ObjectIdentifier)
     case implicitCA(ASN1Null)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ANSI_X9_62_SpecifiedECDomain.defaultIdentifier:
-                self = .specified(try ANSI_X9_62_SpecifiedECDomain(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1ObjectIdentifier.defaultIdentifier:
-                self = .named(try ASN1ObjectIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Null.defaultIdentifier:
-                self = .implicitCA(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ANSI_X9_62_SpecifiedECDomain.defaultIdentifier:
+            self = .specified(try ANSI_X9_62_SpecifiedECDomain(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1ObjectIdentifier.defaultIdentifier:
+            self = .named(try ASN1ObjectIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Null.defaultIdentifier:
+            self = .implicitCA(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .specified(let specified):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(specified)
-                                }
-                            } else {
+        case .specified(let specified):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(specified)
                             }
-            case .named(let named):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(named)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(specified)
+                        }
+        case .named(let named):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(named)
                             }
-            case .implicitCA(let implicitCA):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(implicitCA)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(named)
+                        }
+        case .implicitCA(let implicitCA):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(implicitCA)
                             }
+                        } else {
+                            try coder.serialize(implicitCA)
+                        }
+
         }
     }
 

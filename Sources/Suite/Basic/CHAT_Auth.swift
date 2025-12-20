@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CHAT_Auth: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CHAT_Auth: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var session: ASN1OctetString
     @usableFromInline var type: CHAT_AuthType
@@ -29,6 +29,7 @@ import Foundation
         self.token = token
         self.devkey = devkey
         self.phone = phone
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -45,6 +46,7 @@ import Foundation
             let token: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let devkey: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let phone: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return CHAT_Auth(session: session, type: type, sms_code: sms_code, cert: cert, challange: challange, push: push, os: os, nickname: nickname, settings: settings, token: token, devkey: devkey, phone: phone)
         }
     }
@@ -63,6 +65,7 @@ import Foundation
             try coder.serialize(token)
             try coder.serialize(devkey)
             try coder.serialize(phone)
+
         }
     }
 }

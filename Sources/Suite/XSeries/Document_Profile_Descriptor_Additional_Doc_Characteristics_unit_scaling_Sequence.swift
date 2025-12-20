@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Additional_Doc_Characteristics_unit_scaling_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Additional_Doc_Characteristics_unit_scaling_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var a: ArraySlice<UInt8>
     @usableFromInline var b: ArraySlice<UInt8>
     @inlinable init(a: ArraySlice<UInt8>, b: ArraySlice<UInt8>) {
         self.a = a
         self.b = b
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let a: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let b: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return Document_Profile_Descriptor_Additional_Doc_Characteristics_unit_scaling_Sequence(a: a, b: b)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(a)
             try coder.serialize(b)
+
         }
     }
 }

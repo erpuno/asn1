@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Assured_Reproduction_Areas_Element: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Assured_Reproduction_Areas_Element: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var nominal_page_size: Character_Presentation_Attributes_Measure_Pair
     @usableFromInline var assured_reproduction_area: Document_Profile_Descriptor_Assured_Reproduction_Areas_Element_assured_reproduction_area_Set
     @inlinable init(nominal_page_size: Character_Presentation_Attributes_Measure_Pair, assured_reproduction_area: Document_Profile_Descriptor_Assured_Reproduction_Areas_Element_assured_reproduction_area_Set) {
         self.nominal_page_size = nominal_page_size
         self.assured_reproduction_area = assured_reproduction_area
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let nominal_page_size: Character_Presentation_Attributes_Measure_Pair = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let assured_reproduction_area: Document_Profile_Descriptor_Assured_Reproduction_Areas_Element_assured_reproduction_area_Set = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try Document_Profile_Descriptor_Assured_Reproduction_Areas_Element_assured_reproduction_area_Set(derEncoded: node) }
+
             return Document_Profile_Descriptor_Assured_Reproduction_Areas_Element(nominal_page_size: nominal_page_size, assured_reproduction_area: assured_reproduction_area)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(nominal_page_size, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(assured_reproduction_area) }
+
         }
     }
 }

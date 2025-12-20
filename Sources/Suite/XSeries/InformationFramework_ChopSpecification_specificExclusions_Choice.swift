@@ -2,25 +2,26 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum InformationFramework_ChopSpecification_specificExclusions_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum InformationFramework_ChopSpecification_specificExclusions_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case chopBefore(InformationFramework_LocalName)
     case chopAfter(InformationFramework_LocalName)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .chopBefore(try InformationFramework_LocalName(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .chopAfter(try InformationFramework_LocalName(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .chopBefore(try InformationFramework_LocalName(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .chopAfter(try InformationFramework_LocalName(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .chopBefore(let chopBefore): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try chopBefore.serialize(into: &coder) }
-            case .chopAfter(let chopAfter): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try chopAfter.serialize(into: &coder) }
+        case .chopBefore(let chopBefore): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try chopBefore.serialize(into: &coder) }
+        case .chopAfter(let chopAfter): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try chopAfter.serialize(into: &coder) }
+
         }
     }
 

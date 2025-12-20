@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLKey: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLKey: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var glName: PKIX1Implicit88_GeneralName
     @usableFromInline var glIdentifier: CryptographicMessageSyntax_2010_KEKIdentifier
@@ -17,6 +17,7 @@ import Foundation
         self.glkAlgorithm = glkAlgorithm
         self.glkNotBefore = glkNotBefore
         self.glkNotAfter = glkNotAfter
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -27,6 +28,7 @@ import Foundation
             let glkAlgorithm: SMIMESymmetricKeyDistribution_2009_KeyWrapAlgorithm = try SMIMESymmetricKeyDistribution_2009_KeyWrapAlgorithm(derEncoded: &nodes)
             let glkNotBefore: GeneralizedTime = try GeneralizedTime(derEncoded: &nodes)
             let glkNotAfter: GeneralizedTime = try GeneralizedTime(derEncoded: &nodes)
+
             return SMIMESymmetricKeyDistribution_2009_GLKey(glName: glName, glIdentifier: glIdentifier, glkWrapped: glkWrapped, glkAlgorithm: glkAlgorithm, glkNotBefore: glkNotBefore, glkNotAfter: glkNotAfter)
         }
     }
@@ -39,6 +41,7 @@ import Foundation
             try coder.serialize(glkAlgorithm)
             try coder.serialize(glkNotBefore)
             try coder.serialize(glkNotAfter)
+
         }
     }
 }

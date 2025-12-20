@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Explicit88_ORAddress: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Explicit88_ORAddress: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var built_in_standard_attributes: PKIX1Explicit88_BuiltInStandardAttributes
     @usableFromInline var built_in_domain_defined_attributes: PKIX1Explicit88_BuiltInDomainDefinedAttributes?
@@ -11,6 +11,7 @@ import Foundation
         self.built_in_standard_attributes = built_in_standard_attributes
         self.built_in_domain_defined_attributes = built_in_domain_defined_attributes
         self.extension_attributes = extension_attributes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -26,6 +27,7 @@ var peek_extension_attributes = nodes
 if let next = peek_extension_attributes.next(), next.identifier == PKIX1Explicit88_ExtensionAttributes.defaultIdentifier {
     extension_attributes = try PKIX1Explicit88_ExtensionAttributes(derEncoded: &nodes)
 }
+
             return PKIX1Explicit88_ORAddress(built_in_standard_attributes: built_in_standard_attributes, built_in_domain_defined_attributes: built_in_domain_defined_attributes, extension_attributes: extension_attributes)
         }
     }
@@ -33,8 +35,9 @@ if let next = peek_extension_attributes.next(), next.identifier == PKIX1Explicit
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(built_in_standard_attributes)
-            if let built_in_domain_defined_attributes = self.built_in_domain_defined_attributes { if let built_in_domain_defined_attributes = self.built_in_domain_defined_attributes { try coder.serialize(built_in_domain_defined_attributes) } }
-            if let extension_attributes = self.extension_attributes { if let extension_attributes = self.extension_attributes { try coder.serialize(extension_attributes) } }
+            if let built_in_domain_defined_attributes = self.built_in_domain_defined_attributes { try coder.serialize(built_in_domain_defined_attributes) }
+            if let extension_attributes = self.extension_attributes { try coder.serialize(extension_attributes) }
+
         }
     }
 }

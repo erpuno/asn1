@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_AttributeTypeAndDistinguishedValue: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_AttributeTypeAndDistinguishedValue: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var type: ASN1ObjectIdentifier
     @usableFromInline var value: ASN1Any
@@ -13,6 +13,7 @@ import Foundation
         self.value = value
         self.primaryDistinguished = primaryDistinguished
         self.valuesWithContext = valuesWithContext
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let value: ASN1Any = try ASN1Any(derEncoded: &nodes)
             let primaryDistinguished: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
             let valuesWithContext: [InformationFramework_AttributeTypeAndDistinguishedValue_valuesWithContext_Sequence]? = try DER.set(of: InformationFramework_AttributeTypeAndDistinguishedValue_valuesWithContext_Sequence.self, identifier: .set, nodes: &nodes)
+
             return InformationFramework_AttributeTypeAndDistinguishedValue(type: type, value: value, primaryDistinguished: primaryDistinguished, valuesWithContext: valuesWithContext)
         }
     }
@@ -29,8 +31,9 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(type)
             try coder.serialize(value)
-            if let primaryDistinguished = self.primaryDistinguished { if let primaryDistinguished = self.primaryDistinguished { try coder.serialize(primaryDistinguished) } }
-            if let valuesWithContext = self.valuesWithContext { if let valuesWithContext = self.valuesWithContext { try coder.serializeSetOf(valuesWithContext) } }
+            if let primaryDistinguished = self.primaryDistinguished { try coder.serialize(primaryDistinguished) }
+            if let valuesWithContext = self.valuesWithContext { try coder.serializeSetOf(valuesWithContext) }
+
         }
     }
 }

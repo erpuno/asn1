@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_FilterItem_substrings_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_FilterItem_substrings_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var type: ASN1ObjectIdentifier
     @usableFromInline var strings: [DirectoryAbstractService_FilterItem_substrings_Sequence_strings_Choice]
     @inlinable init(type: ASN1ObjectIdentifier, strings: [DirectoryAbstractService_FilterItem_substrings_Sequence_strings_Choice]) {
         self.type = type
         self.strings = strings
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let type: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let strings: [DirectoryAbstractService_FilterItem_substrings_Sequence_strings_Choice] = try DER.sequence(of: DirectoryAbstractService_FilterItem_substrings_Sequence_strings_Choice.self, identifier: .sequence, nodes: &nodes)
+
             return DirectoryAbstractService_FilterItem_substrings_Sequence(type: type, strings: strings)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(type)
             try coder.serializeSequenceOf(strings)
+
         }
     }
 }

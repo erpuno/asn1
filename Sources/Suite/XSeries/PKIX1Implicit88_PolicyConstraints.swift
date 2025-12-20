@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Implicit88_PolicyConstraints: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Implicit88_PolicyConstraints: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var requireExplicitPolicy: PKIX1Implicit88_SkipCerts?
     @usableFromInline var inhibitPolicyMapping: PKIX1Implicit88_SkipCerts?
     @inlinable init(requireExplicitPolicy: PKIX1Implicit88_SkipCerts?, inhibitPolicyMapping: PKIX1Implicit88_SkipCerts?) {
         self.requireExplicitPolicy = requireExplicitPolicy
         self.inhibitPolicyMapping = inhibitPolicyMapping
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let requireExplicitPolicy: PKIX1Implicit88_SkipCerts? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let inhibitPolicyMapping: PKIX1Implicit88_SkipCerts? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return PKIX1Implicit88_PolicyConstraints(requireExplicitPolicy: requireExplicitPolicy, inhibitPolicyMapping: inhibitPolicyMapping)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let requireExplicitPolicy = self.requireExplicitPolicy { if let requireExplicitPolicy = self.requireExplicitPolicy { try coder.serializeOptionalImplicitlyTagged(requireExplicitPolicy, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let inhibitPolicyMapping = self.inhibitPolicyMapping { if let inhibitPolicyMapping = self.inhibitPolicyMapping { try coder.serializeOptionalImplicitlyTagged(inhibitPolicyMapping, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let requireExplicitPolicy = self.requireExplicitPolicy { try coder.serializeOptionalImplicitlyTagged(requireExplicitPolicy, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let inhibitPolicyMapping = self.inhibitPolicyMapping { try coder.serializeOptionalImplicitlyTagged(inhibitPolicyMapping, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

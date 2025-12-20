@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_Three_Nums: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_Three_Nums: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var column_1: Colour_Attributes_Real_Or_Int
     @usableFromInline var column_2: Colour_Attributes_Real_Or_Int
@@ -11,6 +11,7 @@ import Foundation
         self.column_1 = column_1
         self.column_2 = column_2
         self.column_3 = column_3
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let column_1: Colour_Attributes_Real_Or_Int = try Colour_Attributes_Real_Or_Int(derEncoded: &nodes)
             let column_2: Colour_Attributes_Real_Or_Int = try Colour_Attributes_Real_Or_Int(derEncoded: &nodes)
             let column_3: Colour_Attributes_Real_Or_Int = try Colour_Attributes_Real_Or_Int(derEncoded: &nodes)
+
             return Colour_Attributes_Three_Nums(column_1: column_1, column_2: column_2, column_3: column_3)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(column_1)
             try coder.serialize(column_2)
             try coder.serialize(column_3)
+
         }
     }
 }

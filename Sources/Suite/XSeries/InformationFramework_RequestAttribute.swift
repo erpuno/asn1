@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_RequestAttribute: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_RequestAttribute: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var attributeType: ASN1ObjectIdentifier
     @usableFromInline var includeSubtypes: Bool?
@@ -19,6 +19,7 @@ import Foundation
         self.contexts = contexts
         self.contextCombination = contextCombination
         self.matchingUse = matchingUse
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -30,6 +31,7 @@ import Foundation
             let contexts: [InformationFramework_ContextProfile]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in try DER.sequence(of: InformationFramework_ContextProfile.self, identifier: .sequence, rootNode: node) }
             let contextCombination: InformationFramework_ContextCombination = try DER.explicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in return try InformationFramework_ContextCombination(derEncoded: node) }
             let matchingUse: [InformationFramework_MatchingUse]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 5, tagClass: .contextSpecific) { node in try DER.sequence(of: InformationFramework_MatchingUse.self, identifier: .sequence, rootNode: node) }
+
             return InformationFramework_RequestAttribute(attributeType: attributeType, includeSubtypes: includeSubtypes, selectedValues: selectedValues, defaultValues: defaultValues, contexts: contexts, contextCombination: contextCombination, matchingUse: matchingUse)
         }
     }
@@ -37,12 +39,13 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(attributeType)
-            if let includeSubtypes = self.includeSubtypes { if let includeSubtypes = self.includeSubtypes { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(includeSubtypes) } } }
-            if let selectedValues = self.selectedValues { if let selectedValues = self.selectedValues { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(selectedValues) } } }
-            if let defaultValues = self.defaultValues { if let defaultValues = self.defaultValues { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(defaultValues) } } }
-            if let contexts = self.contexts { if let contexts = self.contexts { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(contexts) } } }
-            if let contextCombination = self.contextCombination { if let contextCombination = self.contextCombination { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(contextCombination) } } }
-            if let matchingUse = self.matchingUse { if let matchingUse = self.matchingUse { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(matchingUse) } } }
+            if let includeSubtypes = self.includeSubtypes { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(includeSubtypes) } }
+            if let selectedValues = self.selectedValues { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(selectedValues) } }
+            if let defaultValues = self.defaultValues { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(defaultValues) } }
+            if let contexts = self.contexts { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(contexts) } }
+            if let contextCombination = self.contextCombination { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(contextCombination) } }
+            if let matchingUse = self.matchingUse { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(matchingUse) } }
+
         }
     }
 }

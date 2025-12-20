@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum CryptographicMessageSyntax_2009_RecipientInfo: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum CryptographicMessageSyntax_2009_RecipientInfo: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case ktri(CryptographicMessageSyntax_2009_KeyTransRecipientInfo)
     case kari(CryptographicMessageSyntax_2009_KeyAgreeRecipientInfo)
@@ -11,35 +11,35 @@ import Foundation
     case ori(CryptographicMessageSyntax_2009_OtherRecipientInfo)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case CryptographicMessageSyntax_2009_KeyTransRecipientInfo.defaultIdentifier:
-                self = .ktri(try CryptographicMessageSyntax_2009_KeyTransRecipientInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case CryptographicMessageSyntax_2009_KeyTransRecipientInfo.defaultIdentifier:
+            self = .ktri(try CryptographicMessageSyntax_2009_KeyTransRecipientInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
 
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .kari(try CryptographicMessageSyntax_2009_KeyAgreeRecipientInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .kekri(try CryptographicMessageSyntax_2009_KEKRecipientInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .pwri(try CryptographicMessageSyntax_2009_PasswordRecipientInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                self = .ori(try CryptographicMessageSyntax_2009_OtherRecipientInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .kari(try CryptographicMessageSyntax_2009_KeyAgreeRecipientInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+            self = .kekri(try CryptographicMessageSyntax_2009_KEKRecipientInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
+            self = .pwri(try CryptographicMessageSyntax_2009_PasswordRecipientInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
+            self = .ori(try CryptographicMessageSyntax_2009_OtherRecipientInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .ktri(let ktri):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(ktri)
-                                }
-                            } else {
+        case .ktri(let ktri):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(ktri)
                             }
+                        } else {
+                            try coder.serialize(ktri)
+                        }
+        case .kari(let kari): try kari.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+        case .kekri(let kekri): try kekri.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+        case .pwri(let pwri): try pwri.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+        case .ori(let ori): try ori.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
 
-            case .kari(let kari): try kari.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            case .kekri(let kekri): try kekri.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
-            case .pwri(let pwri): try pwri.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
-            case .ori(let ori): try ori.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
         }
     }
 

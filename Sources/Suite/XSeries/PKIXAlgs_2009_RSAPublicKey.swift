@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXAlgs_2009_RSAPublicKey: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXAlgs_2009_RSAPublicKey: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var modulus: ArraySlice<UInt8>
     @usableFromInline var publicExponent: ArraySlice<UInt8>
     @inlinable init(modulus: ArraySlice<UInt8>, publicExponent: ArraySlice<UInt8>) {
         self.modulus = modulus
         self.publicExponent = publicExponent
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let modulus: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let publicExponent: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return PKIXAlgs_2009_RSAPublicKey(modulus: modulus, publicExponent: publicExponent)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(modulus)
             try coder.serialize(publicExponent)
+
         }
     }
 }

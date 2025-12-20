@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_Challenge: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_Challenge: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var owf: PKIX1Explicit88_AlgorithmIdentifier?
     @usableFromInline var witness: ASN1OctetString
@@ -11,6 +11,7 @@ import Foundation
         self.owf = owf
         self.witness = witness
         self.challenge = challenge
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,15 +23,17 @@ if let next = peek_owf.next(), next.identifier == PKIX1Explicit88_AlgorithmIdent
 }
             let witness: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let challenge: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return PKIXCMP_2009_Challenge(owf: owf, witness: witness, challenge: challenge)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let owf = self.owf { if let owf = self.owf { try coder.serialize(owf) } }
+            if let owf = self.owf { try coder.serialize(owf) }
             try coder.serialize(witness)
             try coder.serialize(challenge)
+
         }
     }
 }

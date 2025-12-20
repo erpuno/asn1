@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Copyfit_Properties: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Copyfit_Properties: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var iso_standard_9541_copyfitmeasure: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rational?
     @usableFromInline var non_iso_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List?
     @inlinable init(iso_standard_9541_copyfitmeasure: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rational?, non_iso_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List?) {
         self.iso_standard_9541_copyfitmeasure = iso_standard_9541_copyfitmeasure
         self.non_iso_properties = non_iso_properties
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let iso_standard_9541_copyfitmeasure: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rational? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let non_iso_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Copyfit_Properties(iso_standard_9541_copyfitmeasure: iso_standard_9541_copyfitmeasure, non_iso_properties: non_iso_properties)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let iso_standard_9541_copyfitmeasure = self.iso_standard_9541_copyfitmeasure { if let iso_standard_9541_copyfitmeasure = self.iso_standard_9541_copyfitmeasure { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_copyfitmeasure, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let non_iso_properties = self.non_iso_properties { if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let iso_standard_9541_copyfitmeasure = self.iso_standard_9541_copyfitmeasure { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_copyfitmeasure, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

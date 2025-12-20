@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_10_CertificationRequestInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_10_CertificationRequestInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: PKCS_10_CertificationRequestInfo_version_IntEnum
     @usableFromInline var subject: InformationFramework_Name
@@ -13,6 +13,7 @@ import Foundation
         self.subject = subject
         self.subjectPKInfo = subjectPKInfo
         self.attributes = attributes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let subject: InformationFramework_Name = try InformationFramework_Name(derEncoded: &nodes)
             let subjectPKInfo: PKCS_10_SubjectPublicKeyInfo = try PKCS_10_SubjectPublicKeyInfo(derEncoded: &nodes)
             let attributes: PKCS_10_Attributes = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
+
             return PKCS_10_CertificationRequestInfo(version: version, subject: subject, subjectPKInfo: subjectPKInfo, attributes: attributes)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(version.rawValue)
+            try version.serialize(into: &coder, withIdentifier: identifier)
             try coder.serialize(subject)
             try coder.serialize(subjectPKInfo)
             try coder.serializeOptionalImplicitlyTagged(attributes, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+
         }
     }
 }

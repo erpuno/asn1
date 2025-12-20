@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Sealed_Doc_Bodyparts_Element: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Sealed_Doc_Bodyparts_Element: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var seal_id: ArraySlice<UInt8>
     @usableFromInline var sealed_constituents: Document_Profile_Descriptor_Sealed_Constituents
@@ -13,6 +13,7 @@ import Foundation
         self.sealed_constituents = sealed_constituents
         self.privileged_recipients = privileged_recipients
         self.doc_bodypart_seal = doc_bodypart_seal
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let sealed_constituents: Document_Profile_Descriptor_Sealed_Constituents = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
             let privileged_recipients: [Document_Profile_Descriptor_Personal_Name]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.set(of: Document_Profile_Descriptor_Personal_Name.self, identifier: node.identifier, rootNode: node) }
             let doc_bodypart_seal: Document_Profile_Descriptor_Seal_Data = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)))!
+
             return Document_Profile_Descriptor_Sealed_Doc_Bodyparts_Element(seal_id: seal_id, sealed_constituents: sealed_constituents, privileged_recipients: privileged_recipients, doc_bodypart_seal: doc_bodypart_seal)
         }
     }
@@ -29,8 +31,9 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(seal_id, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(sealed_constituents, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            if let privileged_recipients = self.privileged_recipients { if let privileged_recipients = self.privileged_recipients { try coder.serializeSetOf(privileged_recipients, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let privileged_recipients = self.privileged_recipients { try coder.serializeSetOf(privileged_recipients, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
             try coder.serializeOptionalImplicitlyTagged(doc_bodypart_seal, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Text_Rendition: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Text_Rendition: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var font_list: [ASN1UTF8String]?
     @usableFromInline var character_set_list: Geo_Gr_Presentation_Attributes_Text_Rendition_character_set_list_Sequence?
@@ -39,6 +39,7 @@ import Foundation
         self.alternate_character_set_index = alternate_character_set_index
         self.text_aspect_source_flags = text_aspect_source_flags
         self.text_bundle_specifications = text_bundle_specifications
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -60,29 +61,31 @@ import Foundation
             let alternate_character_set_index: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific))
             let text_aspect_source_flags: Geo_Gr_Presentation_Attributes_Text_Rendition_text_aspect_source_flags_Sequence? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific))
             let text_bundle_specifications: [Geo_Gr_Presentation_Attributes_Text_Rendition_text_bundle_specifications_Sequence]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 16, tagClass: .contextSpecific) { node in try DER.sequence(of: Geo_Gr_Presentation_Attributes_Text_Rendition_text_bundle_specifications_Sequence.self, identifier: node.identifier, rootNode: node) }
+
             return Geo_Gr_Presentation_Attributes_Text_Rendition(font_list: font_list, character_set_list: character_set_list, character_coding_announcer: character_coding_announcer, text_bundle_index: text_bundle_index, text_font_index: text_font_index, text_precision: text_precision, character_expansion_factor: character_expansion_factor, character_spacing: character_spacing, text_colour: text_colour, character_height: character_height, character_orientation: character_orientation, text_path: text_path, text_alignment: text_alignment, character_set_index: character_set_index, alternate_character_set_index: alternate_character_set_index, text_aspect_source_flags: text_aspect_source_flags, text_bundle_specifications: text_bundle_specifications)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let font_list = self.font_list { if let font_list = self.font_list { try coder.serializeSequenceOf(font_list, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let character_set_list = self.character_set_list { if let character_set_list = self.character_set_list { try coder.serializeOptionalImplicitlyTagged(character_set_list, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let character_coding_announcer = self.character_coding_announcer { if let character_coding_announcer = self.character_coding_announcer { try coder.serializeOptionalImplicitlyTagged(character_coding_announcer, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let text_bundle_index = self.text_bundle_index { if let text_bundle_index = self.text_bundle_index { try coder.serializeOptionalImplicitlyTagged(text_bundle_index, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let text_font_index = self.text_font_index { if let text_font_index = self.text_font_index { try coder.serializeOptionalImplicitlyTagged(text_font_index, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let text_precision = self.text_precision { if let text_precision = self.text_precision { try coder.serializeOptionalImplicitlyTagged(text_precision, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let character_expansion_factor = self.character_expansion_factor { if let character_expansion_factor = self.character_expansion_factor { try coder.serialize(character_expansion_factor) } }
-            if let character_spacing = self.character_spacing { if let character_spacing = self.character_spacing { try coder.serialize(character_spacing) } }
-            if let text_colour = self.text_colour { if let text_colour = self.text_colour { try coder.serializeOptionalImplicitlyTagged(text_colour, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) } }
-            if let character_height = self.character_height { if let character_height = self.character_height { try coder.serializeOptionalImplicitlyTagged(character_height, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) } }
-            if let character_orientation = self.character_orientation { if let character_orientation = self.character_orientation { try coder.serializeOptionalImplicitlyTagged(character_orientation, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) } }
-            if let text_path = self.text_path { if let text_path = self.text_path { try coder.serializeOptionalImplicitlyTagged(text_path, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) } }
-            if let text_alignment = self.text_alignment { if let text_alignment = self.text_alignment { try coder.serializeOptionalImplicitlyTagged(text_alignment, withIdentifier: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific)) } }
-            if let character_set_index = self.character_set_index { if let character_set_index = self.character_set_index { try coder.serializeOptionalImplicitlyTagged(character_set_index, withIdentifier: ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific)) } }
-            if let alternate_character_set_index = self.alternate_character_set_index { if let alternate_character_set_index = self.alternate_character_set_index { try coder.serializeOptionalImplicitlyTagged(alternate_character_set_index, withIdentifier: ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific)) } }
-            if let text_aspect_source_flags = self.text_aspect_source_flags { if let text_aspect_source_flags = self.text_aspect_source_flags { try coder.serializeOptionalImplicitlyTagged(text_aspect_source_flags, withIdentifier: ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific)) } }
-            if let text_bundle_specifications = self.text_bundle_specifications { if let text_bundle_specifications = self.text_bundle_specifications { try coder.serializeSequenceOf(text_bundle_specifications, identifier: ASN1Identifier(tagWithNumber: 16, tagClass: .contextSpecific)) } }
+            if let font_list = self.font_list { try coder.serializeSequenceOf(font_list, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let character_set_list = self.character_set_list { try coder.serializeOptionalImplicitlyTagged(character_set_list, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let character_coding_announcer = self.character_coding_announcer { try coder.serializeOptionalImplicitlyTagged(character_coding_announcer, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let text_bundle_index = self.text_bundle_index { try coder.serializeOptionalImplicitlyTagged(text_bundle_index, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let text_font_index = self.text_font_index { try coder.serializeOptionalImplicitlyTagged(text_font_index, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let text_precision = self.text_precision { try coder.serializeOptionalImplicitlyTagged(text_precision, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let character_expansion_factor = self.character_expansion_factor { try coder.serialize(character_expansion_factor) }
+            if let character_spacing = self.character_spacing { try coder.serialize(character_spacing) }
+            if let text_colour = self.text_colour { try coder.serializeOptionalImplicitlyTagged(text_colour, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) }
+            if let character_height = self.character_height { try coder.serializeOptionalImplicitlyTagged(character_height, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) }
+            if let character_orientation = self.character_orientation { try coder.serializeOptionalImplicitlyTagged(character_orientation, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) }
+            if let text_path = self.text_path { try coder.serializeOptionalImplicitlyTagged(text_path, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) }
+            if let text_alignment = self.text_alignment { try coder.serializeOptionalImplicitlyTagged(text_alignment, withIdentifier: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific)) }
+            if let character_set_index = self.character_set_index { try coder.serializeOptionalImplicitlyTagged(character_set_index, withIdentifier: ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific)) }
+            if let alternate_character_set_index = self.alternate_character_set_index { try coder.serializeOptionalImplicitlyTagged(alternate_character_set_index, withIdentifier: ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific)) }
+            if let text_aspect_source_flags = self.text_aspect_source_flags { try coder.serializeOptionalImplicitlyTagged(text_aspect_source_flags, withIdentifier: ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific)) }
+            if let text_bundle_specifications = self.text_bundle_specifications { try coder.serializeSequenceOf(text_bundle_specifications, identifier: ASN1Identifier(tagWithNumber: 16, tagClass: .contextSpecific)) }
+
         }
     }
 }

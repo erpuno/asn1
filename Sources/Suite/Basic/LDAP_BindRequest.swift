@@ -2,22 +2,24 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct LDAP_BindRequest: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct LDAP_BindRequest: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: ArraySlice<UInt8>
-    @usableFromInline var name: LDAP_LDAPDN
+    @usableFromInline var name: LDAP_DN
     @usableFromInline var authentication: LDAP_AuthenticationChoice
-    @inlinable init(version: ArraySlice<UInt8>, name: LDAP_LDAPDN, authentication: LDAP_AuthenticationChoice) {
+    @inlinable init(version: ArraySlice<UInt8>, name: LDAP_DN, authentication: LDAP_AuthenticationChoice) {
         self.version = version
         self.name = name
         self.authentication = authentication
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let version: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let name: LDAP_LDAPDN = try LDAP_LDAPDN(derEncoded: &nodes)
+            let name: LDAP_DN = try LDAP_DN(derEncoded: &nodes)
             let authentication: LDAP_AuthenticationChoice = try LDAP_AuthenticationChoice(derEncoded: &nodes)
+
             return LDAP_BindRequest(version: version, name: name, authentication: authentication)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(version)
             try coder.serialize(name)
             try coder.serialize(authentication)
+
         }
     }
 }

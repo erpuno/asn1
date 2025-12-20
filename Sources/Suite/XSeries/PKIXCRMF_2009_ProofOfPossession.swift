@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum PKIXCRMF_2009_ProofOfPossession: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum PKIXCRMF_2009_ProofOfPossession: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case raVerified(ASN1Null)
     case signature(PKIXCRMF_2009_POPOSigningKey)
@@ -10,23 +10,24 @@ import Foundation
     case keyAgreement(PKIXCRMF_2009_POPOPrivKey)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .raVerified(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .signature(try PKIXCRMF_2009_POPOSigningKey(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .keyEncipherment(try PKIXCRMF_2009_POPOPrivKey(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .keyAgreement(try PKIXCRMF_2009_POPOPrivKey(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .raVerified(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .signature(try PKIXCRMF_2009_POPOSigningKey(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+            self = .keyEncipherment(try PKIXCRMF_2009_POPOPrivKey(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
+            self = .keyAgreement(try PKIXCRMF_2009_POPOPrivKey(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .raVerified(let raVerified): try raVerified.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .signature(let signature): try signature.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            case .keyEncipherment(let keyEncipherment): try keyEncipherment.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
-            case .keyAgreement(let keyAgreement): try keyAgreement.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+        case .raVerified(let raVerified): try raVerified.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+        case .signature(let signature): try signature.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+        case .keyEncipherment(let keyEncipherment): try keyEncipherment.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+        case .keyAgreement(let keyAgreement): try keyAgreement.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
         }
     }
 

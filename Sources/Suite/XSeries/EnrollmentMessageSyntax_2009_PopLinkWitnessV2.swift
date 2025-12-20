@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_PopLinkWitnessV2: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_PopLinkWitnessV2: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var keyGenAlgorithm: AuthenticationFramework_AlgorithmIdentifier
     @usableFromInline var macAlgorithm: AuthenticationFramework_AlgorithmIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.keyGenAlgorithm = keyGenAlgorithm
         self.macAlgorithm = macAlgorithm
         self.witness = witness
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let keyGenAlgorithm: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let macAlgorithm: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let witness: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return EnrollmentMessageSyntax_2009_PopLinkWitnessV2(keyGenAlgorithm: keyGenAlgorithm, macAlgorithm: macAlgorithm, witness: witness)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(keyGenAlgorithm)
             try coder.serialize(macAlgorithm)
             try coder.serialize(witness)
+
         }
     }
 }

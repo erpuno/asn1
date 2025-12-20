@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Colour_Representations: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Colour_Representations: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var background_colour: Geo_Gr_Presentation_Attributes_RGB?
     @usableFromInline var colour_table_specification: [Geo_Gr_Presentation_Attributes_Colour_Representations_colour_table_specification_Sequence]?
     @inlinable init(background_colour: Geo_Gr_Presentation_Attributes_RGB?, colour_table_specification: [Geo_Gr_Presentation_Attributes_Colour_Representations_colour_table_specification_Sequence]?) {
         self.background_colour = background_colour
         self.colour_table_specification = colour_table_specification
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let background_colour: Geo_Gr_Presentation_Attributes_RGB? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let colour_table_specification: [Geo_Gr_Presentation_Attributes_Colour_Representations_colour_table_specification_Sequence]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.sequence(of: Geo_Gr_Presentation_Attributes_Colour_Representations_colour_table_specification_Sequence.self, identifier: node.identifier, rootNode: node) }
+
             return Geo_Gr_Presentation_Attributes_Colour_Representations(background_colour: background_colour, colour_table_specification: colour_table_specification)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let background_colour = self.background_colour { if let background_colour = self.background_colour { try coder.serializeOptionalImplicitlyTagged(background_colour, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let colour_table_specification = self.colour_table_specification { if let colour_table_specification = self.colour_table_specification { try coder.serializeSequenceOf(colour_table_specification, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let background_colour = self.background_colour { try coder.serializeOptionalImplicitlyTagged(background_colour, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let colour_table_specification = self.colour_table_specification { try coder.serializeSequenceOf(colour_table_specification, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

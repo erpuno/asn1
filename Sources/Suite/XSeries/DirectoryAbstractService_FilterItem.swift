@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum DirectoryAbstractService_FilterItem: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum DirectoryAbstractService_FilterItem: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case equality(InformationFramework_AttributeValueAssertion)
     case substrings(DirectoryAbstractService_FilterItem_substrings_Sequence)
@@ -14,43 +14,44 @@ import Foundation
     case contextPresent(InformationFramework_AttributeTypeAssertion)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .equality(try InformationFramework_AttributeValueAssertion(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .substrings(try DirectoryAbstractService_FilterItem_substrings_Sequence(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .greaterOrEqual(try InformationFramework_AttributeValueAssertion(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .lessOrEqual(try InformationFramework_AttributeValueAssertion(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .present(try PKIX1Explicit88_AttributeType(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .approximateMatch(try InformationFramework_AttributeValueAssertion(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .extensibleMatch(try DirectoryAbstractService_MatchingRuleAssertion(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .contextPresent(try InformationFramework_AttributeTypeAssertion(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .equality(try InformationFramework_AttributeValueAssertion(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .substrings(try DirectoryAbstractService_FilterItem_substrings_Sequence(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .greaterOrEqual(try InformationFramework_AttributeValueAssertion(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .lessOrEqual(try InformationFramework_AttributeValueAssertion(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .present(try PKIX1Explicit88_AttributeType(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .approximateMatch(try InformationFramework_AttributeValueAssertion(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .extensibleMatch(try DirectoryAbstractService_MatchingRuleAssertion(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .contextPresent(try InformationFramework_AttributeTypeAssertion(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .equality(let equality): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try equality.serialize(into: &coder) }
-            case .substrings(let substrings): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try substrings.serialize(into: &coder) }
-            case .greaterOrEqual(let greaterOrEqual): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) { coder in try greaterOrEqual.serialize(into: &coder) }
-            case .lessOrEqual(let lessOrEqual): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) { coder in try lessOrEqual.serialize(into: &coder) }
-            case .present(let present): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) { coder in try present.serialize(into: &coder) }
-            case .approximateMatch(let approximateMatch): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) { coder in try approximateMatch.serialize(into: &coder) }
-            case .extensibleMatch(let extensibleMatch): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) { coder in try extensibleMatch.serialize(into: &coder) }
-            case .contextPresent(let contextPresent): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) { coder in try contextPresent.serialize(into: &coder) }
+        case .equality(let equality): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try equality.serialize(into: &coder) }
+        case .substrings(let substrings): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try substrings.serialize(into: &coder) }
+        case .greaterOrEqual(let greaterOrEqual): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) { coder in try greaterOrEqual.serialize(into: &coder) }
+        case .lessOrEqual(let lessOrEqual): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) { coder in try lessOrEqual.serialize(into: &coder) }
+        case .present(let present): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) { coder in try present.serialize(into: &coder) }
+        case .approximateMatch(let approximateMatch): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) { coder in try approximateMatch.serialize(into: &coder) }
+        case .extensibleMatch(let extensibleMatch): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) { coder in try extensibleMatch.serialize(into: &coder) }
+        case .contextPresent(let contextPresent): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) { coder in try contextPresent.serialize(into: &coder) }
+
         }
     }
 

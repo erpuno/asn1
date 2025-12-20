@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Originators: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Originators: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var organizations: [Document_Profile_Descriptor_Character_Data]?
     @usableFromInline var preparers: [Document_Profile_Descriptor_Originators_preparers_Set]?
@@ -13,6 +13,7 @@ import Foundation
         self.preparers = preparers
         self.owners = owners
         self.authors = authors
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let preparers: [Document_Profile_Descriptor_Originators_preparers_Set]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.sequence(of: Document_Profile_Descriptor_Originators_preparers_Set.self, identifier: node.identifier, rootNode: node) }
             let owners: [Document_Profile_Descriptor_Originators_owners_Set]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.sequence(of: Document_Profile_Descriptor_Originators_owners_Set.self, identifier: node.identifier, rootNode: node) }
             let authors: [Document_Profile_Descriptor_Originators_authors_Set]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in try DER.sequence(of: Document_Profile_Descriptor_Originators_authors_Set.self, identifier: node.identifier, rootNode: node) }
+
             return Document_Profile_Descriptor_Originators(organizations: organizations, preparers: preparers, owners: owners, authors: authors)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let organizations = self.organizations { if let organizations = self.organizations { try coder.serializeSetOf(organizations, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let preparers = self.preparers { if let preparers = self.preparers { try coder.serializeSequenceOf(preparers, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let owners = self.owners { if let owners = self.owners { try coder.serializeSequenceOf(owners, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let authors = self.authors { if let authors = self.authors { try coder.serializeSequenceOf(authors, identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
+            if let organizations = self.organizations { try coder.serializeSetOf(organizations, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let preparers = self.preparers { try coder.serializeSequenceOf(preparers, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let owners = self.owners { try coder.serializeSequenceOf(owners, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let authors = self.authors { try coder.serializeSequenceOf(authors, identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+
         }
     }
 }

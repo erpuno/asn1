@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_IssuerAndSerialNumber: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_IssuerAndSerialNumber: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var issuer: DSTU_Name
     @usableFromInline var serialNumber: ArraySlice<UInt8>
     @inlinable init(issuer: DSTU_Name, serialNumber: ArraySlice<UInt8>) {
         self.issuer = issuer
         self.serialNumber = serialNumber
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let issuer: DSTU_Name = try DSTU_Name(derEncoded: &nodes)
             let serialNumber: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return KEP_IssuerAndSerialNumber(issuer: issuer, serialNumber: serialNumber)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(issuer)
             try coder.serialize(serialNumber)
+
         }
     }
 }

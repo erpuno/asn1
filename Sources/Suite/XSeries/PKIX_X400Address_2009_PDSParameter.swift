@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX_X400Address_2009_PDSParameter: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX_X400Address_2009_PDSParameter: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var printable_string: ASN1PrintableString?
     @usableFromInline var teletex_string: ASN1TeletexString?
     @inlinable init(printable_string: ASN1PrintableString?, teletex_string: ASN1TeletexString?) {
         self.printable_string = printable_string
         self.teletex_string = teletex_string
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -23,14 +24,16 @@ var peek_teletex_string = nodes
 if let next = peek_teletex_string.next(), next.identifier == ASN1TeletexString.defaultIdentifier {
     teletex_string = try ASN1TeletexString(derEncoded: &nodes)
 }
+
             return PKIX_X400Address_2009_PDSParameter(printable_string: printable_string, teletex_string: teletex_string)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let printable_string = self.printable_string { if let printable_string = self.printable_string { try coder.serialize(printable_string) } }
-            if let teletex_string = self.teletex_string { if let teletex_string = self.teletex_string { try coder.serialize(teletex_string) } }
+            if let printable_string = self.printable_string { try coder.serialize(printable_string) }
+            if let teletex_string = self.teletex_string { try coder.serialize(teletex_string) }
+
         }
     }
 }

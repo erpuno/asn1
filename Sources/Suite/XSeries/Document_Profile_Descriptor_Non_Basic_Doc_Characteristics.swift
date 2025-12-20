@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Non_Basic_Doc_Characteristics: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Non_Basic_Doc_Characteristics: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var profile_character_sets: ASN1OctetString?
     @usableFromInline var comments_character_sets: ASN1OctetString?
@@ -59,6 +59,7 @@ import Foundation
         self.geo_gr_coding_attributes = geo_gr_coding_attributes
         self.ext_non_basic_pres_features = ext_non_basic_pres_features
         self.ext_non_basic_coding_attributes = ext_non_basic_coding_attributes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -90,39 +91,41 @@ import Foundation
             let geo_gr_coding_attributes: [Geo_Gr_Profile_Attributes_Geo_Gr_Coding_Attribute]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 17, tagClass: .contextSpecific) { node in try DER.set(of: Geo_Gr_Profile_Attributes_Geo_Gr_Coding_Attribute.self, identifier: node.identifier, rootNode: node) }
             let ext_non_basic_pres_features: [EXTERNAL]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 10, tagClass: .contextSpecific) { node in try DER.sequence(of: EXTERNAL.self, identifier: node.identifier, rootNode: node) }
             let ext_non_basic_coding_attributes: [EXTERNAL]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 11, tagClass: .contextSpecific) { node in try DER.sequence(of: EXTERNAL.self, identifier: node.identifier, rootNode: node) }
+
             return Document_Profile_Descriptor_Non_Basic_Doc_Characteristics(profile_character_sets: profile_character_sets, comments_character_sets: comments_character_sets, alternative_repr_char_sets: alternative_repr_char_sets, page_dimensions: page_dimensions, medium_types: medium_types, layout_paths: layout_paths, transparencies: transparencies, protections: protections, block_alignments: block_alignments, fill_orders: fill_orders, colours: colours, colours_of_layout_object: colours_of_layout_object, object_colour_tables: object_colour_tables, content_background_colours: content_background_colours, content_foreground_colours: content_foreground_colours, content_colour_tables: content_colour_tables, borders: borders, page_positions: page_positions, types_of_coding: types_of_coding, character_presentation_features: character_presentation_features, ra_gr_presentation_features: ra_gr_presentation_features, geo_gr_presentation_features: geo_gr_presentation_features, character_coding_attributes: character_coding_attributes, ra_gr_coding_attributes: ra_gr_coding_attributes, geo_gr_coding_attributes: geo_gr_coding_attributes, ext_non_basic_pres_features: ext_non_basic_pres_features, ext_non_basic_coding_attributes: ext_non_basic_coding_attributes)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let profile_character_sets = self.profile_character_sets { if let profile_character_sets = self.profile_character_sets { try coder.serializeOptionalImplicitlyTagged(profile_character_sets, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let comments_character_sets = self.comments_character_sets { if let comments_character_sets = self.comments_character_sets { try coder.serializeOptionalImplicitlyTagged(comments_character_sets, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let alternative_repr_char_sets = self.alternative_repr_char_sets { if let alternative_repr_char_sets = self.alternative_repr_char_sets { try coder.serializeOptionalImplicitlyTagged(alternative_repr_char_sets, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let page_dimensions = self.page_dimensions { if let page_dimensions = self.page_dimensions { try coder.serializeSetOf(page_dimensions, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let medium_types = self.medium_types { if let medium_types = self.medium_types { try coder.serializeSetOf(medium_types, identifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) } }
-            if let layout_paths = self.layout_paths { if let layout_paths = self.layout_paths { try coder.serializeSetOf(layout_paths, identifier: ASN1Identifier(tagWithNumber: 21, tagClass: .contextSpecific)) } }
-            if let transparencies = self.transparencies { if let transparencies = self.transparencies { try coder.serializeSetOf(transparencies, identifier: ASN1Identifier(tagWithNumber: 22, tagClass: .contextSpecific)) } }
-            if let protections = self.protections { if let protections = self.protections { try coder.serializeSetOf(protections, identifier: ASN1Identifier(tagWithNumber: 23, tagClass: .contextSpecific)) } }
-            if let block_alignments = self.block_alignments { if let block_alignments = self.block_alignments { try coder.serializeSetOf(block_alignments, identifier: ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific)) } }
-            if let fill_orders = self.fill_orders { if let fill_orders = self.fill_orders { try coder.serializeSetOf(fill_orders, identifier: ASN1Identifier(tagWithNumber: 25, tagClass: .contextSpecific)) } }
-            if let colours = self.colours { if let colours = self.colours { try coder.serializeSetOf(colours, identifier: ASN1Identifier(tagWithNumber: 26, tagClass: .contextSpecific)) } }
-            if let colours_of_layout_object = self.colours_of_layout_object { if let colours_of_layout_object = self.colours_of_layout_object { try coder.serializeSetOf(colours_of_layout_object, identifier: ASN1Identifier(tagWithNumber: 30, tagClass: .contextSpecific)) } }
-            if let object_colour_tables = self.object_colour_tables { if let object_colour_tables = self.object_colour_tables { try coder.serializeSetOf(object_colour_tables, identifier: ASN1Identifier(tagWithNumber: 31, tagClass: .contextSpecific)) } }
-            if let content_background_colours = self.content_background_colours { if let content_background_colours = self.content_background_colours { try coder.serializeSetOf(content_background_colours, identifier: ASN1Identifier(tagWithNumber: 32, tagClass: .contextSpecific)) } }
-            if let content_foreground_colours = self.content_foreground_colours { if let content_foreground_colours = self.content_foreground_colours { try coder.serializeSetOf(content_foreground_colours, identifier: ASN1Identifier(tagWithNumber: 33, tagClass: .contextSpecific)) } }
-            if let content_colour_tables = self.content_colour_tables { if let content_colour_tables = self.content_colour_tables { try coder.serializeSetOf(content_colour_tables, identifier: ASN1Identifier(tagWithNumber: 34, tagClass: .contextSpecific)) } }
-            if let borders = self.borders { if let borders = self.borders { try coder.serializeSetOf(borders, identifier: ASN1Identifier(tagWithNumber: 27, tagClass: .contextSpecific)) } }
-            if let page_positions = self.page_positions { if let page_positions = self.page_positions { try coder.serializeSetOf(page_positions, identifier: ASN1Identifier(tagWithNumber: 28, tagClass: .contextSpecific)) } }
-            if let types_of_coding = self.types_of_coding { if let types_of_coding = self.types_of_coding { try coder.serializeSetOf(types_of_coding, identifier: ASN1Identifier(tagWithNumber: 29, tagClass: .contextSpecific)) } }
-            if let character_presentation_features = self.character_presentation_features { if let character_presentation_features = self.character_presentation_features { try coder.serializeSetOf(character_presentation_features, identifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) } }
-            if let ra_gr_presentation_features = self.ra_gr_presentation_features { if let ra_gr_presentation_features = self.ra_gr_presentation_features { try coder.serializeSetOf(ra_gr_presentation_features, identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let geo_gr_presentation_features = self.geo_gr_presentation_features { if let geo_gr_presentation_features = self.geo_gr_presentation_features { try coder.serializeSetOf(geo_gr_presentation_features, identifier: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific)) } }
-            if let character_coding_attributes = self.character_coding_attributes { if let character_coding_attributes = self.character_coding_attributes { try coder.serializeSetOf(character_coding_attributes, identifier: ASN1Identifier(tagWithNumber: 16, tagClass: .contextSpecific)) } }
-            if let ra_gr_coding_attributes = self.ra_gr_coding_attributes { if let ra_gr_coding_attributes = self.ra_gr_coding_attributes { try coder.serializeSetOf(ra_gr_coding_attributes, identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let geo_gr_coding_attributes = self.geo_gr_coding_attributes { if let geo_gr_coding_attributes = self.geo_gr_coding_attributes { try coder.serializeSetOf(geo_gr_coding_attributes, identifier: ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific)) } }
-            if let ext_non_basic_pres_features = self.ext_non_basic_pres_features { if let ext_non_basic_pres_features = self.ext_non_basic_pres_features { try coder.serializeSequenceOf(ext_non_basic_pres_features, identifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) } }
-            if let ext_non_basic_coding_attributes = self.ext_non_basic_coding_attributes { if let ext_non_basic_coding_attributes = self.ext_non_basic_coding_attributes { try coder.serializeSequenceOf(ext_non_basic_coding_attributes, identifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) } }
+            if let profile_character_sets = self.profile_character_sets { try coder.serializeOptionalImplicitlyTagged(profile_character_sets, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let comments_character_sets = self.comments_character_sets { try coder.serializeOptionalImplicitlyTagged(comments_character_sets, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let alternative_repr_char_sets = self.alternative_repr_char_sets { try coder.serializeOptionalImplicitlyTagged(alternative_repr_char_sets, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+            if let page_dimensions = self.page_dimensions { try coder.serializeSetOf(page_dimensions, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let medium_types = self.medium_types { try coder.serializeSetOf(medium_types, identifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) }
+            if let layout_paths = self.layout_paths { try coder.serializeSetOf(layout_paths, identifier: ASN1Identifier(tagWithNumber: 21, tagClass: .contextSpecific)) }
+            if let transparencies = self.transparencies { try coder.serializeSetOf(transparencies, identifier: ASN1Identifier(tagWithNumber: 22, tagClass: .contextSpecific)) }
+            if let protections = self.protections { try coder.serializeSetOf(protections, identifier: ASN1Identifier(tagWithNumber: 23, tagClass: .contextSpecific)) }
+            if let block_alignments = self.block_alignments { try coder.serializeSetOf(block_alignments, identifier: ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific)) }
+            if let fill_orders = self.fill_orders { try coder.serializeSetOf(fill_orders, identifier: ASN1Identifier(tagWithNumber: 25, tagClass: .contextSpecific)) }
+            if let colours = self.colours { try coder.serializeSetOf(colours, identifier: ASN1Identifier(tagWithNumber: 26, tagClass: .contextSpecific)) }
+            if let colours_of_layout_object = self.colours_of_layout_object { try coder.serializeSetOf(colours_of_layout_object, identifier: ASN1Identifier(tagWithNumber: 30, tagClass: .contextSpecific)) }
+            if let object_colour_tables = self.object_colour_tables { try coder.serializeSetOf(object_colour_tables, identifier: ASN1Identifier(tagWithNumber: 31, tagClass: .contextSpecific)) }
+            if let content_background_colours = self.content_background_colours { try coder.serializeSetOf(content_background_colours, identifier: ASN1Identifier(tagWithNumber: 32, tagClass: .contextSpecific)) }
+            if let content_foreground_colours = self.content_foreground_colours { try coder.serializeSetOf(content_foreground_colours, identifier: ASN1Identifier(tagWithNumber: 33, tagClass: .contextSpecific)) }
+            if let content_colour_tables = self.content_colour_tables { try coder.serializeSetOf(content_colour_tables, identifier: ASN1Identifier(tagWithNumber: 34, tagClass: .contextSpecific)) }
+            if let borders = self.borders { try coder.serializeSetOf(borders, identifier: ASN1Identifier(tagWithNumber: 27, tagClass: .contextSpecific)) }
+            if let page_positions = self.page_positions { try coder.serializeSetOf(page_positions, identifier: ASN1Identifier(tagWithNumber: 28, tagClass: .contextSpecific)) }
+            if let types_of_coding = self.types_of_coding { try coder.serializeSetOf(types_of_coding, identifier: ASN1Identifier(tagWithNumber: 29, tagClass: .contextSpecific)) }
+            if let character_presentation_features = self.character_presentation_features { try coder.serializeSetOf(character_presentation_features, identifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) }
+            if let ra_gr_presentation_features = self.ra_gr_presentation_features { try coder.serializeSetOf(ra_gr_presentation_features, identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let geo_gr_presentation_features = self.geo_gr_presentation_features { try coder.serializeSetOf(geo_gr_presentation_features, identifier: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific)) }
+            if let character_coding_attributes = self.character_coding_attributes { try coder.serializeSetOf(character_coding_attributes, identifier: ASN1Identifier(tagWithNumber: 16, tagClass: .contextSpecific)) }
+            if let ra_gr_coding_attributes = self.ra_gr_coding_attributes { try coder.serializeSetOf(ra_gr_coding_attributes, identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let geo_gr_coding_attributes = self.geo_gr_coding_attributes { try coder.serializeSetOf(geo_gr_coding_attributes, identifier: ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific)) }
+            if let ext_non_basic_pres_features = self.ext_non_basic_pres_features { try coder.serializeSequenceOf(ext_non_basic_pres_features, identifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) }
+            if let ext_non_basic_coding_attributes = self.ext_non_basic_coding_attributes { try coder.serializeSequenceOf(ext_non_basic_coding_attributes, identifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) }
+
         }
     }
 }

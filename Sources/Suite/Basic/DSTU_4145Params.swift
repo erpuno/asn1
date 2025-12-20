@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DSTU_4145Params: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DSTU_4145Params: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var definition: DSTU_4145Params_definition_Choice
     @usableFromInline var dke: ASN1OctetString?
     @inlinable init(definition: DSTU_4145Params_definition_Choice, dke: ASN1OctetString?) {
         self.definition = definition
         self.dke = dke
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,6 +20,7 @@ var peek_dke = nodes
 if let next = peek_dke.next(), next.identifier == ASN1OctetString.defaultIdentifier {
     dke = try ASN1OctetString(derEncoded: &nodes)
 }
+
             return DSTU_4145Params(definition: definition, dke: dke)
         }
     }
@@ -26,7 +28,8 @@ if let next = peek_dke.next(), next.identifier == ASN1OctetString.defaultIdentif
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(definition)
-            if let dke = self.dke { if let dke = self.dke { try coder.serialize(dke) } }
+            if let dke = self.dke { try coder.serialize(dke) }
+
         }
     }
 }

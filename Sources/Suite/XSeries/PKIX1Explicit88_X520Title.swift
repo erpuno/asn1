@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum PKIX1Explicit88_X520Title: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum PKIX1Explicit88_X520Title: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case teletexString(ASN1TeletexString)
     case printableString(ASN1PrintableString)
@@ -11,61 +11,62 @@ import Foundation
     case bmpString(ASN1BMPString)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1TeletexString.defaultIdentifier:
-                self = .teletexString(try ASN1TeletexString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1PrintableString.defaultIdentifier:
-                self = .printableString(try ASN1PrintableString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1UniversalString.defaultIdentifier:
-                self = .universalString(try ASN1UniversalString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1UTF8String.defaultIdentifier:
-                self = .utf8String(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1BMPString.defaultIdentifier:
-                self = .bmpString(try ASN1BMPString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1TeletexString.defaultIdentifier:
+            self = .teletexString(try ASN1TeletexString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1PrintableString.defaultIdentifier:
+            self = .printableString(try ASN1PrintableString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1UniversalString.defaultIdentifier:
+            self = .universalString(try ASN1UniversalString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1UTF8String.defaultIdentifier:
+            self = .utf8String(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1BMPString.defaultIdentifier:
+            self = .bmpString(try ASN1BMPString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .teletexString(let teletexString):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(teletexString)
-                                }
-                            } else {
+        case .teletexString(let teletexString):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(teletexString)
                             }
-            case .printableString(let printableString):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(printableString)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(teletexString)
+                        }
+        case .printableString(let printableString):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(printableString)
                             }
-            case .universalString(let universalString):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(universalString)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(printableString)
+                        }
+        case .universalString(let universalString):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(universalString)
                             }
-            case .utf8String(let utf8String):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(utf8String)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(universalString)
+                        }
+        case .utf8String(let utf8String):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(utf8String)
                             }
-            case .bmpString(let bmpString):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(bmpString)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(utf8String)
+                        }
+        case .bmpString(let bmpString):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(bmpString)
                             }
+                        } else {
+                            try coder.serialize(bmpString)
+                        }
+
         }
     }
 

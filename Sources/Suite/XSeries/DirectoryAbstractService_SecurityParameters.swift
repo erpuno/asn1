@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_SecurityParameters: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_SecurityParameters: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var certification_path: AuthenticationFramework_CertificationPath?
     @usableFromInline var name: PKIX1Explicit88_DistinguishedName?
@@ -25,6 +25,7 @@ import Foundation
         self.attributeCertificationPath = attributeCertificationPath
         self.errorProtection = errorProtection
         self.errorCode = errorCode
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -39,22 +40,24 @@ import Foundation
             let attributeCertificationPath: AuthenticationFramework_AttributeCertificationPath? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 7, tagClass: .contextSpecific) { node in return try AuthenticationFramework_AttributeCertificationPath(derEncoded: node) }
             let errorProtection: DirectoryAbstractService_ErrorProtectionRequest? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 8, tagClass: .contextSpecific) { node in return try DirectoryAbstractService_ErrorProtectionRequest(derEncoded: node) }
             let errorCode: DirectoryAbstractService_Code? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 9, tagClass: .contextSpecific) { node in return try DirectoryAbstractService_Code(derEncoded: node) }
+
             return DirectoryAbstractService_SecurityParameters(certification_path: certification_path, name: name, time: time, random: random, target: target, response: response, operationCode: operationCode, attributeCertificationPath: attributeCertificationPath, errorProtection: errorProtection, errorCode: errorCode)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let certification_path = self.certification_path { if let certification_path = self.certification_path { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(certification_path) } } }
-            if let name = self.name { if let name = self.name { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(name) } } }
-            if let time = self.time { if let time = self.time { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(time) } } }
-            if let random = self.random { if let random = self.random { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(random) } } }
-            if let target = self.target { if let target = self.target { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(target) } } }
-            if let response = self.response { if let response = self.response { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serialize(response) } } }
-            if let operationCode = self.operationCode { if let operationCode = self.operationCode { try coder.serialize(explicitlyTaggedWithTagNumber: 6, tagClass: .contextSpecific) { codec in try codec.serialize(operationCode) } } }
-            if let attributeCertificationPath = self.attributeCertificationPath { if let attributeCertificationPath = self.attributeCertificationPath { try coder.serialize(explicitlyTaggedWithTagNumber: 7, tagClass: .contextSpecific) { codec in try codec.serialize(attributeCertificationPath) } } }
-            if let errorProtection = self.errorProtection { if let errorProtection = self.errorProtection { try coder.serialize(explicitlyTaggedWithTagNumber: 8, tagClass: .contextSpecific) { codec in try codec.serialize(errorProtection) } } }
-            if let errorCode = self.errorCode { if let errorCode = self.errorCode { try coder.serialize(explicitlyTaggedWithTagNumber: 9, tagClass: .contextSpecific) { codec in try codec.serialize(errorCode) } } }
+            if let certification_path = self.certification_path { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(certification_path) } }
+            if let name = self.name { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(name) } }
+            if let time = self.time { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(time) } }
+            if let random = self.random { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(random) } }
+            if let target = self.target { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(target) } }
+            if let response = self.response { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serialize(response) } }
+            if let operationCode = self.operationCode { try coder.serialize(explicitlyTaggedWithTagNumber: 6, tagClass: .contextSpecific) { codec in try codec.serialize(operationCode) } }
+            if let attributeCertificationPath = self.attributeCertificationPath { try coder.serialize(explicitlyTaggedWithTagNumber: 7, tagClass: .contextSpecific) { codec in try codec.serialize(attributeCertificationPath) } }
+            if let errorProtection = self.errorProtection { try coder.serialize(explicitlyTaggedWithTagNumber: 8, tagClass: .contextSpecific) { codec in try codec.serialize(errorProtection) } }
+            if let errorCode = self.errorCode { try coder.serialize(explicitlyTaggedWithTagNumber: 9, tagClass: .contextSpecific) { codec in try codec.serialize(errorCode) } }
+
         }
     }
 }

@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Default_Value_Lists_Page_Set_Attributes: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Default_Value_Lists_Page_Set_Attributes: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var layout_stream_categories: Default_Value_Lists_Attribute?
     @usableFromInline var layout_stream_sub_categories: Default_Value_Lists_Attribute?
     @inlinable init(layout_stream_categories: Default_Value_Lists_Attribute?, layout_stream_sub_categories: Default_Value_Lists_Attribute?) {
         self.layout_stream_categories = layout_stream_categories
         self.layout_stream_sub_categories = layout_stream_sub_categories
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -23,14 +24,16 @@ var peek_layout_stream_sub_categories = nodes
 if let next = peek_layout_stream_sub_categories.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
     layout_stream_sub_categories = try Default_Value_Lists_Attribute(derEncoded: &nodes)
 }
+
             return Default_Value_Lists_Page_Set_Attributes(layout_stream_categories: layout_stream_categories, layout_stream_sub_categories: layout_stream_sub_categories)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let layout_stream_categories = self.layout_stream_categories { if let layout_stream_categories = self.layout_stream_categories { try coder.serialize(layout_stream_categories) } }
-            if let layout_stream_sub_categories = self.layout_stream_sub_categories { if let layout_stream_sub_categories = self.layout_stream_sub_categories { try coder.serialize(layout_stream_sub_categories) } }
+            if let layout_stream_categories = self.layout_stream_categories { try coder.serialize(layout_stream_categories) }
+            if let layout_stream_sub_categories = self.layout_stream_sub_categories { try coder.serialize(layout_stream_sub_categories) }
+
         }
     }
 }

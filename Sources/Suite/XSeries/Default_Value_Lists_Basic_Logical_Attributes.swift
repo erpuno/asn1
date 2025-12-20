@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Default_Value_Lists_Basic_Logical_Attributes: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Default_Value_Lists_Basic_Logical_Attributes: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var presentation_attributes: Default_Value_Lists_Attribute?
     @usableFromInline var protection: Default_Value_Lists_Attribute?
@@ -15,6 +15,7 @@ import Foundation
         self.presentation_style = presentation_style
         self.layout_style = layout_style
         self.sealed = sealed
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -44,17 +45,19 @@ var peek_sealed = nodes
 if let next = peek_sealed.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
     sealed = try Default_Value_Lists_Attribute(derEncoded: &nodes)
 }
+
             return Default_Value_Lists_Basic_Logical_Attributes(presentation_attributes: presentation_attributes, protection: protection, presentation_style: presentation_style, layout_style: layout_style, sealed: sealed)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let presentation_attributes = self.presentation_attributes { if let presentation_attributes = self.presentation_attributes { try coder.serialize(presentation_attributes) } }
-            if let protection = self.protection { if let protection = self.protection { try coder.serialize(protection) } }
-            if let presentation_style = self.presentation_style { if let presentation_style = self.presentation_style { try coder.serialize(presentation_style) } }
-            if let layout_style = self.layout_style { if let layout_style = self.layout_style { try coder.serialize(layout_style) } }
-            if let sealed = self.sealed { if let sealed = self.sealed { try coder.serialize(sealed) } }
+            if let presentation_attributes = self.presentation_attributes { try coder.serialize(presentation_attributes) }
+            if let protection = self.protection { try coder.serialize(protection) }
+            if let presentation_style = self.presentation_style { try coder.serialize(presentation_style) }
+            if let layout_style = self.layout_style { try coder.serialize(layout_style) }
+            if let sealed = self.sealed { try coder.serialize(sealed) }
+
         }
     }
 }

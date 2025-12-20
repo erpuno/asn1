@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Ordered_Value_List: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Ordered_Value_List: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var value: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Value]
     @inlinable public init(_ value: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Value]) { self.value = value }

@@ -2,23 +2,24 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Location_Expressions_AttributeValue_PresentationStyle_Specification: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Location_Expressions_AttributeValue_PresentationStyle_Specification: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case value(Location_Expressions_Simple_AttributeValue_PresentationStyle_Specification)
     case range(Location_Expressions_AttributeValue_PresentationStyle_Specification_range_Sequence)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .value(try Location_Expressions_Simple_AttributeValue_PresentationStyle_Specification(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .range(try Location_Expressions_AttributeValue_PresentationStyle_Specification_range_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .value(try Location_Expressions_Simple_AttributeValue_PresentationStyle_Specification(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .range(try Location_Expressions_AttributeValue_PresentationStyle_Specification_range_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .value(let value): try value.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .range(let range): try range.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+        case .value(let value): try value.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+        case .range(let range): try range.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
         }
     }
 

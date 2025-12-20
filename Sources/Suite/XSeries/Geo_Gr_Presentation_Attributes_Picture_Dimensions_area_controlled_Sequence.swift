@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Picture_Dimensions_area_controlled_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Picture_Dimensions_area_controlled_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var minimum_width: ArraySlice<UInt8>
     @usableFromInline var preferred_width: ArraySlice<UInt8>
@@ -15,6 +15,7 @@ import Foundation
         self.minimum_height = minimum_height
         self.preferred_height = preferred_height
         self.aspect_ratio_flag = aspect_ratio_flag
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,6 +25,7 @@ import Foundation
             let minimum_height: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let preferred_height: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let aspect_ratio_flag: Geo_Gr_Presentation_Attributes_Picture_Dimensions_area_controlled_Sequence_aspect_ratio_flag_Enum = try Geo_Gr_Presentation_Attributes_Picture_Dimensions_area_controlled_Sequence_aspect_ratio_flag_Enum(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Picture_Dimensions_area_controlled_Sequence(minimum_width: minimum_width, preferred_width: preferred_width, minimum_height: minimum_height, preferred_height: preferred_height, aspect_ratio_flag: aspect_ratio_flag)
         }
     }
@@ -35,6 +37,7 @@ import Foundation
             try coder.serialize(minimum_height)
             try coder.serialize(preferred_height)
             try coder.serialize(aspect_ratio_flag)
+
         }
     }
 }

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_FamilyReturn: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_FamilyReturn: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var memberSelect: DirectoryAbstractService_FamilyReturn_memberSelect_Enum
     @usableFromInline var familySelect: [ASN1ObjectIdentifier]?
     @inlinable init(memberSelect: DirectoryAbstractService_FamilyReturn_memberSelect_Enum, familySelect: [ASN1ObjectIdentifier]?) {
         self.memberSelect = memberSelect
         self.familySelect = familySelect
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let memberSelect: DirectoryAbstractService_FamilyReturn_memberSelect_Enum = try DirectoryAbstractService_FamilyReturn_memberSelect_Enum(derEncoded: &nodes)
             let familySelect: [ASN1ObjectIdentifier]? = try DER.sequence(of: ASN1ObjectIdentifier.self, identifier: .sequence, nodes: &nodes)
+
             return DirectoryAbstractService_FamilyReturn(memberSelect: memberSelect, familySelect: familySelect)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(memberSelect)
-            if let familySelect = self.familySelect { if let familySelect = self.familySelect { try coder.serializeSequenceOf(familySelect) } }
+            if let familySelect = self.familySelect { try coder.serializeSequenceOf(familySelect) }
+
         }
     }
 }

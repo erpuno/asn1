@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct AuthenticationFramework_ForwardCertificationPath: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct AuthenticationFramework_ForwardCertificationPath: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var value: [AuthenticationFramework_CrossCertificates]
     @inlinable public init(_ value: [AuthenticationFramework_CrossCertificates]) { self.value = value }

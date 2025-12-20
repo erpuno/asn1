@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Character_Presentation_Attributes_Itemization: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Character_Presentation_Attributes_Itemization: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var identifier_alignment: Character_Presentation_Attributes_Itemization_identifier_alignment_IntEnum
     @usableFromInline var identifier_start_offset: ArraySlice<UInt8>?
@@ -11,6 +11,7 @@ import Foundation
         self.identifier_alignment = identifier_alignment
         self.identifier_start_offset = identifier_start_offset
         self.identifier_end_offset = identifier_end_offset
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let identifier_alignment = try Character_Presentation_Attributes_Itemization_identifier_alignment_IntEnum(rawValue: Int(derEncoded: &nodes))
             let identifier_start_offset: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let identifier_end_offset: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return Character_Presentation_Attributes_Itemization(identifier_alignment: identifier_alignment, identifier_start_offset: identifier_start_offset, identifier_end_offset: identifier_end_offset)
         }
     }
@@ -25,8 +27,9 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(identifier_alignment.rawValue, explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific)
-            if let identifier_start_offset = self.identifier_start_offset { if let identifier_start_offset = self.identifier_start_offset { try coder.serializeOptionalImplicitlyTagged(identifier_start_offset, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let identifier_end_offset = self.identifier_end_offset { if let identifier_end_offset = self.identifier_end_offset { try coder.serializeOptionalImplicitlyTagged(identifier_end_offset, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let identifier_start_offset = self.identifier_start_offset { try coder.serializeOptionalImplicitlyTagged(identifier_start_offset, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let identifier_end_offset = self.identifier_end_offset { try coder.serializeOptionalImplicitlyTagged(identifier_end_offset, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

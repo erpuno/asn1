@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2009_DigestedData: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2009_DigestedData: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: CryptographicMessageSyntax_2009_CMSVersion
     @usableFromInline var digestAlgorithm: CryptographicMessageSyntax_2009_DigestAlgorithmIdentifier

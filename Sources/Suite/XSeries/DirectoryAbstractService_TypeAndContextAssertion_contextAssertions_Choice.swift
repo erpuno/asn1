@@ -2,23 +2,24 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum DirectoryAbstractService_TypeAndContextAssertion_contextAssertions_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum DirectoryAbstractService_TypeAndContextAssertion_contextAssertions_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case preference([InformationFramework_ContextAssertion])
     case all([InformationFramework_ContextAssertion])
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .application):
-                self = .preference(try DER.sequence(of: InformationFramework_ContextAssertion.self, identifier: rootNode.identifier, rootNode: rootNode))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .application):
-                self = .all(try DER.set(of: InformationFramework_ContextAssertion.self, identifier: rootNode.identifier, rootNode: rootNode))
+        case ASN1Identifier.sequence:
+            self = .preference(try DER.sequence(of: InformationFramework_ContextAssertion.self, identifier: .sequence, rootNode: rootNode))
+        case ASN1Identifier.set:
+            self = .all(try DER.set(of: InformationFramework_ContextAssertion.self, identifier: .set, rootNode: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .preference(let preference): try coder.serializeSequenceOf(preference, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .application))
-            case .all(let all): try coder.serializeSetOf(all, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .application))
+        case .preference(let preference): try coder.serializeSequenceOf(preference)
+        case .all(let all): try coder.serializeSetOf(all)
+
         }
     }
 

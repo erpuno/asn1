@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Implicit_2009_UserNotice: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Implicit_2009_UserNotice: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var noticeRef: PKIX1Implicit_2009_NoticeReference?
     @usableFromInline var explicitText: PKIX1Implicit_2009_DisplayText?
     @inlinable init(noticeRef: PKIX1Implicit_2009_NoticeReference?, explicitText: PKIX1Implicit_2009_DisplayText?) {
         self.noticeRef = noticeRef
         self.explicitText = explicitText
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -23,14 +24,16 @@ var peek_explicitText = nodes
 if let next = peek_explicitText.next(), next.identifier == PKIX1Implicit_2009_DisplayText.defaultIdentifier {
     explicitText = try PKIX1Implicit_2009_DisplayText(derEncoded: &nodes)
 }
+
             return PKIX1Implicit_2009_UserNotice(noticeRef: noticeRef, explicitText: explicitText)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let noticeRef = self.noticeRef { if let noticeRef = self.noticeRef { try coder.serialize(noticeRef) } }
-            if let explicitText = self.explicitText { if let explicitText = self.explicitText { try coder.serialize(explicitText) } }
+            if let noticeRef = self.noticeRef { try coder.serialize(noticeRef) }
+            if let explicitText = self.explicitText { try coder.serialize(explicitText) }
+
         }
     }
 }

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_7_DigestInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_7_DigestInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var digestAlgorithm: PKCS_7_DigestAlgorithmIdentifier
     @usableFromInline var digest: PKCS_7_Digest
     @inlinable init(digestAlgorithm: PKCS_7_DigestAlgorithmIdentifier, digest: PKCS_7_Digest) {
         self.digestAlgorithm = digestAlgorithm
         self.digest = digest
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let digestAlgorithm: PKCS_7_DigestAlgorithmIdentifier = try PKCS_7_DigestAlgorithmIdentifier(derEncoded: &nodes)
             let digest: PKCS_7_Digest = try PKCS_7_Digest(derEncoded: &nodes)
+
             return PKCS_7_DigestInfo(digestAlgorithm: digestAlgorithm, digest: digest)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(digestAlgorithm)
             try coder.serialize(digest)
+
         }
     }
 }

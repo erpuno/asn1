@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Style_Descriptors_Presentation_Attributes: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Style_Descriptors_Presentation_Attributes: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var content_architecture_class: Style_Descriptors_Presentation_Attributes_content_architecture_class_Choice?
     @usableFromInline var character_attributes: Character_Presentation_Attributes_Character_Attributes?
@@ -15,6 +15,7 @@ import Foundation
         self.raster_graphics_attributes = raster_graphics_attributes
         self.geometric_graphics_attributes = geometric_graphics_attributes
         self.ext_cont_arch_pres_attributes = ext_cont_arch_pres_attributes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -28,17 +29,19 @@ if let next = peek_content_architecture_class.next(), next.identifier == Style_D
             let raster_graphics_attributes: Raster_Gr_Presentation_Attributes_Raster_Graphics_Attributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let geometric_graphics_attributes: Geo_Gr_Presentation_Attributes_Geometric_Graphics_Attributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let ext_cont_arch_pres_attributes: [EXTERNAL]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 6, tagClass: .contextSpecific) { node in try DER.sequence(of: EXTERNAL.self, identifier: node.identifier, rootNode: node) }
+
             return Style_Descriptors_Presentation_Attributes(content_architecture_class: content_architecture_class, character_attributes: character_attributes, raster_graphics_attributes: raster_graphics_attributes, geometric_graphics_attributes: geometric_graphics_attributes, ext_cont_arch_pres_attributes: ext_cont_arch_pres_attributes)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let content_architecture_class = self.content_architecture_class { if let content_architecture_class = self.content_architecture_class { try coder.serialize(content_architecture_class) } }
-            if let character_attributes = self.character_attributes { if let character_attributes = self.character_attributes { try coder.serializeOptionalImplicitlyTagged(character_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let raster_graphics_attributes = self.raster_graphics_attributes { if let raster_graphics_attributes = self.raster_graphics_attributes { try coder.serializeOptionalImplicitlyTagged(raster_graphics_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let geometric_graphics_attributes = self.geometric_graphics_attributes { if let geometric_graphics_attributes = self.geometric_graphics_attributes { try coder.serializeOptionalImplicitlyTagged(geometric_graphics_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let ext_cont_arch_pres_attributes = self.ext_cont_arch_pres_attributes { if let ext_cont_arch_pres_attributes = self.ext_cont_arch_pres_attributes { try coder.serializeSequenceOf(ext_cont_arch_pres_attributes, identifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
+            if let content_architecture_class = self.content_architecture_class { try coder.serialize(content_architecture_class) }
+            if let character_attributes = self.character_attributes { try coder.serializeOptionalImplicitlyTagged(character_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let raster_graphics_attributes = self.raster_graphics_attributes { try coder.serializeOptionalImplicitlyTagged(raster_graphics_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let geometric_graphics_attributes = self.geometric_graphics_attributes { try coder.serializeOptionalImplicitlyTagged(geometric_graphics_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let ext_cont_arch_pres_attributes = self.ext_cont_arch_pres_attributes { try coder.serializeSequenceOf(ext_cont_arch_pres_attributes, identifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+
         }
     }
 }

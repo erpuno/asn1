@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct Temporal_Relationships_Time_Delay : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct Temporal_Relationships_Time_Delay : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: Temporal_Relationships_Time_Delay, rhs: Temporal_Relationships_Time_Delay) -> Bool { lhs.rawValue < rhs.rawValue }

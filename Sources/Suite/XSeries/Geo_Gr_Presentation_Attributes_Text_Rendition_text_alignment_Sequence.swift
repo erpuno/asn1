@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Text_Rendition_text_alignment_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Text_Rendition_text_alignment_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var horizontal_alignment: Geo_Gr_Presentation_Attributes_Text_Rendition_text_alignment_Sequence_horizontal_alignment_Enum
     @usableFromInline var vertical_alignment: Geo_Gr_Presentation_Attributes_Text_Rendition_text_alignment_Sequence_vertical_alignment_Enum
@@ -13,6 +13,7 @@ import Foundation
         self.vertical_alignment = vertical_alignment
         self.continuous_horizontal_alignment = continuous_horizontal_alignment
         self.continuous_vertical_alignment = continuous_vertical_alignment
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let vertical_alignment: Geo_Gr_Presentation_Attributes_Text_Rendition_text_alignment_Sequence_vertical_alignment_Enum = try Geo_Gr_Presentation_Attributes_Text_Rendition_text_alignment_Sequence_vertical_alignment_Enum(derEncoded: &nodes)
             let continuous_horizontal_alignment: ASN1Any? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in ASN1Any(derEncoded: node) }
             let continuous_vertical_alignment: ASN1Any? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in ASN1Any(derEncoded: node) }
+
             return Geo_Gr_Presentation_Attributes_Text_Rendition_text_alignment_Sequence(horizontal_alignment: horizontal_alignment, vertical_alignment: vertical_alignment, continuous_horizontal_alignment: continuous_horizontal_alignment, continuous_vertical_alignment: continuous_vertical_alignment)
         }
     }
@@ -29,8 +31,9 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(horizontal_alignment)
             try coder.serialize(vertical_alignment)
-            if let continuous_horizontal_alignment = self.continuous_horizontal_alignment { if let continuous_horizontal_alignment = self.continuous_horizontal_alignment { try coder.serialize(continuous_horizontal_alignment) } }
-            if let continuous_vertical_alignment = self.continuous_vertical_alignment { if let continuous_vertical_alignment = self.continuous_vertical_alignment { try coder.serialize(continuous_vertical_alignment) } }
+            if let continuous_horizontal_alignment = self.continuous_horizontal_alignment { try coder.serialize(continuous_horizontal_alignment) }
+            if let continuous_vertical_alignment = self.continuous_vertical_alignment { try coder.serialize(continuous_vertical_alignment) }
+
         }
     }
 }

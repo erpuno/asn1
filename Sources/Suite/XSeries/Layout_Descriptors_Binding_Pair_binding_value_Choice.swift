@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Layout_Descriptors_Binding_Pair_binding_value_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Layout_Descriptors_Binding_Pair_binding_value_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case a(Identifiers_and_Expressions_Object_Id_Expression)
     case b(Identifiers_and_Expressions_Numeric_Expression)
@@ -12,32 +12,33 @@ import Foundation
     case f(ASN1OctetString)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .a(try Identifiers_and_Expressions_Object_Id_Expression(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .b(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .c(try Identifiers_and_Expressions_String_Expression(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                self = .d(try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
-                self = .e(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
-                self = .f(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .a(try Identifiers_and_Expressions_Object_Id_Expression(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .b(try Identifiers_and_Expressions_Numeric_Expression(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .c(try Identifiers_and_Expressions_String_Expression(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
+            self = .d(try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
+            self = .e(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
+            self = .f(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .a(let a): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try a.serialize(into: &coder) }
-            case .b(let b): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) { coder in try b.serialize(into: &coder) }
-            case .c(let c): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) { coder in try c.serialize(into: &coder) }
-            case .d(let d): try d.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
-            case .e(let e): try e.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
-            case .f(let f): try f.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
+        case .a(let a): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try a.serialize(into: &coder) }
+        case .b(let b): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) { coder in try b.serialize(into: &coder) }
+        case .c(let c): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) { coder in try c.serialize(into: &coder) }
+        case .d(let d): try d.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
+        case .e(let e): try e.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
+        case .f(let f): try f.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
+
         }
     }
 

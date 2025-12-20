@@ -2,27 +2,28 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Location_Expressions_Object_Class_Locator: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Location_Expressions_Object_Class_Locator: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case objectClass(Identifiers_and_Expressions_Object_or_Class_Identifier)
     case object_class_of(Location_Expressions_Object_Class_of_argument)
     case object_class_with(Location_Expressions_Object_Class_with_argument)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .objectClass(try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .object_class_of(try Location_Expressions_Object_Class_of_argument(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .object_class_with(try Location_Expressions_Object_Class_with_argument(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .objectClass(try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .object_class_of(try Location_Expressions_Object_Class_of_argument(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+            self = .object_class_with(try Location_Expressions_Object_Class_with_argument(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .objectClass(let objectClass): try objectClass.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .object_class_of(let object_class_of): try object_class_of.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            case .object_class_with(let object_class_with): try object_class_with.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+        case .objectClass(let objectClass): try objectClass.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+        case .object_class_of(let object_class_of): try object_class_of.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+        case .object_class_with(let object_class_with): try object_class_with.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
         }
     }
 

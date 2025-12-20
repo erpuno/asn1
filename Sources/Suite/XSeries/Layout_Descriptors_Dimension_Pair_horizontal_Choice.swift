@@ -2,23 +2,24 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Layout_Descriptors_Dimension_Pair_horizontal_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Layout_Descriptors_Dimension_Pair_horizontal_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case fixed(ArraySlice<UInt8>)
     case not_present(ASN1Null)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .fixed(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                self = .not_present(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .fixed(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
+            self = .not_present(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .fixed(let fixed): try fixed.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .not_present(let not_present): try not_present.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
+        case .fixed(let fixed): try fixed.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+        case .not_present(let not_present): try not_present.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
+
         }
     }
 

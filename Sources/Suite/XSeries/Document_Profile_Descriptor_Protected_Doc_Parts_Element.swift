@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Protected_Doc_Parts_Element: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Protected_Doc_Parts_Element: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var protected_doc_part_id: Identifiers_and_Expressions_Protected_Part_Identifier
     @usableFromInline var priv_recipients_info: [Document_Profile_Descriptor_Priv_Recipients_Info]
     @inlinable init(protected_doc_part_id: Identifiers_and_Expressions_Protected_Part_Identifier, priv_recipients_info: [Document_Profile_Descriptor_Priv_Recipients_Info]) {
         self.protected_doc_part_id = protected_doc_part_id
         self.priv_recipients_info = priv_recipients_info
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let protected_doc_part_id: Identifiers_and_Expressions_Protected_Part_Identifier = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let priv_recipients_info: [Document_Profile_Descriptor_Priv_Recipients_Info] = try DER.set(of: Document_Profile_Descriptor_Priv_Recipients_Info.self, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific), nodes: &nodes)
+
             return Document_Profile_Descriptor_Protected_Doc_Parts_Element(protected_doc_part_id: protected_doc_part_id, priv_recipients_info: priv_recipients_info)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(protected_doc_part_id, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeSetOf(priv_recipients_info, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
         }
     }
 }

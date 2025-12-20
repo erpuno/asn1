@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Implicit88_AccessDescription: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Implicit88_AccessDescription: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var accessMethod: ASN1ObjectIdentifier
     @usableFromInline var accessLocation: PKIX1Implicit88_GeneralName
     @inlinable init(accessMethod: ASN1ObjectIdentifier, accessLocation: PKIX1Implicit88_GeneralName) {
         self.accessMethod = accessMethod
         self.accessLocation = accessLocation
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let accessMethod: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let accessLocation: PKIX1Implicit88_GeneralName = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
+
             return PKIX1Implicit88_AccessDescription(accessMethod: accessMethod, accessLocation: accessLocation)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(accessMethod)
             try coder.serialize(accessLocation)
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Geometric_Graphics_Attributes: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Geometric_Graphics_Attributes: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var line_rendition: Geo_Gr_Presentation_Attributes_Line_Rendition?
     @usableFromInline var marker_rendition: Geo_Gr_Presentation_Attributes_Marker_Rendition?
@@ -27,6 +27,7 @@ import Foundation
         self.region_of_interest_specification = region_of_interest_specification
         self.picture_orientation = picture_orientation
         self.picture_dimensions = picture_dimensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -42,23 +43,25 @@ import Foundation
             let region_of_interest_specification: Geo_Gr_Presentation_Attributes_Region_Of_Interest_Specification? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
             let picture_orientation: Geo_Gr_Presentation_Attributes_Picture_Orientation? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
             let picture_dimensions: Geo_Gr_Presentation_Attributes_Picture_Dimensions? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific))
+
             return Geo_Gr_Presentation_Attributes_Geometric_Graphics_Attributes(line_rendition: line_rendition, marker_rendition: marker_rendition, text_rendition: text_rendition, filled_area_rendition: filled_area_rendition, edge_rendition: edge_rendition, colour_representations: colour_representations, transparency_specification: transparency_specification, transformation_specification: transformation_specification, region_of_interest_specification: region_of_interest_specification, picture_orientation: picture_orientation, picture_dimensions: picture_dimensions)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let line_rendition = self.line_rendition { if let line_rendition = self.line_rendition { try coder.serializeOptionalImplicitlyTagged(line_rendition, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let marker_rendition = self.marker_rendition { if let marker_rendition = self.marker_rendition { try coder.serializeOptionalImplicitlyTagged(marker_rendition, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let text_rendition = self.text_rendition { if let text_rendition = self.text_rendition { try coder.serializeOptionalImplicitlyTagged(text_rendition, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let filled_area_rendition = self.filled_area_rendition { if let filled_area_rendition = self.filled_area_rendition { try coder.serializeOptionalImplicitlyTagged(filled_area_rendition, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let edge_rendition = self.edge_rendition { if let edge_rendition = self.edge_rendition { try coder.serializeOptionalImplicitlyTagged(edge_rendition, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let colour_representations = self.colour_representations { if let colour_representations = self.colour_representations { try coder.serializeOptionalImplicitlyTagged(colour_representations, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let transparency_specification = self.transparency_specification { if let transparency_specification = self.transparency_specification { try coder.serializeOptionalImplicitlyTagged(transparency_specification, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) } }
-            if let transformation_specification = self.transformation_specification { if let transformation_specification = self.transformation_specification { try coder.serializeOptionalImplicitlyTagged(transformation_specification, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) } }
-            if let region_of_interest_specification = self.region_of_interest_specification { if let region_of_interest_specification = self.region_of_interest_specification { try coder.serializeOptionalImplicitlyTagged(region_of_interest_specification, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) } }
-            if let picture_orientation = self.picture_orientation { if let picture_orientation = self.picture_orientation { try coder.serializeOptionalImplicitlyTagged(picture_orientation, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) } }
-            if let picture_dimensions = self.picture_dimensions { if let picture_dimensions = self.picture_dimensions { try coder.serializeOptionalImplicitlyTagged(picture_dimensions, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) } }
+            if let line_rendition = self.line_rendition { try coder.serializeOptionalImplicitlyTagged(line_rendition, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let marker_rendition = self.marker_rendition { try coder.serializeOptionalImplicitlyTagged(marker_rendition, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let text_rendition = self.text_rendition { try coder.serializeOptionalImplicitlyTagged(text_rendition, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let filled_area_rendition = self.filled_area_rendition { try coder.serializeOptionalImplicitlyTagged(filled_area_rendition, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let edge_rendition = self.edge_rendition { try coder.serializeOptionalImplicitlyTagged(edge_rendition, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let colour_representations = self.colour_representations { try coder.serializeOptionalImplicitlyTagged(colour_representations, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+            if let transparency_specification = self.transparency_specification { try coder.serializeOptionalImplicitlyTagged(transparency_specification, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) }
+            if let transformation_specification = self.transformation_specification { try coder.serializeOptionalImplicitlyTagged(transformation_specification, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) }
+            if let region_of_interest_specification = self.region_of_interest_specification { try coder.serializeOptionalImplicitlyTagged(region_of_interest_specification, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) }
+            if let picture_orientation = self.picture_orientation { try coder.serializeOptionalImplicitlyTagged(picture_orientation, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) }
+            if let picture_dimensions = self.picture_dimensions { try coder.serializeOptionalImplicitlyTagged(picture_dimensions, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) }
+
         }
     }
 }

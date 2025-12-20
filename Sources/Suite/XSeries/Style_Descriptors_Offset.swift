@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Style_Descriptors_Offset: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Style_Descriptors_Offset: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var leading: ArraySlice<UInt8>?
     @usableFromInline var trailing: ArraySlice<UInt8>?
@@ -13,6 +13,7 @@ import Foundation
         self.trailing = trailing
         self.left_hand = left_hand
         self.right_hand = right_hand
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let trailing: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let left_hand: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let right_hand: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+
             return Style_Descriptors_Offset(leading: leading, trailing: trailing, left_hand: left_hand, right_hand: right_hand)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let leading = self.leading { if let leading = self.leading { try coder.serializeOptionalImplicitlyTagged(leading, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let trailing = self.trailing { if let trailing = self.trailing { try coder.serializeOptionalImplicitlyTagged(trailing, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let left_hand = self.left_hand { if let left_hand = self.left_hand { try coder.serializeOptionalImplicitlyTagged(left_hand, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let right_hand = self.right_hand { if let right_hand = self.right_hand { try coder.serializeOptionalImplicitlyTagged(right_hand, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let leading = self.leading { try coder.serializeOptionalImplicitlyTagged(leading, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let trailing = self.trailing { try coder.serializeOptionalImplicitlyTagged(trailing, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let left_hand = self.left_hand { try coder.serializeOptionalImplicitlyTagged(left_hand, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let right_hand = self.right_hand { try coder.serializeOptionalImplicitlyTagged(right_hand, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Character_Profile_Attributes_Character_Presentation_Feature: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Character_Profile_Attributes_Character_Presentation_Feature: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case character_path(Character_Presentation_Attributes_One_Of_Four_Angles)
     case line_progression(Character_Presentation_Attributes_One_Of_Two_Angles)
@@ -28,77 +28,78 @@ import Foundation
     case code_extension_announcers(ASN1OctetString)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .character_path(try Character_Presentation_Attributes_One_Of_Four_Angles(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .line_progression(try Character_Presentation_Attributes_One_Of_Two_Angles(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .character_orientation(try Character_Presentation_Attributes_One_Of_Four_Angles(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .initial_offset(try Character_Presentation_Attributes_Measure_Pair(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
-                self = .character_spacing(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
-                self = .line_spacing(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific):
-                self = .alignment(try Character_Presentation_Attributes_Alignment(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific):
-                self = .line_layout_table(try Character_Presentation_Attributes_Layout_Table(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific):
-                self = .graphic_rendition(try Character_Presentation_Attributes_Graphic_Rendition(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific):
-                self = .formatting_indicator(try Character_Presentation_Attributes_Formatting_Indicator(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific):
-                self = .character_fonts(try Character_Presentation_Attributes_Character_Fonts(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific):
-                self = .graphic_char_subrepertoire(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific):
-                self = .itemization(try Character_Presentation_Attributes_Itemization(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific):
-                self = .widow_size(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 16, tagClass: .contextSpecific):
-                self = .orphan_size(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific):
-                self = .graphic_character_sets(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 19, tagClass: .contextSpecific):
-                self = .indentation(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 20, tagClass: .contextSpecific):
-                self = .kerning_offset(try Character_Presentation_Attributes_Kerning_Offset(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 21, tagClass: .contextSpecific):
-                self = .proportional_line_spacing(try Character_Presentation_Attributes_Proportional_Line_Spacing(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 22, tagClass: .contextSpecific):
-                self = .pairwise_kerning(try Character_Presentation_Attributes_Pairwise_Kerning(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 23, tagClass: .contextSpecific):
-                self = .first_line_offset(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific):
-                self = .code_extension_announcers(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .character_path(try Character_Presentation_Attributes_One_Of_Four_Angles(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .line_progression(try Character_Presentation_Attributes_One_Of_Two_Angles(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+            self = .character_orientation(try Character_Presentation_Attributes_One_Of_Four_Angles(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
+            self = .initial_offset(try Character_Presentation_Attributes_Measure_Pair(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
+            self = .character_spacing(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
+            self = .line_spacing(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific):
+            self = .alignment(try Character_Presentation_Attributes_Alignment(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific):
+            self = .line_layout_table(try Character_Presentation_Attributes_Layout_Table(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific):
+            self = .graphic_rendition(try Character_Presentation_Attributes_Graphic_Rendition(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific):
+            self = .formatting_indicator(try Character_Presentation_Attributes_Formatting_Indicator(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific):
+            self = .character_fonts(try Character_Presentation_Attributes_Character_Fonts(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific):
+            self = .graphic_char_subrepertoire(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific):
+            self = .itemization(try Character_Presentation_Attributes_Itemization(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific):
+            self = .widow_size(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 16, tagClass: .contextSpecific):
+            self = .orphan_size(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific):
+            self = .graphic_character_sets(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 19, tagClass: .contextSpecific):
+            self = .indentation(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 20, tagClass: .contextSpecific):
+            self = .kerning_offset(try Character_Presentation_Attributes_Kerning_Offset(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 21, tagClass: .contextSpecific):
+            self = .proportional_line_spacing(try Character_Presentation_Attributes_Proportional_Line_Spacing(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 22, tagClass: .contextSpecific):
+            self = .pairwise_kerning(try Character_Presentation_Attributes_Pairwise_Kerning(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 23, tagClass: .contextSpecific):
+            self = .first_line_offset(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific):
+            self = .code_extension_announcers(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .character_path(let character_path): try character_path.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .line_progression(let line_progression): try line_progression.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            case .character_orientation(let character_orientation): try character_orientation.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
-            case .initial_offset(let initial_offset): try initial_offset.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
-            case .character_spacing(let character_spacing): try character_spacing.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
-            case .line_spacing(let line_spacing): try line_spacing.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific))
-            case .alignment(let alignment): try alignment.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific))
-            case .line_layout_table(let line_layout_table): try line_layout_table.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
-            case .graphic_rendition(let graphic_rendition): try graphic_rendition.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
-            case .formatting_indicator(let formatting_indicator): try formatting_indicator.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific))
-            case .character_fonts(let character_fonts): try character_fonts.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific))
-            case .graphic_char_subrepertoire(let graphic_char_subrepertoire): try graphic_char_subrepertoire.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific))
-            case .itemization(let itemization): try itemization.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific))
-            case .widow_size(let widow_size): try widow_size.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific))
-            case .orphan_size(let orphan_size): try orphan_size.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 16, tagClass: .contextSpecific))
-            case .graphic_character_sets(let graphic_character_sets): try graphic_character_sets.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific))
-            case .indentation(let indentation): try indentation.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 19, tagClass: .contextSpecific))
-            case .kerning_offset(let kerning_offset): try kerning_offset.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 20, tagClass: .contextSpecific))
-            case .proportional_line_spacing(let proportional_line_spacing): try proportional_line_spacing.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 21, tagClass: .contextSpecific))
-            case .pairwise_kerning(let pairwise_kerning): try pairwise_kerning.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 22, tagClass: .contextSpecific))
-            case .first_line_offset(let first_line_offset): try first_line_offset.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 23, tagClass: .contextSpecific))
-            case .code_extension_announcers(let code_extension_announcers): try code_extension_announcers.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific))
+        case .character_path(let character_path): try character_path.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+        case .line_progression(let line_progression): try line_progression.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+        case .character_orientation(let character_orientation): try character_orientation.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+        case .initial_offset(let initial_offset): try initial_offset.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+        case .character_spacing(let character_spacing): try character_spacing.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
+        case .line_spacing(let line_spacing): try line_spacing.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific))
+        case .alignment(let alignment): try alignment.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific))
+        case .line_layout_table(let line_layout_table): try line_layout_table.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
+        case .graphic_rendition(let graphic_rendition): try graphic_rendition.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
+        case .formatting_indicator(let formatting_indicator): try formatting_indicator.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific))
+        case .character_fonts(let character_fonts): try character_fonts.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific))
+        case .graphic_char_subrepertoire(let graphic_char_subrepertoire): try graphic_char_subrepertoire.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific))
+        case .itemization(let itemization): try itemization.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific))
+        case .widow_size(let widow_size): try widow_size.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific))
+        case .orphan_size(let orphan_size): try orphan_size.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 16, tagClass: .contextSpecific))
+        case .graphic_character_sets(let graphic_character_sets): try graphic_character_sets.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific))
+        case .indentation(let indentation): try indentation.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 19, tagClass: .contextSpecific))
+        case .kerning_offset(let kerning_offset): try kerning_offset.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 20, tagClass: .contextSpecific))
+        case .proportional_line_spacing(let proportional_line_spacing): try proportional_line_spacing.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 21, tagClass: .contextSpecific))
+        case .pairwise_kerning(let pairwise_kerning): try pairwise_kerning.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 22, tagClass: .contextSpecific))
+        case .first_line_offset(let first_line_offset): try first_line_offset.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 23, tagClass: .contextSpecific))
+        case .code_extension_announcers(let code_extension_announcers): try code_extension_announcers.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific))
+
         }
     }
 

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_RGB_Calibration: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_RGB_Calibration: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var reference_white: Colour_Attributes_CIE_Ref
     @usableFromInline var matrix1: Colour_Attributes_Three_by_Three_Matrix?
@@ -13,6 +13,7 @@ import Foundation
         self.matrix1 = matrix1
         self.lookup_table = lookup_table
         self.matrix2 = matrix2
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let matrix1: Colour_Attributes_Three_by_Three_Matrix? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let lookup_table: Colour_Attributes_Colour_Lookup_Table? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             let matrix2: Colour_Attributes_Three_by_Three_Matrix? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return Colour_Attributes_RGB_Calibration(reference_white: reference_white, matrix1: matrix1, lookup_table: lookup_table, matrix2: matrix2)
         }
     }
@@ -28,9 +30,10 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(reference_white, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            if let matrix1 = self.matrix1 { if let matrix1 = self.matrix1 { try coder.serializeOptionalImplicitlyTagged(matrix1, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let lookup_table = self.lookup_table { if let lookup_table = self.lookup_table { try coder.serializeOptionalImplicitlyTagged(lookup_table, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let matrix2 = self.matrix2 { if let matrix2 = self.matrix2 { try coder.serializeOptionalImplicitlyTagged(matrix2, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let matrix1 = self.matrix1 { try coder.serializeOptionalImplicitlyTagged(matrix1, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let lookup_table = self.lookup_table { try coder.serializeOptionalImplicitlyTagged(lookup_table, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let matrix2 = self.matrix2 { try coder.serializeOptionalImplicitlyTagged(matrix2, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

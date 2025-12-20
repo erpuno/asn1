@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_bundle_specifications_Sequence_edge_bundle_representation_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_bundle_specifications_Sequence_edge_bundle_representation_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var edge_type: ArraySlice<UInt8>
     @usableFromInline var edge_width: Geo_Gr_Presentation_Attributes_Scaled_or_Absolute
@@ -11,6 +11,7 @@ import Foundation
         self.edge_type = edge_type
         self.edge_width = edge_width
         self.edge_colour = edge_colour
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let edge_type: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let edge_width: Geo_Gr_Presentation_Attributes_Scaled_or_Absolute = try Geo_Gr_Presentation_Attributes_Scaled_or_Absolute(derEncoded: &nodes)
             let edge_colour: Geo_Gr_Presentation_Attributes_Colour = try Geo_Gr_Presentation_Attributes_Colour(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_bundle_specifications_Sequence_edge_bundle_representation_Sequence(edge_type: edge_type, edge_width: edge_width, edge_colour: edge_colour)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(edge_type)
             try coder.serialize(edge_width)
             try coder.serialize(edge_colour)
+
         }
     }
 }

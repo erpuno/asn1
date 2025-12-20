@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_CertificateList: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_CertificateList: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var tbsCertList: KEP_TBSCertList
     @usableFromInline var signatureAlgorithm: DSTU_AlgorithmIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.tbsCertList = tbsCertList
         self.signatureAlgorithm = signatureAlgorithm
         self.signature = signature
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let tbsCertList: KEP_TBSCertList = try KEP_TBSCertList(derEncoded: &nodes)
             let signatureAlgorithm: DSTU_AlgorithmIdentifier = try DSTU_AlgorithmIdentifier(derEncoded: &nodes)
             let signature: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
+
             return KEP_CertificateList(tbsCertList: tbsCertList, signatureAlgorithm: signatureAlgorithm, signature: signature)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(tbsCertList)
             try coder.serialize(signatureAlgorithm)
             try coder.serialize(signature)
+
         }
     }
 }

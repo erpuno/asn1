@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXAttributeCertificate_2009_Clearance_rfc3281: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXAttributeCertificate_2009_Clearance_rfc3281: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var policyId: ASN1ObjectIdentifier
     @usableFromInline var classList: PKIXAttributeCertificate_2009_ClassList?
@@ -11,6 +11,7 @@ import Foundation
         self.policyId = policyId
         self.classList = classList
         self.securityCategories = securityCategories
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let policyId: ASN1ObjectIdentifier = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let classList: PKIXAttributeCertificate_2009_ClassList = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
             let securityCategories: [PKIXAttributeCertificate_2009_SecurityCategory_rfc3281]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.set(of: PKIXAttributeCertificate_2009_SecurityCategory_rfc3281.self, identifier: node.identifier, rootNode: node) }
+
             return PKIXAttributeCertificate_2009_Clearance_rfc3281(policyId: policyId, classList: classList, securityCategories: securityCategories)
         }
     }
@@ -25,8 +27,9 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(policyId, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            if let classList = self.classList { if let classList = self.classList { try coder.serializeOptionalImplicitlyTagged(classList, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let securityCategories = self.securityCategories { if let securityCategories = self.securityCategories { try coder.serializeSetOf(securityCategories, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let classList = self.classList { try coder.serializeOptionalImplicitlyTagged(classList, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let securityCategories = self.securityCategories { try coder.serializeSetOf(securityCategories, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

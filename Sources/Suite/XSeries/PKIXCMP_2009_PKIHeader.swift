@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_PKIHeader: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_PKIHeader: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var pvno: PKIXCMP_2009_PKIHeader_pvno_IntEnum
     @usableFromInline var sender: PKIX1Implicit88_GeneralName
@@ -29,6 +29,7 @@ import Foundation
         self.recipNonce = recipNonce
         self.freeText = freeText
         self.generalInfo = generalInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -45,24 +46,26 @@ import Foundation
             let recipNonce: ASN1OctetString? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 6, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
             let freeText: PKIXCMP_2009_PKIFreeText? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 7, tagClass: .contextSpecific) { node in return try PKIXCMP_2009_PKIFreeText(derEncoded: node) }
             let generalInfo: [PKIXCMP_2009_InfoTypeAndValue]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 8, tagClass: .contextSpecific) { node in try DER.sequence(of: PKIXCMP_2009_InfoTypeAndValue.self, identifier: .sequence, rootNode: node) }
+
             return PKIXCMP_2009_PKIHeader(pvno: pvno, sender: sender, recipient: recipient, messageTime: messageTime, protectionAlg: protectionAlg, senderKID: senderKID, recipKID: recipKID, transactionID: transactionID, senderNonce: senderNonce, recipNonce: recipNonce, freeText: freeText, generalInfo: generalInfo)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(pvno.rawValue)
+            try pvno.serialize(into: &coder, withIdentifier: identifier)
             try coder.serialize(sender)
             try coder.serialize(recipient)
-            if let messageTime = self.messageTime { if let messageTime = self.messageTime { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(messageTime) } } }
-            if let protectionAlg = self.protectionAlg { if let protectionAlg = self.protectionAlg { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(protectionAlg) } } }
-            if let senderKID = self.senderKID { if let senderKID = self.senderKID { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(senderKID) } } }
-            if let recipKID = self.recipKID { if let recipKID = self.recipKID { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(recipKID) } } }
-            if let transactionID = self.transactionID { if let transactionID = self.transactionID { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(transactionID) } } }
-            if let senderNonce = self.senderNonce { if let senderNonce = self.senderNonce { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serialize(senderNonce) } } }
-            if let recipNonce = self.recipNonce { if let recipNonce = self.recipNonce { try coder.serialize(explicitlyTaggedWithTagNumber: 6, tagClass: .contextSpecific) { codec in try codec.serialize(recipNonce) } } }
-            if let freeText = self.freeText { if let freeText = self.freeText { try coder.serialize(explicitlyTaggedWithTagNumber: 7, tagClass: .contextSpecific) { codec in try codec.serialize(freeText) } } }
-            if let generalInfo = self.generalInfo { if let generalInfo = self.generalInfo { try coder.serialize(explicitlyTaggedWithTagNumber: 8, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(generalInfo) } } }
+            if let messageTime = self.messageTime { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(messageTime) } }
+            if let protectionAlg = self.protectionAlg { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(protectionAlg) } }
+            if let senderKID = self.senderKID { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(senderKID) } }
+            if let recipKID = self.recipKID { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(recipKID) } }
+            if let transactionID = self.transactionID { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(transactionID) } }
+            if let senderNonce = self.senderNonce { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serialize(senderNonce) } }
+            if let recipNonce = self.recipNonce { try coder.serialize(explicitlyTaggedWithTagNumber: 6, tagClass: .contextSpecific) { codec in try codec.serialize(recipNonce) } }
+            if let freeText = self.freeText { try coder.serialize(explicitlyTaggedWithTagNumber: 7, tagClass: .contextSpecific) { codec in try codec.serialize(freeText) } }
+            if let generalInfo = self.generalInfo { try coder.serialize(explicitlyTaggedWithTagNumber: 8, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(generalInfo) } }
+
         }
     }
 }

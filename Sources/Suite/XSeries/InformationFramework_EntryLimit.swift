@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_EntryLimit: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_EntryLimit: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var `default`: ArraySlice<UInt8>
     @usableFromInline var max: ArraySlice<UInt8>
     @inlinable init(`default`: ArraySlice<UInt8>, max: ArraySlice<UInt8>) {
         self.`default` = `default`
         self.max = max
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let `default`: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let max: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return InformationFramework_EntryLimit(`default`: `default`, max: max)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(`default`)
             try coder.serialize(max)
+
         }
     }
 }

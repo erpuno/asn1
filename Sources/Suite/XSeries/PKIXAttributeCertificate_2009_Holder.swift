@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXAttributeCertificate_2009_Holder: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXAttributeCertificate_2009_Holder: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var baseCertificateID: AuthenticationFramework_IssuerSerial?
     @usableFromInline var entityName: PKIX1Implicit_2009_GeneralNames?
@@ -11,6 +11,7 @@ import Foundation
         self.baseCertificateID = baseCertificateID
         self.entityName = entityName
         self.objectDigestInfo = objectDigestInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let baseCertificateID: AuthenticationFramework_IssuerSerial? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let entityName: PKIX1Implicit_2009_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let objectDigestInfo: PKIXAttributeCertificate_2009_ObjectDigestInfo? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return PKIXAttributeCertificate_2009_Holder(baseCertificateID: baseCertificateID, entityName: entityName, objectDigestInfo: objectDigestInfo)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let baseCertificateID = self.baseCertificateID { if let baseCertificateID = self.baseCertificateID { try coder.serializeOptionalImplicitlyTagged(baseCertificateID, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let entityName = self.entityName { if let entityName = self.entityName { try coder.serializeOptionalImplicitlyTagged(entityName, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let objectDigestInfo = self.objectDigestInfo { if let objectDigestInfo = self.objectDigestInfo { try coder.serializeOptionalImplicitlyTagged(objectDigestInfo, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let baseCertificateID = self.baseCertificateID { try coder.serializeOptionalImplicitlyTagged(baseCertificateID, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let entityName = self.entityName { try coder.serializeOptionalImplicitlyTagged(entityName, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let objectDigestInfo = self.objectDigestInfo { try coder.serializeOptionalImplicitlyTagged(objectDigestInfo, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct LDAP_Message: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct LDAP_Message: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var messageID: LDAP_MessageID
     @usableFromInline var protocolOp: LDAP_Message_protocolOp_Choice
@@ -11,6 +11,7 @@ import Foundation
         self.messageID = messageID
         self.protocolOp = protocolOp
         self.controls = controls
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let messageID: LDAP_MessageID = try LDAP_MessageID(derEncoded: &nodes)
             let protocolOp: LDAP_Message_protocolOp_Choice = try LDAP_Message_protocolOp_Choice(derEncoded: &nodes)
             let controls: LDAP_Controls? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+
             return LDAP_Message(messageID: messageID, protocolOp: protocolOp, controls: controls)
         }
     }
@@ -26,7 +28,8 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(messageID)
             try coder.serialize(protocolOp)
-            if let controls = self.controls { if let controls = self.controls { try coder.serializeOptionalImplicitlyTagged(controls, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let controls = self.controls { try coder.serializeOptionalImplicitlyTagged(controls, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+
         }
     }
 }

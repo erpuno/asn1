@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CertificateExtensions_CRLDistPointsSyntax: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct CertificateExtensions_CRLDistPointsSyntax: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var value: [CertificateExtensions_DistributionPoint]
     @inlinable public init(_ value: [CertificateExtensions_DistributionPoint]) { self.value = value }

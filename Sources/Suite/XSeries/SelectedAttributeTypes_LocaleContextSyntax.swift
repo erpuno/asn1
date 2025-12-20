@@ -2,37 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum SelectedAttributeTypes_LocaleContextSyntax: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum SelectedAttributeTypes_LocaleContextSyntax: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case localeID1(ASN1ObjectIdentifier)
     case localeID2(PKIX1Explicit88_DirectoryString)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1ObjectIdentifier.defaultIdentifier:
-                self = .localeID1(try ASN1ObjectIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case PKIX1Explicit88_DirectoryString.defaultIdentifier:
-                self = .localeID2(try PKIX1Explicit88_DirectoryString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1ObjectIdentifier.defaultIdentifier:
+            self = .localeID1(try ASN1ObjectIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case PKIX1Explicit88_DirectoryString.defaultIdentifier:
+            self = .localeID2(try PKIX1Explicit88_DirectoryString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .localeID1(let localeID1):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(localeID1)
-                                }
-                            } else {
+        case .localeID1(let localeID1):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(localeID1)
                             }
-            case .localeID2(let localeID2):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(localeID2)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(localeID1)
+                        }
+        case .localeID2(let localeID2):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(localeID2)
                             }
+                        } else {
+                            try coder.serialize(localeID2)
+                        }
+
         }
     }
 

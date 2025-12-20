@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct AttributeCertificateVersion1_2009_AttCertVersionV1 : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct AttributeCertificateVersion1_2009_AttCertVersionV1 : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: AttributeCertificateVersion1_2009_AttCertVersionV1, rhs: AttributeCertificateVersion1_2009_AttCertVersionV1) -> Bool { lhs.rawValue < rhs.rawValue }

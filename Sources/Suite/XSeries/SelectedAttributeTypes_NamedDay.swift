@@ -2,37 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum SelectedAttributeTypes_NamedDay: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum SelectedAttributeTypes_NamedDay: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case intNamedDays(SelectedAttributeTypes_NamedDay_intNamedDays_Enum)
     case bitNamedDays(ASN1BitString)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case SelectedAttributeTypes_NamedDay_intNamedDays_Enum.defaultIdentifier:
-                self = .intNamedDays(try SelectedAttributeTypes_NamedDay_intNamedDays_Enum(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1BitString.defaultIdentifier:
-                self = .bitNamedDays(try ASN1BitString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case SelectedAttributeTypes_NamedDay_intNamedDays_Enum.defaultIdentifier:
+            self = .intNamedDays(try SelectedAttributeTypes_NamedDay_intNamedDays_Enum(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1BitString.defaultIdentifier:
+            self = .bitNamedDays(try ASN1BitString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .intNamedDays(let intNamedDays):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(intNamedDays)
-                                }
-                            } else {
+        case .intNamedDays(let intNamedDays):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(intNamedDays)
                             }
-            case .bitNamedDays(let bitNamedDays):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(bitNamedDays)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(intNamedDays)
+                        }
+        case .bitNamedDays(let bitNamedDays):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(bitNamedDays)
                             }
+                        } else {
+                            try coder.serialize(bitNamedDays)
+                        }
+
         }
     }
 

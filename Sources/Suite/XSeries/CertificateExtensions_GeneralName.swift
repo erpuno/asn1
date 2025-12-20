@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum CertificateExtensions_GeneralName: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum CertificateExtensions_GeneralName: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case otherName(CertificateExtensions_GeneralName)
     case rfc822Name(ASN1IA5String)
@@ -14,35 +14,36 @@ import Foundation
     case registeredID(ASN1ObjectIdentifier)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .otherName(try CertificateExtensions_GeneralName(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .rfc822Name(try ASN1IA5String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .dNSName(try ASN1IA5String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                self = .directoryName(try PKIX1Explicit88_Name(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
-                self = .ediPartyName(try CertificateExtensions_EDIPartyName(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
-                self = .uniformResourceIdentifier(try ASN1IA5String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
-                self = .iPAddress(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific):
-                self = .registeredID(try ASN1ObjectIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .otherName(try CertificateExtensions_GeneralName(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .rfc822Name(try ASN1IA5String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+            self = .dNSName(try ASN1IA5String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
+            self = .directoryName(try PKIX1Explicit88_Name(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
+            self = .ediPartyName(try CertificateExtensions_EDIPartyName(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
+            self = .uniformResourceIdentifier(try ASN1IA5String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
+            self = .iPAddress(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific):
+            self = .registeredID(try ASN1ObjectIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .otherName(let otherName): try otherName.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .rfc822Name(let rfc822Name): try rfc822Name.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            case .dNSName(let dNSName): try dNSName.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
-            case .directoryName(let directoryName): try directoryName.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
-            case .ediPartyName(let ediPartyName): try ediPartyName.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
-            case .uniformResourceIdentifier(let uniformResourceIdentifier): try uniformResourceIdentifier.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
-            case .iPAddress(let iPAddress): try iPAddress.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific))
-            case .registeredID(let registeredID): try registeredID.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific))
+        case .otherName(let otherName): try otherName.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+        case .rfc822Name(let rfc822Name): try rfc822Name.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+        case .dNSName(let dNSName): try dNSName.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+        case .directoryName(let directoryName): try directoryName.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
+        case .ediPartyName(let ediPartyName): try ediPartyName.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
+        case .uniformResourceIdentifier(let uniformResourceIdentifier): try uniformResourceIdentifier.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
+        case .iPAddress(let iPAddress): try iPAddress.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific))
+        case .registeredID(let registeredID): try registeredID.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific))
+
         }
     }
 

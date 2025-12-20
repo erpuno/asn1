@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_BasicOCSPResponse: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_BasicOCSPResponse: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var tbsResponseData: KEP_ResponseData
     @usableFromInline var signatureAlgorithm: DSTU_AlgorithmIdentifier
@@ -13,6 +13,7 @@ import Foundation
         self.signatureAlgorithm = signatureAlgorithm
         self.signature = signature
         self.certs = certs
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let signatureAlgorithm: DSTU_AlgorithmIdentifier = try DSTU_AlgorithmIdentifier(derEncoded: &nodes)
             let signature: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
             let certs: [DSTU_Certificate]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in try DER.sequence(of: DSTU_Certificate.self, identifier: .sequence, rootNode: node) }
+
             return KEP_BasicOCSPResponse(tbsResponseData: tbsResponseData, signatureAlgorithm: signatureAlgorithm, signature: signature, certs: certs)
         }
     }
@@ -30,7 +32,8 @@ import Foundation
             try coder.serialize(tbsResponseData)
             try coder.serialize(signatureAlgorithm)
             try coder.serialize(signature)
-            if let certs = self.certs { if let certs = self.certs { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(certs) } } }
+            if let certs = self.certs { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(certs) } }
+
         }
     }
 }

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Implicit_2009_NoticeReference: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Implicit_2009_NoticeReference: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var organization: PKIX1Implicit_2009_DisplayText
     @usableFromInline var noticeNumbers: [ArraySlice<UInt8>]
     @inlinable init(organization: PKIX1Implicit_2009_DisplayText, noticeNumbers: [ArraySlice<UInt8>]) {
         self.organization = organization
         self.noticeNumbers = noticeNumbers
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let organization: PKIX1Implicit_2009_DisplayText = try PKIX1Implicit_2009_DisplayText(derEncoded: &nodes)
             let noticeNumbers: [ArraySlice<UInt8>] = try DER.sequence(of: ArraySlice<UInt8>.self, identifier: .sequence, nodes: &nodes)
+
             return PKIX1Implicit_2009_NoticeReference(organization: organization, noticeNumbers: noticeNumbers)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(organization)
             try coder.serializeSequenceOf(noticeNumbers)
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct AttributeCertificateVersion1_2009_AttributeCertificateV1: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct AttributeCertificateVersion1_2009_AttributeCertificateV1: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var toBeSigned: AttributeCertificateVersion1_2009_AttributeCertificateV1_toBeSigned
     @usableFromInline var algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.toBeSigned = toBeSigned
         self.algorithmIdentifier = algorithmIdentifier
         self.encrypted = encrypted
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let toBeSigned: AttributeCertificateVersion1_2009_AttributeCertificateV1_toBeSigned = try AttributeCertificateVersion1_2009_AttributeCertificateV1_toBeSigned(derEncoded: &nodes)
             let algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let encrypted: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
+
             return AttributeCertificateVersion1_2009_AttributeCertificateV1(toBeSigned: toBeSigned, algorithmIdentifier: algorithmIdentifier, encrypted: encrypted)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(toBeSigned)
             try coder.serialize(algorithmIdentifier)
             try coder.serialize(encrypted)
+
         }
     }
 }

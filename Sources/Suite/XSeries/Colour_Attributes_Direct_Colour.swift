@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_Direct_Colour: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_Direct_Colour: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var colour_space_id: ArraySlice<UInt8>?
     @usableFromInline var colour_specification: Colour_Attributes_Colour_Specification?
@@ -11,6 +11,7 @@ import Foundation
         self.colour_space_id = colour_space_id
         self.colour_specification = colour_specification
         self.colour_tolerance = colour_tolerance
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let colour_space_id: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let colour_specification: Colour_Attributes_Colour_Specification? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try Colour_Attributes_Colour_Specification(derEncoded: node) }
             let colour_tolerance: Colour_Attributes_Colour_Tolerance? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try Colour_Attributes_Colour_Tolerance(derEncoded: node) }
+
             return Colour_Attributes_Direct_Colour(colour_space_id: colour_space_id, colour_specification: colour_specification, colour_tolerance: colour_tolerance)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let colour_space_id = self.colour_space_id { if let colour_space_id = self.colour_space_id { try coder.serializeOptionalImplicitlyTagged(colour_space_id, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let colour_specification = self.colour_specification { if let colour_specification = self.colour_specification { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(colour_specification) } } }
-            if let colour_tolerance = self.colour_tolerance { if let colour_tolerance = self.colour_tolerance { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(colour_tolerance) } } }
+            if let colour_space_id = self.colour_space_id { try coder.serializeOptionalImplicitlyTagged(colour_space_id, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let colour_specification = self.colour_specification { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(colour_specification) } }
+            if let colour_tolerance = self.colour_tolerance { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(colour_tolerance) } }
+
         }
     }
 }

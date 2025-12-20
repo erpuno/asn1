@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Rectangle: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Rectangle: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var first_corner: Geo_Gr_Presentation_Attributes_VDC_Pair
     @usableFromInline var second_corner: Geo_Gr_Presentation_Attributes_VDC_Pair
     @inlinable init(first_corner: Geo_Gr_Presentation_Attributes_VDC_Pair, second_corner: Geo_Gr_Presentation_Attributes_VDC_Pair) {
         self.first_corner = first_corner
         self.second_corner = second_corner
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let first_corner: Geo_Gr_Presentation_Attributes_VDC_Pair = try Geo_Gr_Presentation_Attributes_VDC_Pair(derEncoded: &nodes)
             let second_corner: Geo_Gr_Presentation_Attributes_VDC_Pair = try Geo_Gr_Presentation_Attributes_VDC_Pair(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Rectangle(first_corner: first_corner, second_corner: second_corner)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(first_corner)
             try coder.serialize(second_corner)
+
         }
     }
 }

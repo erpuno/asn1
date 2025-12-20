@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct AuthenticationFramework_Certificates: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct AuthenticationFramework_Certificates: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var userCertificate: AuthenticationFramework_Certificate
     @usableFromInline var certificationPath: AuthenticationFramework_ForwardCertificationPath?
     @inlinable init(userCertificate: AuthenticationFramework_Certificate, certificationPath: AuthenticationFramework_ForwardCertificationPath?) {
         self.userCertificate = userCertificate
         self.certificationPath = certificationPath
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,6 +20,7 @@ var peek_certificationPath = nodes
 if let next = peek_certificationPath.next(), next.identifier == AuthenticationFramework_ForwardCertificationPath.defaultIdentifier {
     certificationPath = try AuthenticationFramework_ForwardCertificationPath(derEncoded: &nodes)
 }
+
             return AuthenticationFramework_Certificates(userCertificate: userCertificate, certificationPath: certificationPath)
         }
     }
@@ -26,7 +28,8 @@ if let next = peek_certificationPath.next(), next.identifier == AuthenticationFr
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(userCertificate)
-            if let certificationPath = self.certificationPath { if let certificationPath = self.certificationPath { try coder.serialize(certificationPath) } }
+            if let certificationPath = self.certificationPath { try coder.serialize(certificationPath) }
+
         }
     }
 }

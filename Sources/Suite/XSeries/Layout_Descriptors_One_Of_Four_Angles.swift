@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct Layout_Descriptors_One_Of_Four_Angles : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct Layout_Descriptors_One_Of_Four_Angles : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: Layout_Descriptors_One_Of_Four_Angles, rhs: Layout_Descriptors_One_Of_Four_Angles) -> Bool { lhs.rawValue < rhs.rawValue }

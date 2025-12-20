@@ -2,10 +2,8 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_SearchRule: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_SearchRule: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var id: ArraySlice<UInt8>
-    @usableFromInline var dmdId: ASN1ObjectIdentifier
     @usableFromInline var serviceType: ASN1ObjectIdentifier?
     @usableFromInline var userClass: ArraySlice<UInt8>?
     @usableFromInline var inputAttributeTypes: [InformationFramework_RequestAttribute]?
@@ -21,9 +19,7 @@ import Foundation
     @usableFromInline var allowedSubset: InformationFramework_AllowedSubset?
     @usableFromInline var imposedSubset: InformationFramework_ImposedSubset?
     @usableFromInline var entryLimit: InformationFramework_EntryLimit?
-    @inlinable init(id: ArraySlice<UInt8>, dmdId: ASN1ObjectIdentifier, serviceType: ASN1ObjectIdentifier?, userClass: ArraySlice<UInt8>?, inputAttributeTypes: [InformationFramework_RequestAttribute]?, attributeCombination: InformationFramework_AttributeCombination?, outputAttributeTypes: [InformationFramework_ResultAttribute]?, defaultControls: InformationFramework_ControlOptions?, mandatoryControls: InformationFramework_ControlOptions?, searchRuleControls: InformationFramework_ControlOptions?, familyGrouping: DirectoryAbstractService_FamilyGrouping?, familyReturn: DirectoryAbstractService_FamilyReturn?, relaxation: InformationFramework_RelaxationPolicy?, additionalControl: [InformationFramework_AttributeType]?, allowedSubset: InformationFramework_AllowedSubset?, imposedSubset: InformationFramework_ImposedSubset?, entryLimit: InformationFramework_EntryLimit?) {
-        self.id = id
-        self.dmdId = dmdId
+    @inlinable init(serviceType: ASN1ObjectIdentifier?, userClass: ArraySlice<UInt8>?, inputAttributeTypes: [InformationFramework_RequestAttribute]?, attributeCombination: InformationFramework_AttributeCombination?, outputAttributeTypes: [InformationFramework_ResultAttribute]?, defaultControls: InformationFramework_ControlOptions?, mandatoryControls: InformationFramework_ControlOptions?, searchRuleControls: InformationFramework_ControlOptions?, familyGrouping: DirectoryAbstractService_FamilyGrouping?, familyReturn: DirectoryAbstractService_FamilyReturn?, relaxation: InformationFramework_RelaxationPolicy?, additionalControl: [InformationFramework_AttributeType]?, allowedSubset: InformationFramework_AllowedSubset?, imposedSubset: InformationFramework_ImposedSubset?, entryLimit: InformationFramework_EntryLimit?) {
         self.serviceType = serviceType
         self.userClass = userClass
         self.inputAttributeTypes = inputAttributeTypes
@@ -39,12 +35,11 @@ import Foundation
         self.allowedSubset = allowedSubset
         self.imposedSubset = imposedSubset
         self.entryLimit = entryLimit
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let id: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
-            let dmdId: ASN1ObjectIdentifier = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ASN1ObjectIdentifier(derEncoded: node) }
             let serviceType: ASN1ObjectIdentifier? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try ASN1ObjectIdentifier(derEncoded: node) }
             let userClass: ArraySlice<UInt8>? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
             let inputAttributeTypes: [InformationFramework_RequestAttribute]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in try DER.sequence(of: InformationFramework_RequestAttribute.self, identifier: .sequence, rootNode: node) }
@@ -60,29 +55,29 @@ import Foundation
             let allowedSubset: InformationFramework_AllowedSubset = try DER.explicitlyTagged(&nodes, tagNumber: 13, tagClass: .contextSpecific) { node in return try InformationFramework_AllowedSubset(derEncoded: node) }
             let imposedSubset: InformationFramework_ImposedSubset? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 14, tagClass: .contextSpecific) { node in return try InformationFramework_ImposedSubset(derEncoded: node) }
             let entryLimit: InformationFramework_EntryLimit? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 15, tagClass: .contextSpecific) { node in return try InformationFramework_EntryLimit(derEncoded: node) }
-            return InformationFramework_SearchRule(id: id, dmdId: dmdId, serviceType: serviceType, userClass: userClass, inputAttributeTypes: inputAttributeTypes, attributeCombination: attributeCombination, outputAttributeTypes: outputAttributeTypes, defaultControls: defaultControls, mandatoryControls: mandatoryControls, searchRuleControls: searchRuleControls, familyGrouping: familyGrouping, familyReturn: familyReturn, relaxation: relaxation, additionalControl: additionalControl, allowedSubset: allowedSubset, imposedSubset: imposedSubset, entryLimit: entryLimit)
+
+            return InformationFramework_SearchRule(serviceType: serviceType, userClass: userClass, inputAttributeTypes: inputAttributeTypes, attributeCombination: attributeCombination, outputAttributeTypes: outputAttributeTypes, defaultControls: defaultControls, mandatoryControls: mandatoryControls, searchRuleControls: searchRuleControls, familyGrouping: familyGrouping, familyReturn: familyReturn, relaxation: relaxation, additionalControl: additionalControl, allowedSubset: allowedSubset, imposedSubset: imposedSubset, entryLimit: entryLimit)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(id)
-            try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(dmdId) }
-            if let serviceType = self.serviceType { if let serviceType = self.serviceType { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(serviceType) } } }
-            if let userClass = self.userClass { if let userClass = self.userClass { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(userClass) } } }
-            if let inputAttributeTypes = self.inputAttributeTypes { if let inputAttributeTypes = self.inputAttributeTypes { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(inputAttributeTypes) } } }
-            if let attributeCombination = self.attributeCombination { if let attributeCombination = self.attributeCombination { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(attributeCombination) } } }
-            if let outputAttributeTypes = self.outputAttributeTypes { if let outputAttributeTypes = self.outputAttributeTypes { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(outputAttributeTypes) } } }
-            if let defaultControls = self.defaultControls { if let defaultControls = self.defaultControls { try coder.serialize(explicitlyTaggedWithTagNumber: 6, tagClass: .contextSpecific) { codec in try codec.serialize(defaultControls) } } }
-            if let mandatoryControls = self.mandatoryControls { if let mandatoryControls = self.mandatoryControls { try coder.serialize(explicitlyTaggedWithTagNumber: 7, tagClass: .contextSpecific) { codec in try codec.serialize(mandatoryControls) } } }
-            if let searchRuleControls = self.searchRuleControls { if let searchRuleControls = self.searchRuleControls { try coder.serialize(explicitlyTaggedWithTagNumber: 8, tagClass: .contextSpecific) { codec in try codec.serialize(searchRuleControls) } } }
-            if let familyGrouping = self.familyGrouping { if let familyGrouping = self.familyGrouping { try coder.serialize(explicitlyTaggedWithTagNumber: 9, tagClass: .contextSpecific) { codec in try codec.serialize(familyGrouping) } } }
-            if let familyReturn = self.familyReturn { if let familyReturn = self.familyReturn { try coder.serialize(explicitlyTaggedWithTagNumber: 10, tagClass: .contextSpecific) { codec in try codec.serialize(familyReturn) } } }
-            if let relaxation = self.relaxation { if let relaxation = self.relaxation { try coder.serialize(explicitlyTaggedWithTagNumber: 11, tagClass: .contextSpecific) { codec in try codec.serialize(relaxation) } } }
-            if let additionalControl = self.additionalControl { if let additionalControl = self.additionalControl { try coder.serialize(explicitlyTaggedWithTagNumber: 12, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(additionalControl) } } }
-            if let allowedSubset = self.allowedSubset { if let allowedSubset = self.allowedSubset { try coder.serialize(explicitlyTaggedWithTagNumber: 13, tagClass: .contextSpecific) { codec in try codec.serialize(allowedSubset) } } }
-            if let imposedSubset = self.imposedSubset { if let imposedSubset = self.imposedSubset { try coder.serialize(explicitlyTaggedWithTagNumber: 14, tagClass: .contextSpecific) { codec in try codec.serialize(imposedSubset) } } }
-            if let entryLimit = self.entryLimit { if let entryLimit = self.entryLimit { try coder.serialize(explicitlyTaggedWithTagNumber: 15, tagClass: .contextSpecific) { codec in try codec.serialize(entryLimit) } } }
+            if let serviceType = self.serviceType { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(serviceType) } }
+            if let userClass = self.userClass { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(userClass) } }
+            if let inputAttributeTypes = self.inputAttributeTypes { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(inputAttributeTypes) } }
+            if let attributeCombination = self.attributeCombination { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(attributeCombination) } }
+            if let outputAttributeTypes = self.outputAttributeTypes { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(outputAttributeTypes) } }
+            if let defaultControls = self.defaultControls { try coder.serialize(explicitlyTaggedWithTagNumber: 6, tagClass: .contextSpecific) { codec in try codec.serialize(defaultControls) } }
+            if let mandatoryControls = self.mandatoryControls { try coder.serialize(explicitlyTaggedWithTagNumber: 7, tagClass: .contextSpecific) { codec in try codec.serialize(mandatoryControls) } }
+            if let searchRuleControls = self.searchRuleControls { try coder.serialize(explicitlyTaggedWithTagNumber: 8, tagClass: .contextSpecific) { codec in try codec.serialize(searchRuleControls) } }
+            if let familyGrouping = self.familyGrouping { try coder.serialize(explicitlyTaggedWithTagNumber: 9, tagClass: .contextSpecific) { codec in try codec.serialize(familyGrouping) } }
+            if let familyReturn = self.familyReturn { try coder.serialize(explicitlyTaggedWithTagNumber: 10, tagClass: .contextSpecific) { codec in try codec.serialize(familyReturn) } }
+            if let relaxation = self.relaxation { try coder.serialize(explicitlyTaggedWithTagNumber: 11, tagClass: .contextSpecific) { codec in try codec.serialize(relaxation) } }
+            if let additionalControl = self.additionalControl { try coder.serialize(explicitlyTaggedWithTagNumber: 12, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(additionalControl) } }
+            if let allowedSubset = self.allowedSubset { try coder.serialize(explicitlyTaggedWithTagNumber: 13, tagClass: .contextSpecific) { codec in try codec.serialize(allowedSubset) } }
+            if let imposedSubset = self.imposedSubset { try coder.serialize(explicitlyTaggedWithTagNumber: 14, tagClass: .contextSpecific) { codec in try codec.serialize(imposedSubset) } }
+            if let entryLimit = self.entryLimit { try coder.serialize(explicitlyTaggedWithTagNumber: 15, tagClass: .contextSpecific) { codec in try codec.serialize(entryLimit) } }
+
         }
     }
 }

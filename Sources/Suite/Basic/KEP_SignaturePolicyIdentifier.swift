@@ -2,13 +2,13 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum KEP_SignaturePolicyIdentifier: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum KEP_SignaturePolicyIdentifier: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { KEP_SignaturePolicyId.defaultIdentifier }
         case signaturePolicy(KEP_SignaturePolicyId)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case KEP_SignaturePolicyId.defaultIdentifier:
-                self = .signaturePolicy(try KEP_SignaturePolicyId(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case KEP_SignaturePolicyId.defaultIdentifier:
+            self = .signaturePolicy(try KEP_SignaturePolicyId(derEncoded: rootNode, withIdentifier: rootNode.identifier))
 default:
     if identifier == rootNode.identifier {
         if case .constructed(let nodes) = rootNode.content {
@@ -29,14 +29,15 @@ default:
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .signaturePolicy(let signaturePolicy):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(signaturePolicy)
-                                }
-                            } else {
+        case .signaturePolicy(let signaturePolicy):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(signaturePolicy)
                             }
+                        } else {
+                            try coder.serialize(signaturePolicy)
+                        }
+
         }
     }
 

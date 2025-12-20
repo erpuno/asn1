@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Document_Architecture_Defaults: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Document_Architecture_Defaults: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var content_architecture_class: Document_Profile_Descriptor_Document_Architecture_Defaults_content_architecture_class_Choice?
     @usableFromInline var page_dimensions: Character_Presentation_Attributes_Measure_Pair?
@@ -35,6 +35,7 @@ import Foundation
         self.border = border
         self.page_position = page_position
         self.type_of_coding = type_of_coding
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -58,27 +59,29 @@ if let next = peek_content_architecture_class.next(), next.identifier == Documen
             let border: Layout_Descriptors_Border? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific))
             let page_position: Character_Presentation_Attributes_Measure_Pair? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
             let type_of_coding: Text_Units_Type_Of_Coding? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 10, tagClass: .contextSpecific) { node in return try Text_Units_Type_Of_Coding(derEncoded: node) }
+
             return Document_Profile_Descriptor_Document_Architecture_Defaults(content_architecture_class: content_architecture_class, page_dimensions: page_dimensions, transparency: transparency, colour: colour, colour_of_layout_object: colour_of_layout_object, object_colour_table: object_colour_table, content_background_colour: content_background_colour, content_foreground_colour: content_foreground_colour, content_colour_table: content_colour_table, layout_path: layout_path, medium_type: medium_type, block_alignment: block_alignment, border: border, page_position: page_position, type_of_coding: type_of_coding)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let content_architecture_class = self.content_architecture_class { if let content_architecture_class = self.content_architecture_class { try coder.serialize(content_architecture_class) } }
-            if let page_dimensions = self.page_dimensions { if let page_dimensions = self.page_dimensions { try coder.serializeOptionalImplicitlyTagged(page_dimensions, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let transparency = self.transparency { if let transparency = self.transparency { try coder.serializeOptionalImplicitlyTagged(transparency, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let colour = self.colour { if let colour = self.colour { try coder.serializeOptionalImplicitlyTagged(colour, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let colour_of_layout_object = self.colour_of_layout_object { if let colour_of_layout_object = self.colour_of_layout_object { try coder.serialize(explicitlyTaggedWithTagNumber: 11, tagClass: .contextSpecific) { codec in try codec.serialize(colour_of_layout_object) } } }
-            if let object_colour_table = self.object_colour_table { if let object_colour_table = self.object_colour_table { try coder.serializeOptionalImplicitlyTagged(object_colour_table, withIdentifier: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific)) } }
-            if let content_background_colour = self.content_background_colour { if let content_background_colour = self.content_background_colour { try coder.serialize(explicitlyTaggedWithTagNumber: 13, tagClass: .contextSpecific) { codec in try codec.serialize(content_background_colour) } } }
-            if let content_foreground_colour = self.content_foreground_colour { if let content_foreground_colour = self.content_foreground_colour { try coder.serialize(explicitlyTaggedWithTagNumber: 14, tagClass: .contextSpecific) { codec in try codec.serialize(content_foreground_colour) } } }
-            if let content_colour_table = self.content_colour_table { if let content_colour_table = self.content_colour_table { try coder.serializeOptionalImplicitlyTagged(content_colour_table, withIdentifier: ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific)) } }
-            if let layout_path = self.layout_path { if let layout_path = self.layout_path { try coder.serializeOptionalImplicitlyTagged(layout_path, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let medium_type = self.medium_type { if let medium_type = self.medium_type { try coder.serializeOptionalImplicitlyTagged(medium_type, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let block_alignment = self.block_alignment { if let block_alignment = self.block_alignment { try coder.serializeOptionalImplicitlyTagged(block_alignment, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) } }
-            if let border = self.border { if let border = self.border { try coder.serializeOptionalImplicitlyTagged(border, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) } }
-            if let page_position = self.page_position { if let page_position = self.page_position { try coder.serializeOptionalImplicitlyTagged(page_position, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) } }
-            if let type_of_coding = self.type_of_coding { if let type_of_coding = self.type_of_coding { try coder.serialize(explicitlyTaggedWithTagNumber: 10, tagClass: .contextSpecific) { codec in try codec.serialize(type_of_coding) } } }
+            if let content_architecture_class = self.content_architecture_class { try coder.serialize(content_architecture_class) }
+            if let page_dimensions = self.page_dimensions { try coder.serializeOptionalImplicitlyTagged(page_dimensions, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let transparency = self.transparency { try coder.serializeOptionalImplicitlyTagged(transparency, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let colour = self.colour { try coder.serializeOptionalImplicitlyTagged(colour, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let colour_of_layout_object = self.colour_of_layout_object { try coder.serialize(explicitlyTaggedWithTagNumber: 11, tagClass: .contextSpecific) { codec in try codec.serialize(colour_of_layout_object) } }
+            if let object_colour_table = self.object_colour_table { try coder.serializeOptionalImplicitlyTagged(object_colour_table, withIdentifier: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific)) }
+            if let content_background_colour = self.content_background_colour { try coder.serialize(explicitlyTaggedWithTagNumber: 13, tagClass: .contextSpecific) { codec in try codec.serialize(content_background_colour) } }
+            if let content_foreground_colour = self.content_foreground_colour { try coder.serialize(explicitlyTaggedWithTagNumber: 14, tagClass: .contextSpecific) { codec in try codec.serialize(content_foreground_colour) } }
+            if let content_colour_table = self.content_colour_table { try coder.serializeOptionalImplicitlyTagged(content_colour_table, withIdentifier: ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific)) }
+            if let layout_path = self.layout_path { try coder.serializeOptionalImplicitlyTagged(layout_path, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let medium_type = self.medium_type { try coder.serializeOptionalImplicitlyTagged(medium_type, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+            if let block_alignment = self.block_alignment { try coder.serializeOptionalImplicitlyTagged(block_alignment, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) }
+            if let border = self.border { try coder.serializeOptionalImplicitlyTagged(border, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) }
+            if let page_position = self.page_position { try coder.serializeOptionalImplicitlyTagged(page_position, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) }
+            if let type_of_coding = self.type_of_coding { try coder.serialize(explicitlyTaggedWithTagNumber: 10, tagClass: .contextSpecific) { codec in try codec.serialize(type_of_coding) } }
+
         }
     }
 }

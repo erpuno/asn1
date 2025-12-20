@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_GetCRL: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_GetCRL: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var issuerName: PKIX1Explicit88_Name
     @usableFromInline var cRLName: CertificateExtensions_GeneralName?
@@ -13,6 +13,7 @@ import Foundation
         self.cRLName = cRLName
         self.time = time
         self.reasons = reasons
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -33,6 +34,7 @@ var peek_reasons = nodes
 if let next = peek_reasons.next(), next.identifier == CertificateExtensions_ReasonFlags.defaultIdentifier {
     reasons = try CertificateExtensions_ReasonFlags(derEncoded: &nodes)
 }
+
             return EnrollmentMessageSyntax_2009_GetCRL(issuerName: issuerName, cRLName: cRLName, time: time, reasons: reasons)
         }
     }
@@ -40,9 +42,10 @@ if let next = peek_reasons.next(), next.identifier == CertificateExtensions_Reas
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(issuerName)
-            if let cRLName = self.cRLName { if let cRLName = self.cRLName { try coder.serialize(cRLName) } }
-            if let time = self.time { if let time = self.time { try coder.serialize(time) } }
-            if let reasons = self.reasons { if let reasons = self.reasons { try coder.serialize(reasons) } }
+            if let cRLName = self.cRLName { try coder.serialize(cRLName) }
+            if let time = self.time { try coder.serialize(time) }
+            if let reasons = self.reasons { try coder.serialize(reasons) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DOR_definition_AE_Identifier: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DOR_definition_AE_Identifier: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var locational_identifier: DOR_definition_Locational_identifier?
     @usableFromInline var direct_logical_identifier: PKIX1Explicit88_DistinguishedName?
@@ -11,6 +11,7 @@ import Foundation
         self.locational_identifier = locational_identifier
         self.direct_logical_identifier = direct_logical_identifier
         self.indirect_logical_identifier = indirect_logical_identifier
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let locational_identifier: DOR_definition_Locational_identifier? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try DOR_definition_Locational_identifier(derEncoded: node) }
             let direct_logical_identifier: PKIX1Explicit88_DistinguishedName? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try PKIX1Explicit88_DistinguishedName(derEncoded: node) }
             let indirect_logical_identifier: PKIX1Explicit88_DistinguishedName? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try PKIX1Explicit88_DistinguishedName(derEncoded: node) }
+
             return DOR_definition_AE_Identifier(locational_identifier: locational_identifier, direct_logical_identifier: direct_logical_identifier, indirect_logical_identifier: indirect_logical_identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let locational_identifier = self.locational_identifier { if let locational_identifier = self.locational_identifier { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(locational_identifier) } } }
-            if let direct_logical_identifier = self.direct_logical_identifier { if let direct_logical_identifier = self.direct_logical_identifier { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(direct_logical_identifier) } } }
-            if let indirect_logical_identifier = self.indirect_logical_identifier { if let indirect_logical_identifier = self.indirect_logical_identifier { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(indirect_logical_identifier) } } }
+            if let locational_identifier = self.locational_identifier { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(locational_identifier) } }
+            if let direct_logical_identifier = self.direct_logical_identifier { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(direct_logical_identifier) } }
+            if let indirect_logical_identifier = self.indirect_logical_identifier { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(indirect_logical_identifier) } }
+
         }
     }
 }

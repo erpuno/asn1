@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Layout_Descriptors_Layout_Class_Descriptor_Body: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Layout_Descriptors_Layout_Class_Descriptor_Body: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var object_class_identifier: Identifiers_and_Expressions_Object_or_Class_Identifier
     @usableFromInline var generator_for_subordinates: Identifiers_and_Expressions_Construction_Expression?
@@ -71,6 +71,7 @@ import Foundation
         self.enciphered = enciphered
         self.sealed = sealed
         self.presentation_time = presentation_time
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -112,6 +113,7 @@ if let next = peek_position.next(), next.identifier == Layout_Descriptors_Layout
             let enciphered: Layout_Descriptors_Enciphered? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 34, tagClass: .contextSpecific))
             let sealed: Layout_Descriptors_Sealed? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 35, tagClass: .contextSpecific))
             let presentation_time: Temporal_Relationships_Presentation_Time? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 52, tagClass: .contextSpecific))
+
             return Layout_Descriptors_Layout_Class_Descriptor_Body(object_class_identifier: object_class_identifier, generator_for_subordinates: generator_for_subordinates, content_portions: content_portions, position: position, dimensions: dimensions, transparency: transparency, presentation_attributes: presentation_attributes, default_value_lists: default_value_lists, user_readable_comments: user_readable_comments, bindings: bindings, content_generator: content_generator, layout_path: layout_path, layout_stream_categories: layout_stream_categories, layout_stream_sub_categories: layout_stream_sub_categories, permitted_categories: permitted_categories, user_visible_name: user_visible_name, page_position: page_position, medium_type: medium_type, presentation_style: presentation_style, logical_source: logical_source, balance: balance, colour: colour, colour_of_layout_object: colour_of_layout_object, object_colour_table: object_colour_table, content_background_colour: content_background_colour, content_foreground_colour: content_foreground_colour, content_colour_table: content_colour_table, border: border, resource: resource, application_comments: application_comments, enciphered: enciphered, sealed: sealed, presentation_time: presentation_time)
         }
     }
@@ -119,38 +121,39 @@ if let next = peek_position.next(), next.identifier == Layout_Descriptors_Layout
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(object_class_identifier)
-            if let generator_for_subordinates = self.generator_for_subordinates { if let generator_for_subordinates = self.generator_for_subordinates { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(generator_for_subordinates) } } }
-            if let content_portions = self.content_portions { if let content_portions = self.content_portions { try coder.serializeSequenceOf(content_portions, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let position = self.position { if let position = self.position { try coder.serialize(position) } }
-            if let dimensions = self.dimensions { if let dimensions = self.dimensions { try coder.serializeOptionalImplicitlyTagged(dimensions, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let transparency = self.transparency { if let transparency = self.transparency { try coder.serializeOptionalImplicitlyTagged(transparency, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let presentation_attributes = self.presentation_attributes { if let presentation_attributes = self.presentation_attributes { try coder.serializeOptionalImplicitlyTagged(presentation_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let default_value_lists = self.default_value_lists { if let default_value_lists = self.default_value_lists { try coder.serializeOptionalImplicitlyTagged(default_value_lists, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) } }
-            if let user_readable_comments = self.user_readable_comments { if let user_readable_comments = self.user_readable_comments { try coder.serializeOptionalImplicitlyTagged(user_readable_comments, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) } }
-            if let bindings = self.bindings { if let bindings = self.bindings { try coder.serializeSetOf(bindings, identifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) } }
-            if let content_generator = self.content_generator { if let content_generator = self.content_generator { try coder.serializeOptionalImplicitlyTagged(content_generator, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) } }
-            if let layout_path = self.layout_path { if let layout_path = self.layout_path { try coder.serializeOptionalImplicitlyTagged(layout_path, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) } }
-            if let layout_stream_categories = self.layout_stream_categories { if let layout_stream_categories = self.layout_stream_categories { try coder.serializeSetOf(layout_stream_categories, identifier: ASN1Identifier(tagWithNumber: 36, tagClass: .contextSpecific)) } }
-            if let layout_stream_sub_categories = self.layout_stream_sub_categories { if let layout_stream_sub_categories = self.layout_stream_sub_categories { try coder.serializeSetOf(layout_stream_sub_categories, identifier: ASN1Identifier(tagWithNumber: 37, tagClass: .contextSpecific)) } }
-            if let permitted_categories = self.permitted_categories { if let permitted_categories = self.permitted_categories { try coder.serializeSetOf(permitted_categories, identifier: ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific)) } }
-            if let user_visible_name = self.user_visible_name { if let user_visible_name = self.user_visible_name { try coder.serializeOptionalImplicitlyTagged(user_visible_name, withIdentifier: ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific)) } }
-            if let page_position = self.page_position { if let page_position = self.page_position { try coder.serializeOptionalImplicitlyTagged(page_position, withIdentifier: ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific)) } }
-            if let medium_type = self.medium_type { if let medium_type = self.medium_type { try coder.serializeOptionalImplicitlyTagged(medium_type, withIdentifier: ASN1Identifier(tagWithNumber: 16, tagClass: .contextSpecific)) } }
-            if let presentation_style = self.presentation_style { if let presentation_style = self.presentation_style { try coder.serializeOptionalImplicitlyTagged(presentation_style, withIdentifier: ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific)) } }
-            if let logical_source = self.logical_source { if let logical_source = self.logical_source { try coder.serializeOptionalImplicitlyTagged(logical_source, withIdentifier: ASN1Identifier(tagWithNumber: 18, tagClass: .contextSpecific)) } }
-            if let balance = self.balance { if let balance = self.balance { try coder.serializeSequenceOf(balance, identifier: ASN1Identifier(tagWithNumber: 21, tagClass: .contextSpecific)) } }
-            if let colour = self.colour { if let colour = self.colour { try coder.serializeOptionalImplicitlyTagged(colour, withIdentifier: ASN1Identifier(tagWithNumber: 22, tagClass: .contextSpecific)) } }
-            if let colour_of_layout_object = self.colour_of_layout_object { if let colour_of_layout_object = self.colour_of_layout_object { try coder.serialize(explicitlyTaggedWithTagNumber: 29, tagClass: .contextSpecific) { codec in try codec.serialize(colour_of_layout_object) } } }
-            if let object_colour_table = self.object_colour_table { if let object_colour_table = self.object_colour_table { try coder.serializeOptionalImplicitlyTagged(object_colour_table, withIdentifier: ASN1Identifier(tagWithNumber: 30, tagClass: .contextSpecific)) } }
-            if let content_background_colour = self.content_background_colour { if let content_background_colour = self.content_background_colour { try coder.serialize(explicitlyTaggedWithTagNumber: 31, tagClass: .contextSpecific) { codec in try codec.serialize(content_background_colour) } } }
-            if let content_foreground_colour = self.content_foreground_colour { if let content_foreground_colour = self.content_foreground_colour { try coder.serialize(explicitlyTaggedWithTagNumber: 32, tagClass: .contextSpecific) { codec in try codec.serialize(content_foreground_colour) } } }
-            if let content_colour_table = self.content_colour_table { if let content_colour_table = self.content_colour_table { try coder.serializeOptionalImplicitlyTagged(content_colour_table, withIdentifier: ASN1Identifier(tagWithNumber: 33, tagClass: .contextSpecific)) } }
-            if let border = self.border { if let border = self.border { try coder.serializeOptionalImplicitlyTagged(border, withIdentifier: ASN1Identifier(tagWithNumber: 23, tagClass: .contextSpecific)) } }
-            if let resource = self.resource { if let resource = self.resource { try coder.serializeOptionalImplicitlyTagged(resource, withIdentifier: ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific)) } }
-            if let application_comments = self.application_comments { if let application_comments = self.application_comments { try coder.serializeOptionalImplicitlyTagged(application_comments, withIdentifier: ASN1Identifier(tagWithNumber: 25, tagClass: .contextSpecific)) } }
-            if let enciphered = self.enciphered { if let enciphered = self.enciphered { try coder.serializeOptionalImplicitlyTagged(enciphered, withIdentifier: ASN1Identifier(tagWithNumber: 34, tagClass: .contextSpecific)) } }
-            if let sealed = self.sealed { if let sealed = self.sealed { try coder.serializeOptionalImplicitlyTagged(sealed, withIdentifier: ASN1Identifier(tagWithNumber: 35, tagClass: .contextSpecific)) } }
-            if let presentation_time = self.presentation_time { if let presentation_time = self.presentation_time { try coder.serializeOptionalImplicitlyTagged(presentation_time, withIdentifier: ASN1Identifier(tagWithNumber: 52, tagClass: .contextSpecific)) } }
+            if let generator_for_subordinates = self.generator_for_subordinates { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(generator_for_subordinates) } }
+            if let content_portions = self.content_portions { try coder.serializeSequenceOf(content_portions, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let position = self.position { try coder.serialize(position) }
+            if let dimensions = self.dimensions { try coder.serializeOptionalImplicitlyTagged(dimensions, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let transparency = self.transparency { try coder.serializeOptionalImplicitlyTagged(transparency, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let presentation_attributes = self.presentation_attributes { try coder.serializeOptionalImplicitlyTagged(presentation_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+            if let default_value_lists = self.default_value_lists { try coder.serializeOptionalImplicitlyTagged(default_value_lists, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) }
+            if let user_readable_comments = self.user_readable_comments { try coder.serializeOptionalImplicitlyTagged(user_readable_comments, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) }
+            if let bindings = self.bindings { try coder.serializeSetOf(bindings, identifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) }
+            if let content_generator = self.content_generator { try coder.serializeOptionalImplicitlyTagged(content_generator, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) }
+            if let layout_path = self.layout_path { try coder.serializeOptionalImplicitlyTagged(layout_path, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) }
+            if let layout_stream_categories = self.layout_stream_categories { try coder.serializeSetOf(layout_stream_categories, identifier: ASN1Identifier(tagWithNumber: 36, tagClass: .contextSpecific)) }
+            if let layout_stream_sub_categories = self.layout_stream_sub_categories { try coder.serializeSetOf(layout_stream_sub_categories, identifier: ASN1Identifier(tagWithNumber: 37, tagClass: .contextSpecific)) }
+            if let permitted_categories = self.permitted_categories { try coder.serializeSetOf(permitted_categories, identifier: ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific)) }
+            if let user_visible_name = self.user_visible_name { try coder.serializeOptionalImplicitlyTagged(user_visible_name, withIdentifier: ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific)) }
+            if let page_position = self.page_position { try coder.serializeOptionalImplicitlyTagged(page_position, withIdentifier: ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific)) }
+            if let medium_type = self.medium_type { try coder.serializeOptionalImplicitlyTagged(medium_type, withIdentifier: ASN1Identifier(tagWithNumber: 16, tagClass: .contextSpecific)) }
+            if let presentation_style = self.presentation_style { try coder.serializeOptionalImplicitlyTagged(presentation_style, withIdentifier: ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific)) }
+            if let logical_source = self.logical_source { try coder.serializeOptionalImplicitlyTagged(logical_source, withIdentifier: ASN1Identifier(tagWithNumber: 18, tagClass: .contextSpecific)) }
+            if let balance = self.balance { try coder.serializeSequenceOf(balance, identifier: ASN1Identifier(tagWithNumber: 21, tagClass: .contextSpecific)) }
+            if let colour = self.colour { try coder.serializeOptionalImplicitlyTagged(colour, withIdentifier: ASN1Identifier(tagWithNumber: 22, tagClass: .contextSpecific)) }
+            if let colour_of_layout_object = self.colour_of_layout_object { try coder.serialize(explicitlyTaggedWithTagNumber: 29, tagClass: .contextSpecific) { codec in try codec.serialize(colour_of_layout_object) } }
+            if let object_colour_table = self.object_colour_table { try coder.serializeOptionalImplicitlyTagged(object_colour_table, withIdentifier: ASN1Identifier(tagWithNumber: 30, tagClass: .contextSpecific)) }
+            if let content_background_colour = self.content_background_colour { try coder.serialize(explicitlyTaggedWithTagNumber: 31, tagClass: .contextSpecific) { codec in try codec.serialize(content_background_colour) } }
+            if let content_foreground_colour = self.content_foreground_colour { try coder.serialize(explicitlyTaggedWithTagNumber: 32, tagClass: .contextSpecific) { codec in try codec.serialize(content_foreground_colour) } }
+            if let content_colour_table = self.content_colour_table { try coder.serializeOptionalImplicitlyTagged(content_colour_table, withIdentifier: ASN1Identifier(tagWithNumber: 33, tagClass: .contextSpecific)) }
+            if let border = self.border { try coder.serializeOptionalImplicitlyTagged(border, withIdentifier: ASN1Identifier(tagWithNumber: 23, tagClass: .contextSpecific)) }
+            if let resource = self.resource { try coder.serializeOptionalImplicitlyTagged(resource, withIdentifier: ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific)) }
+            if let application_comments = self.application_comments { try coder.serializeOptionalImplicitlyTagged(application_comments, withIdentifier: ASN1Identifier(tagWithNumber: 25, tagClass: .contextSpecific)) }
+            if let enciphered = self.enciphered { try coder.serializeOptionalImplicitlyTagged(enciphered, withIdentifier: ASN1Identifier(tagWithNumber: 34, tagClass: .contextSpecific)) }
+            if let sealed = self.sealed { try coder.serializeOptionalImplicitlyTagged(sealed, withIdentifier: ASN1Identifier(tagWithNumber: 35, tagClass: .contextSpecific)) }
+            if let presentation_time = self.presentation_time { try coder.serializeOptionalImplicitlyTagged(presentation_time, withIdentifier: ASN1Identifier(tagWithNumber: 52, tagClass: .contextSpecific)) }
+
         }
     }
 }

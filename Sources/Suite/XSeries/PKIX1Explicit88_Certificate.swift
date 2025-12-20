@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Explicit88_Certificate: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Explicit88_Certificate: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var tbsCertificate: PKIX1Explicit88_TBSCertificate
     @usableFromInline var signatureAlgorithm: PKIX1Explicit88_AlgorithmIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.tbsCertificate = tbsCertificate
         self.signatureAlgorithm = signatureAlgorithm
         self.signature = signature
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let tbsCertificate: PKIX1Explicit88_TBSCertificate = try PKIX1Explicit88_TBSCertificate(derEncoded: &nodes)
             let signatureAlgorithm: PKIX1Explicit88_AlgorithmIdentifier = try PKIX1Explicit88_AlgorithmIdentifier(derEncoded: &nodes)
             let signature: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
+
             return PKIX1Explicit88_Certificate(tbsCertificate: tbsCertificate, signatureAlgorithm: signatureAlgorithm, signature: signature)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(tbsCertificate)
             try coder.serialize(signatureAlgorithm)
             try coder.serialize(signature)
+
         }
     }
 }

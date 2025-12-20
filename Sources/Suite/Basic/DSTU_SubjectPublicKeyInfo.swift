@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DSTU_SubjectPublicKeyInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DSTU_SubjectPublicKeyInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var algorithm: DSTU_AlgorithmIdentifier
     @usableFromInline var subjectPublicKey: ASN1BitString
     @inlinable init(algorithm: DSTU_AlgorithmIdentifier, subjectPublicKey: ASN1BitString) {
         self.algorithm = algorithm
         self.subjectPublicKey = subjectPublicKey
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let algorithm: DSTU_AlgorithmIdentifier = try DSTU_AlgorithmIdentifier(derEncoded: &nodes)
             let subjectPublicKey: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
+
             return DSTU_SubjectPublicKeyInfo(algorithm: algorithm, subjectPublicKey: subjectPublicKey)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(algorithm)
             try coder.serialize(subjectPublicKey)
+
         }
     }
 }

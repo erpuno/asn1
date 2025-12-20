@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_CMCUnsignedData: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_CMCUnsignedData: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var bodyPartPath: EnrollmentMessageSyntax_2009_BodyPartPath
     @usableFromInline var ident: ASN1ObjectIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.bodyPartPath = bodyPartPath
         self.ident = ident
         self.content = content
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let bodyPartPath: EnrollmentMessageSyntax_2009_BodyPartPath = try EnrollmentMessageSyntax_2009_BodyPartPath(derEncoded: &nodes)
             let ident: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let content: ASN1Any = try ASN1Any(derEncoded: &nodes)
+
             return EnrollmentMessageSyntax_2009_CMCUnsignedData(bodyPartPath: bodyPartPath, ident: ident, content: content)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(bodyPartPath)
             try coder.serialize(ident)
             try coder.serialize(content)
+
         }
     }
 }

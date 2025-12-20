@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct Raster_Gr_Presentation_Attributes_Image_Dimensions_area_controlled_Sequence_aspect_ratio_flag_IntEnum : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct Raster_Gr_Presentation_Attributes_Image_Dimensions_area_controlled_Sequence_aspect_ratio_flag_IntEnum : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: Raster_Gr_Presentation_Attributes_Image_Dimensions_area_controlled_Sequence_aspect_ratio_flag_IntEnum, rhs: Raster_Gr_Presentation_Attributes_Image_Dimensions_area_controlled_Sequence_aspect_ratio_flag_IntEnum) -> Bool { lhs.rawValue < rhs.rawValue }

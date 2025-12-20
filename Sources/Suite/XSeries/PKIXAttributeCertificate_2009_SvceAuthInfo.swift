@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXAttributeCertificate_2009_SvceAuthInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXAttributeCertificate_2009_SvceAuthInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var service: PKIX1Implicit88_GeneralName
     @usableFromInline var ident: PKIX1Implicit88_GeneralName
@@ -11,6 +11,7 @@ import Foundation
         self.service = service
         self.ident = ident
         self.authInfo = authInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ var peek_authInfo = nodes
 if let next = peek_authInfo.next(), next.identifier == ASN1OctetString.defaultIdentifier {
     authInfo = try ASN1OctetString(derEncoded: &nodes)
 }
+
             return PKIXAttributeCertificate_2009_SvceAuthInfo(service: service, ident: ident, authInfo: authInfo)
         }
     }
@@ -30,7 +32,8 @@ if let next = peek_authInfo.next(), next.identifier == ASN1OctetString.defaultId
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(service)
             try coder.serialize(ident)
-            if let authInfo = self.authInfo { if let authInfo = self.authInfo { try coder.serialize(authInfo) } }
+            if let authInfo = self.authInfo { try coder.serialize(authInfo) }
+
         }
     }
 }

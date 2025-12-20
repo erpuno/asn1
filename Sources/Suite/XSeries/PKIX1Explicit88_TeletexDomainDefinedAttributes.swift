@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Explicit88_TeletexDomainDefinedAttributes: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct PKIX1Explicit88_TeletexDomainDefinedAttributes: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var value: [PKIX1Explicit88_TeletexDomainDefinedAttribute]
     @inlinable public init(_ value: [PKIX1Explicit88_TeletexDomainDefinedAttribute]) { self.value = value }

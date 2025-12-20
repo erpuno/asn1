@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Fonts_List_Element: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Fonts_List_Element: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var font_identifier: ArraySlice<UInt8>
     @usableFromInline var font_reference: Document_Profile_Descriptor_Font_Reference
     @inlinable init(font_identifier: ArraySlice<UInt8>, font_reference: Document_Profile_Descriptor_Font_Reference) {
         self.font_identifier = font_identifier
         self.font_reference = font_reference
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let font_identifier: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let font_reference: Document_Profile_Descriptor_Font_Reference = try Document_Profile_Descriptor_Font_Reference(derEncoded: &nodes)
+
             return Document_Profile_Descriptor_Fonts_List_Element(font_identifier: font_identifier, font_reference: font_reference)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(font_identifier)
             try coder.serialize(font_reference)
+
         }
     }
 }

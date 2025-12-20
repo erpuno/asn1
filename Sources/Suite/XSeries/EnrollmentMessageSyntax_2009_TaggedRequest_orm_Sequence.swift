@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_TaggedRequest_orm_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_TaggedRequest_orm_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var bodyPartID: EnrollmentMessageSyntax_2009_BodyPartID
     @usableFromInline var requestMessageType: ASN1ObjectIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.bodyPartID = bodyPartID
         self.requestMessageType = requestMessageType
         self.requestMessageValue = requestMessageValue
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let bodyPartID: EnrollmentMessageSyntax_2009_BodyPartID = try EnrollmentMessageSyntax_2009_BodyPartID(derEncoded: &nodes)
             let requestMessageType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let requestMessageValue: ASN1Any = try ASN1Any(derEncoded: &nodes)
+
             return EnrollmentMessageSyntax_2009_TaggedRequest_orm_Sequence(bodyPartID: bodyPartID, requestMessageType: requestMessageType, requestMessageValue: requestMessageValue)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(bodyPartID)
             try coder.serialize(requestMessageType)
             try coder.serialize(requestMessageValue)
+
         }
     }
 }

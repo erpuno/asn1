@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SelectedAttributeTypes_FacsimileTelephoneNumber: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SelectedAttributeTypes_FacsimileTelephoneNumber: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var telephoneNumber: SelectedAttributeTypes_TelephoneNumber
     @usableFromInline var parameters: SelectedAttributeTypes_G3FacsimileNonBasicParameters?
     @inlinable init(telephoneNumber: SelectedAttributeTypes_TelephoneNumber, parameters: SelectedAttributeTypes_G3FacsimileNonBasicParameters?) {
         self.telephoneNumber = telephoneNumber
         self.parameters = parameters
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,6 +20,7 @@ var peek_parameters = nodes
 if let next = peek_parameters.next(), next.identifier == SelectedAttributeTypes_G3FacsimileNonBasicParameters.defaultIdentifier {
     parameters = try SelectedAttributeTypes_G3FacsimileNonBasicParameters(derEncoded: &nodes)
 }
+
             return SelectedAttributeTypes_FacsimileTelephoneNumber(telephoneNumber: telephoneNumber, parameters: parameters)
         }
     }
@@ -26,7 +28,8 @@ if let next = peek_parameters.next(), next.identifier == SelectedAttributeTypes_
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(telephoneNumber)
-            if let parameters = self.parameters { if let parameters = self.parameters { try coder.serialize(parameters) } }
+            if let parameters = self.parameters { try coder.serialize(parameters) }
+
         }
     }
 }

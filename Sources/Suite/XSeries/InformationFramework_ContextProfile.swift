@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_ContextProfile: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_ContextProfile: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var contextType: ASN1ObjectIdentifier
     @usableFromInline var contextValue: [ASN1Any]?
     @inlinable init(contextType: ASN1ObjectIdentifier, contextValue: [ASN1Any]?) {
         self.contextType = contextType
         self.contextValue = contextValue
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let contextType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let contextValue: [ASN1Any]? = try DER.sequence(of: ASN1Any.self, identifier: .sequence, nodes: &nodes)
+
             return InformationFramework_ContextProfile(contextType: contextType, contextValue: contextValue)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(contextType)
-            if let contextValue = self.contextValue { if let contextValue = self.contextValue { try coder.serializeSequenceOf(contextValue) } }
+            if let contextValue = self.contextValue { try coder.serializeSequenceOf(contextValue) }
+
         }
     }
 }

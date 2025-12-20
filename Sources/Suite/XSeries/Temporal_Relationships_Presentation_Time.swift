@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Temporal_Relationships_Presentation_Time: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Temporal_Relationships_Presentation_Time: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var timing: Temporal_Relationships_Presentation_Time_timing_Choice?
     @usableFromInline var duration: Temporal_Relationships_Presentation_Time_duration_Choice?
@@ -11,6 +11,7 @@ import Foundation
         self.timing = timing
         self.duration = duration
         self.cyclic = cyclic
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -26,15 +27,17 @@ if let next = peek_duration.next(), next.identifier == Temporal_Relationships_Pr
     duration = try Temporal_Relationships_Presentation_Time_duration_Choice(derEncoded: &nodes)
 }
             let cyclic: Temporal_Relationships_Cyclic? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 5, tagClass: .contextSpecific) { node in return try Temporal_Relationships_Cyclic(derEncoded: node) }
+
             return Temporal_Relationships_Presentation_Time(timing: timing, duration: duration, cyclic: cyclic)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let timing = self.timing { if let timing = self.timing { try coder.serialize(timing) } }
-            if let duration = self.duration { if let duration = self.duration { try coder.serialize(duration) } }
-            if let cyclic = self.cyclic { if let cyclic = self.cyclic { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serialize(cyclic) } } }
+            if let timing = self.timing { try coder.serialize(timing) }
+            if let duration = self.duration { try coder.serialize(duration) }
+            if let cyclic = self.cyclic { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serialize(cyclic) } }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CMSECCAlgs_2009_02_ECC_CMS_SharedInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CMSECCAlgs_2009_02_ECC_CMS_SharedInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var keyInfo: CMSECCAlgs_2009_02_KeyWrapAlgorithm
     @usableFromInline var entityUInfo: ASN1OctetString?
@@ -11,6 +11,7 @@ import Foundation
         self.keyInfo = keyInfo
         self.entityUInfo = entityUInfo
         self.suppPubInfo = suppPubInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let keyInfo: CMSECCAlgs_2009_02_KeyWrapAlgorithm = try CMSECCAlgs_2009_02_KeyWrapAlgorithm(derEncoded: &nodes)
             let entityUInfo: ASN1OctetString? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
             let suppPubInfo: ASN1OctetString = try DER.explicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
+
             return CMSECCAlgs_2009_02_ECC_CMS_SharedInfo(keyInfo: keyInfo, entityUInfo: entityUInfo, suppPubInfo: suppPubInfo)
         }
     }
@@ -25,8 +27,9 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(keyInfo)
-            if let entityUInfo = self.entityUInfo { if let entityUInfo = self.entityUInfo { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(entityUInfo) } } }
+            if let entityUInfo = self.entityUInfo { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(entityUInfo) } }
             try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(suppPubInfo) }
+
         }
     }
 }

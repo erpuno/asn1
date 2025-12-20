@@ -2,16 +2,18 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_PollReqContent_Element: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_PollReqContent_Element: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var certReqId: ArraySlice<UInt8>
     @inlinable init(certReqId: ArraySlice<UInt8>) {
         self.certReqId = certReqId
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let certReqId: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return PKIXCMP_2009_PollReqContent_Element(certReqId: certReqId)
         }
     }
@@ -19,6 +21,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(certReqId)
+
         }
     }
 }

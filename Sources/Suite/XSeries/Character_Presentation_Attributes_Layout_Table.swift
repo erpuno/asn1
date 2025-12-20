@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Character_Presentation_Attributes_Layout_Table: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct Character_Presentation_Attributes_Layout_Table: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var value: [Character_Presentation_Attributes_Tabulation_Stop]
     @inlinable public init(_ value: [Character_Presentation_Attributes_Tabulation_Stop]) { self.value = value }

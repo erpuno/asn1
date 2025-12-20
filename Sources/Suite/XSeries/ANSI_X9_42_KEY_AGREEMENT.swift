@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline typealias ANSI_X9_42_KEY_AGREEMENT = ANSI_X9_42_ALGORITHM_ID_Class
+@usableFromInline typealias ANSI_X9_42_KEY_AGREEMENT = ANSI_X9_42_ALGORITHM_ID

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_12_MacData: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_12_MacData: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var mac: PKCS_7_DigestInfo
     @usableFromInline var macSalt: ASN1OctetString
@@ -11,6 +11,7 @@ import Foundation
         self.mac = mac
         self.macSalt = macSalt
         self.iterations = iterations
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let mac: PKCS_7_DigestInfo = try PKCS_7_DigestInfo(derEncoded: &nodes)
             let macSalt: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let iterations: ArraySlice<UInt8>? = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return PKCS_12_MacData(mac: mac, macSalt: macSalt, iterations: iterations)
         }
     }
@@ -26,7 +28,8 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(mac)
             try coder.serialize(macSalt)
-            if let iterations = self.iterations { if let iterations = self.iterations { try coder.serialize(iterations) } }
+            if let iterations = self.iterations { try coder.serialize(iterations) }
+
         }
     }
 }

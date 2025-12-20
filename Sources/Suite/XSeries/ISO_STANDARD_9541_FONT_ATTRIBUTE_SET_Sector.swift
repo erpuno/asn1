@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Sector: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Sector: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var sector_left: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational
     @usableFromInline var sector_right: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational
     @inlinable init(sector_left: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational, sector_right: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational) {
         self.sector_left = sector_left
         self.sector_right = sector_right
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let sector_left: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let sector_right: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Sector(sector_left: sector_left, sector_right: sector_right)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(sector_left, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(sector_right, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
         }
     }
 }

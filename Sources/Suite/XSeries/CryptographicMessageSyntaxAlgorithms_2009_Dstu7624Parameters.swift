@@ -2,16 +2,18 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntaxAlgorithms_2009_Dstu7624Parameters: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntaxAlgorithms_2009_Dstu7624Parameters: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var iv: ASN1OctetString
     @inlinable init(iv: ASN1OctetString) {
         self.iv = iv
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let iv: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return CryptographicMessageSyntaxAlgorithms_2009_Dstu7624Parameters(iv: iv)
         }
     }
@@ -19,6 +21,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(iv)
+
         }
     }
 }

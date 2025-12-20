@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2009_KEKIdentifier: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2009_KEKIdentifier: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var keyIdentifier: ASN1OctetString
     @usableFromInline var date: GeneralizedTime?
@@ -11,6 +11,7 @@ import Foundation
         self.keyIdentifier = keyIdentifier
         self.date = date
         self.other = other
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -26,6 +27,7 @@ var peek_other = nodes
 if let next = peek_other.next(), next.identifier == CryptographicMessageSyntax_2009_OtherKeyAttribute.defaultIdentifier {
     other = try CryptographicMessageSyntax_2009_OtherKeyAttribute(derEncoded: &nodes)
 }
+
             return CryptographicMessageSyntax_2009_KEKIdentifier(keyIdentifier: keyIdentifier, date: date, other: other)
         }
     }
@@ -33,8 +35,9 @@ if let next = peek_other.next(), next.identifier == CryptographicMessageSyntax_2
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(keyIdentifier)
-            if let date = self.date { if let date = self.date { try coder.serialize(date) } }
-            if let other = self.other { if let other = self.other { try coder.serialize(other) } }
+            if let date = self.date { try coder.serialize(date) }
+            if let other = self.other { try coder.serialize(other) }
+
         }
     }
 }

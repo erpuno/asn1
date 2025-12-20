@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_EntryInformationSelection: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_EntryInformationSelection: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var attributes: DirectoryAbstractService_EntryInformationSelection_attributes_Choice?
     @usableFromInline var infoTypes: DirectoryAbstractService_EntryInformationSelection_infoTypes_IntEnum?
@@ -17,6 +17,7 @@ import Foundation
         self.contextSelection = contextSelection
         self.returnContexts = returnContexts
         self.familyReturn = familyReturn
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -35,18 +36,20 @@ if let next = peek_contextSelection.next(), next.identifier == DirectoryAbstract
 }
             let returnContexts: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
             let familyReturn: DirectoryAbstractService_FamilyReturn? = try DirectoryAbstractService_FamilyReturn(derEncoded: &nodes)
+
             return DirectoryAbstractService_EntryInformationSelection(attributes: attributes, infoTypes: infoTypes, extraAttributes: extraAttributes, contextSelection: contextSelection, returnContexts: returnContexts, familyReturn: familyReturn)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let attributes = self.attributes { if let attributes = self.attributes { try coder.serialize(attributes) } }
+            if let attributes = self.attributes { try coder.serialize(attributes) }
             if let infoTypes = self.infoTypes { try coder.serialize(infoTypes.rawValue, explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) }
-            if let extraAttributes = self.extraAttributes { if let extraAttributes = self.extraAttributes { try coder.serialize(extraAttributes) } }
-            if let contextSelection = self.contextSelection { if let contextSelection = self.contextSelection { try coder.serialize(contextSelection) } }
-            if let returnContexts = self.returnContexts { if let returnContexts = self.returnContexts { try coder.serialize(returnContexts) } }
-            if let familyReturn = self.familyReturn { if let familyReturn = self.familyReturn { try coder.serialize(familyReturn) } }
+            if let extraAttributes = self.extraAttributes { try coder.serialize(extraAttributes) }
+            if let contextSelection = self.contextSelection { try coder.serialize(contextSelection) }
+            if let returnContexts = self.returnContexts { try coder.serialize(returnContexts) }
+            if let familyReturn = self.familyReturn { try coder.serialize(familyReturn) }
+
         }
     }
 }

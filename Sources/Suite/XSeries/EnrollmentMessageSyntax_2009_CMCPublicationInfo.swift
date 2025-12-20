@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_CMCPublicationInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_CMCPublicationInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var hashAlg: AuthenticationFramework_AlgorithmIdentifier
     @usableFromInline var certHashes: [ASN1OctetString]
@@ -11,6 +11,7 @@ import Foundation
         self.hashAlg = hashAlg
         self.certHashes = certHashes
         self.pubInfo = pubInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let hashAlg: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let certHashes: [ASN1OctetString] = try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, nodes: &nodes)
             let pubInfo: PKIXCRMF_2009_PKIPublicationInfo = try PKIXCRMF_2009_PKIPublicationInfo(derEncoded: &nodes)
+
             return EnrollmentMessageSyntax_2009_CMCPublicationInfo(hashAlg: hashAlg, certHashes: certHashes, pubInfo: pubInfo)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(hashAlg)
             try coder.serializeSequenceOf(certHashes)
             try coder.serialize(pubInfo)
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CertificateExtensions_IssuingDistPointSyntax: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CertificateExtensions_IssuingDistPointSyntax: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var distributionPoint: CertificateExtensions_DistributionPointName?
     @usableFromInline var onlyContainsUserCerts: Bool?
@@ -15,6 +15,7 @@ import Foundation
         self.onlyContainsCACerts = onlyContainsCACerts
         self.onlySomeReasons = onlySomeReasons
         self.indirectCRL = indirectCRL
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,17 +25,19 @@ import Foundation
             let onlyContainsCACerts: Bool = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)))!
             let onlySomeReasons: CertificateExtensions_ReasonFlags? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             let indirectCRL: Bool = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)))!
+
             return CertificateExtensions_IssuingDistPointSyntax(distributionPoint: distributionPoint, onlyContainsUserCerts: onlyContainsUserCerts, onlyContainsCACerts: onlyContainsCACerts, onlySomeReasons: onlySomeReasons, indirectCRL: indirectCRL)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let distributionPoint = self.distributionPoint { if let distributionPoint = self.distributionPoint { try coder.serializeOptionalImplicitlyTagged(distributionPoint, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let onlyContainsUserCerts = self.onlyContainsUserCerts { if let onlyContainsUserCerts = self.onlyContainsUserCerts { try coder.serializeOptionalImplicitlyTagged(onlyContainsUserCerts, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let onlyContainsCACerts = self.onlyContainsCACerts { if let onlyContainsCACerts = self.onlyContainsCACerts { try coder.serializeOptionalImplicitlyTagged(onlyContainsCACerts, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let onlySomeReasons = self.onlySomeReasons { if let onlySomeReasons = self.onlySomeReasons { try coder.serializeOptionalImplicitlyTagged(onlySomeReasons, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let indirectCRL = self.indirectCRL { if let indirectCRL = self.indirectCRL { try coder.serializeOptionalImplicitlyTagged(indirectCRL, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
+            if let distributionPoint = self.distributionPoint { try coder.serializeOptionalImplicitlyTagged(distributionPoint, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let onlyContainsUserCerts = self.onlyContainsUserCerts { try coder.serializeOptionalImplicitlyTagged(onlyContainsUserCerts, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let onlyContainsCACerts = self.onlyContainsCACerts { try coder.serializeOptionalImplicitlyTagged(onlyContainsCACerts, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let onlySomeReasons = self.onlySomeReasons { try coder.serializeOptionalImplicitlyTagged(onlySomeReasons, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let indirectCRL = self.indirectCRL { try coder.serializeOptionalImplicitlyTagged(indirectCRL, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+
         }
     }
 }

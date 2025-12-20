@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var prefix_index: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Code?
     @usableFromInline var name_value: ISO9541_SN_Structured_Name
     @inlinable init(prefix_index: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Code?, name_value: ISO9541_SN_Structured_Name) {
         self.prefix_index = prefix_index
         self.name_value = name_value
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let prefix_index: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Code? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let name_value: ISO9541_SN_Structured_Name = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name(prefix_index: prefix_index, name_value: name_value)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let prefix_index = self.prefix_index { if let prefix_index = self.prefix_index { try coder.serializeOptionalImplicitlyTagged(prefix_index, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let prefix_index = self.prefix_index { try coder.serializeOptionalImplicitlyTagged(prefix_index, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
             try coder.serializeOptionalImplicitlyTagged(name_value, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
         }
     }
 }

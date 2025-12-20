@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Vscript: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Vscript: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var iso_standard_9541_vsname: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name
     @usableFromInline var vscript_property_list: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Vscript_Properties
     @inlinable init(iso_standard_9541_vsname: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name, vscript_property_list: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Vscript_Properties) {
         self.iso_standard_9541_vsname = iso_standard_9541_vsname
         self.vscript_property_list = vscript_property_list
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let iso_standard_9541_vsname: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let vscript_property_list: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Vscript_Properties = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Vscript(iso_standard_9541_vsname: iso_standard_9541_vsname, vscript_property_list: vscript_property_list)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_vsname, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(vscript_property_list, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
         }
     }
 }

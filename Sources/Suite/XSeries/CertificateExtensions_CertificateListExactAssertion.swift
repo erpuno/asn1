@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CertificateExtensions_CertificateListExactAssertion: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CertificateExtensions_CertificateListExactAssertion: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var issuer: PKIX1Explicit88_Name
     @usableFromInline var thisUpdate: AuthenticationFramework_Time
@@ -11,6 +11,7 @@ import Foundation
         self.issuer = issuer
         self.thisUpdate = thisUpdate
         self.distributionPoint = distributionPoint
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ var peek_distributionPoint = nodes
 if let next = peek_distributionPoint.next(), next.identifier == CertificateExtensions_DistributionPointName.defaultIdentifier {
     distributionPoint = try CertificateExtensions_DistributionPointName(derEncoded: &nodes)
 }
+
             return CertificateExtensions_CertificateListExactAssertion(issuer: issuer, thisUpdate: thisUpdate, distributionPoint: distributionPoint)
         }
     }
@@ -30,7 +32,8 @@ if let next = peek_distributionPoint.next(), next.identifier == CertificateExten
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(issuer)
             try coder.serialize(thisUpdate)
-            if let distributionPoint = self.distributionPoint { if let distributionPoint = self.distributionPoint { try coder.serialize(distributionPoint) } }
+            if let distributionPoint = self.distributionPoint { try coder.serialize(distributionPoint) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2010_EncryptedData: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2010_EncryptedData: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: CryptographicMessageSyntax_2010_CMSVersion
     @usableFromInline var encryptedContentInfo: CryptographicMessageSyntax_2010_EncryptedContentInfo
@@ -10,8 +10,6 @@ import Foundation
     @inlinable init(version: CryptographicMessageSyntax_2010_CMSVersion, encryptedContentInfo: CryptographicMessageSyntax_2010_EncryptedContentInfo, unprotectedAttrs: CryptographicMessageSyntax_2010_Attributes?) {
         self.version = version
         self.encryptedContentInfo = encryptedContentInfo
-
-
         self.unprotectedAttrs = unprotectedAttrs
 
     }
@@ -20,8 +18,6 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let version: CryptographicMessageSyntax_2010_CMSVersion = try CryptographicMessageSyntax_2010_CMSVersion(derEncoded: &nodes)
             let encryptedContentInfo: CryptographicMessageSyntax_2010_EncryptedContentInfo = try CryptographicMessageSyntax_2010_EncryptedContentInfo(derEncoded: &nodes)
-
-
             let unprotectedAttrs: CryptographicMessageSyntax_2010_Attributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
 
             return CryptographicMessageSyntax_2010_EncryptedData(version: version, encryptedContentInfo: encryptedContentInfo, unprotectedAttrs: unprotectedAttrs)
@@ -32,9 +28,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(version)
             try coder.serialize(encryptedContentInfo)
-
-
-            if let unprotectedAttrs = self.unprotectedAttrs { if let unprotectedAttrs = self.unprotectedAttrs { try coder.serializeOptionalImplicitlyTagged(unprotectedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let unprotectedAttrs = self.unprotectedAttrs { try coder.serializeOptionalImplicitlyTagged(unprotectedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
 
         }
     }

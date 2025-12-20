@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Transformation_Specification: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Transformation_Specification: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var vdc_extent: Geo_Gr_Presentation_Attributes_Rectangle?
     @usableFromInline var clip_rectangle: Geo_Gr_Presentation_Attributes_Rectangle?
@@ -11,6 +11,7 @@ import Foundation
         self.vdc_extent = vdc_extent
         self.clip_rectangle = clip_rectangle
         self.clip_indicator = clip_indicator
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let vdc_extent: Geo_Gr_Presentation_Attributes_Rectangle? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let clip_rectangle: Geo_Gr_Presentation_Attributes_Rectangle? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let clip_indicator: Geo_Gr_Presentation_Attributes_On_or_Off? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return Geo_Gr_Presentation_Attributes_Transformation_Specification(vdc_extent: vdc_extent, clip_rectangle: clip_rectangle, clip_indicator: clip_indicator)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let vdc_extent = self.vdc_extent { if let vdc_extent = self.vdc_extent { try coder.serializeOptionalImplicitlyTagged(vdc_extent, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let clip_rectangle = self.clip_rectangle { if let clip_rectangle = self.clip_rectangle { try coder.serializeOptionalImplicitlyTagged(clip_rectangle, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let clip_indicator = self.clip_indicator { if let clip_indicator = self.clip_indicator { try coder.serializeOptionalImplicitlyTagged(clip_indicator, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let vdc_extent = self.vdc_extent { try coder.serializeOptionalImplicitlyTagged(vdc_extent, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let clip_rectangle = self.clip_rectangle { try coder.serializeOptionalImplicitlyTagged(clip_rectangle, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let clip_indicator = self.clip_indicator { try coder.serializeOptionalImplicitlyTagged(clip_indicator, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2009_ExtendedCertificateInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2009_ExtendedCertificateInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: CryptographicMessageSyntax_2009_CMSVersion
     @usableFromInline var certificate: AuthenticationFramework_Certificate
@@ -11,6 +11,7 @@ import Foundation
         self.version = version
         self.certificate = certificate
         self.attributes = attributes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let version: CryptographicMessageSyntax_2009_CMSVersion = try CryptographicMessageSyntax_2009_CMSVersion(derEncoded: &nodes)
             let certificate: AuthenticationFramework_Certificate = try AuthenticationFramework_Certificate(derEncoded: &nodes)
             let attributes: CryptographicMessageSyntax_2009_UnauthAttributes = try CryptographicMessageSyntax_2009_UnauthAttributes(derEncoded: &nodes)
+
             return CryptographicMessageSyntax_2009_ExtendedCertificateInfo(version: version, certificate: certificate, attributes: attributes)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(version)
             try coder.serialize(certificate)
             try coder.serialize(attributes)
+
         }
     }
 }

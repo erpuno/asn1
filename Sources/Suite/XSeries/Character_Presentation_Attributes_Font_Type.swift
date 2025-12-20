@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Character_Presentation_Attributes_Font_Type: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Character_Presentation_Attributes_Font_Type: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var font_size: ArraySlice<UInt8>
     @usableFromInline var font_identifier: ArraySlice<UInt8>
     @inlinable init(font_size: ArraySlice<UInt8>, font_identifier: ArraySlice<UInt8>) {
         self.font_size = font_size
         self.font_identifier = font_identifier
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let font_size: ArraySlice<UInt8> = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let font_identifier: ArraySlice<UInt8> = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
+
             return Character_Presentation_Attributes_Font_Type(font_size: font_size, font_identifier: font_identifier)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(font_size, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(font_identifier, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_RevocationValues: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_RevocationValues: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var crlVals: [KEP_CertificateList]?
     @usableFromInline var ocspVals: [KEP_BasicOCSPResponse]?
@@ -11,6 +11,7 @@ import Foundation
         self.crlVals = crlVals
         self.ocspVals = ocspVals
         self.otherRevVals = otherRevVals
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let crlVals: [KEP_CertificateList]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in try DER.sequence(of: KEP_CertificateList.self, identifier: node.identifier, rootNode: node) }
             let ocspVals: [KEP_BasicOCSPResponse]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.sequence(of: KEP_BasicOCSPResponse.self, identifier: node.identifier, rootNode: node) }
             let otherRevVals: KEP_OtherRevVals? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return KEP_RevocationValues(crlVals: crlVals, ocspVals: ocspVals, otherRevVals: otherRevVals)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let crlVals = self.crlVals { if let crlVals = self.crlVals { try coder.serializeSequenceOf(crlVals, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let ocspVals = self.ocspVals { if let ocspVals = self.ocspVals { try coder.serializeSequenceOf(ocspVals, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let otherRevVals = self.otherRevVals { if let otherRevVals = self.otherRevVals { try coder.serializeOptionalImplicitlyTagged(otherRevVals, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let crlVals = self.crlVals { try coder.serializeSequenceOf(crlVals, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let ocspVals = self.ocspVals { try coder.serializeSequenceOf(ocspVals, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let otherRevVals = self.otherRevVals { try coder.serializeOptionalImplicitlyTagged(otherRevVals, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

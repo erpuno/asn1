@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ANSI_X9_62_FieldID: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ANSI_X9_62_FieldID: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var fieldType: ASN1ObjectIdentifier
     @usableFromInline var parameters: ASN1Any
     @inlinable init(fieldType: ASN1ObjectIdentifier, parameters: ASN1Any) {
         self.fieldType = fieldType
         self.parameters = parameters
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let fieldType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let parameters: ASN1Any = try ASN1Any(derEncoded: &nodes)
+
             return ANSI_X9_62_FieldID(fieldType: fieldType, parameters: parameters)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(fieldType)
             try coder.serialize(parameters)
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXAttributeCertificate_2009_ObjectDigestInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXAttributeCertificate_2009_ObjectDigestInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var digestedObjectType: PKIXAttributeCertificate_2009_ObjectDigestInfo_digestedObjectType_Enum
     @usableFromInline var otherObjectTypeID: ASN1ObjectIdentifier?
@@ -13,6 +13,7 @@ import Foundation
         self.otherObjectTypeID = otherObjectTypeID
         self.digestAlgorithm = digestAlgorithm
         self.objectDigest = objectDigest
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -25,6 +26,7 @@ if let next = peek_otherObjectTypeID.next(), next.identifier == ASN1ObjectIdenti
 }
             let digestAlgorithm: PKIX1Explicit88_AlgorithmIdentifier = try PKIX1Explicit88_AlgorithmIdentifier(derEncoded: &nodes)
             let objectDigest: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
+
             return PKIXAttributeCertificate_2009_ObjectDigestInfo(digestedObjectType: digestedObjectType, otherObjectTypeID: otherObjectTypeID, digestAlgorithm: digestAlgorithm, objectDigest: objectDigest)
         }
     }
@@ -32,9 +34,10 @@ if let next = peek_otherObjectTypeID.next(), next.identifier == ASN1ObjectIdenti
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(digestedObjectType)
-            if let otherObjectTypeID = self.otherObjectTypeID { if let otherObjectTypeID = self.otherObjectTypeID { try coder.serialize(otherObjectTypeID) } }
+            if let otherObjectTypeID = self.otherObjectTypeID { try coder.serialize(otherObjectTypeID) }
             try coder.serialize(digestAlgorithm)
             try coder.serialize(objectDigest)
+
         }
     }
 }

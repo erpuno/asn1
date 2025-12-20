@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Temporal_Relationships_Rule_Spec: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Temporal_Relationships_Rule_Spec: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var minimum_duration: ArraySlice<UInt8>?
     @usableFromInline var maximum_duration: ArraySlice<UInt8>?
     @inlinable init(minimum_duration: ArraySlice<UInt8>?, maximum_duration: ArraySlice<UInt8>?) {
         self.minimum_duration = minimum_duration
         self.maximum_duration = maximum_duration
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let minimum_duration: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let maximum_duration: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return Temporal_Relationships_Rule_Spec(minimum_duration: minimum_duration, maximum_duration: maximum_duration)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let minimum_duration = self.minimum_duration { if let minimum_duration = self.minimum_duration { try coder.serializeOptionalImplicitlyTagged(minimum_duration, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let maximum_duration = self.maximum_duration { if let maximum_duration = self.maximum_duration { try coder.serializeOptionalImplicitlyTagged(maximum_duration, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let minimum_duration = self.minimum_duration { try coder.serializeOptionalImplicitlyTagged(minimum_duration, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let maximum_duration = self.maximum_duration { try coder.serializeOptionalImplicitlyTagged(maximum_duration, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

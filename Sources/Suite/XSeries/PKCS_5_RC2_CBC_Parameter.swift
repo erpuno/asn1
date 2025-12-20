@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_5_RC2_CBC_Parameter: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_5_RC2_CBC_Parameter: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var rc2ParameterVersion: ArraySlice<UInt8>?
     @usableFromInline var iv: ASN1OctetString
     @inlinable init(rc2ParameterVersion: ArraySlice<UInt8>?, iv: ASN1OctetString) {
         self.rc2ParameterVersion = rc2ParameterVersion
         self.iv = iv
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,14 +20,16 @@ if let next = peek_rc2ParameterVersion.next(), next.identifier == ArraySlice<UIn
     rc2ParameterVersion = try ArraySlice<UInt8>(derEncoded: &nodes)
 }
             let iv: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return PKCS_5_RC2_CBC_Parameter(rc2ParameterVersion: rc2ParameterVersion, iv: iv)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let rc2ParameterVersion = self.rc2ParameterVersion { if let rc2ParameterVersion = self.rc2ParameterVersion { try coder.serialize(rc2ParameterVersion) } }
+            if let rc2ParameterVersion = self.rc2ParameterVersion { try coder.serialize(rc2ParameterVersion) }
             try coder.serialize(iv)
+
         }
     }
 }

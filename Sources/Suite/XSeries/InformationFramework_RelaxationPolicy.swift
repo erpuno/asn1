@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_RelaxationPolicy: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_RelaxationPolicy: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var basic: InformationFramework_MRMapping?
     @usableFromInline var tightenings: [InformationFramework_MRMapping]?
@@ -15,6 +15,7 @@ import Foundation
         self.relaxations = relaxations
         self.maximum = maximum
         self.minimum = minimum
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,17 +25,19 @@ import Foundation
             let relaxations: [InformationFramework_MRMapping]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.sequence(of: InformationFramework_MRMapping.self, identifier: .sequence, rootNode: node) }
             let maximum: ArraySlice<UInt8>? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
             let minimum: ArraySlice<UInt8> = try DER.explicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
+
             return InformationFramework_RelaxationPolicy(basic: basic, tightenings: tightenings, relaxations: relaxations, maximum: maximum, minimum: minimum)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let basic = self.basic { if let basic = self.basic { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(basic) } } }
-            if let tightenings = self.tightenings { if let tightenings = self.tightenings { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(tightenings) } } }
-            if let relaxations = self.relaxations { if let relaxations = self.relaxations { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(relaxations) } } }
-            if let maximum = self.maximum { if let maximum = self.maximum { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(maximum) } } }
-            if let minimum = self.minimum { if let minimum = self.minimum { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(minimum) } } }
+            if let basic = self.basic { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(basic) } }
+            if let tightenings = self.tightenings { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(tightenings) } }
+            if let relaxations = self.relaxations { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(relaxations) } }
+            if let maximum = self.maximum { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(maximum) } }
+            if let minimum = self.minimum { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(minimum) } }
+
         }
     }
 }

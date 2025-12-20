@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_IdentityProofV2: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_IdentityProofV2: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var proofAlgID: AuthenticationFramework_AlgorithmIdentifier
     @usableFromInline var macAlgId: AuthenticationFramework_AlgorithmIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.proofAlgID = proofAlgID
         self.macAlgId = macAlgId
         self.witness = witness
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let proofAlgID: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let macAlgId: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let witness: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return EnrollmentMessageSyntax_2009_IdentityProofV2(proofAlgID: proofAlgID, macAlgId: macAlgId, witness: witness)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(proofAlgID)
             try coder.serialize(macAlgId)
             try coder.serialize(witness)
+
         }
     }
 }

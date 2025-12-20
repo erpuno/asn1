@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXAttributeCertificate_2009_ACClearAttrs: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXAttributeCertificate_2009_ACClearAttrs: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var acIssuer: PKIX1Implicit88_GeneralName
     @usableFromInline var acSerial: ArraySlice<UInt8>
@@ -11,6 +11,7 @@ import Foundation
         self.acIssuer = acIssuer
         self.acSerial = acSerial
         self.attrs = attrs
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let acIssuer: PKIX1Implicit88_GeneralName = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
             let acSerial: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let attrs: [PKIX_CommonTypes_2009_AttributeSet] = try DER.sequence(of: PKIX_CommonTypes_2009_AttributeSet.self, identifier: .sequence, nodes: &nodes)
+
             return PKIXAttributeCertificate_2009_ACClearAttrs(acIssuer: acIssuer, acSerial: acSerial, attrs: attrs)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(acIssuer)
             try coder.serialize(acSerial)
             try coder.serializeSequenceOf(attrs)
+
         }
     }
 }

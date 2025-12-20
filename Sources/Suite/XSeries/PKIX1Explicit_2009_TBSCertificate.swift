@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Explicit_2009_TBSCertificate: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Explicit_2009_TBSCertificate: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: PKIX1Explicit_2009_Version?
     @usableFromInline var serialNumber: PKIX1Explicit_2009_CertificateSerialNumber
@@ -22,14 +22,9 @@ import Foundation
         self.validity = validity
         self.subject = subject
         self.subjectPublicKeyInfo = subjectPublicKeyInfo
-
-
         self.issuerUniqueID = issuerUniqueID
         self.subjectUniqueID = subjectUniqueID
-
-
         self.extensions = extensions
-
 
     }
     @inlinable init(derEncoded root: ASN1Node,
@@ -42,14 +37,9 @@ import Foundation
             let validity: PKIX1Explicit_2009_Validity = try PKIX1Explicit_2009_Validity(derEncoded: &nodes)
             let subject: PKIX1Explicit_2009_Name = try PKIX1Explicit_2009_Name(derEncoded: &nodes)
             let subjectPublicKeyInfo: PKIX1Explicit_2009_SubjectPublicKeyInfo = try PKIX1Explicit_2009_SubjectPublicKeyInfo(derEncoded: &nodes)
-
-
             let issuerUniqueID: PKIX1Explicit_2009_UniqueIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let subjectUniqueID: PKIX1Explicit_2009_UniqueIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
-
-
             let extensions: PKIX_CommonTypes_2009_Extensions? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try PKIX_CommonTypes_2009_Extensions(derEncoded: node) }
-
 
             return PKIX1Explicit_2009_TBSCertificate(version: version, serialNumber: serialNumber, signature: signature, issuer: issuer, validity: validity, subject: subject, subjectPublicKeyInfo: subjectPublicKeyInfo, issuerUniqueID: issuerUniqueID, subjectUniqueID: subjectUniqueID, extensions: extensions)
         }
@@ -57,21 +47,16 @@ import Foundation
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let version = self.version { if let version = self.version { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) } } }
+            if let version = self.version { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) } }
             try coder.serialize(serialNumber)
             try coder.serialize(signature)
             try coder.serialize(issuer)
             try coder.serialize(validity)
             try coder.serialize(subject)
             try coder.serialize(subjectPublicKeyInfo)
-
-
-            if let issuerUniqueID = self.issuerUniqueID { if let issuerUniqueID = self.issuerUniqueID { try coder.serializeOptionalImplicitlyTagged(issuerUniqueID, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let subjectUniqueID = self.subjectUniqueID { if let subjectUniqueID = self.subjectUniqueID { try coder.serializeOptionalImplicitlyTagged(subjectUniqueID, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-
-
-            if let extensions = self.extensions { if let extensions = self.extensions { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(extensions) } } }
-
+            if let issuerUniqueID = self.issuerUniqueID { try coder.serializeOptionalImplicitlyTagged(issuerUniqueID, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let subjectUniqueID = self.subjectUniqueID { try coder.serializeOptionalImplicitlyTagged(subjectUniqueID, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let extensions = self.extensions { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(extensions) } }
 
         }
     }

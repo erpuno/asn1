@@ -2,23 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_params_salt_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_params_salt_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case specified(ASN1OctetString)
     case otherSource(CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_SaltSourcesAlgorithmIdentifier)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .application):
-                self = .specified(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .application):
-                self = .otherSource(try CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_SaltSourcesAlgorithmIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1OctetString.defaultIdentifier:
+            self = .specified(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_SaltSourcesAlgorithmIdentifier.defaultIdentifier:
+            self = .otherSource(try CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_SaltSourcesAlgorithmIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .specified(let specified): try specified.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .application))
-            case .otherSource(let otherSource): try otherSource.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .application))
+        case .specified(let specified):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(specified)
+                            }
+                        } else {
+                            try coder.serialize(specified)
+                        }
+        case .otherSource(let otherSource):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(otherSource)
+                            }
+                        } else {
+                            try coder.serialize(otherSource)
+                        }
+
         }
     }
 

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CHAT_Ack: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CHAT_Ack: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var table: ASN1OctetString
     @usableFromInline var id: ASN1OctetString
     @inlinable init(table: ASN1OctetString, id: ASN1OctetString) {
         self.table = table
         self.id = id
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let table: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let id: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return CHAT_Ack(table: table, id: id)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(table)
             try coder.serialize(id)
+
         }
     }
 }

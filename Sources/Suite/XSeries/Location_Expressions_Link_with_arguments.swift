@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Location_Expressions_Link_with_arguments: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Location_Expressions_Link_with_arguments: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var attributeValueLink: Location_Expressions_AttributeValue_Link_Specification
     @usableFromInline var not_defaulting: Bool?
     @inlinable init(attributeValueLink: Location_Expressions_AttributeValue_Link_Specification, not_defaulting: Bool?) {
         self.attributeValueLink = attributeValueLink
         self.not_defaulting = not_defaulting
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let attributeValueLink: Location_Expressions_AttributeValue_Link_Specification = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let not_defaulting: Bool = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
+
             return Location_Expressions_Link_with_arguments(attributeValueLink: attributeValueLink, not_defaulting: not_defaulting)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(attributeValueLink, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            if let not_defaulting = self.not_defaulting { if let not_defaulting = self.not_defaulting { try coder.serializeOptionalImplicitlyTagged(not_defaulting, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let not_defaulting = self.not_defaulting { try coder.serializeOptionalImplicitlyTagged(not_defaulting, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

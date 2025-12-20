@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Location_Expressions_Region_Locator: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Location_Expressions_Region_Locator: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var start: Location_Expressions_Start_End_Object_Locator
     @usableFromInline var end: Location_Expressions_Start_End_Object_Locator
     @inlinable init(start: Location_Expressions_Start_End_Object_Locator, end: Location_Expressions_Start_End_Object_Locator) {
         self.start = start
         self.end = end
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let start: Location_Expressions_Start_End_Object_Locator = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let end: Location_Expressions_Start_End_Object_Locator = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
+
             return Location_Expressions_Region_Locator(start: start, end: end)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(start, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(end, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Esc_Class_Code : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Esc_Class_Code : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Esc_Class_Code, rhs: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Esc_Class_Code) -> Bool { lhs.rawValue < rhs.rawValue }

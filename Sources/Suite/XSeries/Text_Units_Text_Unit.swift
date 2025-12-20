@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Text_Units_Text_Unit: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Text_Units_Text_Unit: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var content_portion_attributes: Text_Units_Content_Portion_Attributes?
     @usableFromInline var content_information: Text_Units_Content_Information?
     @inlinable init(content_portion_attributes: Text_Units_Content_Portion_Attributes?, content_information: Text_Units_Content_Information?) {
         self.content_portion_attributes = content_portion_attributes
         self.content_information = content_information
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -23,14 +24,16 @@ var peek_content_information = nodes
 if let next = peek_content_information.next(), next.identifier == Text_Units_Content_Information.defaultIdentifier {
     content_information = try Text_Units_Content_Information(derEncoded: &nodes)
 }
+
             return Text_Units_Text_Unit(content_portion_attributes: content_portion_attributes, content_information: content_information)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let content_portion_attributes = self.content_portion_attributes { if let content_portion_attributes = self.content_portion_attributes { try coder.serialize(content_portion_attributes) } }
-            if let content_information = self.content_information { if let content_information = self.content_information { try coder.serialize(content_information) } }
+            if let content_portion_attributes = self.content_portion_attributes { try coder.serialize(content_portion_attributes) }
+            if let content_information = self.content_information { try coder.serialize(content_information) }
+
         }
     }
 }

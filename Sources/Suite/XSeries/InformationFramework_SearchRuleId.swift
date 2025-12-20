@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_SearchRuleId: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_SearchRuleId: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var id: ArraySlice<UInt8>
     @usableFromInline var dmdId: ASN1ObjectIdentifier
     @inlinable init(id: ArraySlice<UInt8>, dmdId: ASN1ObjectIdentifier) {
         self.id = id
         self.dmdId = dmdId
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let id: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let dmdId: ASN1ObjectIdentifier = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ASN1ObjectIdentifier(derEncoded: node) }
+
             return InformationFramework_SearchRuleId(id: id, dmdId: dmdId)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(id)
             try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(dmdId) }
+
         }
     }
 }

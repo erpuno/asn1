@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_MRSubstitution: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_MRSubstitution: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var attribute: InformationFramework_AttributeType
     @usableFromInline var oldMatchingRule: ASN1ObjectIdentifier?
@@ -11,6 +11,7 @@ import Foundation
         self.attribute = attribute
         self.oldMatchingRule = oldMatchingRule
         self.newMatchingRule = newMatchingRule
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let attribute: InformationFramework_AttributeType = try InformationFramework_AttributeType(derEncoded: &nodes)
             let oldMatchingRule: ASN1ObjectIdentifier? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ASN1ObjectIdentifier(derEncoded: node) }
             let newMatchingRule: ASN1ObjectIdentifier? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try ASN1ObjectIdentifier(derEncoded: node) }
+
             return InformationFramework_MRSubstitution(attribute: attribute, oldMatchingRule: oldMatchingRule, newMatchingRule: newMatchingRule)
         }
     }
@@ -25,8 +27,9 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(attribute)
-            if let oldMatchingRule = self.oldMatchingRule { if let oldMatchingRule = self.oldMatchingRule { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(oldMatchingRule) } } }
-            if let newMatchingRule = self.newMatchingRule { if let newMatchingRule = self.newMatchingRule { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(newMatchingRule) } } }
+            if let oldMatchingRule = self.oldMatchingRule { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(oldMatchingRule) } }
+            if let newMatchingRule = self.newMatchingRule { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(newMatchingRule) } }
+
         }
     }
 }

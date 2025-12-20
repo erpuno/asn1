@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCRMF_2009_POPOSigningKeyInput: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCRMF_2009_POPOSigningKeyInput: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var authInfo: PKIXCRMF_2009_POPOSigningKeyInput_authInfo_Choice
     @usableFromInline var publicKey: PKIX1Explicit88_SubjectPublicKeyInfo
     @inlinable init(authInfo: PKIXCRMF_2009_POPOSigningKeyInput_authInfo_Choice, publicKey: PKIX1Explicit88_SubjectPublicKeyInfo) {
         self.authInfo = authInfo
         self.publicKey = publicKey
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let authInfo: PKIXCRMF_2009_POPOSigningKeyInput_authInfo_Choice = try PKIXCRMF_2009_POPOSigningKeyInput_authInfo_Choice(derEncoded: &nodes)
             let publicKey: PKIX1Explicit88_SubjectPublicKeyInfo = try PKIX1Explicit88_SubjectPublicKeyInfo(derEncoded: &nodes)
+
             return PKIXCRMF_2009_POPOSigningKeyInput(authInfo: authInfo, publicKey: publicKey)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(authInfo)
             try coder.serialize(publicKey)
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_ExtensionReq: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_ExtensionReq: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var value: [AuthenticationFramework_Extension]
     @inlinable public init(_ value: [AuthenticationFramework_Extension]) { self.value = value }

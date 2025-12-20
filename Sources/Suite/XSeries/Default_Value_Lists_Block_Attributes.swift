@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Default_Value_Lists_Block_Attributes: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Default_Value_Lists_Block_Attributes: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var position: Default_Value_Lists_Attribute?
     @usableFromInline var dimensions: Default_Value_Lists_Attribute?
@@ -35,6 +35,7 @@ import Foundation
         self.content_colour_table = content_colour_table
         self.border = border
         self.sealed = sealed
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -114,27 +115,29 @@ var peek_sealed = nodes
 if let next = peek_sealed.next(), next.identifier == Default_Value_Lists_Attribute.defaultIdentifier {
     sealed = try Default_Value_Lists_Attribute(derEncoded: &nodes)
 }
+
             return Default_Value_Lists_Block_Attributes(position: position, dimensions: dimensions, transparency: transparency, presentation_attributes: presentation_attributes, presentation_style: presentation_style, layout_stream_categories: layout_stream_categories, layout_stream_sub_categories: layout_stream_sub_categories, colou: colou, colour_of_layout_object: colour_of_layout_object, object_colour_table: object_colour_table, content_background_colour: content_background_colour, content_foreground_colour: content_foreground_colour, content_colour_table: content_colour_table, border: border, sealed: sealed)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let position = self.position { if let position = self.position { try coder.serialize(position) } }
-            if let dimensions = self.dimensions { if let dimensions = self.dimensions { try coder.serialize(dimensions) } }
-            if let transparency = self.transparency { if let transparency = self.transparency { try coder.serialize(transparency) } }
-            if let presentation_attributes = self.presentation_attributes { if let presentation_attributes = self.presentation_attributes { try coder.serialize(presentation_attributes) } }
-            if let presentation_style = self.presentation_style { if let presentation_style = self.presentation_style { try coder.serialize(presentation_style) } }
-            if let layout_stream_categories = self.layout_stream_categories { if let layout_stream_categories = self.layout_stream_categories { try coder.serialize(layout_stream_categories) } }
-            if let layout_stream_sub_categories = self.layout_stream_sub_categories { if let layout_stream_sub_categories = self.layout_stream_sub_categories { try coder.serialize(layout_stream_sub_categories) } }
-            if let colou = self.colou { if let colou = self.colou { try coder.serialize(colou) } }
-            if let colour_of_layout_object = self.colour_of_layout_object { if let colour_of_layout_object = self.colour_of_layout_object { try coder.serialize(colour_of_layout_object) } }
-            if let object_colour_table = self.object_colour_table { if let object_colour_table = self.object_colour_table { try coder.serialize(object_colour_table) } }
-            if let content_background_colour = self.content_background_colour { if let content_background_colour = self.content_background_colour { try coder.serialize(content_background_colour) } }
-            if let content_foreground_colour = self.content_foreground_colour { if let content_foreground_colour = self.content_foreground_colour { try coder.serialize(content_foreground_colour) } }
-            if let content_colour_table = self.content_colour_table { if let content_colour_table = self.content_colour_table { try coder.serialize(content_colour_table) } }
-            if let border = self.border { if let border = self.border { try coder.serialize(border) } }
-            if let sealed = self.sealed { if let sealed = self.sealed { try coder.serialize(sealed) } }
+            if let position = self.position { try coder.serialize(position) }
+            if let dimensions = self.dimensions { try coder.serialize(dimensions) }
+            if let transparency = self.transparency { try coder.serialize(transparency) }
+            if let presentation_attributes = self.presentation_attributes { try coder.serialize(presentation_attributes) }
+            if let presentation_style = self.presentation_style { try coder.serialize(presentation_style) }
+            if let layout_stream_categories = self.layout_stream_categories { try coder.serialize(layout_stream_categories) }
+            if let layout_stream_sub_categories = self.layout_stream_sub_categories { try coder.serialize(layout_stream_sub_categories) }
+            if let colou = self.colou { try coder.serialize(colou) }
+            if let colour_of_layout_object = self.colour_of_layout_object { try coder.serialize(colour_of_layout_object) }
+            if let object_colour_table = self.object_colour_table { try coder.serialize(object_colour_table) }
+            if let content_background_colour = self.content_background_colour { try coder.serialize(content_background_colour) }
+            if let content_foreground_colour = self.content_foreground_colour { try coder.serialize(content_foreground_colour) }
+            if let content_colour_table = self.content_colour_table { try coder.serialize(content_colour_table) }
+            if let border = self.border { try coder.serialize(border) }
+            if let sealed = self.sealed { try coder.serialize(sealed) }
+
         }
     }
 }

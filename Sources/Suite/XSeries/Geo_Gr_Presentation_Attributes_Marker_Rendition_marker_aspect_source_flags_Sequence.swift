@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_aspect_source_flags_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_aspect_source_flags_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var marker_type_asf: Geo_Gr_Presentation_Attributes_ASF_Type
     @usableFromInline var marker_size_asf: Geo_Gr_Presentation_Attributes_ASF_Type
@@ -11,6 +11,7 @@ import Foundation
         self.marker_type_asf = marker_type_asf
         self.marker_size_asf = marker_size_asf
         self.marker_colour_asf = marker_colour_asf
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let marker_type_asf: Geo_Gr_Presentation_Attributes_ASF_Type = try Geo_Gr_Presentation_Attributes_ASF_Type(derEncoded: &nodes)
             let marker_size_asf: Geo_Gr_Presentation_Attributes_ASF_Type = try Geo_Gr_Presentation_Attributes_ASF_Type(derEncoded: &nodes)
             let marker_colour_asf: Geo_Gr_Presentation_Attributes_ASF_Type = try Geo_Gr_Presentation_Attributes_ASF_Type(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_aspect_source_flags_Sequence(marker_type_asf: marker_type_asf, marker_size_asf: marker_size_asf, marker_colour_asf: marker_colour_asf)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(marker_type_asf)
             try coder.serialize(marker_size_asf)
             try coder.serialize(marker_colour_asf)
+
         }
     }
 }

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLOwnerAdministration: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLOwnerAdministration: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var glName: PKIX1Implicit88_GeneralName
     @usableFromInline var glOwnerInfo: SMIMESymmetricKeyDistribution_2009_GLOwnerInfo
     @inlinable init(glName: PKIX1Implicit88_GeneralName, glOwnerInfo: SMIMESymmetricKeyDistribution_2009_GLOwnerInfo) {
         self.glName = glName
         self.glOwnerInfo = glOwnerInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let glName: PKIX1Implicit88_GeneralName = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
             let glOwnerInfo: SMIMESymmetricKeyDistribution_2009_GLOwnerInfo = try SMIMESymmetricKeyDistribution_2009_GLOwnerInfo(derEncoded: &nodes)
+
             return SMIMESymmetricKeyDistribution_2009_GLOwnerAdministration(glName: glName, glOwnerInfo: glOwnerInfo)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(glName)
             try coder.serialize(glOwnerInfo)
+
         }
     }
 }

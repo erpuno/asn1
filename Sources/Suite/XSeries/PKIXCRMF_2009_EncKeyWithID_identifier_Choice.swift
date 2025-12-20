@@ -2,23 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum PKIXCRMF_2009_EncKeyWithID_identifier_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum PKIXCRMF_2009_EncKeyWithID_identifier_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case string(ASN1UTF8String)
     case generalName(PKIX1Implicit88_GeneralName)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .application):
-                self = .string(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .application):
-                self = .generalName(try PKIX1Implicit88_GeneralName(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1UTF8String.defaultIdentifier:
+            self = .string(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case PKIX1Implicit88_GeneralName.defaultIdentifier:
+            self = .generalName(try PKIX1Implicit88_GeneralName(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .string(let string): try string.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .application))
-            case .generalName(let generalName): try generalName.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .application))
+        case .string(let string):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(string)
+                            }
+                        } else {
+                            try coder.serialize(string)
+                        }
+        case .generalName(let generalName):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(generalName)
+                            }
+                        } else {
+                            try coder.serialize(generalName)
+                        }
+
         }
     }
 

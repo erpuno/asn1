@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_7_ContentInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_7_ContentInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var contentType: PKCS_7_ContentType
     @usableFromInline var content: ASN1Any?
     @inlinable init(contentType: PKCS_7_ContentType, content: ASN1Any?) {
         self.contentType = contentType
         self.content = content
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let contentType: PKCS_7_ContentType = try PKCS_7_ContentType(derEncoded: &nodes)
             let content: ASN1Any? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ASN1Any(derEncoded: node) }
+
             return PKCS_7_ContentInfo(contentType: contentType, content: content)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(contentType)
-            if let content = self.content { if let content = self.content { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(content) } } }
+            if let content = self.content { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(content) } }
+
         }
     }
 }

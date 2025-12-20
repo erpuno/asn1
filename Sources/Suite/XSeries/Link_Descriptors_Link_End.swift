@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Link_Descriptors_Link_End: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Link_Descriptors_Link_End: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var reference: Link_Descriptors_Link_End_reference_Set
     @usableFromInline var user_readable_comments: Layout_Descriptors_Comment_String?
@@ -17,6 +17,7 @@ import Foundation
         self.presentation_style = presentation_style
         self.layout_style = layout_style
         self.application_comments = application_comments
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -27,6 +28,7 @@ import Foundation
             let presentation_style: Identifiers_and_Expressions_Style_Identifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific))
             let layout_style: Identifiers_and_Expressions_Style_Identifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 19, tagClass: .contextSpecific))
             let application_comments: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 25, tagClass: .contextSpecific))
+
             return Link_Descriptors_Link_End(reference: reference, user_readable_comments: user_readable_comments, user_visible_name: user_visible_name, presentation_style: presentation_style, layout_style: layout_style, application_comments: application_comments)
         }
     }
@@ -34,11 +36,12 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(reference)
-            if let user_readable_comments = self.user_readable_comments { if let user_readable_comments = self.user_readable_comments { try coder.serializeOptionalImplicitlyTagged(user_readable_comments, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let user_visible_name = self.user_visible_name { if let user_visible_name = self.user_visible_name { try coder.serializeOptionalImplicitlyTagged(user_visible_name, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let presentation_style = self.presentation_style { if let presentation_style = self.presentation_style { try coder.serializeOptionalImplicitlyTagged(presentation_style, withIdentifier: ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific)) } }
-            if let layout_style = self.layout_style { if let layout_style = self.layout_style { try coder.serializeOptionalImplicitlyTagged(layout_style, withIdentifier: ASN1Identifier(tagWithNumber: 19, tagClass: .contextSpecific)) } }
-            if let application_comments = self.application_comments { if let application_comments = self.application_comments { try coder.serializeOptionalImplicitlyTagged(application_comments, withIdentifier: ASN1Identifier(tagWithNumber: 25, tagClass: .contextSpecific)) } }
+            if let user_readable_comments = self.user_readable_comments { try coder.serializeOptionalImplicitlyTagged(user_readable_comments, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let user_visible_name = self.user_visible_name { try coder.serializeOptionalImplicitlyTagged(user_visible_name, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let presentation_style = self.presentation_style { try coder.serializeOptionalImplicitlyTagged(presentation_style, withIdentifier: ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific)) }
+            if let layout_style = self.layout_style { try coder.serializeOptionalImplicitlyTagged(layout_style, withIdentifier: ASN1Identifier(tagWithNumber: 19, tagClass: .contextSpecific)) }
+            if let application_comments = self.application_comments { try coder.serializeOptionalImplicitlyTagged(application_comments, withIdentifier: ASN1Identifier(tagWithNumber: 25, tagClass: .contextSpecific)) }
+
         }
     }
 }

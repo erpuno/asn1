@@ -2,27 +2,28 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Location_Expressions_Composite_Location_Expression: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Location_Expressions_Composite_Location_Expression: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case complement(Location_Expressions_Location_Expression)
     case intersection([Location_Expressions_Location_Expression])
     case union([Location_Expressions_Location_Expression])
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .complement(try Location_Expressions_Location_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .intersection(try DER.sequence(of: Location_Expressions_Location_Expression.self, identifier: rootNode.identifier, rootNode: rootNode))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .union(try DER.sequence(of: Location_Expressions_Location_Expression.self, identifier: rootNode.identifier, rootNode: rootNode))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .complement(try Location_Expressions_Location_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .intersection(try DER.sequence(of: Location_Expressions_Location_Expression.self, identifier: rootNode.identifier, rootNode: rootNode))
+        case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+            self = .union(try DER.sequence(of: Location_Expressions_Location_Expression.self, identifier: rootNode.identifier, rootNode: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .complement(let complement): try complement.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .intersection(let intersection): try coder.serializeSequenceOf(intersection, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            case .union(let union): try coder.serializeSequenceOf(union, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+        case .complement(let complement): try complement.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+        case .intersection(let intersection): try coder.serializeSequenceOf(intersection, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+        case .union(let union): try coder.serializeSequenceOf(union, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
         }
     }
 

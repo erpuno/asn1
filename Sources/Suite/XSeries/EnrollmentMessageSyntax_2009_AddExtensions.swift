@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_AddExtensions: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_AddExtensions: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var pkiDataReference: EnrollmentMessageSyntax_2009_BodyPartID
     @usableFromInline var certReferences: [EnrollmentMessageSyntax_2009_BodyPartID]
@@ -11,6 +11,7 @@ import Foundation
         self.pkiDataReference = pkiDataReference
         self.certReferences = certReferences
         self.extensions = extensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let pkiDataReference: EnrollmentMessageSyntax_2009_BodyPartID = try EnrollmentMessageSyntax_2009_BodyPartID(derEncoded: &nodes)
             let certReferences: [EnrollmentMessageSyntax_2009_BodyPartID] = try DER.sequence(of: EnrollmentMessageSyntax_2009_BodyPartID.self, identifier: .sequence, nodes: &nodes)
             let extensions: [AuthenticationFramework_Extension] = try DER.sequence(of: AuthenticationFramework_Extension.self, identifier: .sequence, nodes: &nodes)
+
             return EnrollmentMessageSyntax_2009_AddExtensions(pkiDataReference: pkiDataReference, certReferences: certReferences, extensions: extensions)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(pkiDataReference)
             try coder.serializeSequenceOf(certReferences)
             try coder.serializeSequenceOf(extensions)
+
         }
     }
 }

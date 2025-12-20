@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SMIMESymmetricKeyDistribution_2009_Certificates: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SMIMESymmetricKeyDistribution_2009_Certificates: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var pKC: PKIX1Explicit88_Certificate?
     @usableFromInline var aC: [PKIXAttributeCertificate_2009_AttributeCertificate]?
@@ -11,6 +11,7 @@ import Foundation
         self.pKC = pKC
         self.aC = aC
         self.certPath = certPath
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let pKC: PKIX1Explicit88_Certificate? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let aC: [PKIXAttributeCertificate_2009_AttributeCertificate]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.sequence(of: PKIXAttributeCertificate_2009_AttributeCertificate.self, identifier: node.identifier, rootNode: node) }
             let certPath: CryptographicMessageSyntax_2010_CertificateSet? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return SMIMESymmetricKeyDistribution_2009_Certificates(pKC: pKC, aC: aC, certPath: certPath)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let pKC = self.pKC { if let pKC = self.pKC { try coder.serializeOptionalImplicitlyTagged(pKC, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let aC = self.aC { if let aC = self.aC { try coder.serializeSequenceOf(aC, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let certPath = self.certPath { if let certPath = self.certPath { try coder.serializeOptionalImplicitlyTagged(certPath, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let pKC = self.pKC { try coder.serializeOptionalImplicitlyTagged(pKC, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let aC = self.aC { try coder.serializeSequenceOf(aC, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let certPath = self.certPath { try coder.serializeOptionalImplicitlyTagged(certPath, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

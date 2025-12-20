@@ -2,23 +2,24 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Geo_Gr_Presentation_Attributes_Scaled_or_Absolute: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Geo_Gr_Presentation_Attributes_Scaled_or_Absolute: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case absolute(Geo_Gr_Presentation_Attributes_Scaled_or_Absolute_absolute_Choice)
     case scaled(ASN1Any)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .absolute(try Geo_Gr_Presentation_Attributes_Scaled_or_Absolute_absolute_Choice(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 9, tagClass: .universal):
-                self = .scaled(ASN1Any(derEncoded: rootNode))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .absolute(try Geo_Gr_Presentation_Attributes_Scaled_or_Absolute_absolute_Choice(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 9, tagClass: .universal):
+            self = .scaled(ASN1Any(derEncoded: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .absolute(let absolute): try absolute.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .scaled(let scaled): try coder.serialize(scaled)
+        case .absolute(let absolute): try absolute.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+        case .scaled(let scaled): try coder.serialize(scaled)
+
         }
     }
 

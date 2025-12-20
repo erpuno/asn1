@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Text_Rendition_character_set_list_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Text_Rendition_character_set_list_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var character_set_type: Geo_Gr_Presentation_Attributes_Text_Rendition_character_set_list_Sequence_character_set_type_Enum
     @usableFromInline var designation_sequence_tail: ASN1UTF8String
     @inlinable init(character_set_type: Geo_Gr_Presentation_Attributes_Text_Rendition_character_set_list_Sequence_character_set_type_Enum, designation_sequence_tail: ASN1UTF8String) {
         self.character_set_type = character_set_type
         self.designation_sequence_tail = designation_sequence_tail
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let character_set_type: Geo_Gr_Presentation_Attributes_Text_Rendition_character_set_list_Sequence_character_set_type_Enum = try Geo_Gr_Presentation_Attributes_Text_Rendition_character_set_list_Sequence_character_set_type_Enum(derEncoded: &nodes)
             let designation_sequence_tail: ASN1UTF8String = try ASN1UTF8String(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Text_Rendition_character_set_list_Sequence(character_set_type: character_set_type, designation_sequence_tail: designation_sequence_tail)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(character_set_type)
             try coder.serialize(designation_sequence_tail)
+
         }
     }
 }

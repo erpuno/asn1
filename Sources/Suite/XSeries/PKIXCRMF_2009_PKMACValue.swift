@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCRMF_2009_PKMACValue: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCRMF_2009_PKMACValue: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var algId: PKIX1Explicit88_AlgorithmIdentifier
     @usableFromInline var value: ASN1BitString
     @inlinable init(algId: PKIX1Explicit88_AlgorithmIdentifier, value: ASN1BitString) {
         self.algId = algId
         self.value = value
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let algId: PKIX1Explicit88_AlgorithmIdentifier = try PKIX1Explicit88_AlgorithmIdentifier(derEncoded: &nodes)
             let value: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
+
             return PKIXCRMF_2009_PKMACValue(algId: algId, value: value)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(algId)
             try coder.serialize(value)
+
         }
     }
 }

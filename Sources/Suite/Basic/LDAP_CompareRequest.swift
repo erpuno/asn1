@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct LDAP_CompareRequest: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct LDAP_CompareRequest: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var entry: LDAP_LDAPDN
+    @usableFromInline var entry: LDAP_DN
     @usableFromInline var ava: LDAP_AttributeValueAssertion
-    @inlinable init(entry: LDAP_LDAPDN, ava: LDAP_AttributeValueAssertion) {
+    @inlinable init(entry: LDAP_DN, ava: LDAP_AttributeValueAssertion) {
         self.entry = entry
         self.ava = ava
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let entry: LDAP_LDAPDN = try LDAP_LDAPDN(derEncoded: &nodes)
+            let entry: LDAP_DN = try LDAP_DN(derEncoded: &nodes)
             let ava: LDAP_AttributeValueAssertion = try LDAP_AttributeValueAssertion(derEncoded: &nodes)
+
             return LDAP_CompareRequest(entry: entry, ava: ava)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(entry)
             try coder.serialize(ava)
+
         }
     }
 }

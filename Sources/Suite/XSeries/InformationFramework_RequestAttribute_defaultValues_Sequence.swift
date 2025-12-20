@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_RequestAttribute_defaultValues_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_RequestAttribute_defaultValues_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var entryType: ASN1ObjectIdentifier?
     @usableFromInline var values: [ASN1Any]
     @inlinable init(entryType: ASN1ObjectIdentifier?, values: [ASN1Any]) {
         self.entryType = entryType
         self.values = values
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,14 +20,16 @@ if let next = peek_entryType.next(), next.identifier == ASN1ObjectIdentifier.def
     entryType = try ASN1ObjectIdentifier(derEncoded: &nodes)
 }
             let values: [ASN1Any] = try DER.sequence(of: ASN1Any.self, identifier: .sequence, nodes: &nodes)
+
             return InformationFramework_RequestAttribute_defaultValues_Sequence(entryType: entryType, values: values)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let entryType = self.entryType { if let entryType = self.entryType { try coder.serialize(entryType) } }
+            if let entryType = self.entryType { try coder.serialize(entryType) }
             try coder.serializeSequenceOf(values)
+
         }
     }
 }

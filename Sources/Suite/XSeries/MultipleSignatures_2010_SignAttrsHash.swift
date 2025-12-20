@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct MultipleSignatures_2010_SignAttrsHash: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct MultipleSignatures_2010_SignAttrsHash: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var algID: CryptographicMessageSyntax_2010_DigestAlgorithmIdentifier
     @usableFromInline var hash: ASN1OctetString
     @inlinable init(algID: CryptographicMessageSyntax_2010_DigestAlgorithmIdentifier, hash: ASN1OctetString) {
         self.algID = algID
         self.hash = hash
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let algID: CryptographicMessageSyntax_2010_DigestAlgorithmIdentifier = try CryptographicMessageSyntax_2010_DigestAlgorithmIdentifier(derEncoded: &nodes)
             let hash: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return MultipleSignatures_2010_SignAttrsHash(algID: algID, hash: hash)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(algID)
             try coder.serialize(hash)
+
         }
     }
 }

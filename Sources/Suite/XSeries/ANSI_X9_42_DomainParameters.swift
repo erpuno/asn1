@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ANSI_X9_42_DomainParameters: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ANSI_X9_42_DomainParameters: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var p: ArraySlice<UInt8>
     @usableFromInline var g: ArraySlice<UInt8>
@@ -15,6 +15,7 @@ import Foundation
         self.q = q
         self.j = j
         self.validationParms = validationParms
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -32,6 +33,7 @@ var peek_validationParms = nodes
 if let next = peek_validationParms.next(), next.identifier == ANSI_X9_42_ValidationParms.defaultIdentifier {
     validationParms = try ANSI_X9_42_ValidationParms(derEncoded: &nodes)
 }
+
             return ANSI_X9_42_DomainParameters(p: p, g: g, q: q, j: j, validationParms: validationParms)
         }
     }
@@ -41,8 +43,9 @@ if let next = peek_validationParms.next(), next.identifier == ANSI_X9_42_Validat
             try coder.serialize(p)
             try coder.serialize(g)
             try coder.serialize(q)
-            if let j = self.j { if let j = self.j { try coder.serialize(j) } }
-            if let validationParms = self.validationParms { if let validationParms = self.validationParms { try coder.serialize(validationParms) } }
+            if let j = self.j { try coder.serialize(j) }
+            if let validationParms = self.validationParms { try coder.serialize(validationParms) }
+
         }
     }
 }

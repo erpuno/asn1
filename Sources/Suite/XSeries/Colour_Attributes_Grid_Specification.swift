@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_Grid_Specification: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_Grid_Specification: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var value: [Colour_Attributes_Grid_Specification_Element]
     @inlinable public init(_ value: [Colour_Attributes_Grid_Specification_Element]) { self.value = value }

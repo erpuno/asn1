@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_Colour_Space: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_Colour_Space: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var colour_space_id: ArraySlice<UInt8>
     @usableFromInline var colour_space_type: Colour_Attributes_Colour_Space_Type
@@ -15,6 +15,7 @@ import Foundation
         self.colour_space_name = colour_space_name
         self.colour_data_scaling = colour_data_scaling
         self.calibration_data = calibration_data
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,6 +25,7 @@ import Foundation
             let colour_space_name: Document_Profile_Descriptor_Character_Data? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let colour_data_scaling: Colour_Attributes_Colour_Data_Scaling? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try Colour_Attributes_Colour_Data_Scaling(derEncoded: node) }
             let calibration_data: Colour_Attributes_Calibration_Data? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in return try Colour_Attributes_Calibration_Data(derEncoded: node) }
+
             return Colour_Attributes_Colour_Space(colour_space_id: colour_space_id, colour_space_type: colour_space_type, colour_space_name: colour_space_name, colour_data_scaling: colour_data_scaling, calibration_data: calibration_data)
         }
     }
@@ -32,9 +34,10 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(colour_space_id, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(colour_space_type, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            if let colour_space_name = self.colour_space_name { if let colour_space_name = self.colour_space_name { try coder.serializeOptionalImplicitlyTagged(colour_space_name, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let colour_data_scaling = self.colour_data_scaling { if let colour_data_scaling = self.colour_data_scaling { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(colour_data_scaling) } } }
-            if let calibration_data = self.calibration_data { if let calibration_data = self.calibration_data { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(calibration_data) } } }
+            if let colour_space_name = self.colour_space_name { try coder.serializeOptionalImplicitlyTagged(colour_space_name, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let colour_data_scaling = self.colour_data_scaling { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(colour_data_scaling) } }
+            if let calibration_data = self.calibration_data { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(calibration_data) } }
+
         }
     }
 }

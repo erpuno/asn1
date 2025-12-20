@@ -2,27 +2,42 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum SelectedAttributeTypes_Period_weeks_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum SelectedAttributeTypes_Period_weeks_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case allWeeks(ASN1Null)
     case intWeek([ArraySlice<UInt8>])
     case bitWeek(ASN1BitString)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .application):
-                self = .allWeeks(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .application):
-                self = .intWeek(try DER.set(of: ArraySlice<UInt8>.self, identifier: rootNode.identifier, rootNode: rootNode))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .application):
-                self = .bitWeek(try ASN1BitString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Null.defaultIdentifier:
+            self = .allWeeks(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier.set:
+            self = .intWeek(try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: rootNode))
+        case ASN1BitString.defaultIdentifier:
+            self = .bitWeek(try ASN1BitString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .allWeeks(let allWeeks): try allWeeks.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .application))
-            case .intWeek(let intWeek): try coder.serializeSetOf(intWeek, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .application))
-            case .bitWeek(let bitWeek): try bitWeek.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .application))
+        case .allWeeks(let allWeeks):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(allWeeks)
+                            }
+                        } else {
+                            try coder.serialize(allWeeks)
+                        }
+        case .intWeek(let intWeek): try coder.serializeSetOf(intWeek)
+        case .bitWeek(let bitWeek):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(bitWeek)
+                            }
+                        } else {
+                            try coder.serialize(bitWeek)
+                        }
+
         }
     }
 

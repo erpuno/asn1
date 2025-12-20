@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct Layout_Descriptors_Enciphered_enciphered_subordinates_Choice_none_all_IntEnum : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct Layout_Descriptors_Enciphered_enciphered_subordinates_Choice_none_all_IntEnum : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: Layout_Descriptors_Enciphered_enciphered_subordinates_Choice_none_all_IntEnum, rhs: Layout_Descriptors_Enciphered_enciphered_subordinates_Choice_none_all_IntEnum) -> Bool { lhs.rawValue < rhs.rawValue }

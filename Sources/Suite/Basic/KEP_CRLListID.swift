@@ -2,16 +2,18 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_CRLListID: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_CRLListID: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var crls: [KEP_CrlValidatedID]
     @inlinable init(crls: [KEP_CrlValidatedID]) {
         self.crls = crls
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let crls: [KEP_CrlValidatedID] = try DER.sequence(of: KEP_CrlValidatedID.self, identifier: .sequence, nodes: &nodes)
+
             return KEP_CRLListID(crls: crls)
         }
     }
@@ -19,6 +21,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeSequenceOf(crls)
+
         }
     }
 }

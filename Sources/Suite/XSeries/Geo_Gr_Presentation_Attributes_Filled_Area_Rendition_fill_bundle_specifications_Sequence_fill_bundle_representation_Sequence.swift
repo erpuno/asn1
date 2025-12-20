@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Filled_Area_Rendition_fill_bundle_specifications_Sequence_fill_bundle_representation_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Filled_Area_Rendition_fill_bundle_specifications_Sequence_fill_bundle_representation_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var interior_style: Geo_Gr_Presentation_Attributes_Filled_Area_Rendition_fill_bundle_specifications_Sequence_fill_bundle_representation_Sequence_interior_style_Enum
     @usableFromInline var fill_colour: Geo_Gr_Presentation_Attributes_Colour
@@ -13,6 +13,7 @@ import Foundation
         self.fill_colour = fill_colour
         self.hatch_index = hatch_index
         self.patttern_index = patttern_index
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let fill_colour: Geo_Gr_Presentation_Attributes_Colour = try Geo_Gr_Presentation_Attributes_Colour(derEncoded: &nodes)
             let hatch_index: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let patttern_index: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Filled_Area_Rendition_fill_bundle_specifications_Sequence_fill_bundle_representation_Sequence(interior_style: interior_style, fill_colour: fill_colour, hatch_index: hatch_index, patttern_index: patttern_index)
         }
     }
@@ -31,6 +33,7 @@ import Foundation
             try coder.serialize(fill_colour)
             try coder.serialize(hatch_index)
             try coder.serialize(patttern_index)
+
         }
     }
 }

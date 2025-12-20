@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SelectedAttributeTypes_EnhancedGuide: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SelectedAttributeTypes_EnhancedGuide: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var objectClass: ASN1ObjectIdentifier
     @usableFromInline var criteria: SelectedAttributeTypes_Criteria
@@ -11,6 +11,7 @@ import Foundation
         self.objectClass = objectClass
         self.criteria = criteria
         self.subset = subset
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let objectClass: ASN1ObjectIdentifier = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ASN1ObjectIdentifier(derEncoded: node) }
             let criteria: SelectedAttributeTypes_Criteria = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try SelectedAttributeTypes_Criteria(derEncoded: node) }
             let subset = try SelectedAttributeTypes_EnhancedGuide_subset_IntEnum(rawValue: Int(derEncoded: &nodes))
+
             return SelectedAttributeTypes_EnhancedGuide(objectClass: objectClass, criteria: criteria, subset: subset)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(objectClass) }
             try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(criteria) }
             if let subset = self.subset { try coder.serialize(subset.rawValue, explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) }
+
         }
     }
 }

@@ -2,48 +2,49 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum SelectedAttributeTypes_TimeAssertion: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum SelectedAttributeTypes_TimeAssertion: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case now(ASN1Null)
     case at(GeneralizedTime)
     case between(SelectedAttributeTypes_TimeAssertion_between_Sequence)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Null.defaultIdentifier:
-                self = .now(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case GeneralizedTime.defaultIdentifier:
-                self = .at(try GeneralizedTime(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case SelectedAttributeTypes_TimeAssertion_between_Sequence.defaultIdentifier:
-                self = .between(try SelectedAttributeTypes_TimeAssertion_between_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Null.defaultIdentifier:
+            self = .now(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case GeneralizedTime.defaultIdentifier:
+            self = .at(try GeneralizedTime(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case SelectedAttributeTypes_TimeAssertion_between_Sequence.defaultIdentifier:
+            self = .between(try SelectedAttributeTypes_TimeAssertion_between_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .now(let now):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(now)
-                                }
-                            } else {
+        case .now(let now):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(now)
                             }
-            case .at(let at):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(at)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(now)
+                        }
+        case .at(let at):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(at)
                             }
-            case .between(let between):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(between)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(at)
+                        }
+        case .between(let between):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(between)
                             }
+                        } else {
+                            try coder.serialize(between)
+                        }
+
         }
     }
 

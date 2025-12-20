@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_bundle_specifications_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_bundle_specifications_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var marker_bundle_index: ArraySlice<UInt8>
     @usableFromInline var marker_bundle_representation: Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_bundle_specifications_Sequence_marker_bundle_representation_Sequence
     @inlinable init(marker_bundle_index: ArraySlice<UInt8>, marker_bundle_representation: Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_bundle_specifications_Sequence_marker_bundle_representation_Sequence) {
         self.marker_bundle_index = marker_bundle_index
         self.marker_bundle_representation = marker_bundle_representation
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let marker_bundle_index: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let marker_bundle_representation: Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_bundle_specifications_Sequence_marker_bundle_representation_Sequence = try Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_bundle_specifications_Sequence_marker_bundle_representation_Sequence(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_bundle_specifications_Sequence(marker_bundle_index: marker_bundle_index, marker_bundle_representation: marker_bundle_representation)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(marker_bundle_index)
             try coder.serialize(marker_bundle_representation)
+
         }
     }
 }

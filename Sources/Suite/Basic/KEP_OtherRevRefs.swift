@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_OtherRevRefs: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_OtherRevRefs: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var otherRevRefType: KEP_OtherRevRefType
     @usableFromInline var otherRevRefs: ASN1Any
     @inlinable init(otherRevRefType: KEP_OtherRevRefType, otherRevRefs: ASN1Any) {
         self.otherRevRefType = otherRevRefType
         self.otherRevRefs = otherRevRefs
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let otherRevRefType: KEP_OtherRevRefType = try KEP_OtherRevRefType(derEncoded: &nodes)
             let otherRevRefs: ASN1Any = try ASN1Any(derEncoded: &nodes)
+
             return KEP_OtherRevRefs(otherRevRefType: otherRevRefType, otherRevRefs: otherRevRefs)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(otherRevRefType)
             try coder.serialize(otherRevRefs)
+
         }
     }
 }

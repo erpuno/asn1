@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Line_Rendition: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Line_Rendition: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var line_width_specification_mode: Geo_Gr_Presentation_Attributes_SpecificationMode?
     @usableFromInline var line_bundle_index: ArraySlice<UInt8>?
@@ -19,6 +19,7 @@ import Foundation
         self.line_colour = line_colour
         self.line_aspect_source_flags = line_aspect_source_flags
         self.line_bundle_specifications = line_bundle_specifications
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -30,19 +31,21 @@ import Foundation
             let line_colour: Geo_Gr_Presentation_Attributes_Colour? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
             let line_aspect_source_flags: Geo_Gr_Presentation_Attributes_Line_Rendition_line_aspect_source_flags_Sequence? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
             let line_bundle_specifications: [Geo_Gr_Presentation_Attributes_Line_Rendition_line_bundle_specifications_Sequence]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 6, tagClass: .contextSpecific) { node in try DER.sequence(of: Geo_Gr_Presentation_Attributes_Line_Rendition_line_bundle_specifications_Sequence.self, identifier: node.identifier, rootNode: node) }
+
             return Geo_Gr_Presentation_Attributes_Line_Rendition(line_width_specification_mode: line_width_specification_mode, line_bundle_index: line_bundle_index, line_type: line_type, line_width: line_width, line_colour: line_colour, line_aspect_source_flags: line_aspect_source_flags, line_bundle_specifications: line_bundle_specifications)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let line_width_specification_mode = self.line_width_specification_mode { if let line_width_specification_mode = self.line_width_specification_mode { try coder.serializeOptionalImplicitlyTagged(line_width_specification_mode, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let line_bundle_index = self.line_bundle_index { if let line_bundle_index = self.line_bundle_index { try coder.serializeOptionalImplicitlyTagged(line_bundle_index, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let line_type = self.line_type { if let line_type = self.line_type { try coder.serializeOptionalImplicitlyTagged(line_type, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let line_width = self.line_width { if let line_width = self.line_width { try coder.serializeOptionalImplicitlyTagged(line_width, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let line_colour = self.line_colour { if let line_colour = self.line_colour { try coder.serializeOptionalImplicitlyTagged(line_colour, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let line_aspect_source_flags = self.line_aspect_source_flags { if let line_aspect_source_flags = self.line_aspect_source_flags { try coder.serializeOptionalImplicitlyTagged(line_aspect_source_flags, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let line_bundle_specifications = self.line_bundle_specifications { if let line_bundle_specifications = self.line_bundle_specifications { try coder.serializeSequenceOf(line_bundle_specifications, identifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
+            if let line_width_specification_mode = self.line_width_specification_mode { try coder.serializeOptionalImplicitlyTagged(line_width_specification_mode, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let line_bundle_index = self.line_bundle_index { try coder.serializeOptionalImplicitlyTagged(line_bundle_index, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let line_type = self.line_type { try coder.serializeOptionalImplicitlyTagged(line_type, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let line_width = self.line_width { try coder.serializeOptionalImplicitlyTagged(line_width, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let line_colour = self.line_colour { try coder.serializeOptionalImplicitlyTagged(line_colour, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let line_aspect_source_flags = self.line_aspect_source_flags { try coder.serializeOptionalImplicitlyTagged(line_aspect_source_flags, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let line_bundle_specifications = self.line_bundle_specifications { try coder.serializeSequenceOf(line_bundle_specifications, identifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+
         }
     }
 }

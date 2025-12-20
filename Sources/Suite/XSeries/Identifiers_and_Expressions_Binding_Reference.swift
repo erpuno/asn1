@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Identifiers_and_Expressions_Binding_Reference: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Identifiers_and_Expressions_Binding_Reference: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var object_reference: Identifiers_and_Expressions_Binding_Reference_object_reference_Choice
     @usableFromInline var binding_identifier: Identifiers_and_Expressions_Binding_Name
     @inlinable init(object_reference: Identifiers_and_Expressions_Binding_Reference_object_reference_Choice, binding_identifier: Identifiers_and_Expressions_Binding_Name) {
         self.object_reference = object_reference
         self.binding_identifier = binding_identifier
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let object_reference: Identifiers_and_Expressions_Binding_Reference_object_reference_Choice = try Identifiers_and_Expressions_Binding_Reference_object_reference_Choice(derEncoded: &nodes)
             let binding_identifier: Identifiers_and_Expressions_Binding_Name = try Identifiers_and_Expressions_Binding_Name(derEncoded: &nodes)
+
             return Identifiers_and_Expressions_Binding_Reference(object_reference: object_reference, binding_identifier: binding_identifier)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(object_reference)
             try coder.serialize(binding_identifier)
+
         }
     }
 }

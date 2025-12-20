@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_SignaturePolicyId: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_SignaturePolicyId: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var sigPolicyId: KEP_SigPolicyId
     @usableFromInline var sigPolicyHash: KEP_SigPolicyHash?
     @inlinable init(sigPolicyId: KEP_SigPolicyId, sigPolicyHash: KEP_SigPolicyHash?) {
         self.sigPolicyId = sigPolicyId
         self.sigPolicyHash = sigPolicyHash
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,6 +20,7 @@ var peek_sigPolicyHash = nodes
 if let next = peek_sigPolicyHash.next(), next.identifier == KEP_SigPolicyHash.defaultIdentifier {
     sigPolicyHash = try KEP_SigPolicyHash(derEncoded: &nodes)
 }
+
             return KEP_SignaturePolicyId(sigPolicyId: sigPolicyId, sigPolicyHash: sigPolicyHash)
         }
     }
@@ -26,7 +28,8 @@ if let next = peek_sigPolicyHash.next(), next.identifier == KEP_SigPolicyHash.de
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(sigPolicyId)
-            if let sigPolicyHash = self.sigPolicyHash { if let sigPolicyHash = self.sigPolicyHash { try coder.serialize(sigPolicyHash) } }
+            if let sigPolicyHash = self.sigPolicyHash { try coder.serialize(sigPolicyHash) }
+
         }
     }
 }

@@ -2,37 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum DOR_definition_Token: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum DOR_definition_Token: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case simpletoken(ASN1OctetString)
     case externaltoken(EXTERNAL)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1OctetString.defaultIdentifier:
-                self = .simpletoken(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case EXTERNAL.defaultIdentifier:
-                self = .externaltoken(try EXTERNAL(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1OctetString.defaultIdentifier:
+            self = .simpletoken(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case EXTERNAL.defaultIdentifier:
+            self = .externaltoken(try EXTERNAL(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .simpletoken(let simpletoken):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(simpletoken)
-                                }
-                            } else {
+        case .simpletoken(let simpletoken):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(simpletoken)
                             }
-            case .externaltoken(let externaltoken):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(externaltoken)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(simpletoken)
+                        }
+        case .externaltoken(let externaltoken):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(externaltoken)
                             }
+                        } else {
+                            try coder.serialize(externaltoken)
+                        }
+
         }
     }
 

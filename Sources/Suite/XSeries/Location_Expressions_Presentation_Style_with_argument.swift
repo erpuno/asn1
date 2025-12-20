@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Location_Expressions_Presentation_Style_with_argument: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Location_Expressions_Presentation_Style_with_argument: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var attributeValuePresentationStyle: Location_Expressions_AttributeValue_PresentationStyle_Specification
     @usableFromInline var not_defaulting: Bool?
     @inlinable init(attributeValuePresentationStyle: Location_Expressions_AttributeValue_PresentationStyle_Specification, not_defaulting: Bool?) {
         self.attributeValuePresentationStyle = attributeValuePresentationStyle
         self.not_defaulting = not_defaulting
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let attributeValuePresentationStyle: Location_Expressions_AttributeValue_PresentationStyle_Specification = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let not_defaulting: Bool = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
+
             return Location_Expressions_Presentation_Style_with_argument(attributeValuePresentationStyle: attributeValuePresentationStyle, not_defaulting: not_defaulting)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(attributeValuePresentationStyle, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            if let not_defaulting = self.not_defaulting { if let not_defaulting = self.not_defaulting { try coder.serializeOptionalImplicitlyTagged(not_defaulting, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let not_defaulting = self.not_defaulting { try coder.serializeOptionalImplicitlyTagged(not_defaulting, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

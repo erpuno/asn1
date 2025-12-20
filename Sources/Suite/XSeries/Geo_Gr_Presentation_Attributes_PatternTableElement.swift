@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_PatternTableElement: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_PatternTableElement: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var pattern_table_index: ArraySlice<UInt8>
     @usableFromInline var nx: ArraySlice<UInt8>
@@ -15,6 +15,7 @@ import Foundation
         self.ny = ny
         self.local_colour_precision = local_colour_precision
         self.colour = colour
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,6 +25,7 @@ import Foundation
             let ny: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let local_colour_precision: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let colour: [Geo_Gr_Presentation_Attributes_Colour] = try DER.sequence(of: Geo_Gr_Presentation_Attributes_Colour.self, identifier: .sequence, nodes: &nodes)
+
             return Geo_Gr_Presentation_Attributes_PatternTableElement(pattern_table_index: pattern_table_index, nx: nx, ny: ny, local_colour_precision: local_colour_precision, colour: colour)
         }
     }
@@ -35,6 +37,7 @@ import Foundation
             try coder.serialize(ny)
             try coder.serialize(local_colour_precision)
             try coder.serializeSequenceOf(colour)
+
         }
     }
 }

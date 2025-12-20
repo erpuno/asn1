@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXAttributeCertificate_2009_AttCertValidityPeriod: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXAttributeCertificate_2009_AttCertValidityPeriod: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var notBeforeTime: GeneralizedTime
     @usableFromInline var notAfterTime: GeneralizedTime
     @inlinable init(notBeforeTime: GeneralizedTime, notAfterTime: GeneralizedTime) {
         self.notBeforeTime = notBeforeTime
         self.notAfterTime = notAfterTime
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let notBeforeTime: GeneralizedTime = try GeneralizedTime(derEncoded: &nodes)
             let notAfterTime: GeneralizedTime = try GeneralizedTime(derEncoded: &nodes)
+
             return PKIXAttributeCertificate_2009_AttCertValidityPeriod(notBeforeTime: notBeforeTime, notAfterTime: notAfterTime)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(notBeforeTime)
             try coder.serialize(notAfterTime)
+
         }
     }
 }

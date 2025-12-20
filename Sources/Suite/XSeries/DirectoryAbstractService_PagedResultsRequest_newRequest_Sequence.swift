@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_PagedResultsRequest_newRequest_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_PagedResultsRequest_newRequest_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var pageSize: ArraySlice<UInt8>
     @usableFromInline var sortKeys: [DirectoryAbstractService_SortKey]?
@@ -13,6 +13,7 @@ import Foundation
         self.sortKeys = sortKeys
         self.reverse = reverse
         self.unmerged = unmerged
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let sortKeys: [DirectoryAbstractService_SortKey]? = try DER.sequence(of: DirectoryAbstractService_SortKey.self, identifier: .sequence, nodes: &nodes)
             let reverse: Bool = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try Bool(derEncoded: node) }
             let unmerged: Bool = try DER.explicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try Bool(derEncoded: node) }
+
             return DirectoryAbstractService_PagedResultsRequest_newRequest_Sequence(pageSize: pageSize, sortKeys: sortKeys, reverse: reverse, unmerged: unmerged)
         }
     }
@@ -28,9 +30,10 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(pageSize)
-            if let sortKeys = self.sortKeys { if let sortKeys = self.sortKeys { try coder.serializeSequenceOf(sortKeys) } }
-            if let reverse = self.reverse { if let reverse = self.reverse { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(reverse) } } }
-            if let unmerged = self.unmerged { if let unmerged = self.unmerged { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(unmerged) } } }
+            if let sortKeys = self.sortKeys { try coder.serializeSequenceOf(sortKeys) }
+            if let reverse = self.reverse { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(reverse) } }
+            if let unmerged = self.unmerged { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(unmerged) } }
+
         }
     }
 }

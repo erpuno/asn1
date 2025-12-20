@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Layout_Descriptors_Dimension_rule_b_Set: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Layout_Descriptors_Dimension_rule_b_Set: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var minimum: ArraySlice<UInt8>?
     @usableFromInline var maximum: ArraySlice<UInt8>?
     @inlinable init(minimum: ArraySlice<UInt8>?, maximum: ArraySlice<UInt8>?) {
         self.minimum = minimum
         self.maximum = maximum
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let minimum: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let maximum: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return Layout_Descriptors_Dimension_rule_b_Set(minimum: minimum, maximum: maximum)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let minimum = self.minimum { if let minimum = self.minimum { try coder.serializeOptionalImplicitlyTagged(minimum, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let maximum = self.maximum { if let maximum = self.maximum { try coder.serializeOptionalImplicitlyTagged(maximum, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let minimum = self.minimum { try coder.serializeOptionalImplicitlyTagged(minimum, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let maximum = self.maximum { try coder.serializeOptionalImplicitlyTagged(maximum, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

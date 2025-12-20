@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct Layout_Descriptors_Colour : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct Layout_Descriptors_Colour : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: Layout_Descriptors_Colour, rhs: Layout_Descriptors_Colour) -> Bool { lhs.rawValue < rhs.rawValue }

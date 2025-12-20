@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct AlgorithmInformation_2009_SMIMECapabilities: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct AlgorithmInformation_2009_SMIMECapabilities: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var value: [AlgorithmInformation_2009_SMIMECapability]
     @inlinable public init(_ value: [AlgorithmInformation_2009_SMIMECapability]) { self.value = value }

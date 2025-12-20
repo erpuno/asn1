@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Document_Profile_Descriptor_Document_Characteristics_alternative_feature_sets_Element: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Document_Profile_Descriptor_Document_Characteristics_alternative_feature_sets_Element: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var value: [ASN1ObjectIdentifier]
     @inlinable public init(_ value: [ASN1ObjectIdentifier]) { self.value = value }

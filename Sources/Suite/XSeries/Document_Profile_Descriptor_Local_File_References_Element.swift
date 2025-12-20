@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Local_File_References_Element: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Local_File_References_Element: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var file_name: Document_Profile_Descriptor_Character_Data?
     @usableFromInline var location: Document_Profile_Descriptor_Character_Data?
@@ -11,6 +11,7 @@ import Foundation
         self.file_name = file_name
         self.location = location
         self.user_comments = user_comments
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let file_name: Document_Profile_Descriptor_Character_Data? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let location: Document_Profile_Descriptor_Character_Data? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let user_comments: Document_Profile_Descriptor_Character_Data? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return Document_Profile_Descriptor_Local_File_References_Element(file_name: file_name, location: location, user_comments: user_comments)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let file_name = self.file_name { if let file_name = self.file_name { try coder.serializeOptionalImplicitlyTagged(file_name, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let location = self.location { if let location = self.location { try coder.serializeOptionalImplicitlyTagged(location, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let user_comments = self.user_comments { if let user_comments = self.user_comments { try coder.serializeOptionalImplicitlyTagged(user_comments, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let file_name = self.file_name { try coder.serializeOptionalImplicitlyTagged(file_name, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let location = self.location { try coder.serializeOptionalImplicitlyTagged(location, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let user_comments = self.user_comments { try coder.serializeOptionalImplicitlyTagged(user_comments, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

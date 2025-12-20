@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ANSI_X9_42_ValidationParms: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ANSI_X9_42_ValidationParms: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var seed: ASN1BitString
     @usableFromInline var pGenCounter: ArraySlice<UInt8>
     @inlinable init(seed: ASN1BitString, pGenCounter: ArraySlice<UInt8>) {
         self.seed = seed
         self.pGenCounter = pGenCounter
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let seed: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
             let pGenCounter: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return ANSI_X9_42_ValidationParms(seed: seed, pGenCounter: pGenCounter)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(seed)
             try coder.serialize(pGenCounter)
+
         }
     }
 }

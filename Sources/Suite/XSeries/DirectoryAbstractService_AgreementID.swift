@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_AgreementID: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_AgreementID: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var ident: ArraySlice<UInt8>
     @usableFromInline var version: ArraySlice<UInt8>
     @inlinable init(ident: ArraySlice<UInt8>, version: ArraySlice<UInt8>) {
         self.ident = ident
         self.version = version
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let ident: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let version: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return DirectoryAbstractService_AgreementID(ident: ident, version: version)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(ident)
             try coder.serialize(version)
+
         }
     }
 }

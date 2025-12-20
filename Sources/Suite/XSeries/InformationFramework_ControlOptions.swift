@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_ControlOptions: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_ControlOptions: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var serviceControls: DirectoryAbstractService_ServiceControlOptions?
     @usableFromInline var searchOptions: DirectoryAbstractService_SearchControlOptions?
@@ -11,6 +11,7 @@ import Foundation
         self.serviceControls = serviceControls
         self.searchOptions = searchOptions
         self.hierarchyOptions = hierarchyOptions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let serviceControls: DirectoryAbstractService_ServiceControlOptions = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try DirectoryAbstractService_ServiceControlOptions(derEncoded: node) }
             let searchOptions: DirectoryAbstractService_SearchControlOptions = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try DirectoryAbstractService_SearchControlOptions(derEncoded: node) }
             let hierarchyOptions: DirectoryAbstractService_HierarchySelections? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try DirectoryAbstractService_HierarchySelections(derEncoded: node) }
+
             return InformationFramework_ControlOptions(serviceControls: serviceControls, searchOptions: searchOptions, hierarchyOptions: hierarchyOptions)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let serviceControls = self.serviceControls { if let serviceControls = self.serviceControls { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(serviceControls) } } }
-            if let searchOptions = self.searchOptions { if let searchOptions = self.searchOptions { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(searchOptions) } } }
-            if let hierarchyOptions = self.hierarchyOptions { if let hierarchyOptions = self.hierarchyOptions { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(hierarchyOptions) } } }
+            if let serviceControls = self.serviceControls { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(serviceControls) } }
+            if let searchOptions = self.searchOptions { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(searchOptions) } }
+            if let hierarchyOptions = self.hierarchyOptions { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(hierarchyOptions) } }
+
         }
     }
 }

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Raster_Gr_Presentation_Attributes_Coordinate_Pair: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Raster_Gr_Presentation_Attributes_Coordinate_Pair: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var x_coordinate: ArraySlice<UInt8>
     @usableFromInline var y_coordinate: ArraySlice<UInt8>
     @inlinable init(x_coordinate: ArraySlice<UInt8>, y_coordinate: ArraySlice<UInt8>) {
         self.x_coordinate = x_coordinate
         self.y_coordinate = y_coordinate
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let x_coordinate: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let y_coordinate: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return Raster_Gr_Presentation_Attributes_Coordinate_Pair(x_coordinate: x_coordinate, y_coordinate: y_coordinate)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(x_coordinate)
             try coder.serialize(y_coordinate)
+
         }
     }
 }

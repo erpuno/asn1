@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCRMF_2009_SinglePubInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCRMF_2009_SinglePubInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var pubMethod: PKIXCRMF_2009_SinglePubInfo_pubMethod_IntEnum
     @usableFromInline var pubLocation: PKIX1Implicit88_GeneralName?
     @inlinable init(pubMethod: PKIXCRMF_2009_SinglePubInfo_pubMethod_IntEnum, pubLocation: PKIX1Implicit88_GeneralName?) {
         self.pubMethod = pubMethod
         self.pubLocation = pubLocation
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,14 +20,16 @@ var peek_pubLocation = nodes
 if let next = peek_pubLocation.next(), next.identifier == PKIX1Implicit88_GeneralName.defaultIdentifier {
     pubLocation = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
 }
+
             return PKIXCRMF_2009_SinglePubInfo(pubMethod: pubMethod, pubLocation: pubLocation)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(pubMethod.rawValue)
-            if let pubLocation = self.pubLocation { if let pubLocation = self.pubLocation { try coder.serialize(pubLocation) } }
+            try pubMethod.serialize(into: &coder, withIdentifier: identifier)
+            if let pubLocation = self.pubLocation { try coder.serialize(pubLocation) }
+
         }
     }
 }

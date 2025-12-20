@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Character_Presentation_Attributes_Tabulation_Stop: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Character_Presentation_Attributes_Tabulation_Stop: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var tabulation_reference: ASN1PrintableString
     @usableFromInline var tabulation_position: ArraySlice<UInt8>
@@ -13,6 +13,7 @@ import Foundation
         self.tabulation_position = tabulation_position
         self.alignment = alignment
         self.alignment_character_string = alignment_character_string
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let tabulation_position: ArraySlice<UInt8> = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
             let alignment = try Character_Presentation_Attributes_Tabulation_Stop_alignment_IntEnum(rawValue: Int(derEncoded: &nodes))
             let alignment_character_string: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
             return Character_Presentation_Attributes_Tabulation_Stop(tabulation_reference: tabulation_reference, tabulation_position: tabulation_position, alignment: alignment, alignment_character_string: alignment_character_string)
         }
     }
@@ -30,7 +32,8 @@ import Foundation
             try coder.serializeOptionalImplicitlyTagged(tabulation_reference, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(tabulation_position, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             try coder.serialize(alignment.rawValue, explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific)
-            if let alignment_character_string = self.alignment_character_string { if let alignment_character_string = self.alignment_character_string { try coder.serializeOptionalImplicitlyTagged(alignment_character_string, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
+            if let alignment_character_string = self.alignment_character_string { try coder.serializeOptionalImplicitlyTagged(alignment_character_string, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+
         }
     }
 }

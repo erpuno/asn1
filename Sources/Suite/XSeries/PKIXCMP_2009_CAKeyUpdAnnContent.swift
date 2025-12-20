@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_CAKeyUpdAnnContent: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_CAKeyUpdAnnContent: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var oldWithNew: PKIXCMP_2009_CMPCertificate
     @usableFromInline var newWithOld: PKIXCMP_2009_CMPCertificate
@@ -11,6 +11,7 @@ import Foundation
         self.oldWithNew = oldWithNew
         self.newWithOld = newWithOld
         self.newWithNew = newWithNew
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let oldWithNew: PKIXCMP_2009_CMPCertificate = try PKIXCMP_2009_CMPCertificate(derEncoded: &nodes)
             let newWithOld: PKIXCMP_2009_CMPCertificate = try PKIXCMP_2009_CMPCertificate(derEncoded: &nodes)
             let newWithNew: PKIXCMP_2009_CMPCertificate = try PKIXCMP_2009_CMPCertificate(derEncoded: &nodes)
+
             return PKIXCMP_2009_CAKeyUpdAnnContent(oldWithNew: oldWithNew, newWithOld: newWithOld, newWithNew: newWithNew)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(oldWithNew)
             try coder.serialize(newWithOld)
             try coder.serialize(newWithNew)
+
         }
     }
 }

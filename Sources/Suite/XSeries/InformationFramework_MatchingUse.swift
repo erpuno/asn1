@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_MatchingUse: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_MatchingUse: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var restrictionType: ASN1ObjectIdentifier
     @usableFromInline var restrictionValue: ASN1Any
     @inlinable init(restrictionType: ASN1ObjectIdentifier, restrictionValue: ASN1Any) {
         self.restrictionType = restrictionType
         self.restrictionValue = restrictionValue
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let restrictionType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let restrictionValue: ASN1Any = try ASN1Any(derEncoded: &nodes)
+
             return InformationFramework_MatchingUse(restrictionType: restrictionType, restrictionValue: restrictionValue)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(restrictionType)
             try coder.serialize(restrictionValue)
+
         }
     }
 }

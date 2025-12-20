@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ANSI_X9_62_ECCAlgorithms: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct ANSI_X9_62_ECCAlgorithms: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var value: [ANSI_X9_62_ECCAlgorithm]
     @inlinable public init(_ value: [ANSI_X9_62_ECCAlgorithm]) { self.value = value }

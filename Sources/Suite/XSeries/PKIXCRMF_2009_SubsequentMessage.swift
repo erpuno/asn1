@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct PKIXCRMF_2009_SubsequentMessage : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct PKIXCRMF_2009_SubsequentMessage : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: PKIXCRMF_2009_SubsequentMessage, rhs: PKIXCRMF_2009_SubsequentMessage) -> Bool { lhs.rawValue < rhs.rawValue }

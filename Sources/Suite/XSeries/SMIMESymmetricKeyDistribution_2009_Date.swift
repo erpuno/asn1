@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SMIMESymmetricKeyDistribution_2009_Date: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SMIMESymmetricKeyDistribution_2009_Date: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var start: GeneralizedTime
     @usableFromInline var end: GeneralizedTime?
     @inlinable init(start: GeneralizedTime, end: GeneralizedTime?) {
         self.start = start
         self.end = end
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,6 +20,7 @@ var peek_end = nodes
 if let next = peek_end.next(), next.identifier == GeneralizedTime.defaultIdentifier {
     end = try GeneralizedTime(derEncoded: &nodes)
 }
+
             return SMIMESymmetricKeyDistribution_2009_Date(start: start, end: end)
         }
     }
@@ -26,7 +28,8 @@ if let next = peek_end.next(), next.identifier == GeneralizedTime.defaultIdentif
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(start)
-            if let end = self.end { if let end = self.end { try coder.serialize(end) } }
+            if let end = self.end { try coder.serialize(end) }
+
         }
     }
 }

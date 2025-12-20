@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Glyph_Complement: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Glyph_Complement: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var iso_standard_9541_numglyphs: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Cardinal?
     @usableFromInline var iso_standard_9541_incglyphcols: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name]?
@@ -17,6 +17,7 @@ import Foundation
         self.iso_standard_9541_incglyphs = iso_standard_9541_incglyphs
         self.iso_standard_9541_excglyphs = iso_standard_9541_excglyphs
         self.non_iso_properties = non_iso_properties
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -27,18 +28,20 @@ import Foundation
             let iso_standard_9541_incglyphs: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in try DER.set(of: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name.self, identifier: node.identifier, rootNode: node) }
             let iso_standard_9541_excglyphs: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in try DER.set(of: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name.self, identifier: node.identifier, rootNode: node) }
             let non_iso_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Glyph_Complement(iso_standard_9541_numglyphs: iso_standard_9541_numglyphs, iso_standard_9541_incglyphcols: iso_standard_9541_incglyphcols, iso_standard_9541_excglyphcols: iso_standard_9541_excglyphcols, iso_standard_9541_incglyphs: iso_standard_9541_incglyphs, iso_standard_9541_excglyphs: iso_standard_9541_excglyphs, non_iso_properties: non_iso_properties)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let iso_standard_9541_numglyphs = self.iso_standard_9541_numglyphs { if let iso_standard_9541_numglyphs = self.iso_standard_9541_numglyphs { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_numglyphs, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_incglyphcols = self.iso_standard_9541_incglyphcols { if let iso_standard_9541_incglyphcols = self.iso_standard_9541_incglyphcols { try coder.serializeSetOf(iso_standard_9541_incglyphcols, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_excglyphcols = self.iso_standard_9541_excglyphcols { if let iso_standard_9541_excglyphcols = self.iso_standard_9541_excglyphcols { try coder.serializeSetOf(iso_standard_9541_excglyphcols, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_incglyphs = self.iso_standard_9541_incglyphs { if let iso_standard_9541_incglyphs = self.iso_standard_9541_incglyphs { try coder.serializeSetOf(iso_standard_9541_incglyphs, identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_excglyphs = self.iso_standard_9541_excglyphs { if let iso_standard_9541_excglyphs = self.iso_standard_9541_excglyphs { try coder.serializeSetOf(iso_standard_9541_excglyphs, identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let non_iso_properties = self.non_iso_properties { if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
+            if let iso_standard_9541_numglyphs = self.iso_standard_9541_numglyphs { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_numglyphs, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_incglyphcols = self.iso_standard_9541_incglyphcols { try coder.serializeSetOf(iso_standard_9541_incglyphcols, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_excglyphcols = self.iso_standard_9541_excglyphcols { try coder.serializeSetOf(iso_standard_9541_excglyphcols, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_incglyphs = self.iso_standard_9541_incglyphs { try coder.serializeSetOf(iso_standard_9541_incglyphs, identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_excglyphs = self.iso_standard_9541_excglyphs { try coder.serializeSetOf(iso_standard_9541_excglyphs, identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+
         }
     }
 }

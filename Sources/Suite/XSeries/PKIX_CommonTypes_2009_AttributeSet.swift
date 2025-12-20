@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX_CommonTypes_2009_AttributeSet: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX_CommonTypes_2009_AttributeSet: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var type: ASN1ObjectIdentifier
     @usableFromInline var values: [ASN1Any]
     @inlinable init(type: ASN1ObjectIdentifier, values: [ASN1Any]) {
         self.type = type
         self.values = values
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let type: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let values: [ASN1Any] = try DER.set(of: ASN1Any.self, identifier: .set, nodes: &nodes)
+
             return PKIX_CommonTypes_2009_AttributeSet(type: type, values: values)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(type)
             try coder.serializeSetOf(values)
+
         }
     }
 }

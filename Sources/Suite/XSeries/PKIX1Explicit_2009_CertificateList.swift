@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Explicit_2009_CertificateList: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Explicit_2009_CertificateList: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var toBeSigned: PKIX1Explicit_2009_CertificateList_toBeSigned
     @usableFromInline var algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.toBeSigned = toBeSigned
         self.algorithmIdentifier = algorithmIdentifier
         self.encrypted = encrypted
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let toBeSigned: PKIX1Explicit_2009_CertificateList_toBeSigned = try PKIX1Explicit_2009_CertificateList_toBeSigned(derEncoded: &nodes)
             let algorithmIdentifier: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let encrypted: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
+
             return PKIX1Explicit_2009_CertificateList(toBeSigned: toBeSigned, algorithmIdentifier: algorithmIdentifier, encrypted: encrypted)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(toBeSigned)
             try coder.serialize(algorithmIdentifier)
             try coder.serialize(encrypted)
+
         }
     }
 }

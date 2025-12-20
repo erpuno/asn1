@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CHAT_Typing: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CHAT_Typing: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var session: ASN1OctetString
     @usableFromInline var nickname: ASN1OctetString
@@ -11,6 +11,7 @@ import Foundation
         self.session = session
         self.nickname = nickname
         self.comments = comments
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let session: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let nickname: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let comments: [ASN1OctetString] = try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, nodes: &nodes)
+
             return CHAT_Typing(session: session, nickname: nickname, comments: comments)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(session)
             try coder.serialize(nickname)
             try coder.serializeSequenceOf(comments)
+
         }
     }
 }

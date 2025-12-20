@@ -2,27 +2,28 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum SecureMimeMessageV3dot1_2009_SMIMEEncryptionKeyPreference: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum SecureMimeMessageV3dot1_2009_SMIMEEncryptionKeyPreference: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case issuerAndSerialNumber(PKCS_7_IssuerAndSerialNumber)
     case receipentKeyId(CryptographicMessageSyntax_2010_RecipientKeyIdentifier)
     case subjectAltKeyIdentifier(PKIX1Implicit88_SubjectKeyIdentifier)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .issuerAndSerialNumber(try PKCS_7_IssuerAndSerialNumber(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .receipentKeyId(try CryptographicMessageSyntax_2010_RecipientKeyIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .subjectAltKeyIdentifier(try PKIX1Implicit88_SubjectKeyIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .issuerAndSerialNumber(try PKCS_7_IssuerAndSerialNumber(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .receipentKeyId(try CryptographicMessageSyntax_2010_RecipientKeyIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+            self = .subjectAltKeyIdentifier(try PKIX1Implicit88_SubjectKeyIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .issuerAndSerialNumber(let issuerAndSerialNumber): try issuerAndSerialNumber.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .receipentKeyId(let receipentKeyId): try receipentKeyId.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            case .subjectAltKeyIdentifier(let subjectAltKeyIdentifier): try subjectAltKeyIdentifier.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+        case .issuerAndSerialNumber(let issuerAndSerialNumber): try issuerAndSerialNumber.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+        case .receipentKeyId(let receipentKeyId): try receipentKeyId.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+        case .subjectAltKeyIdentifier(let subjectAltKeyIdentifier): try subjectAltKeyIdentifier.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
         }
     }
 

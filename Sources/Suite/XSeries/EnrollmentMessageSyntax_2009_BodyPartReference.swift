@@ -2,37 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum EnrollmentMessageSyntax_2009_BodyPartReference: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum EnrollmentMessageSyntax_2009_BodyPartReference: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case bodyPartID(EnrollmentMessageSyntax_2009_BodyPartID)
     case bodyPartPath(EnrollmentMessageSyntax_2009_BodyPartPath)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case EnrollmentMessageSyntax_2009_BodyPartID.defaultIdentifier:
-                self = .bodyPartID(try EnrollmentMessageSyntax_2009_BodyPartID(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case EnrollmentMessageSyntax_2009_BodyPartPath.defaultIdentifier:
-                self = .bodyPartPath(try EnrollmentMessageSyntax_2009_BodyPartPath(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case EnrollmentMessageSyntax_2009_BodyPartID.defaultIdentifier:
+            self = .bodyPartID(try EnrollmentMessageSyntax_2009_BodyPartID(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case EnrollmentMessageSyntax_2009_BodyPartPath.defaultIdentifier:
+            self = .bodyPartPath(try EnrollmentMessageSyntax_2009_BodyPartPath(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .bodyPartID(let bodyPartID):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(bodyPartID)
-                                }
-                            } else {
+        case .bodyPartID(let bodyPartID):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(bodyPartID)
                             }
-            case .bodyPartPath(let bodyPartPath):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(bodyPartPath)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(bodyPartID)
+                        }
+        case .bodyPartPath(let bodyPartPath):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(bodyPartPath)
                             }
+                        } else {
+                            try coder.serialize(bodyPartPath)
+                        }
+
         }
     }
 

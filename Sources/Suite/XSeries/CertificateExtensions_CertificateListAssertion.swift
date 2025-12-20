@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CertificateExtensions_CertificateListAssertion: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CertificateExtensions_CertificateListAssertion: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var issuer: PKIX1Explicit88_Name?
     @usableFromInline var minCRLNumber: CertificateExtensions_CRLNumber?
@@ -17,6 +17,7 @@ import Foundation
         self.reasonFlags = reasonFlags
         self.dateAndTime = dateAndTime
         self.distributionPoint = distributionPoint
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -39,18 +40,20 @@ if let next = peek_dateAndTime.next(), next.identifier == AuthenticationFramewor
     dateAndTime = try AuthenticationFramework_Time(derEncoded: &nodes)
 }
             let distributionPoint: CertificateExtensions_DistributionPointName? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return CertificateExtensions_CertificateListAssertion(issuer: issuer, minCRLNumber: minCRLNumber, maxCRLNumber: maxCRLNumber, reasonFlags: reasonFlags, dateAndTime: dateAndTime, distributionPoint: distributionPoint)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let issuer = self.issuer { if let issuer = self.issuer { try coder.serialize(issuer) } }
-            if let minCRLNumber = self.minCRLNumber { if let minCRLNumber = self.minCRLNumber { try coder.serializeOptionalImplicitlyTagged(minCRLNumber, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let maxCRLNumber = self.maxCRLNumber { if let maxCRLNumber = self.maxCRLNumber { try coder.serializeOptionalImplicitlyTagged(maxCRLNumber, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let reasonFlags = self.reasonFlags { if let reasonFlags = self.reasonFlags { try coder.serialize(reasonFlags) } }
-            if let dateAndTime = self.dateAndTime { if let dateAndTime = self.dateAndTime { try coder.serialize(dateAndTime) } }
-            if let distributionPoint = self.distributionPoint { if let distributionPoint = self.distributionPoint { try coder.serializeOptionalImplicitlyTagged(distributionPoint, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let issuer = self.issuer { try coder.serialize(issuer) }
+            if let minCRLNumber = self.minCRLNumber { try coder.serializeOptionalImplicitlyTagged(minCRLNumber, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let maxCRLNumber = self.maxCRLNumber { try coder.serializeOptionalImplicitlyTagged(maxCRLNumber, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let reasonFlags = self.reasonFlags { try coder.serialize(reasonFlags) }
+            if let dateAndTime = self.dateAndTime { try coder.serialize(dateAndTime) }
+            if let distributionPoint = self.distributionPoint { try coder.serializeOptionalImplicitlyTagged(distributionPoint, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

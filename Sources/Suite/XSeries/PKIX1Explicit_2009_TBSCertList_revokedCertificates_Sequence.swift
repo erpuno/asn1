@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Explicit_2009_TBSCertList_revokedCertificates_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Explicit_2009_TBSCertList_revokedCertificates_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var userCertificate: PKIX1Explicit_2009_CertificateSerialNumber
     @usableFromInline var revocationDate: PKIX1Explicit_2009_Time
@@ -10,10 +10,7 @@ import Foundation
     @inlinable init(userCertificate: PKIX1Explicit_2009_CertificateSerialNumber, revocationDate: PKIX1Explicit_2009_Time, crlEntryExtensions: PKIX_CommonTypes_2009_Extensions?) {
         self.userCertificate = userCertificate
         self.revocationDate = revocationDate
-
-
         self.crlEntryExtensions = crlEntryExtensions
-
 
     }
     @inlinable init(derEncoded root: ASN1Node,
@@ -21,14 +18,11 @@ import Foundation
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let userCertificate: PKIX1Explicit_2009_CertificateSerialNumber = try PKIX1Explicit_2009_CertificateSerialNumber(derEncoded: &nodes)
             let revocationDate: PKIX1Explicit_2009_Time = try PKIX1Explicit_2009_Time(derEncoded: &nodes)
-
-
             var crlEntryExtensions: PKIX_CommonTypes_2009_Extensions? = nil
 var peek_crlEntryExtensions = nodes
 if let next = peek_crlEntryExtensions.next(), next.identifier == PKIX_CommonTypes_2009_Extensions.defaultIdentifier {
     crlEntryExtensions = try PKIX_CommonTypes_2009_Extensions(derEncoded: &nodes)
 }
-
 
             return PKIX1Explicit_2009_TBSCertList_revokedCertificates_Sequence(userCertificate: userCertificate, revocationDate: revocationDate, crlEntryExtensions: crlEntryExtensions)
         }
@@ -38,10 +32,7 @@ if let next = peek_crlEntryExtensions.next(), next.identifier == PKIX_CommonType
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(userCertificate)
             try coder.serialize(revocationDate)
-
-
-            if let crlEntryExtensions = self.crlEntryExtensions { if let crlEntryExtensions = self.crlEntryExtensions { try coder.serialize(crlEntryExtensions) } }
-
+            if let crlEntryExtensions = self.crlEntryExtensions { try coder.serialize(crlEntryExtensions) }
 
         }
     }

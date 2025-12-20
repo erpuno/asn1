@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_CertificationRequest_certificationRequestInfo_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_CertificationRequest_certificationRequestInfo_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: ArraySlice<UInt8>
     @usableFromInline var subject: PKIX1Explicit88_Name
@@ -13,6 +13,7 @@ import Foundation
         self.subject = subject
         self.subjectPublicKeyInfo = subjectPublicKeyInfo
         self.attributes = attributes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let subject: PKIX1Explicit88_Name = try PKIX1Explicit88_Name(derEncoded: &nodes)
             let subjectPublicKeyInfo: EnrollmentMessageSyntax_2009_CertificationRequest_certificationRequestInfo_Sequence_subjectPublicKeyInfo_Sequence = try EnrollmentMessageSyntax_2009_CertificationRequest_certificationRequestInfo_Sequence_subjectPublicKeyInfo_Sequence(derEncoded: &nodes)
             let attributes: [PKIX_CommonTypes_2009_AttributeSet] = try DER.set(of: PKIX_CommonTypes_2009_AttributeSet.self, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific), nodes: &nodes)
+
             return EnrollmentMessageSyntax_2009_CertificationRequest_certificationRequestInfo_Sequence(version: version, subject: subject, subjectPublicKeyInfo: subjectPublicKeyInfo, attributes: attributes)
         }
     }
@@ -31,6 +33,7 @@ import Foundation
             try coder.serialize(subject)
             try coder.serialize(subjectPublicKeyInfo)
             try coder.serializeSetOf(attributes, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+
         }
     }
 }

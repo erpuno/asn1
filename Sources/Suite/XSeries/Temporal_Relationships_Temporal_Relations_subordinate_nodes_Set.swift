@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Temporal_Relationships_Temporal_Relations_subordinate_nodes_Set: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Temporal_Relationships_Temporal_Relations_subordinate_nodes_Set: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var node_identifier: Temporal_Relationships_Node_Identifier
     @usableFromInline var start_time: Temporal_Relationships_Time_Delay?
@@ -17,6 +17,7 @@ import Foundation
         self.cyclic = cyclic
         self.end_time = end_time
         self.application_comments = application_comments
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -27,6 +28,7 @@ import Foundation
             let cyclic: Temporal_Relationships_Cyclic? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             let end_time: Temporal_Relationships_Time_Delay? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
             let application_comments: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
+
             return Temporal_Relationships_Temporal_Relations_subordinate_nodes_Set(node_identifier: node_identifier, start_time: start_time, duration: duration, cyclic: cyclic, end_time: end_time, application_comments: application_comments)
         }
     }
@@ -34,11 +36,12 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(node_identifier, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            if let start_time = self.start_time { if let start_time = self.start_time { try coder.serializeOptionalImplicitlyTagged(start_time, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let duration = self.duration { if let duration = self.duration { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(duration) } } }
-            if let cyclic = self.cyclic { if let cyclic = self.cyclic { try coder.serializeOptionalImplicitlyTagged(cyclic, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let end_time = self.end_time { if let end_time = self.end_time { try coder.serializeOptionalImplicitlyTagged(end_time, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let application_comments = self.application_comments { if let application_comments = self.application_comments { try coder.serializeOptionalImplicitlyTagged(application_comments, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
+            if let start_time = self.start_time { try coder.serializeOptionalImplicitlyTagged(start_time, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let duration = self.duration { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(duration) } }
+            if let cyclic = self.cyclic { try coder.serializeOptionalImplicitlyTagged(cyclic, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let end_time = self.end_time { try coder.serializeOptionalImplicitlyTagged(end_time, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let application_comments = self.application_comments { try coder.serializeOptionalImplicitlyTagged(application_comments, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+
         }
     }
 }

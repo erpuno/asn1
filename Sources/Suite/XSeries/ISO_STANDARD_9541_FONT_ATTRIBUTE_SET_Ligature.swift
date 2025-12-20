@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Ligature: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Ligature: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var iso_standard_9541_lgn: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name
     @usableFromInline var iso_standard_9541_lgsn: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name]
     @inlinable init(iso_standard_9541_lgn: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name, iso_standard_9541_lgsn: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name]) {
         self.iso_standard_9541_lgn = iso_standard_9541_lgn
         self.iso_standard_9541_lgsn = iso_standard_9541_lgsn
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let iso_standard_9541_lgn: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let iso_standard_9541_lgsn: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name] = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.sequence(of: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name.self, identifier: .sequence, rootNode: node) }
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Ligature(iso_standard_9541_lgn: iso_standard_9541_lgn, iso_standard_9541_lgsn: iso_standard_9541_lgsn)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_lgn, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_lgsn) }
+
         }
     }
 }

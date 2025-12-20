@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum SelectedAttributeTypes_CriteriaItem: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum SelectedAttributeTypes_CriteriaItem: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case equality(PKIX1Explicit88_AttributeType)
     case substrings(PKIX1Explicit88_AttributeType)
@@ -11,31 +11,32 @@ import Foundation
     case approximateMatch(PKIX1Explicit88_AttributeType)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .equality(try PKIX1Explicit88_AttributeType(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .substrings(try PKIX1Explicit88_AttributeType(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .greaterOrEqual(try PKIX1Explicit88_AttributeType(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .lessOrEqual(try PKIX1Explicit88_AttributeType(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .approximateMatch(try PKIX1Explicit88_AttributeType(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .equality(try PKIX1Explicit88_AttributeType(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .substrings(try PKIX1Explicit88_AttributeType(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .greaterOrEqual(try PKIX1Explicit88_AttributeType(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .lessOrEqual(try PKIX1Explicit88_AttributeType(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .approximateMatch(try PKIX1Explicit88_AttributeType(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .equality(let equality): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try equality.serialize(into: &coder) }
-            case .substrings(let substrings): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try substrings.serialize(into: &coder) }
-            case .greaterOrEqual(let greaterOrEqual): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) { coder in try greaterOrEqual.serialize(into: &coder) }
-            case .lessOrEqual(let lessOrEqual): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) { coder in try lessOrEqual.serialize(into: &coder) }
-            case .approximateMatch(let approximateMatch): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) { coder in try approximateMatch.serialize(into: &coder) }
+        case .equality(let equality): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try equality.serialize(into: &coder) }
+        case .substrings(let substrings): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try substrings.serialize(into: &coder) }
+        case .greaterOrEqual(let greaterOrEqual): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) { coder in try greaterOrEqual.serialize(into: &coder) }
+        case .lessOrEqual(let lessOrEqual): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) { coder in try lessOrEqual.serialize(into: &coder) }
+        case .approximateMatch(let approximateMatch): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) { coder in try approximateMatch.serialize(into: &coder) }
+
         }
     }
 

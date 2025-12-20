@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_CIE_Ref: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_CIE_Ref: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var xn_value: Colour_Attributes_Real_Or_Int
     @usableFromInline var yn_value: Colour_Attributes_Real_Or_Int
@@ -11,6 +11,7 @@ import Foundation
         self.xn_value = xn_value
         self.yn_value = yn_value
         self.zn_value = zn_value
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let xn_value: Colour_Attributes_Real_Or_Int = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try Colour_Attributes_Real_Or_Int(derEncoded: node) }
             let yn_value: Colour_Attributes_Real_Or_Int = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try Colour_Attributes_Real_Or_Int(derEncoded: node) }
             let zn_value: Colour_Attributes_Real_Or_Int = try DER.explicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try Colour_Attributes_Real_Or_Int(derEncoded: node) }
+
             return Colour_Attributes_CIE_Ref(xn_value: xn_value, yn_value: yn_value, zn_value: zn_value)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(xn_value) }
             try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(yn_value) }
             try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(zn_value) }
+
         }
     }
 }

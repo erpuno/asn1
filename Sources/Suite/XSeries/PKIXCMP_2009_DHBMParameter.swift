@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_DHBMParameter: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_DHBMParameter: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var owf: PKIX1Explicit88_AlgorithmIdentifier
     @usableFromInline var mac: PKIX1Explicit88_AlgorithmIdentifier
     @inlinable init(owf: PKIX1Explicit88_AlgorithmIdentifier, mac: PKIX1Explicit88_AlgorithmIdentifier) {
         self.owf = owf
         self.mac = mac
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let owf: PKIX1Explicit88_AlgorithmIdentifier = try PKIX1Explicit88_AlgorithmIdentifier(derEncoded: &nodes)
             let mac: PKIX1Explicit88_AlgorithmIdentifier = try PKIX1Explicit88_AlgorithmIdentifier(derEncoded: &nodes)
+
             return PKIXCMP_2009_DHBMParameter(owf: owf, mac: mac)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(owf)
             try coder.serialize(mac)
+
         }
     }
 }

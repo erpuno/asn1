@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Security_Information: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Security_Information: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var authorization: Document_Profile_Descriptor_Security_Information_authorization_Choice?
     @usableFromInline var security_classification: Document_Profile_Descriptor_Character_Data?
@@ -11,6 +11,7 @@ import Foundation
         self.authorization = authorization
         self.security_classification = security_classification
         self.access_rights = access_rights
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,15 +23,17 @@ if let next = peek_authorization.next(), next.identifier == Document_Profile_Des
 }
             let security_classification: Document_Profile_Descriptor_Character_Data? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let access_rights: [Document_Profile_Descriptor_Character_Data]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.set(of: Document_Profile_Descriptor_Character_Data.self, identifier: node.identifier, rootNode: node) }
+
             return Document_Profile_Descriptor_Security_Information(authorization: authorization, security_classification: security_classification, access_rights: access_rights)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let authorization = self.authorization { if let authorization = self.authorization { try coder.serialize(authorization) } }
-            if let security_classification = self.security_classification { if let security_classification = self.security_classification { try coder.serializeOptionalImplicitlyTagged(security_classification, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let access_rights = self.access_rights { if let access_rights = self.access_rights { try coder.serializeSetOf(access_rights, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let authorization = self.authorization { try coder.serialize(authorization) }
+            if let security_classification = self.security_classification { try coder.serializeOptionalImplicitlyTagged(security_classification, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let access_rights = self.access_rights { try coder.serializeSetOf(access_rights, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

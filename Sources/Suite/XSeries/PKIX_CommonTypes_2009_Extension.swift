@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX_CommonTypes_2009_Extension: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX_CommonTypes_2009_Extension: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var extnID: ASN1ObjectIdentifier
     @usableFromInline var critical: Bool?
@@ -11,6 +11,7 @@ import Foundation
         self.extnID = extnID
         self.critical = critical
         self.extnValue = extnValue
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let extnID: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let critical: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
             let extnValue: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return PKIX_CommonTypes_2009_Extension(extnID: extnID, critical: critical, extnValue: extnValue)
         }
     }
@@ -25,8 +27,9 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(extnID)
-            if let critical = self.critical { if let critical = self.critical { try coder.serialize(critical) } }
+            if let critical = self.critical { try coder.serialize(critical) }
             try coder.serialize(extnValue)
+
         }
     }
 }

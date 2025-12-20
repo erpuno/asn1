@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_OperationProgress: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_OperationProgress: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var nameResolutionPhase: DirectoryAbstractService_OperationProgress_nameResolutionPhase_Enum
     @usableFromInline var nextRDNToBeResolved: ArraySlice<UInt8>?
     @inlinable init(nameResolutionPhase: DirectoryAbstractService_OperationProgress_nameResolutionPhase_Enum, nextRDNToBeResolved: ArraySlice<UInt8>?) {
         self.nameResolutionPhase = nameResolutionPhase
         self.nextRDNToBeResolved = nextRDNToBeResolved
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let nameResolutionPhase: DirectoryAbstractService_OperationProgress_nameResolutionPhase_Enum = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try DirectoryAbstractService_OperationProgress_nameResolutionPhase_Enum(derEncoded: node) }
             let nextRDNToBeResolved: ArraySlice<UInt8>? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
+
             return DirectoryAbstractService_OperationProgress(nameResolutionPhase: nameResolutionPhase, nextRDNToBeResolved: nextRDNToBeResolved)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(nameResolutionPhase) }
-            if let nextRDNToBeResolved = self.nextRDNToBeResolved { if let nextRDNToBeResolved = self.nextRDNToBeResolved { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(nextRDNToBeResolved) } } }
+            if let nextRDNToBeResolved = self.nextRDNToBeResolved { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(nextRDNToBeResolved) } }
+
         }
     }
 }

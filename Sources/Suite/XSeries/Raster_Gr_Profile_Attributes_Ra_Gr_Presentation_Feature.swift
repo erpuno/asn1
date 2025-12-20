@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Raster_Gr_Profile_Attributes_Ra_Gr_Presentation_Feature: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Raster_Gr_Profile_Attributes_Ra_Gr_Presentation_Feature: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case initial_offset(Raster_Gr_Presentation_Attributes_Measure_Pair)
     case clipping(Raster_Gr_Presentation_Attributes_Clipping)
@@ -14,37 +14,38 @@ import Foundation
     case pel_transmission_density(Raster_Gr_Presentation_Attributes_Pel_Transmission_Density)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .initial_offset(try Raster_Gr_Presentation_Attributes_Measure_Pair(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                self = .clipping(try Raster_Gr_Presentation_Attributes_Clipping(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .pel_spacing(try Raster_Gr_Presentation_Attributes_Pel_Spacing(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
-                self = .spacing_ratio(try Raster_Gr_Presentation_Attributes_Spacing_Ratio(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .image_dimensions(try Raster_Gr_Presentation_Attributes_Image_Dimensions(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific):
-                self = .pel_path(try Raster_Gr_Presentation_Attributes_One_Of_Four_Angles(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific):
-                self = .line_progression(try Raster_Gr_Presentation_Attributes_One_Of_Two_Angles(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific):
-                self = .pel_transmission_density(try Raster_Gr_Presentation_Attributes_Pel_Transmission_Density(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
+            self = .initial_offset(try Raster_Gr_Presentation_Attributes_Measure_Pair(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
+            self = .clipping(try Raster_Gr_Presentation_Attributes_Clipping(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .pel_spacing(try Raster_Gr_Presentation_Attributes_Pel_Spacing(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
+            self = .spacing_ratio(try Raster_Gr_Presentation_Attributes_Spacing_Ratio(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .image_dimensions(try Raster_Gr_Presentation_Attributes_Image_Dimensions(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific):
+            self = .pel_path(try Raster_Gr_Presentation_Attributes_One_Of_Four_Angles(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific):
+            self = .line_progression(try Raster_Gr_Presentation_Attributes_One_Of_Two_Angles(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific):
+            self = .pel_transmission_density(try Raster_Gr_Presentation_Attributes_Pel_Transmission_Density(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .initial_offset(let initial_offset): try initial_offset.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
-            case .clipping(let clipping): try clipping.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
-            case .pel_spacing(let pel_spacing): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) { coder in try pel_spacing.serialize(into: &coder) }
-            case .spacing_ratio(let spacing_ratio): try spacing_ratio.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
-            case .image_dimensions(let image_dimensions): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) { coder in try image_dimensions.serialize(into: &coder) }
-            case .pel_path(let pel_path): try pel_path.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
-            case .line_progression(let line_progression): try line_progression.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
-            case .pel_transmission_density(let pel_transmission_density): try pel_transmission_density.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific))
+        case .initial_offset(let initial_offset): try initial_offset.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+        case .clipping(let clipping): try clipping.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
+        case .pel_spacing(let pel_spacing): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) { coder in try pel_spacing.serialize(into: &coder) }
+        case .spacing_ratio(let spacing_ratio): try spacing_ratio.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
+        case .image_dimensions(let image_dimensions): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) { coder in try image_dimensions.serialize(into: &coder) }
+        case .pel_path(let pel_path): try pel_path.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
+        case .line_progression(let line_progression): try line_progression.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
+        case .pel_transmission_density(let pel_transmission_density): try pel_transmission_density.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific))
+
         }
     }
 

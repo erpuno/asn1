@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Implicit_2009_NameConstraints: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Implicit_2009_NameConstraints: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var permittedSubtrees: PKIX1Implicit_2009_GeneralSubtrees?
     @usableFromInline var excludedSubtrees: PKIX1Implicit_2009_GeneralSubtrees?
     @inlinable init(permittedSubtrees: PKIX1Implicit_2009_GeneralSubtrees?, excludedSubtrees: PKIX1Implicit_2009_GeneralSubtrees?) {
         self.permittedSubtrees = permittedSubtrees
         self.excludedSubtrees = excludedSubtrees
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let permittedSubtrees: PKIX1Implicit_2009_GeneralSubtrees? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let excludedSubtrees: PKIX1Implicit_2009_GeneralSubtrees? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return PKIX1Implicit_2009_NameConstraints(permittedSubtrees: permittedSubtrees, excludedSubtrees: excludedSubtrees)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let permittedSubtrees = self.permittedSubtrees { if let permittedSubtrees = self.permittedSubtrees { try coder.serializeOptionalImplicitlyTagged(permittedSubtrees, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let excludedSubtrees = self.excludedSubtrees { if let excludedSubtrees = self.excludedSubtrees { try coder.serializeOptionalImplicitlyTagged(excludedSubtrees, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let permittedSubtrees = self.permittedSubtrees { try coder.serializeOptionalImplicitlyTagged(permittedSubtrees, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let excludedSubtrees = self.excludedSubtrees { try coder.serializeOptionalImplicitlyTagged(excludedSubtrees, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

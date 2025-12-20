@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_PKIResponse: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_PKIResponse: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var controlSequence: [EnrollmentMessageSyntax_2009_TaggedAttribute]
     @usableFromInline var cmsSequence: [EnrollmentMessageSyntax_2009_TaggedContentInfo]
@@ -11,6 +11,7 @@ import Foundation
         self.controlSequence = controlSequence
         self.cmsSequence = cmsSequence
         self.otherMsgSequence = otherMsgSequence
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let controlSequence: [EnrollmentMessageSyntax_2009_TaggedAttribute] = try DER.sequence(of: EnrollmentMessageSyntax_2009_TaggedAttribute.self, identifier: .sequence, nodes: &nodes)
             let cmsSequence: [EnrollmentMessageSyntax_2009_TaggedContentInfo] = try DER.sequence(of: EnrollmentMessageSyntax_2009_TaggedContentInfo.self, identifier: .sequence, nodes: &nodes)
             let otherMsgSequence: [EnrollmentMessageSyntax_2009_OtherMsg] = try DER.sequence(of: EnrollmentMessageSyntax_2009_OtherMsg.self, identifier: .sequence, nodes: &nodes)
+
             return EnrollmentMessageSyntax_2009_PKIResponse(controlSequence: controlSequence, cmsSequence: cmsSequence, otherMsgSequence: otherMsgSequence)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serializeSequenceOf(controlSequence)
             try coder.serializeSequenceOf(cmsSequence)
             try coder.serializeSequenceOf(otherMsgSequence)
+
         }
     }
 }

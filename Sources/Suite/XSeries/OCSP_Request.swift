@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct OCSP_Request: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct OCSP_Request: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var reqCert: OCSP_CertID
     @usableFromInline var singleRequestExtensions: AuthenticationFramework_Extensions?
     @inlinable init(reqCert: OCSP_CertID, singleRequestExtensions: AuthenticationFramework_Extensions?) {
         self.reqCert = reqCert
         self.singleRequestExtensions = singleRequestExtensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let reqCert: OCSP_CertID = try OCSP_CertID(derEncoded: &nodes)
             let singleRequestExtensions: AuthenticationFramework_Extensions? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try AuthenticationFramework_Extensions(derEncoded: node) }
+
             return OCSP_Request(reqCert: reqCert, singleRequestExtensions: singleRequestExtensions)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(reqCert)
-            if let singleRequestExtensions = self.singleRequestExtensions { if let singleRequestExtensions = self.singleRequestExtensions { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(singleRequestExtensions) } } }
+            if let singleRequestExtensions = self.singleRequestExtensions { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(singleRequestExtensions) } }
+
         }
     }
 }

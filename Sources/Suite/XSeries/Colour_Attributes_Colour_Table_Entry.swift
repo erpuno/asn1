@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_Colour_Table_Entry: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_Colour_Table_Entry: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var index: ArraySlice<UInt8>
     @usableFromInline var r: Colour_Attributes_Real_Or_Int
@@ -13,6 +13,7 @@ import Foundation
         self.r = r
         self.g = g
         self.b = b
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let r: Colour_Attributes_Real_Or_Int = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try Colour_Attributes_Real_Or_Int(derEncoded: node) }
             let g: Colour_Attributes_Real_Or_Int = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try Colour_Attributes_Real_Or_Int(derEncoded: node) }
             let b: Colour_Attributes_Real_Or_Int = try DER.explicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try Colour_Attributes_Real_Or_Int(derEncoded: node) }
+
             return Colour_Attributes_Colour_Table_Entry(index: index, r: r, g: g, b: b)
         }
     }
@@ -31,6 +33,7 @@ import Foundation
             try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(r) }
             try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(g) }
             try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(b) }
+
         }
     }
 }

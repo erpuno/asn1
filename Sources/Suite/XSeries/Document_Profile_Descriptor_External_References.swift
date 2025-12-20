@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_External_References: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_External_References: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var references_to_other_documents: [Document_Profile_Descriptor_Document_Reference]?
     @usableFromInline var superseded_documents: [Document_Profile_Descriptor_Document_Reference]?
     @inlinable init(references_to_other_documents: [Document_Profile_Descriptor_Document_Reference]?, superseded_documents: [Document_Profile_Descriptor_Document_Reference]?) {
         self.references_to_other_documents = references_to_other_documents
         self.superseded_documents = superseded_documents
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let references_to_other_documents: [Document_Profile_Descriptor_Document_Reference]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in try DER.set(of: Document_Profile_Descriptor_Document_Reference.self, identifier: node.identifier, rootNode: node) }
             let superseded_documents: [Document_Profile_Descriptor_Document_Reference]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.set(of: Document_Profile_Descriptor_Document_Reference.self, identifier: node.identifier, rootNode: node) }
+
             return Document_Profile_Descriptor_External_References(references_to_other_documents: references_to_other_documents, superseded_documents: superseded_documents)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let references_to_other_documents = self.references_to_other_documents { if let references_to_other_documents = self.references_to_other_documents { try coder.serializeSetOf(references_to_other_documents, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let superseded_documents = self.superseded_documents { if let superseded_documents = self.superseded_documents { try coder.serializeSetOf(superseded_documents, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let references_to_other_documents = self.references_to_other_documents { try coder.serializeSetOf(references_to_other_documents, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let superseded_documents = self.superseded_documents { try coder.serializeSetOf(superseded_documents, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

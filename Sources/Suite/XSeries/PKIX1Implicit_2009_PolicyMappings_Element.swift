@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Implicit_2009_PolicyMappings_Element: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Implicit_2009_PolicyMappings_Element: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var issuerDomainPolicy: PKIX1Implicit_2009_CertPolicyId
     @usableFromInline var subjectDomainPolicy: PKIX1Implicit_2009_CertPolicyId
     @inlinable init(issuerDomainPolicy: PKIX1Implicit_2009_CertPolicyId, subjectDomainPolicy: PKIX1Implicit_2009_CertPolicyId) {
         self.issuerDomainPolicy = issuerDomainPolicy
         self.subjectDomainPolicy = subjectDomainPolicy
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let issuerDomainPolicy: PKIX1Implicit_2009_CertPolicyId = try PKIX1Implicit_2009_CertPolicyId(derEncoded: &nodes)
             let subjectDomainPolicy: PKIX1Implicit_2009_CertPolicyId = try PKIX1Implicit_2009_CertPolicyId(derEncoded: &nodes)
+
             return PKIX1Implicit_2009_PolicyMappings_Element(issuerDomainPolicy: issuerDomainPolicy, subjectDomainPolicy: subjectDomainPolicy)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(issuerDomainPolicy)
             try coder.serialize(subjectDomainPolicy)
+
         }
     }
 }

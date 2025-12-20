@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_7_SignerInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_7_SignerInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: PKCS_7_SignerInfo_version_IntEnum
     @usableFromInline var issuerAndSerialNumber: PKCS_7_IssuerAndSerialNumber
@@ -19,6 +19,7 @@ import Foundation
         self.digestEncryptionAlgorithm = digestEncryptionAlgorithm
         self.encryptedDigest = encryptedDigest
         self.unauthenticatedAttributes = unauthenticatedAttributes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -38,19 +39,21 @@ var peek_unauthenticatedAttributes = nodes
 if let next = peek_unauthenticatedAttributes.next(), next.identifier == PKCS_7_SignerInfo_unauthenticatedAttributes_Choice.defaultIdentifier {
     unauthenticatedAttributes = try PKCS_7_SignerInfo_unauthenticatedAttributes_Choice(derEncoded: &nodes)
 }
+
             return PKCS_7_SignerInfo(version: version, issuerAndSerialNumber: issuerAndSerialNumber, digestAlgorithm: digestAlgorithm, authenticatedAttributes: authenticatedAttributes, digestEncryptionAlgorithm: digestEncryptionAlgorithm, encryptedDigest: encryptedDigest, unauthenticatedAttributes: unauthenticatedAttributes)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(version.rawValue)
+            try version.serialize(into: &coder, withIdentifier: identifier)
             try coder.serialize(issuerAndSerialNumber)
             try coder.serialize(digestAlgorithm)
-            if let authenticatedAttributes = self.authenticatedAttributes { if let authenticatedAttributes = self.authenticatedAttributes { try coder.serialize(authenticatedAttributes) } }
+            if let authenticatedAttributes = self.authenticatedAttributes { try coder.serialize(authenticatedAttributes) }
             try coder.serialize(digestEncryptionAlgorithm)
             try coder.serialize(encryptedDigest)
-            if let unauthenticatedAttributes = self.unauthenticatedAttributes { if let unauthenticatedAttributes = self.unauthenticatedAttributes { try coder.serialize(unauthenticatedAttributes) } }
+            if let unauthenticatedAttributes = self.unauthenticatedAttributes { try coder.serialize(unauthenticatedAttributes) }
+
         }
     }
 }

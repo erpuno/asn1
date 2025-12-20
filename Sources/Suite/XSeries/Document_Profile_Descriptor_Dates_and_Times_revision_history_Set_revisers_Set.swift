@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Dates_and_Times_revision_history_Set_revisers_Set: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Dates_and_Times_revision_history_Set_revisers_Set: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var names: [Document_Profile_Descriptor_Personal_Name]?
     @usableFromInline var position: Document_Profile_Descriptor_Character_Data?
@@ -11,6 +11,7 @@ import Foundation
         self.names = names
         self.position = position
         self.organization = organization
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let names: [Document_Profile_Descriptor_Personal_Name]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in try DER.set(of: Document_Profile_Descriptor_Personal_Name.self, identifier: node.identifier, rootNode: node) }
             let position: Document_Profile_Descriptor_Character_Data? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let organization: Document_Profile_Descriptor_Character_Data? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return Document_Profile_Descriptor_Dates_and_Times_revision_history_Set_revisers_Set(names: names, position: position, organization: organization)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let names = self.names { if let names = self.names { try coder.serializeSetOf(names, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let position = self.position { if let position = self.position { try coder.serializeOptionalImplicitlyTagged(position, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let organization = self.organization { if let organization = self.organization { try coder.serializeOptionalImplicitlyTagged(organization, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let names = self.names { try coder.serializeSetOf(names, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let position = self.position { try coder.serializeOptionalImplicitlyTagged(position, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let organization = self.organization { try coder.serializeOptionalImplicitlyTagged(organization, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

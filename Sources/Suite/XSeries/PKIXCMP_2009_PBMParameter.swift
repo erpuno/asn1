@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_PBMParameter: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_PBMParameter: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var salt: ASN1OctetString
     @usableFromInline var owf: PKIX1Explicit88_AlgorithmIdentifier
@@ -13,6 +13,7 @@ import Foundation
         self.owf = owf
         self.iterationCount = iterationCount
         self.mac = mac
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let owf: PKIX1Explicit88_AlgorithmIdentifier = try PKIX1Explicit88_AlgorithmIdentifier(derEncoded: &nodes)
             let iterationCount: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let mac: PKIX1Explicit88_AlgorithmIdentifier = try PKIX1Explicit88_AlgorithmIdentifier(derEncoded: &nodes)
+
             return PKIXCMP_2009_PBMParameter(salt: salt, owf: owf, iterationCount: iterationCount, mac: mac)
         }
     }
@@ -31,6 +33,7 @@ import Foundation
             try coder.serialize(owf)
             try coder.serialize(iterationCount)
             try coder.serialize(mac)
+
         }
     }
 }

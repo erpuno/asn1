@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CHAT_Roster: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CHAT_Roster: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var id: ASN1OctetString
     @usableFromInline var nickname: ASN1OctetString
@@ -17,6 +17,7 @@ import Foundation
         self.contacts = contacts
         self.topics = topics
         self.status = status
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -27,6 +28,7 @@ import Foundation
             let contacts: [CHAT_Contact] = try DER.sequence(of: CHAT_Contact.self, identifier: .sequence, nodes: &nodes)
             let topics: [CHAT_Room] = try DER.sequence(of: CHAT_Room.self, identifier: .sequence, nodes: &nodes)
             let status: CHAT_RosterStatus = try CHAT_RosterStatus(derEncoded: &nodes)
+
             return CHAT_Roster(id: id, nickname: nickname, update: update, contacts: contacts, topics: topics, status: status)
         }
     }
@@ -39,6 +41,7 @@ import Foundation
             try coder.serializeSequenceOf(contacts)
             try coder.serializeSequenceOf(topics)
             try coder.serialize(status)
+
         }
     }
 }

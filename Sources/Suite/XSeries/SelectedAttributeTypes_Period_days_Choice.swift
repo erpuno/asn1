@@ -2,27 +2,42 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum SelectedAttributeTypes_Period_days_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum SelectedAttributeTypes_Period_days_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case intDay([ArraySlice<UInt8>])
     case bitDay(ASN1BitString)
     case dayOf(SelectedAttributeTypes_XDayOf)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .application):
-                self = .intDay(try DER.set(of: ArraySlice<UInt8>.self, identifier: rootNode.identifier, rootNode: rootNode))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .application):
-                self = .bitDay(try ASN1BitString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .application):
-                self = .dayOf(try SelectedAttributeTypes_XDayOf(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier.set:
+            self = .intDay(try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: rootNode))
+        case ASN1BitString.defaultIdentifier:
+            self = .bitDay(try ASN1BitString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case SelectedAttributeTypes_XDayOf.defaultIdentifier:
+            self = .dayOf(try SelectedAttributeTypes_XDayOf(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .intDay(let intDay): try coder.serializeSetOf(intDay, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .application))
-            case .bitDay(let bitDay): try bitDay.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .application))
-            case .dayOf(let dayOf): try dayOf.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .application))
+        case .intDay(let intDay): try coder.serializeSetOf(intDay)
+        case .bitDay(let bitDay):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(bitDay)
+                            }
+                        } else {
+                            try coder.serialize(bitDay)
+                        }
+        case .dayOf(let dayOf):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(dayOf)
+                            }
+                        } else {
+                            try coder.serialize(dayOf)
+                        }
+
         }
     }
 

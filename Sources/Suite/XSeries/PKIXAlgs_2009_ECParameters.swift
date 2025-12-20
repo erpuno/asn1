@@ -2,13 +2,13 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum PKIXAlgs_2009_ECParameters: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum PKIXAlgs_2009_ECParameters: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { ASN1ObjectIdentifier.defaultIdentifier }
         case namedCurve(ASN1ObjectIdentifier)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1ObjectIdentifier.defaultIdentifier:
-                self = .namedCurve(try ASN1ObjectIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1ObjectIdentifier.defaultIdentifier:
+            self = .namedCurve(try ASN1ObjectIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
 default:
     if identifier == rootNode.identifier {
         if case .constructed(let nodes) = rootNode.content {
@@ -29,14 +29,15 @@ default:
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .namedCurve(let namedCurve):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(namedCurve)
-                                }
-                            } else {
+        case .namedCurve(let namedCurve):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(namedCurve)
                             }
+                        } else {
+                            try coder.serialize(namedCurve)
+                        }
+
         }
     }
 

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Font_Reference: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Font_Reference: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var user_visible_name: Layout_Descriptors_Comment_String?
     @usableFromInline var user_readable_comment: Layout_Descriptors_Comment_String?
@@ -11,6 +11,7 @@ import Foundation
         self.user_visible_name = user_visible_name
         self.user_readable_comment = user_readable_comment
         self.reference_properties = reference_properties
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let user_visible_name: Layout_Descriptors_Comment_String? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let user_readable_comment: Layout_Descriptors_Comment_String? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let reference_properties: [Document_Profile_Descriptor_Font_Reference_reference_properties_Set] = try DER.set(of: Document_Profile_Descriptor_Font_Reference_reference_properties_Set.self, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific), nodes: &nodes)
+
             return Document_Profile_Descriptor_Font_Reference(user_visible_name: user_visible_name, user_readable_comment: user_readable_comment, reference_properties: reference_properties)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let user_visible_name = self.user_visible_name { if let user_visible_name = self.user_visible_name { try coder.serializeOptionalImplicitlyTagged(user_visible_name, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let user_readable_comment = self.user_readable_comment { if let user_readable_comment = self.user_readable_comment { try coder.serializeOptionalImplicitlyTagged(user_readable_comment, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let user_visible_name = self.user_visible_name { try coder.serializeOptionalImplicitlyTagged(user_visible_name, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let user_readable_comment = self.user_readable_comment { try coder.serializeOptionalImplicitlyTagged(user_readable_comment, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
             try coder.serializeSetOf(reference_properties, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
         }
     }
 }

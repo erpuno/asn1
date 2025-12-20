@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct Document_Profile_Descriptor_Document_Characteristics_document_application_profile_Choice_a_IntEnum : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct Document_Profile_Descriptor_Document_Characteristics_document_application_profile_Choice_a_IntEnum : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: Document_Profile_Descriptor_Document_Characteristics_document_application_profile_Choice_a_IntEnum, rhs: Document_Profile_Descriptor_Document_Characteristics_document_application_profile_Choice_a_IntEnum) -> Bool { lhs.rawValue < rhs.rawValue }

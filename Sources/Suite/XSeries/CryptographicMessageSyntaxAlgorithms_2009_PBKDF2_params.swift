@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_params: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_params: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var salt: CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_params_salt_Choice
     @usableFromInline var iterationCount: ArraySlice<UInt8>
@@ -13,6 +13,7 @@ import Foundation
         self.iterationCount = iterationCount
         self.keyLength = keyLength
         self.prf = prf
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -25,6 +26,7 @@ if let next = peek_keyLength.next(), next.identifier == ArraySlice<UInt8>.defaul
     keyLength = try ArraySlice<UInt8>(derEncoded: &nodes)
 }
             let prf: CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_PRFsAlgorithmIdentifier? = try CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_PRFsAlgorithmIdentifier(derEncoded: &nodes)
+
             return CryptographicMessageSyntaxAlgorithms_2009_PBKDF2_params(salt: salt, iterationCount: iterationCount, keyLength: keyLength, prf: prf)
         }
     }
@@ -33,8 +35,9 @@ if let next = peek_keyLength.next(), next.identifier == ArraySlice<UInt8>.defaul
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(salt)
             try coder.serialize(iterationCount)
-            if let keyLength = self.keyLength { if let keyLength = self.keyLength { try coder.serialize(keyLength) } }
-            if let prf = self.prf { if let prf = self.prf { try coder.serialize(prf) } }
+            if let keyLength = self.keyLength { try coder.serialize(keyLength) }
+            if let prf = self.prf { try coder.serialize(prf) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_ModCertTemplate: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_ModCertTemplate: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var pkiDataReference: EnrollmentMessageSyntax_2009_BodyPartPath
     @usableFromInline var certReferences: EnrollmentMessageSyntax_2009_BodyPartList
@@ -13,6 +13,7 @@ import Foundation
         self.certReferences = certReferences
         self.replace = replace
         self.certTemplate = certTemplate
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let certReferences: EnrollmentMessageSyntax_2009_BodyPartList = try EnrollmentMessageSyntax_2009_BodyPartList(derEncoded: &nodes)
             let replace: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
             let certTemplate: PKIXCRMF_2009_CertTemplate = try PKIXCRMF_2009_CertTemplate(derEncoded: &nodes)
+
             return EnrollmentMessageSyntax_2009_ModCertTemplate(pkiDataReference: pkiDataReference, certReferences: certReferences, replace: replace, certTemplate: certTemplate)
         }
     }
@@ -29,8 +31,9 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(pkiDataReference)
             try coder.serialize(certReferences)
-            if let replace = self.replace { if let replace = self.replace { try coder.serialize(replace) } }
+            if let replace = self.replace { try coder.serialize(replace) }
             try coder.serialize(certTemplate)
+
         }
     }
 }

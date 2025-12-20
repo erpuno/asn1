@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CHAT_Server: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CHAT_Server: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var service: ASN1OctetString
     @usableFromInline var port: ArraySlice<UInt8>
@@ -11,6 +11,7 @@ import Foundation
         self.service = service
         self.port = port
         self.host = host
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let service: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let port: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let host: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return CHAT_Server(service: service, port: port, host: host)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(service)
             try coder.serialize(port)
             try coder.serialize(host)
+
         }
     }
 }

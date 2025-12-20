@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Location_Expressions_Subord_argument: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Location_Expressions_Subord_argument: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var object: Box<Location_Expressions_Object_Locator>
     @usableFromInline var counters: Location_Expressions_CountersType?
     @inlinable init(object: Box<Location_Expressions_Object_Locator>, counters: Location_Expressions_CountersType?) {
         self.object = object
         self.counters = counters
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let object: Box<Location_Expressions_Object_Locator> = Box((try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!)
             let counters: Location_Expressions_CountersType? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return Location_Expressions_Subord_argument(object: object, counters: counters)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serializeOptionalImplicitlyTagged(object.value, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            if let counters = self.counters { if let counters = self.counters { try coder.serializeOptionalImplicitlyTagged(counters, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            try coder.serializeOptionalImplicitlyTagged(object, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+            if let counters = self.counters { try coder.serializeOptionalImplicitlyTagged(counters, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

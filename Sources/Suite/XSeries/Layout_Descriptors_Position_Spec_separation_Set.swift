@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Layout_Descriptors_Position_Spec_separation_Set: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Layout_Descriptors_Position_Spec_separation_Set: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var leading: ArraySlice<UInt8>?
     @usableFromInline var trailing: ArraySlice<UInt8>?
@@ -11,6 +11,7 @@ import Foundation
         self.leading = leading
         self.trailing = trailing
         self.centre = centre
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let leading: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let trailing: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let centre: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return Layout_Descriptors_Position_Spec_separation_Set(leading: leading, trailing: trailing, centre: centre)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let leading = self.leading { if let leading = self.leading { try coder.serializeOptionalImplicitlyTagged(leading, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let trailing = self.trailing { if let trailing = self.trailing { try coder.serializeOptionalImplicitlyTagged(trailing, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let centre = self.centre { if let centre = self.centre { try coder.serializeOptionalImplicitlyTagged(centre, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let leading = self.leading { try coder.serializeOptionalImplicitlyTagged(leading, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let trailing = self.trailing { try coder.serializeOptionalImplicitlyTagged(trailing, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let centre = self.centre { try coder.serializeOptionalImplicitlyTagged(centre, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

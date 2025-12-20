@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DSTU_AttributeTypeAndValue: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DSTU_AttributeTypeAndValue: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var type: DSTU_AttributeType
     @usableFromInline var value: ASN1Any
     @inlinable init(type: DSTU_AttributeType, value: ASN1Any) {
         self.type = type
         self.value = value
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let type: DSTU_AttributeType = try DSTU_AttributeType(derEncoded: &nodes)
             let value: ASN1Any = try ASN1Any(derEncoded: &nodes)
+
             return DSTU_AttributeTypeAndValue(type: type, value: value)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(type)
             try coder.serialize(value)
+
         }
     }
 }

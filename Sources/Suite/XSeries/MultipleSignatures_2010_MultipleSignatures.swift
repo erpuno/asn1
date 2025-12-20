@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct MultipleSignatures_2010_MultipleSignatures: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct MultipleSignatures_2010_MultipleSignatures: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var bodyHashAlg: CryptographicMessageSyntax_2010_DigestAlgorithmIdentifier
     @usableFromInline var signAlg: CryptographicMessageSyntax_2010_SignatureAlgorithmIdentifier
@@ -13,6 +13,7 @@ import Foundation
         self.signAlg = signAlg
         self.signAttrsHash = signAttrsHash
         self.cert = cert
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -25,6 +26,7 @@ var peek_cert = nodes
 if let next = peek_cert.next(), next.identifier == ExtendedSecurityServices_2009_ESSCertIDv2.defaultIdentifier {
     cert = try ExtendedSecurityServices_2009_ESSCertIDv2(derEncoded: &nodes)
 }
+
             return MultipleSignatures_2010_MultipleSignatures(bodyHashAlg: bodyHashAlg, signAlg: signAlg, signAttrsHash: signAttrsHash, cert: cert)
         }
     }
@@ -34,7 +36,8 @@ if let next = peek_cert.next(), next.identifier == ExtendedSecurityServices_2009
             try coder.serialize(bodyHashAlg)
             try coder.serialize(signAlg)
             try coder.serialize(signAttrsHash)
-            if let cert = self.cert { if let cert = self.cert { try coder.serialize(cert) } }
+            if let cert = self.cert { try coder.serialize(cert) }
+
         }
     }
 }

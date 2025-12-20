@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_Colour_Data_Scaling: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_Colour_Data_Scaling: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var first_component: Colour_Attributes_Scale_And_Offset
     @usableFromInline var second_component: Colour_Attributes_Scale_And_Offset
@@ -13,6 +13,7 @@ import Foundation
         self.second_component = second_component
         self.third_component = third_component
         self.fourth_component = fourth_component
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let second_component: Colour_Attributes_Scale_And_Offset = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
             let third_component: Colour_Attributes_Scale_And_Offset = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)))!
             let fourth_component: Colour_Attributes_Scale_And_Offset? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
             return Colour_Attributes_Colour_Data_Scaling(first_component: first_component, second_component: second_component, third_component: third_component, fourth_component: fourth_component)
         }
     }
@@ -30,7 +32,8 @@ import Foundation
             try coder.serializeOptionalImplicitlyTagged(first_component, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(second_component, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(third_component, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
-            if let fourth_component = self.fourth_component { if let fourth_component = self.fourth_component { try coder.serializeOptionalImplicitlyTagged(fourth_component, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
+            if let fourth_component = self.fourth_component { try coder.serializeOptionalImplicitlyTagged(fourth_component, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+
         }
     }
 }

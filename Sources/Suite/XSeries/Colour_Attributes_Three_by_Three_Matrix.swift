@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_Three_by_Three_Matrix: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_Three_by_Three_Matrix: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var row_1: Colour_Attributes_Three_Nums
     @usableFromInline var row_2: Colour_Attributes_Three_Nums
@@ -11,6 +11,7 @@ import Foundation
         self.row_1 = row_1
         self.row_2 = row_2
         self.row_3 = row_3
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let row_1: Colour_Attributes_Three_Nums = try Colour_Attributes_Three_Nums(derEncoded: &nodes)
             let row_2: Colour_Attributes_Three_Nums = try Colour_Attributes_Three_Nums(derEncoded: &nodes)
             let row_3: Colour_Attributes_Three_Nums = try Colour_Attributes_Three_Nums(derEncoded: &nodes)
+
             return Colour_Attributes_Three_by_Three_Matrix(row_1: row_1, row_2: row_2, row_3: row_3)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(row_1)
             try coder.serialize(row_2)
             try coder.serialize(row_3)
+
         }
     }
 }

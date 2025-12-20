@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCRMF_2009_EncKeyWithID: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCRMF_2009_EncKeyWithID: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var privateKey: PKIXCRMF_2009_PrivateKeyInfo
     @usableFromInline var ident: PKIXCRMF_2009_EncKeyWithID_identifier_Choice?
     @inlinable init(privateKey: PKIXCRMF_2009_PrivateKeyInfo, ident: PKIXCRMF_2009_EncKeyWithID_identifier_Choice?) {
         self.privateKey = privateKey
         self.ident = ident
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,6 +20,7 @@ var peek_ident = nodes
 if let next = peek_ident.next(), next.identifier == PKIXCRMF_2009_EncKeyWithID_identifier_Choice.defaultIdentifier {
     ident = try PKIXCRMF_2009_EncKeyWithID_identifier_Choice(derEncoded: &nodes)
 }
+
             return PKIXCRMF_2009_EncKeyWithID(privateKey: privateKey, ident: ident)
         }
     }
@@ -26,7 +28,8 @@ if let next = peek_ident.next(), next.identifier == PKIXCRMF_2009_EncKeyWithID_i
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(privateKey)
-            if let ident = self.ident { if let ident = self.ident { try coder.serialize(ident) } }
+            if let ident = self.ident { try coder.serialize(ident) }
+
         }
     }
 }

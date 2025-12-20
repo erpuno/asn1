@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2010_KeyTransRecipientInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2010_KeyTransRecipientInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: CryptographicMessageSyntax_2010_CMSVersion
     @usableFromInline var rid: CryptographicMessageSyntax_2010_RecipientIdentifier
@@ -13,6 +13,7 @@ import Foundation
         self.rid = rid
         self.keyEncryptionAlgorithm = keyEncryptionAlgorithm
         self.encryptedKey = encryptedKey
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let rid: CryptographicMessageSyntax_2010_RecipientIdentifier = try CryptographicMessageSyntax_2010_RecipientIdentifier(derEncoded: &nodes)
             let keyEncryptionAlgorithm: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let encryptedKey: CryptographicMessageSyntax_2010_EncryptedKey = try CryptographicMessageSyntax_2010_EncryptedKey(derEncoded: &nodes)
+
             return CryptographicMessageSyntax_2010_KeyTransRecipientInfo(version: version, rid: rid, keyEncryptionAlgorithm: keyEncryptionAlgorithm, encryptedKey: encryptedKey)
         }
     }
@@ -31,6 +33,7 @@ import Foundation
             try coder.serialize(rid)
             try coder.serialize(keyEncryptionAlgorithm)
             try coder.serialize(encryptedKey)
+
         }
     }
 }

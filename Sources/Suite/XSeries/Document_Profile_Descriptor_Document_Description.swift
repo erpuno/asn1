@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Document_Description: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Document_Description: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var title: Document_Profile_Descriptor_Character_Data?
     @usableFromInline var subject: Document_Profile_Descriptor_Character_Data?
@@ -17,6 +17,7 @@ import Foundation
         self.abstract = abstract
         self.keywords = keywords
         self.document_reference = document_reference
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -27,18 +28,20 @@ import Foundation
             let abstract: Document_Profile_Descriptor_Character_Data? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             let keywords: [Document_Profile_Descriptor_Character_Data]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in try DER.set(of: Document_Profile_Descriptor_Character_Data.self, identifier: node.identifier, rootNode: node) }
             let document_reference: Document_Profile_Descriptor_Document_Reference? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 5, tagClass: .contextSpecific) { node in return try Document_Profile_Descriptor_Document_Reference(derEncoded: node) }
+
             return Document_Profile_Descriptor_Document_Description(title: title, subject: subject, document_type: document_type, abstract: abstract, keywords: keywords, document_reference: document_reference)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let title = self.title { if let title = self.title { try coder.serializeOptionalImplicitlyTagged(title, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let subject = self.subject { if let subject = self.subject { try coder.serializeOptionalImplicitlyTagged(subject, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let document_type = self.document_type { if let document_type = self.document_type { try coder.serializeOptionalImplicitlyTagged(document_type, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let abstract = self.abstract { if let abstract = self.abstract { try coder.serializeOptionalImplicitlyTagged(abstract, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let keywords = self.keywords { if let keywords = self.keywords { try coder.serializeSetOf(keywords, identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let document_reference = self.document_reference { if let document_reference = self.document_reference { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serialize(document_reference) } } }
+            if let title = self.title { try coder.serializeOptionalImplicitlyTagged(title, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let subject = self.subject { try coder.serializeOptionalImplicitlyTagged(subject, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let document_type = self.document_type { try coder.serializeOptionalImplicitlyTagged(document_type, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let abstract = self.abstract { try coder.serializeOptionalImplicitlyTagged(abstract, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let keywords = self.keywords { try coder.serializeSetOf(keywords, identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let document_reference = self.document_reference { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serialize(document_reference) } }
+
         }
     }
 }

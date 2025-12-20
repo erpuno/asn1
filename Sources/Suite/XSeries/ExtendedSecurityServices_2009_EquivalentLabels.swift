@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ExtendedSecurityServices_2009_EquivalentLabels: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct ExtendedSecurityServices_2009_EquivalentLabels: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var value: [ExtendedSecurityServices_2009_ESSSecurityLabel]
     @inlinable public init(_ value: [ExtendedSecurityServices_2009_ESSSecurityLabel]) { self.value = value }

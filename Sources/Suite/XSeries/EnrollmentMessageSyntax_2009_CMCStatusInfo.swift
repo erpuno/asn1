@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_CMCStatusInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_CMCStatusInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var cMCStatus: EnrollmentMessageSyntax_2009_CMCStatus
     @usableFromInline var bodyList: [EnrollmentMessageSyntax_2009_BodyPartID]
@@ -13,6 +13,7 @@ import Foundation
         self.bodyList = bodyList
         self.statusString = statusString
         self.otherInfo = otherInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -29,6 +30,7 @@ var peek_otherInfo = nodes
 if let next = peek_otherInfo.next(), next.identifier == EnrollmentMessageSyntax_2009_CMCStatusInfo_otherInfo_Choice.defaultIdentifier {
     otherInfo = try EnrollmentMessageSyntax_2009_CMCStatusInfo_otherInfo_Choice(derEncoded: &nodes)
 }
+
             return EnrollmentMessageSyntax_2009_CMCStatusInfo(cMCStatus: cMCStatus, bodyList: bodyList, statusString: statusString, otherInfo: otherInfo)
         }
     }
@@ -37,8 +39,9 @@ if let next = peek_otherInfo.next(), next.identifier == EnrollmentMessageSyntax_
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(cMCStatus)
             try coder.serializeSequenceOf(bodyList)
-            if let statusString = self.statusString { if let statusString = self.statusString { try coder.serialize(statusString) } }
-            if let otherInfo = self.otherInfo { if let otherInfo = self.otherInfo { try coder.serialize(otherInfo) } }
+            if let statusString = self.statusString { try coder.serialize(statusString) }
+            if let otherInfo = self.otherInfo { try coder.serialize(otherInfo) }
+
         }
     }
 }

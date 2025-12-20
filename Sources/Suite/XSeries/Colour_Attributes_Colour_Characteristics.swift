@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_Colour_Characteristics: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_Colour_Characteristics: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var colour_spaces_present: [Colour_Attributes_Colour_Characteristics_colour_spaces_present_Set]
     @usableFromInline var colour_modes_present: Colour_Attributes_Colour_Modes_Present
@@ -17,6 +17,7 @@ import Foundation
         self.maximum_colour_table_length = maximum_colour_table_length
         self.maximum_rgb_lut_length = maximum_rgb_lut_length
         self.maximum_cmy_k_grid_size = maximum_cmy_k_grid_size
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -27,6 +28,7 @@ import Foundation
             let maximum_colour_table_length: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             let maximum_rgb_lut_length: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
             let maximum_cmy_k_grid_size: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
+
             return Colour_Attributes_Colour_Characteristics(colour_spaces_present: colour_spaces_present, colour_modes_present: colour_modes_present, minimum_colour_tolerance: minimum_colour_tolerance, maximum_colour_table_length: maximum_colour_table_length, maximum_rgb_lut_length: maximum_rgb_lut_length, maximum_cmy_k_grid_size: maximum_cmy_k_grid_size)
         }
     }
@@ -35,10 +37,11 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeSequenceOf(colour_spaces_present, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(colour_modes_present, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            if let minimum_colour_tolerance = self.minimum_colour_tolerance { if let minimum_colour_tolerance = self.minimum_colour_tolerance { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(minimum_colour_tolerance) } } }
-            if let maximum_colour_table_length = self.maximum_colour_table_length { if let maximum_colour_table_length = self.maximum_colour_table_length { try coder.serializeOptionalImplicitlyTagged(maximum_colour_table_length, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let maximum_rgb_lut_length = self.maximum_rgb_lut_length { if let maximum_rgb_lut_length = self.maximum_rgb_lut_length { try coder.serializeOptionalImplicitlyTagged(maximum_rgb_lut_length, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let maximum_cmy_k_grid_size = self.maximum_cmy_k_grid_size { if let maximum_cmy_k_grid_size = self.maximum_cmy_k_grid_size { try coder.serializeOptionalImplicitlyTagged(maximum_cmy_k_grid_size, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
+            if let minimum_colour_tolerance = self.minimum_colour_tolerance { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(minimum_colour_tolerance) } }
+            if let maximum_colour_table_length = self.maximum_colour_table_length { try coder.serializeOptionalImplicitlyTagged(maximum_colour_table_length, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let maximum_rgb_lut_length = self.maximum_rgb_lut_length { try coder.serializeOptionalImplicitlyTagged(maximum_rgb_lut_length, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let maximum_cmy_k_grid_size = self.maximum_cmy_k_grid_size { try coder.serializeOptionalImplicitlyTagged(maximum_cmy_k_grid_size, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+
         }
     }
 }

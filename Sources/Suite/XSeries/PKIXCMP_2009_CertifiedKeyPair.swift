@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_CertifiedKeyPair: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_CertifiedKeyPair: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var certOrEncCert: PKIXCMP_2009_CertOrEncCert
     @usableFromInline var privateKey: PKIXCRMF_2009_EncryptedValue?
@@ -11,6 +11,7 @@ import Foundation
         self.certOrEncCert = certOrEncCert
         self.privateKey = privateKey
         self.publicationInfo = publicationInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let certOrEncCert: PKIXCMP_2009_CertOrEncCert = try PKIXCMP_2009_CertOrEncCert(derEncoded: &nodes)
             let privateKey: PKIXCRMF_2009_EncryptedValue? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try PKIXCRMF_2009_EncryptedValue(derEncoded: node) }
             let publicationInfo: PKIXCRMF_2009_PKIPublicationInfo? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try PKIXCRMF_2009_PKIPublicationInfo(derEncoded: node) }
+
             return PKIXCMP_2009_CertifiedKeyPair(certOrEncCert: certOrEncCert, privateKey: privateKey, publicationInfo: publicationInfo)
         }
     }
@@ -25,8 +27,9 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(certOrEncCert)
-            if let privateKey = self.privateKey { if let privateKey = self.privateKey { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(privateKey) } } }
-            if let publicationInfo = self.publicationInfo { if let publicationInfo = self.publicationInfo { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(publicationInfo) } } }
+            if let privateKey = self.privateKey { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(privateKey) } }
+            if let publicationInfo = self.publicationInfo { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(publicationInfo) } }
+
         }
     }
 }

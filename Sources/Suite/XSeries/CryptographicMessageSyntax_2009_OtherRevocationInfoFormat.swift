@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2009_OtherRevocationInfoFormat: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2009_OtherRevocationInfoFormat: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var otherRevInfoFormat: ASN1ObjectIdentifier
     @usableFromInline var otherRevInfo: ASN1Any
     @inlinable init(otherRevInfoFormat: ASN1ObjectIdentifier, otherRevInfo: ASN1Any) {
         self.otherRevInfoFormat = otherRevInfoFormat
         self.otherRevInfo = otherRevInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let otherRevInfoFormat: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let otherRevInfo: ASN1Any = try ASN1Any(derEncoded: &nodes)
+
             return CryptographicMessageSyntax_2009_OtherRevocationInfoFormat(otherRevInfoFormat: otherRevInfoFormat, otherRevInfo: otherRevInfo)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(otherRevInfoFormat)
             try coder.serialize(otherRevInfo)
+
         }
     }
 }

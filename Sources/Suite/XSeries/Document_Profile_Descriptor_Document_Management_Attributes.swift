@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Document_Management_Attributes: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Document_Management_Attributes: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var document_description: Document_Profile_Descriptor_Document_Description?
     @usableFromInline var dates_and_times: Document_Profile_Descriptor_Dates_and_Times?
@@ -21,6 +21,7 @@ import Foundation
         self.local_file_references = local_file_references
         self.content_attributes = content_attributes
         self.security_information = security_information
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -33,20 +34,22 @@ import Foundation
             let local_file_references: Document_Profile_Descriptor_Local_File_References? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
             let content_attributes: Document_Profile_Descriptor_Content_Attributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
             let security_information: Document_Profile_Descriptor_Security_Information? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
+
             return Document_Profile_Descriptor_Document_Management_Attributes(document_description: document_description, dates_and_times: dates_and_times, originators: originators, other_user_information: other_user_information, external_references: external_references, local_file_references: local_file_references, content_attributes: content_attributes, security_information: security_information)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let document_description = self.document_description { if let document_description = self.document_description { try coder.serializeOptionalImplicitlyTagged(document_description, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) } }
-            if let dates_and_times = self.dates_and_times { if let dates_and_times = self.dates_and_times { try coder.serializeOptionalImplicitlyTagged(dates_and_times, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let originators = self.originators { if let originators = self.originators { try coder.serializeOptionalImplicitlyTagged(originators, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let other_user_information = self.other_user_information { if let other_user_information = self.other_user_information { try coder.serializeOptionalImplicitlyTagged(other_user_information, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let external_references = self.external_references { if let external_references = self.external_references { try coder.serializeOptionalImplicitlyTagged(external_references, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let local_file_references = self.local_file_references { if let local_file_references = self.local_file_references { try coder.serializeOptionalImplicitlyTagged(local_file_references, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let content_attributes = self.content_attributes { if let content_attributes = self.content_attributes { try coder.serializeOptionalImplicitlyTagged(content_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let security_information = self.security_information { if let security_information = self.security_information { try coder.serializeOptionalImplicitlyTagged(security_information, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
+            if let document_description = self.document_description { try coder.serializeOptionalImplicitlyTagged(document_description, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) }
+            if let dates_and_times = self.dates_and_times { try coder.serializeOptionalImplicitlyTagged(dates_and_times, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let originators = self.originators { try coder.serializeOptionalImplicitlyTagged(originators, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let other_user_information = self.other_user_information { try coder.serializeOptionalImplicitlyTagged(other_user_information, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let external_references = self.external_references { try coder.serializeOptionalImplicitlyTagged(external_references, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let local_file_references = self.local_file_references { try coder.serializeOptionalImplicitlyTagged(local_file_references, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let content_attributes = self.content_attributes { try coder.serializeOptionalImplicitlyTagged(content_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let security_information = self.security_information { try coder.serializeOptionalImplicitlyTagged(security_information, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+
         }
     }
 }

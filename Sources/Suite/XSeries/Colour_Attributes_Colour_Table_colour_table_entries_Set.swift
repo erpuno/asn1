@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_Colour_Table_colour_table_entries_Set: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_Colour_Table_colour_table_entries_Set: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var index: ArraySlice<UInt8>
     @usableFromInline var colour_coordinates: Colour_Attributes_Colour_Specification
@@ -11,6 +11,7 @@ import Foundation
         self.index = index
         self.colour_coordinates = colour_coordinates
         self.colour_tolerance = colour_tolerance
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let index: ArraySlice<UInt8> = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let colour_coordinates: Colour_Attributes_Colour_Specification = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try Colour_Attributes_Colour_Specification(derEncoded: node) }
             let colour_tolerance: Colour_Attributes_Colour_Tolerance? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try Colour_Attributes_Colour_Tolerance(derEncoded: node) }
+
             return Colour_Attributes_Colour_Table_colour_table_entries_Set(index: index, colour_coordinates: colour_coordinates, colour_tolerance: colour_tolerance)
         }
     }
@@ -26,7 +28,8 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(index, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(colour_coordinates) }
-            if let colour_tolerance = self.colour_tolerance { if let colour_tolerance = self.colour_tolerance { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(colour_tolerance) } } }
+            if let colour_tolerance = self.colour_tolerance { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(colour_tolerance) } }
+
         }
     }
 }

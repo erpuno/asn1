@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct AuthenticationFramework_AttributeCertificateAssertion: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct AuthenticationFramework_AttributeCertificateAssertion: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var subject: AuthenticationFramework_AttributeCertificateAssertion_subject_Choice?
     @usableFromInline var issuer: PKIX1Explicit88_Name?
@@ -13,6 +13,7 @@ import Foundation
         self.issuer = issuer
         self.attCertValidity = attCertValidity
         self.attType = attType
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let issuer: PKIX1Explicit88_Name? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try PKIX1Explicit88_Name(derEncoded: node) }
             let attCertValidity: GeneralizedTime? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try GeneralizedTime(derEncoded: node) }
             let attType: [PKIX1Explicit88_AttributeType]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in try DER.set(of: PKIX1Explicit88_AttributeType.self, identifier: .set, rootNode: node) }
+
             return AuthenticationFramework_AttributeCertificateAssertion(subject: subject, issuer: issuer, attCertValidity: attCertValidity, attType: attType)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let subject = self.subject { if let subject = self.subject { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(subject) } } }
-            if let issuer = self.issuer { if let issuer = self.issuer { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(issuer) } } }
-            if let attCertValidity = self.attCertValidity { if let attCertValidity = self.attCertValidity { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(attCertValidity) } } }
-            if let attType = self.attType { if let attType = self.attType { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(attType) } } }
+            if let subject = self.subject { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(subject) } }
+            if let issuer = self.issuer { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(issuer) } }
+            if let attCertValidity = self.attCertValidity { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(attCertValidity) } }
+            if let attType = self.attType { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(attType) } }
+
         }
     }
 }

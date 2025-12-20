@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_FamilyEntries: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_FamilyEntries: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var family_class: ASN1ObjectIdentifier
     @usableFromInline var familyEntries: [DirectoryAbstractService_FamilyEntry]
     @inlinable init(family_class: ASN1ObjectIdentifier, familyEntries: [DirectoryAbstractService_FamilyEntry]) {
         self.family_class = family_class
         self.familyEntries = familyEntries
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let family_class: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let familyEntries: [DirectoryAbstractService_FamilyEntry] = try DER.sequence(of: DirectoryAbstractService_FamilyEntry.self, identifier: .sequence, nodes: &nodes)
+
             return DirectoryAbstractService_FamilyEntries(family_class: family_class, familyEntries: familyEntries)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(family_class)
             try coder.serializeSequenceOf(familyEntries)
+
         }
     }
 }

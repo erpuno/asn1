@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Layout_Descriptors_Sealed: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Layout_Descriptors_Sealed: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var sealed_status: Layout_Descriptors_Sealed_sealed_status_IntEnum
     @usableFromInline var seal_ids: [ArraySlice<UInt8>]?
     @inlinable init(sealed_status: Layout_Descriptors_Sealed_sealed_status_IntEnum, seal_ids: [ArraySlice<UInt8>]?) {
         self.sealed_status = sealed_status
         self.seal_ids = seal_ids
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let sealed_status = try Layout_Descriptors_Sealed_sealed_status_IntEnum(rawValue: Int(derEncoded: &nodes))
             let seal_ids: [ArraySlice<UInt8>]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.set(of: ArraySlice<UInt8>.self, identifier: node.identifier, rootNode: node) }
+
             return Layout_Descriptors_Sealed(sealed_status: sealed_status, seal_ids: seal_ids)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(sealed_status.rawValue, explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific)
-            if let seal_ids = self.seal_ids { if let seal_ids = self.seal_ids { try coder.serializeSetOf(seal_ids, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let seal_ids = self.seal_ids { try coder.serializeSetOf(seal_ids, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

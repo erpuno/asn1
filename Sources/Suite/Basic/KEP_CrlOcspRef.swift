@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_CrlOcspRef: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_CrlOcspRef: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var crlids: KEP_CRLListID?
     @usableFromInline var ocspids: KEP_OcspListID?
@@ -11,6 +11,7 @@ import Foundation
         self.crlids = crlids
         self.ocspids = ocspids
         self.otherRev = otherRev
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let crlids: KEP_CRLListID? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let ocspids: KEP_OcspListID? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let otherRev: KEP_OtherRevRefs? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return KEP_CrlOcspRef(crlids: crlids, ocspids: ocspids, otherRev: otherRev)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let crlids = self.crlids { if let crlids = self.crlids { try coder.serializeOptionalImplicitlyTagged(crlids, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let ocspids = self.ocspids { if let ocspids = self.ocspids { try coder.serializeOptionalImplicitlyTagged(ocspids, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let otherRev = self.otherRev { if let otherRev = self.otherRev { try coder.serializeOptionalImplicitlyTagged(otherRev, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let crlids = self.crlids { try coder.serializeOptionalImplicitlyTagged(crlids, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let ocspids = self.ocspids { try coder.serializeOptionalImplicitlyTagged(ocspids, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let otherRev = self.otherRev { try coder.serializeOptionalImplicitlyTagged(otherRev, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

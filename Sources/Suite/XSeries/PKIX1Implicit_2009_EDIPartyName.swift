@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Implicit_2009_EDIPartyName: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Implicit_2009_EDIPartyName: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var nameAssigner: PKIX1Explicit88_DirectoryString?
     @usableFromInline var partyName: PKIX1Explicit88_DirectoryString
     @inlinable init(nameAssigner: PKIX1Explicit88_DirectoryString?, partyName: PKIX1Explicit88_DirectoryString) {
         self.nameAssigner = nameAssigner
         self.partyName = partyName
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let nameAssigner: PKIX1Explicit88_DirectoryString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let partyName: PKIX1Explicit88_DirectoryString = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
+
             return PKIX1Implicit_2009_EDIPartyName(nameAssigner: nameAssigner, partyName: partyName)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let nameAssigner = self.nameAssigner { if let nameAssigner = self.nameAssigner { try coder.serializeOptionalImplicitlyTagged(nameAssigner, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let nameAssigner = self.nameAssigner { try coder.serializeOptionalImplicitlyTagged(nameAssigner, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
             try coder.serializeOptionalImplicitlyTagged(partyName, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
         }
     }
 }

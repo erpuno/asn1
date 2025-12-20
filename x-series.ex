@@ -513,6 +513,7 @@ IO.puts("Found #{map_size(deps)} modules with dependencies")
 IO.puts("Topologically sorting by dependencies...")
 files = DependencyAnalyzer.topological_sort(deps, raw_files, base_dir)
 IO.puts("Sorted order: #{length(files)} files")
+Enum.each(files, fn f -> IO.puts("Sorted: #{f}") end)
 
 # Detect type cycles for Box wrapping
 IO.puts("Detecting type cycles for Box wrapper...")

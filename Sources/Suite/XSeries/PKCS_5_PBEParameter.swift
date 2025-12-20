@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_5_PBEParameter: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_5_PBEParameter: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var salt: ASN1OctetString
     @usableFromInline var iterationCount: ArraySlice<UInt8>
     @inlinable init(salt: ASN1OctetString, iterationCount: ArraySlice<UInt8>) {
         self.salt = salt
         self.iterationCount = iterationCount
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let salt: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let iterationCount: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return PKCS_5_PBEParameter(salt: salt, iterationCount: iterationCount)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(salt)
             try coder.serialize(iterationCount)
+
         }
     }
 }

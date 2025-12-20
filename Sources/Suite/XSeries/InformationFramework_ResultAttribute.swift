@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_ResultAttribute: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_ResultAttribute: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var attributeType: ASN1ObjectIdentifier
     @usableFromInline var outputValues: InformationFramework_ResultAttribute_outputValues_Choice?
@@ -11,6 +11,7 @@ import Foundation
         self.attributeType = attributeType
         self.outputValues = outputValues
         self.contexts = contexts
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ if let next = peek_outputValues.next(), next.identifier == InformationFramework_
     outputValues = try InformationFramework_ResultAttribute_outputValues_Choice(derEncoded: &nodes)
 }
             let contexts: [InformationFramework_ContextProfile]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in try DER.sequence(of: InformationFramework_ContextProfile.self, identifier: .sequence, rootNode: node) }
+
             return InformationFramework_ResultAttribute(attributeType: attributeType, outputValues: outputValues, contexts: contexts)
         }
     }
@@ -29,8 +31,9 @@ if let next = peek_outputValues.next(), next.identifier == InformationFramework_
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(attributeType)
-            if let outputValues = self.outputValues { if let outputValues = self.outputValues { try coder.serialize(outputValues) } }
-            if let contexts = self.contexts { if let contexts = self.contexts { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(contexts) } } }
+            if let outputValues = self.outputValues { try coder.serialize(outputValues) }
+            if let contexts = self.contexts { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(contexts) } }
+
         }
     }
 }

@@ -2,43 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct LDAP_ExtendedResponse: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct LDAP_ExtendedResponse: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var resultCode: LDAP_Result_resultCode_Enum
-    @usableFromInline var matchedDN: LDAP_LDAPDN
-    @usableFromInline var diagnosticMessage: LDAP_LDAPString
-    @usableFromInline var referral: LDAP_Referral?
-    @usableFromInline var responseName: LDAP_LDAPOID?
+    @usableFromInline var responseName: LDAP_OID?
     @usableFromInline var responseValue: ASN1OctetString?
-    @inlinable init(resultCode: LDAP_Result_resultCode_Enum, matchedDN: LDAP_LDAPDN, diagnosticMessage: LDAP_LDAPString, referral: LDAP_Referral?, responseName: LDAP_LDAPOID?, responseValue: ASN1OctetString?) {
-        self.resultCode = resultCode
-        self.matchedDN = matchedDN
-        self.diagnosticMessage = diagnosticMessage
-        self.referral = referral
+    @inlinable init(responseName: LDAP_OID?, responseValue: ASN1OctetString?) {
         self.responseName = responseName
         self.responseValue = responseValue
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let resultCode: LDAP_Result_resultCode_Enum = try LDAP_Result_resultCode_Enum(derEncoded: &nodes)
-            let matchedDN: LDAP_LDAPDN = try LDAP_LDAPDN(derEncoded: &nodes)
-            let diagnosticMessage: LDAP_LDAPString = try LDAP_LDAPString(derEncoded: &nodes)
-            let referral: LDAP_Referral? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
-            let responseName: LDAP_LDAPOID? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
+            let responseName: LDAP_OID? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
             let responseValue: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific))
-            return LDAP_ExtendedResponse(resultCode: resultCode, matchedDN: matchedDN, diagnosticMessage: diagnosticMessage, referral: referral, responseName: responseName, responseValue: responseValue)
+
+            return LDAP_ExtendedResponse(responseName: responseName, responseValue: responseValue)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(resultCode)
-            try coder.serialize(matchedDN)
-            try coder.serialize(diagnosticMessage)
-            if let referral = self.referral { if let referral = self.referral { try coder.serializeOptionalImplicitlyTagged(referral, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let responseName = self.responseName { if let responseName = self.responseName { try coder.serializeOptionalImplicitlyTagged(responseName, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) } }
-            if let responseValue = self.responseValue { if let responseValue = self.responseValue { try coder.serializeOptionalImplicitlyTagged(responseValue, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) } }
+            if let responseName = self.responseName { try coder.serializeOptionalImplicitlyTagged(responseName, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) }
+            if let responseValue = self.responseValue { try coder.serializeOptionalImplicitlyTagged(responseValue, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_TSTInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_TSTInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: KEP_TSTInfo_version_IntEnum
     @usableFromInline var policy: KEP_TSAPolicyId
@@ -23,6 +23,7 @@ import Foundation
         self.nonce = nonce
         self.tsa = tsa
         self.extensions = extensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -44,21 +45,23 @@ if let next = peek_nonce.next(), next.identifier == ArraySlice<UInt8>.defaultIde
 }
             let tsa: KEP_GeneralName? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let extensions: DSTU_Extensions? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return KEP_TSTInfo(version: version, policy: policy, messageImprint: messageImprint, serialNumber: serialNumber, genTime: genTime, accuracy: accuracy, nonce: nonce, tsa: tsa, extensions: extensions)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(version.rawValue)
+            try version.serialize(into: &coder, withIdentifier: identifier)
             try coder.serialize(policy)
             try coder.serialize(messageImprint)
             try coder.serialize(serialNumber)
             try coder.serialize(genTime)
-            if let accuracy = self.accuracy { if let accuracy = self.accuracy { try coder.serialize(accuracy) } }
-            if let nonce = self.nonce { if let nonce = self.nonce { try coder.serialize(nonce) } }
-            if let tsa = self.tsa { if let tsa = self.tsa { try coder.serializeOptionalImplicitlyTagged(tsa, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let extensions = self.extensions { if let extensions = self.extensions { try coder.serializeOptionalImplicitlyTagged(extensions, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let accuracy = self.accuracy { try coder.serialize(accuracy) }
+            if let nonce = self.nonce { try coder.serialize(nonce) }
+            if let tsa = self.tsa { try coder.serializeOptionalImplicitlyTagged(tsa, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let extensions = self.extensions { try coder.serializeOptionalImplicitlyTagged(extensions, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

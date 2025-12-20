@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline typealias LDAP_URI = LDAP_LDAPString
+@usableFromInline typealias LDAP_URI = LDAP_String

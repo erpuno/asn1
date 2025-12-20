@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Filled_Area_Rendition: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Filled_Area_Rendition: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var fill_bundle_index: ArraySlice<UInt8>?
     @usableFromInline var interior_style: Geo_Gr_Presentation_Attributes_Filled_Area_Rendition_interior_style_Enum?
@@ -25,6 +25,7 @@ import Foundation
         self.pattern_table_specifications = pattern_table_specifications
         self.fill_aspect_source_flags = fill_aspect_source_flags
         self.fill_bundle_specifications = fill_bundle_specifications
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -39,22 +40,24 @@ import Foundation
             let pattern_table_specifications: [Geo_Gr_Presentation_Attributes_PatternTableElement]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 8, tagClass: .contextSpecific) { node in try DER.sequence(of: Geo_Gr_Presentation_Attributes_PatternTableElement.self, identifier: node.identifier, rootNode: node) }
             let fill_aspect_source_flags: Geo_Gr_Presentation_Attributes_Filled_Area_Rendition_fill_aspect_source_flags_Sequence? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
             let fill_bundle_specifications: Geo_Gr_Presentation_Attributes_Filled_Area_Rendition_fill_bundle_specifications_Sequence? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
+
             return Geo_Gr_Presentation_Attributes_Filled_Area_Rendition(fill_bundle_index: fill_bundle_index, interior_style: interior_style, fill_colour: fill_colour, hatch_index: hatch_index, pattern_index: pattern_index, fill_reference_point: fill_reference_point, pattern_size: pattern_size, pattern_table_specifications: pattern_table_specifications, fill_aspect_source_flags: fill_aspect_source_flags, fill_bundle_specifications: fill_bundle_specifications)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let fill_bundle_index = self.fill_bundle_index { if let fill_bundle_index = self.fill_bundle_index { try coder.serializeOptionalImplicitlyTagged(fill_bundle_index, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let interior_style = self.interior_style { if let interior_style = self.interior_style { try coder.serializeOptionalImplicitlyTagged(interior_style, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let fill_colour = self.fill_colour { if let fill_colour = self.fill_colour { try coder.serializeOptionalImplicitlyTagged(fill_colour, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let hatch_index = self.hatch_index { if let hatch_index = self.hatch_index { try coder.serializeOptionalImplicitlyTagged(hatch_index, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let pattern_index = self.pattern_index { if let pattern_index = self.pattern_index { try coder.serializeOptionalImplicitlyTagged(pattern_index, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let fill_reference_point = self.fill_reference_point { if let fill_reference_point = self.fill_reference_point { try coder.serializeOptionalImplicitlyTagged(fill_reference_point, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let pattern_size = self.pattern_size { if let pattern_size = self.pattern_size { try coder.serializeOptionalImplicitlyTagged(pattern_size, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) } }
-            if let pattern_table_specifications = self.pattern_table_specifications { if let pattern_table_specifications = self.pattern_table_specifications { try coder.serializeSequenceOf(pattern_table_specifications, identifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) } }
-            if let fill_aspect_source_flags = self.fill_aspect_source_flags { if let fill_aspect_source_flags = self.fill_aspect_source_flags { try coder.serializeOptionalImplicitlyTagged(fill_aspect_source_flags, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) } }
-            if let fill_bundle_specifications = self.fill_bundle_specifications { if let fill_bundle_specifications = self.fill_bundle_specifications { try coder.serializeOptionalImplicitlyTagged(fill_bundle_specifications, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) } }
+            if let fill_bundle_index = self.fill_bundle_index { try coder.serializeOptionalImplicitlyTagged(fill_bundle_index, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let interior_style = self.interior_style { try coder.serializeOptionalImplicitlyTagged(interior_style, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let fill_colour = self.fill_colour { try coder.serializeOptionalImplicitlyTagged(fill_colour, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let hatch_index = self.hatch_index { try coder.serializeOptionalImplicitlyTagged(hatch_index, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let pattern_index = self.pattern_index { try coder.serializeOptionalImplicitlyTagged(pattern_index, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let fill_reference_point = self.fill_reference_point { try coder.serializeOptionalImplicitlyTagged(fill_reference_point, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+            if let pattern_size = self.pattern_size { try coder.serializeOptionalImplicitlyTagged(pattern_size, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) }
+            if let pattern_table_specifications = self.pattern_table_specifications { try coder.serializeSequenceOf(pattern_table_specifications, identifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) }
+            if let fill_aspect_source_flags = self.fill_aspect_source_flags { try coder.serializeOptionalImplicitlyTagged(fill_aspect_source_flags, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) }
+            if let fill_bundle_specifications = self.fill_bundle_specifications { try coder.serializeOptionalImplicitlyTagged(fill_bundle_specifications, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) }
+
         }
     }
 }

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Explicit88_ExtendedNetworkAddress_e163_4_address_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Explicit88_ExtendedNetworkAddress_e163_4_address_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var number: ASN1PrintableString
     @usableFromInline var sub_address: ASN1PrintableString?
     @inlinable init(number: ASN1PrintableString, sub_address: ASN1PrintableString?) {
         self.number = number
         self.sub_address = sub_address
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let number: ASN1PrintableString = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let sub_address: ASN1PrintableString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return PKIX1Explicit88_ExtendedNetworkAddress_e163_4_address_Sequence(number: number, sub_address: sub_address)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(number, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            if let sub_address = self.sub_address { if let sub_address = self.sub_address { try coder.serializeOptionalImplicitlyTagged(sub_address, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let sub_address = self.sub_address { try coder.serializeOptionalImplicitlyTagged(sub_address, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

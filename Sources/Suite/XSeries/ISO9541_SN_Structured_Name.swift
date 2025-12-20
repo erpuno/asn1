@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO9541_SN_Structured_Name: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO9541_SN_Structured_Name: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var owner_name: ISO9541_SN_Owner_Name?
     @usableFromInline var owner_description: ISO9541_SN_Message?
@@ -13,6 +13,7 @@ import Foundation
         self.owner_description = owner_description
         self.object_name = object_name
         self.object_description = object_description
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let owner_description: ISO9541_SN_Message? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try ISO9541_SN_Message(derEncoded: node) }
             let object_name: [ISO9541_SN_Object_Name_Component]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.sequence(of: ISO9541_SN_Object_Name_Component.self, identifier: .sequence, rootNode: node) }
             let object_description: ISO9541_SN_Message? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try ISO9541_SN_Message(derEncoded: node) }
+
             return ISO9541_SN_Structured_Name(owner_name: owner_name, owner_description: owner_description, object_name: object_name, object_description: object_description)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let owner_name = self.owner_name { if let owner_name = self.owner_name { try coder.serializeOptionalImplicitlyTagged(owner_name, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let owner_description = self.owner_description { if let owner_description = self.owner_description { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(owner_description) } } }
-            if let object_name = self.object_name { if let object_name = self.object_name { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(object_name) } } }
-            if let object_description = self.object_description { if let object_description = self.object_description { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(object_description) } } }
+            if let owner_name = self.owner_name { try coder.serializeOptionalImplicitlyTagged(owner_name, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let owner_description = self.owner_description { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(owner_description) } }
+            if let object_name = self.object_name { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(object_name) } }
+            if let object_description = self.object_description { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(object_description) } }
+
         }
     }
 }

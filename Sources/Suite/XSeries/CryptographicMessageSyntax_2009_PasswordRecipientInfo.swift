@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2009_PasswordRecipientInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2009_PasswordRecipientInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: CryptographicMessageSyntax_2009_CMSVersion
     @usableFromInline var keyDerivationAlgorithm: CryptographicMessageSyntax_2009_KeyDerivationAlgorithmIdentifier?
@@ -13,6 +13,7 @@ import Foundation
         self.keyDerivationAlgorithm = keyDerivationAlgorithm
         self.keyEncryptionAlgorithm = keyEncryptionAlgorithm
         self.encryptedKey = encryptedKey
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let keyDerivationAlgorithm: CryptographicMessageSyntax_2009_KeyDerivationAlgorithmIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let keyEncryptionAlgorithm: CryptographicMessageSyntax_2009_KeyEncryptionAlgorithmIdentifier = try CryptographicMessageSyntax_2009_KeyEncryptionAlgorithmIdentifier(derEncoded: &nodes)
             let encryptedKey: CryptographicMessageSyntax_2009_EncryptedKey = try CryptographicMessageSyntax_2009_EncryptedKey(derEncoded: &nodes)
+
             return CryptographicMessageSyntax_2009_PasswordRecipientInfo(version: version, keyDerivationAlgorithm: keyDerivationAlgorithm, keyEncryptionAlgorithm: keyEncryptionAlgorithm, encryptedKey: encryptedKey)
         }
     }
@@ -28,9 +30,10 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(version)
-            if let keyDerivationAlgorithm = self.keyDerivationAlgorithm { if let keyDerivationAlgorithm = self.keyDerivationAlgorithm { try coder.serializeOptionalImplicitlyTagged(keyDerivationAlgorithm, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let keyDerivationAlgorithm = self.keyDerivationAlgorithm { try coder.serializeOptionalImplicitlyTagged(keyDerivationAlgorithm, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
             try coder.serialize(keyEncryptionAlgorithm)
             try coder.serialize(encryptedKey)
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1_PSS_OAEP_Algorithms_2009_RSASSA_PSS_params: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1_PSS_OAEP_Algorithms_2009_RSASSA_PSS_params: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var hashAlgorithm: PKIX1_PSS_OAEP_Algorithms_2009_HashAlgorithm?
     @usableFromInline var maskGenAlgorithm: PKIX1_PSS_OAEP_Algorithms_2009_MaskGenAlgorithm?
@@ -13,6 +13,7 @@ import Foundation
         self.maskGenAlgorithm = maskGenAlgorithm
         self.saltLength = saltLength
         self.trailerField = trailerField
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let maskGenAlgorithm: PKIX1_PSS_OAEP_Algorithms_2009_MaskGenAlgorithm = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try PKIX1_PSS_OAEP_Algorithms_2009_MaskGenAlgorithm(derEncoded: node) }
             let saltLength: ArraySlice<UInt8> = try DER.explicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
             let trailerField: ArraySlice<UInt8> = try DER.explicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
+
             return PKIX1_PSS_OAEP_Algorithms_2009_RSASSA_PSS_params(hashAlgorithm: hashAlgorithm, maskGenAlgorithm: maskGenAlgorithm, saltLength: saltLength, trailerField: trailerField)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let hashAlgorithm = self.hashAlgorithm { if let hashAlgorithm = self.hashAlgorithm { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(hashAlgorithm) } } }
-            if let maskGenAlgorithm = self.maskGenAlgorithm { if let maskGenAlgorithm = self.maskGenAlgorithm { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(maskGenAlgorithm) } } }
-            if let saltLength = self.saltLength { if let saltLength = self.saltLength { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(saltLength) } } }
-            if let trailerField = self.trailerField { if let trailerField = self.trailerField { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(trailerField) } } }
+            if let hashAlgorithm = self.hashAlgorithm { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(hashAlgorithm) } }
+            if let maskGenAlgorithm = self.maskGenAlgorithm { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(maskGenAlgorithm) } }
+            if let saltLength = self.saltLength { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(saltLength) } }
+            if let trailerField = self.trailerField { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(trailerField) } }
+
         }
     }
 }

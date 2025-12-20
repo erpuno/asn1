@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLOwnerInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLOwnerInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var glOwnerName: PKIX1Implicit88_GeneralName
     @usableFromInline var glOwnerAddress: PKIX1Implicit88_GeneralName
@@ -11,6 +11,7 @@ import Foundation
         self.glOwnerName = glOwnerName
         self.glOwnerAddress = glOwnerAddress
         self.certificates = certificates
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ var peek_certificates = nodes
 if let next = peek_certificates.next(), next.identifier == SMIMESymmetricKeyDistribution_2009_Certificates.defaultIdentifier {
     certificates = try SMIMESymmetricKeyDistribution_2009_Certificates(derEncoded: &nodes)
 }
+
             return SMIMESymmetricKeyDistribution_2009_GLOwnerInfo(glOwnerName: glOwnerName, glOwnerAddress: glOwnerAddress, certificates: certificates)
         }
     }
@@ -30,7 +32,8 @@ if let next = peek_certificates.next(), next.identifier == SMIMESymmetricKeyDist
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(glOwnerName)
             try coder.serialize(glOwnerAddress)
-            if let certificates = self.certificates { if let certificates = self.certificates { try coder.serialize(certificates) } }
+            if let certificates = self.certificates { try coder.serialize(certificates) }
+
         }
     }
 }

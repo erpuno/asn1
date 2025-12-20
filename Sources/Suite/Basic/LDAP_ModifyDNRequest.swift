@@ -2,25 +2,27 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct LDAP_ModifyDNRequest: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct LDAP_ModifyDNRequest: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var entry: LDAP_LDAPDN
+    @usableFromInline var entry: LDAP_DN
     @usableFromInline var newrdn: LDAP_RelativeLDAPDN
     @usableFromInline var deleteoldrdn: Bool
-    @usableFromInline var newSuperior: LDAP_LDAPDN?
-    @inlinable init(entry: LDAP_LDAPDN, newrdn: LDAP_RelativeLDAPDN, deleteoldrdn: Bool, newSuperior: LDAP_LDAPDN?) {
+    @usableFromInline var newSuperior: LDAP_DN?
+    @inlinable init(entry: LDAP_DN, newrdn: LDAP_RelativeLDAPDN, deleteoldrdn: Bool, newSuperior: LDAP_DN?) {
         self.entry = entry
         self.newrdn = newrdn
         self.deleteoldrdn = deleteoldrdn
         self.newSuperior = newSuperior
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let entry: LDAP_LDAPDN = try LDAP_LDAPDN(derEncoded: &nodes)
+            let entry: LDAP_DN = try LDAP_DN(derEncoded: &nodes)
             let newrdn: LDAP_RelativeLDAPDN = try LDAP_RelativeLDAPDN(derEncoded: &nodes)
             let deleteoldrdn: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
-            let newSuperior: LDAP_LDAPDN? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+            let newSuperior: LDAP_DN? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+
             return LDAP_ModifyDNRequest(entry: entry, newrdn: newrdn, deleteoldrdn: deleteoldrdn, newSuperior: newSuperior)
         }
     }
@@ -30,7 +32,8 @@ import Foundation
             try coder.serialize(entry)
             try coder.serialize(newrdn)
             try coder.serialize(deleteoldrdn)
-            if let newSuperior = self.newSuperior { if let newSuperior = self.newSuperior { try coder.serializeOptionalImplicitlyTagged(newSuperior, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let newSuperior = self.newSuperior { try coder.serializeOptionalImplicitlyTagged(newSuperior, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+
         }
     }
 }

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct AuthenticationFramework_CertificationPath: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct AuthenticationFramework_CertificationPath: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var userCertificate: AuthenticationFramework_Certificate
     @usableFromInline var theCACertificates: [AuthenticationFramework_CertificatePair]?
     @inlinable init(userCertificate: AuthenticationFramework_Certificate, theCACertificates: [AuthenticationFramework_CertificatePair]?) {
         self.userCertificate = userCertificate
         self.theCACertificates = theCACertificates
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let userCertificate: AuthenticationFramework_Certificate = try AuthenticationFramework_Certificate(derEncoded: &nodes)
             let theCACertificates: [AuthenticationFramework_CertificatePair]? = try DER.sequence(of: AuthenticationFramework_CertificatePair.self, identifier: .sequence, nodes: &nodes)
+
             return AuthenticationFramework_CertificationPath(userCertificate: userCertificate, theCACertificates: theCACertificates)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(userCertificate)
-            if let theCACertificates = self.theCACertificates { if let theCACertificates = self.theCACertificates { try coder.serializeSequenceOf(theCACertificates) } }
+            if let theCACertificates = self.theCACertificates { try coder.serializeSequenceOf(theCACertificates) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SelectedAttributeTypes_TimeAssertion_between_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SelectedAttributeTypes_TimeAssertion_between_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var startTime: GeneralizedTime
     @usableFromInline var endTime: GeneralizedTime?
@@ -11,6 +11,7 @@ import Foundation
         self.startTime = startTime
         self.endTime = endTime
         self.entirely = entirely
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let startTime: GeneralizedTime = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try GeneralizedTime(derEncoded: node) }
             let endTime: GeneralizedTime? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try GeneralizedTime(derEncoded: node) }
             let entirely: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
+
             return SelectedAttributeTypes_TimeAssertion_between_Sequence(startTime: startTime, endTime: endTime, entirely: entirely)
         }
     }
@@ -25,8 +27,9 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(startTime) }
-            if let endTime = self.endTime { if let endTime = self.endTime { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(endTime) } } }
-            if let entirely = self.entirely { if let entirely = self.entirely { try coder.serialize(entirely) } }
+            if let endTime = self.endTime { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(endTime) } }
+            if let entirely = self.entirely { try coder.serialize(entirely) }
+
         }
     }
 }

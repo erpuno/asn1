@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var property_name: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name
     @usableFromInline var property_value: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_Value
     @inlinable init(property_name: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name, property_value: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_Value) {
         self.property_name = property_name
         self.property_value = property_value
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let property_name: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name(derEncoded: node) }
             let property_value: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_Value = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_Value(derEncoded: node) }
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property(property_name: property_name, property_value: property_value)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(property_name) }
             try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(property_value) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLRekey: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLRekey: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var glName: PKIX1Implicit88_GeneralName
     @usableFromInline var glAdministration: SMIMESymmetricKeyDistribution_2009_GLAdministration?
@@ -13,6 +13,7 @@ import Foundation
         self.glAdministration = glAdministration
         self.glNewKeyAttributes = glNewKeyAttributes
         self.glRekeyAllGLKeys = glRekeyAllGLKeys
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -29,6 +30,7 @@ if let next = peek_glNewKeyAttributes.next(), next.identifier == SMIMESymmetricK
     glNewKeyAttributes = try SMIMESymmetricKeyDistribution_2009_GLNewKeyAttributes(derEncoded: &nodes)
 }
             let glRekeyAllGLKeys: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
+
             return SMIMESymmetricKeyDistribution_2009_GLRekey(glName: glName, glAdministration: glAdministration, glNewKeyAttributes: glNewKeyAttributes, glRekeyAllGLKeys: glRekeyAllGLKeys)
         }
     }
@@ -36,9 +38,10 @@ if let next = peek_glNewKeyAttributes.next(), next.identifier == SMIMESymmetricK
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(glName)
-            if let glAdministration = self.glAdministration { if let glAdministration = self.glAdministration { try coder.serialize(glAdministration) } }
-            if let glNewKeyAttributes = self.glNewKeyAttributes { if let glNewKeyAttributes = self.glNewKeyAttributes { try coder.serialize(glNewKeyAttributes) } }
-            if let glRekeyAllGLKeys = self.glRekeyAllGLKeys { if let glRekeyAllGLKeys = self.glRekeyAllGLKeys { try coder.serialize(glRekeyAllGLKeys) } }
+            if let glAdministration = self.glAdministration { try coder.serialize(glAdministration) }
+            if let glNewKeyAttributes = self.glNewKeyAttributes { try coder.serialize(glNewKeyAttributes) }
+            if let glRekeyAllGLKeys = self.glRekeyAllGLKeys { try coder.serialize(glRekeyAllGLKeys) }
+
         }
     }
 }

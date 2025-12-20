@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct AuthenticationFramework_AttributeCertificationPath: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct AuthenticationFramework_AttributeCertificationPath: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var attributeCertificate: AuthenticationFramework_AttributeCertificate
     @usableFromInline var acPath: [AuthenticationFramework_ACPathData]?
     @inlinable init(attributeCertificate: AuthenticationFramework_AttributeCertificate, acPath: [AuthenticationFramework_ACPathData]?) {
         self.attributeCertificate = attributeCertificate
         self.acPath = acPath
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let attributeCertificate: AuthenticationFramework_AttributeCertificate = try AuthenticationFramework_AttributeCertificate(derEncoded: &nodes)
             let acPath: [AuthenticationFramework_ACPathData]? = try DER.sequence(of: AuthenticationFramework_ACPathData.self, identifier: .sequence, nodes: &nodes)
+
             return AuthenticationFramework_AttributeCertificationPath(attributeCertificate: attributeCertificate, acPath: acPath)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(attributeCertificate)
-            if let acPath = self.acPath { if let acPath = self.acPath { try coder.serializeSequenceOf(acPath) } }
+            if let acPath = self.acPath { try coder.serializeSequenceOf(acPath) }
+
         }
     }
 }

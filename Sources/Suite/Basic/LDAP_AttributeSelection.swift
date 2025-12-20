@@ -2,12 +2,12 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct LDAP_AttributeSelection: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct LDAP_AttributeSelection: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var value: [LDAP_LDAPString]
-    @inlinable public init(_ value: [LDAP_LDAPString]) { self.value = value }
+    @usableFromInline var value: [LDAP_String]
+    @inlinable public init(_ value: [LDAP_String]) { self.value = value }
     @inlinable public init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
-        self.value = try DER.sequence(of: LDAP_LDAPString.self, identifier: identifier, rootNode: rootNode)
+        self.value = try DER.sequence(of: LDAP_String.self, identifier: identifier, rootNode: rootNode)
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         try coder.serializeSequenceOf(value, identifier: identifier)

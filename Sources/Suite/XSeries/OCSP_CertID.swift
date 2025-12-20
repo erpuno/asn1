@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct OCSP_CertID: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct OCSP_CertID: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var hashAlgorithm: AuthenticationFramework_AlgorithmIdentifier
     @usableFromInline var issuerNameHash: ASN1OctetString
@@ -13,6 +13,7 @@ import Foundation
         self.issuerNameHash = issuerNameHash
         self.issuerKeyHash = issuerKeyHash
         self.serialNumber = serialNumber
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let issuerNameHash: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let issuerKeyHash: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let serialNumber: AuthenticationFramework_CertificateSerialNumber = try AuthenticationFramework_CertificateSerialNumber(derEncoded: &nodes)
+
             return OCSP_CertID(hashAlgorithm: hashAlgorithm, issuerNameHash: issuerNameHash, issuerKeyHash: issuerKeyHash, serialNumber: serialNumber)
         }
     }
@@ -31,6 +33,7 @@ import Foundation
             try coder.serialize(issuerNameHash)
             try coder.serialize(issuerKeyHash)
             try coder.serialize(serialNumber)
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_PKIMessage: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_PKIMessage: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var header: PKIXCMP_2009_PKIHeader
     @usableFromInline var body: PKIXCMP_2009_PKIBody
@@ -13,6 +13,7 @@ import Foundation
         self.body = body
         self.protection = protection
         self.extraCerts = extraCerts
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let body: PKIXCMP_2009_PKIBody = try PKIXCMP_2009_PKIBody(derEncoded: &nodes)
             let protection: PKIXCMP_2009_PKIProtection? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try PKIXCMP_2009_PKIProtection(derEncoded: node) }
             let extraCerts: [PKIXCMP_2009_CMPCertificate]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.sequence(of: PKIXCMP_2009_CMPCertificate.self, identifier: .sequence, rootNode: node) }
+
             return PKIXCMP_2009_PKIMessage(header: header, body: body, protection: protection, extraCerts: extraCerts)
         }
     }
@@ -29,8 +31,9 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(header)
             try coder.serialize(body)
-            if let protection = self.protection { if let protection = self.protection { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(protection) } } }
-            if let extraCerts = self.extraCerts { if let extraCerts = self.extraCerts { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(extraCerts) } } }
+            if let protection = self.protection { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(protection) } }
+            if let extraCerts = self.extraCerts { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(extraCerts) } }
+
         }
     }
 }

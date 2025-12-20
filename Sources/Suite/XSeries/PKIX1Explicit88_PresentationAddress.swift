@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Explicit88_PresentationAddress: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Explicit88_PresentationAddress: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var pSelector: ASN1OctetString?
     @usableFromInline var sSelector: ASN1OctetString?
@@ -13,6 +13,7 @@ import Foundation
         self.sSelector = sSelector
         self.tSelector = tSelector
         self.nAddresses = nAddresses
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let sSelector: ASN1OctetString? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
             let tSelector: ASN1OctetString? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
             let nAddresses: [ASN1OctetString] = try DER.explicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in try DER.set(of: ASN1OctetString.self, identifier: .set, rootNode: node) }
+
             return PKIX1Explicit88_PresentationAddress(pSelector: pSelector, sSelector: sSelector, tSelector: tSelector, nAddresses: nAddresses)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let pSelector = self.pSelector { if let pSelector = self.pSelector { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(pSelector) } } }
-            if let sSelector = self.sSelector { if let sSelector = self.sSelector { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(sSelector) } } }
-            if let tSelector = self.tSelector { if let tSelector = self.tSelector { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(tSelector) } } }
+            if let pSelector = self.pSelector { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(pSelector) } }
+            if let sSelector = self.sSelector { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(sSelector) } }
+            if let tSelector = self.tSelector { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(tSelector) } }
             try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(nAddresses) }
+
         }
     }
 }

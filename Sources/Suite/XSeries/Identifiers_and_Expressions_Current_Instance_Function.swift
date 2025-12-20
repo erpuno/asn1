@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Identifiers_and_Expressions_Current_Instance_Function: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Identifiers_and_Expressions_Current_Instance_Function: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var first_parameter: Identifiers_and_Expressions_Current_Instance_Function_first_parameter_Choice
-    @usableFromInline var second_parameter: Box<Identifiers_and_Expressions_Current_Instance_Function_second_parameter_Choice>
-    @inlinable init(first_parameter: Identifiers_and_Expressions_Current_Instance_Function_first_parameter_Choice, second_parameter: Box<Identifiers_and_Expressions_Current_Instance_Function_second_parameter_Choice>) {
+    @usableFromInline var second_parameter: Identifiers_and_Expressions_Current_Instance_Function_second_parameter_Choice
+    @inlinable init(first_parameter: Identifiers_and_Expressions_Current_Instance_Function_first_parameter_Choice, second_parameter: Identifiers_and_Expressions_Current_Instance_Function_second_parameter_Choice) {
         self.first_parameter = first_parameter
         self.second_parameter = second_parameter
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let first_parameter: Identifiers_and_Expressions_Current_Instance_Function_first_parameter_Choice = try Identifiers_and_Expressions_Current_Instance_Function_first_parameter_Choice(derEncoded: &nodes)
-            let second_parameter: Box<Identifiers_and_Expressions_Current_Instance_Function_second_parameter_Choice> = Box(try Identifiers_and_Expressions_Current_Instance_Function_second_parameter_Choice(derEncoded: &nodes))
+            let second_parameter: Identifiers_and_Expressions_Current_Instance_Function_second_parameter_Choice = try Identifiers_and_Expressions_Current_Instance_Function_second_parameter_Choice(derEncoded: &nodes)
+
             return Identifiers_and_Expressions_Current_Instance_Function(first_parameter: first_parameter, second_parameter: second_parameter)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(first_parameter)
-            try coder.serialize(second_parameter.value)
+            try coder.serialize(second_parameter)
+
         }
     }
 }

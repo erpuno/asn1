@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Extents: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Extents: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var minx: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational?
     @usableFromInline var miny: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational?
@@ -13,6 +13,7 @@ import Foundation
         self.miny = miny
         self.maxx = maxx
         self.maxy = maxy
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let miny: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let maxx: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let maxy: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Extents(minx: minx, miny: miny, maxx: maxx, maxy: maxy)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let minx = self.minx { if let minx = self.minx { try coder.serializeOptionalImplicitlyTagged(minx, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let miny = self.miny { if let miny = self.miny { try coder.serializeOptionalImplicitlyTagged(miny, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let maxx = self.maxx { if let maxx = self.maxx { try coder.serializeOptionalImplicitlyTagged(maxx, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let maxy = self.maxy { if let maxy = self.maxy { try coder.serializeOptionalImplicitlyTagged(maxy, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
+            if let minx = self.minx { try coder.serializeOptionalImplicitlyTagged(minx, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let miny = self.miny { try coder.serializeOptionalImplicitlyTagged(miny, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let maxx = self.maxx { try coder.serializeOptionalImplicitlyTagged(maxx, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let maxy = self.maxy { try coder.serializeOptionalImplicitlyTagged(maxy, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+
         }
     }
 }

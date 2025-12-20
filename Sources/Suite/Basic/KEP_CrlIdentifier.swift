@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_CrlIdentifier: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_CrlIdentifier: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var crlissuer: DSTU_Name
     @usableFromInline var crlIssuedTime: UTCTime
@@ -11,6 +11,7 @@ import Foundation
         self.crlissuer = crlissuer
         self.crlIssuedTime = crlIssuedTime
         self.crlNumber = crlNumber
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ var peek_crlNumber = nodes
 if let next = peek_crlNumber.next(), next.identifier == ArraySlice<UInt8>.defaultIdentifier {
     crlNumber = try ArraySlice<UInt8>(derEncoded: &nodes)
 }
+
             return KEP_CrlIdentifier(crlissuer: crlissuer, crlIssuedTime: crlIssuedTime, crlNumber: crlNumber)
         }
     }
@@ -30,7 +32,8 @@ if let next = peek_crlNumber.next(), next.identifier == ArraySlice<UInt8>.defaul
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(crlissuer)
             try coder.serialize(crlIssuedTime)
-            if let crlNumber = self.crlNumber { if let crlNumber = self.crlNumber { try coder.serialize(crlNumber) } }
+            if let crlNumber = self.crlNumber { try coder.serialize(crlNumber) }
+
         }
     }
 }

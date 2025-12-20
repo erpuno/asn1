@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct InformationFramework_ImposedSubset: DERImplicitlyTaggable, Hashable, Sendable, RawRepresentable {
+public struct InformationFramework_ImposedSubset: DERImplicitlyTaggable, Sendable, RawRepresentable {
     public static var defaultIdentifier: ASN1Identifier { .enumerated }
     public var rawValue: Int
     public init(rawValue: Int) { self.rawValue = rawValue }

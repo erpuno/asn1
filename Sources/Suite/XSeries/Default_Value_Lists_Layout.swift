@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Default_Value_Lists_Layout: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Default_Value_Lists_Layout: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var page_set_attributes: Default_Value_Lists_Page_Set_Attributes?
     @usableFromInline var page_attributes: Default_Value_Lists_Page_Attributes?
@@ -13,6 +13,7 @@ import Foundation
         self.page_attributes = page_attributes
         self.frame_attributes = frame_attributes
         self.block_attributes = block_attributes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let page_attributes: Default_Value_Lists_Page_Attributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let frame_attributes: Default_Value_Lists_Frame_Attributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             let block_attributes: Default_Value_Lists_Block_Attributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
+
             return Default_Value_Lists_Layout(page_set_attributes: page_set_attributes, page_attributes: page_attributes, frame_attributes: frame_attributes, block_attributes: block_attributes)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let page_set_attributes = self.page_set_attributes { if let page_set_attributes = self.page_set_attributes { try coder.serializeOptionalImplicitlyTagged(page_set_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let page_attributes = self.page_attributes { if let page_attributes = self.page_attributes { try coder.serializeOptionalImplicitlyTagged(page_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let frame_attributes = self.frame_attributes { if let frame_attributes = self.frame_attributes { try coder.serializeOptionalImplicitlyTagged(frame_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let block_attributes = self.block_attributes { if let block_attributes = self.block_attributes { try coder.serializeOptionalImplicitlyTagged(block_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
+            if let page_set_attributes = self.page_set_attributes { try coder.serializeOptionalImplicitlyTagged(page_set_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let page_attributes = self.page_attributes { try coder.serializeOptionalImplicitlyTagged(page_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let frame_attributes = self.frame_attributes { try coder.serializeOptionalImplicitlyTagged(frame_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let block_attributes = self.block_attributes { try coder.serializeOptionalImplicitlyTagged(block_attributes, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+
         }
     }
 }

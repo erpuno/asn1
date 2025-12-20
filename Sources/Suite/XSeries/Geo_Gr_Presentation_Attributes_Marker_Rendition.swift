@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Marker_Rendition: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Marker_Rendition: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var marker_size_specification_mode: Geo_Gr_Presentation_Attributes_SpecificationMode?
     @usableFromInline var marker_bundle_index: ArraySlice<UInt8>?
@@ -19,6 +19,7 @@ import Foundation
         self.marker_colour = marker_colour
         self.marker_aspect_source_flags = marker_aspect_source_flags
         self.marker_bundle_specifications = marker_bundle_specifications
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -30,19 +31,21 @@ import Foundation
             let marker_colour: Geo_Gr_Presentation_Attributes_Colour? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
             let marker_aspect_source_flags: Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_aspect_source_flags_Sequence? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
             let marker_bundle_specifications: [Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_bundle_specifications_Sequence]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 6, tagClass: .contextSpecific) { node in try DER.sequence(of: Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_bundle_specifications_Sequence.self, identifier: node.identifier, rootNode: node) }
+
             return Geo_Gr_Presentation_Attributes_Marker_Rendition(marker_size_specification_mode: marker_size_specification_mode, marker_bundle_index: marker_bundle_index, marker_type: marker_type, marker_size: marker_size, marker_colour: marker_colour, marker_aspect_source_flags: marker_aspect_source_flags, marker_bundle_specifications: marker_bundle_specifications)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let marker_size_specification_mode = self.marker_size_specification_mode { if let marker_size_specification_mode = self.marker_size_specification_mode { try coder.serializeOptionalImplicitlyTagged(marker_size_specification_mode, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let marker_bundle_index = self.marker_bundle_index { if let marker_bundle_index = self.marker_bundle_index { try coder.serializeOptionalImplicitlyTagged(marker_bundle_index, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let marker_type = self.marker_type { if let marker_type = self.marker_type { try coder.serializeOptionalImplicitlyTagged(marker_type, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let marker_size = self.marker_size { if let marker_size = self.marker_size { try coder.serializeOptionalImplicitlyTagged(marker_size, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let marker_colour = self.marker_colour { if let marker_colour = self.marker_colour { try coder.serializeOptionalImplicitlyTagged(marker_colour, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let marker_aspect_source_flags = self.marker_aspect_source_flags { if let marker_aspect_source_flags = self.marker_aspect_source_flags { try coder.serializeOptionalImplicitlyTagged(marker_aspect_source_flags, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let marker_bundle_specifications = self.marker_bundle_specifications { if let marker_bundle_specifications = self.marker_bundle_specifications { try coder.serializeSequenceOf(marker_bundle_specifications, identifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
+            if let marker_size_specification_mode = self.marker_size_specification_mode { try coder.serializeOptionalImplicitlyTagged(marker_size_specification_mode, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let marker_bundle_index = self.marker_bundle_index { try coder.serializeOptionalImplicitlyTagged(marker_bundle_index, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let marker_type = self.marker_type { try coder.serializeOptionalImplicitlyTagged(marker_type, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let marker_size = self.marker_size { try coder.serializeOptionalImplicitlyTagged(marker_size, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let marker_colour = self.marker_colour { try coder.serializeOptionalImplicitlyTagged(marker_colour, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let marker_aspect_source_flags = self.marker_aspect_source_flags { try coder.serializeOptionalImplicitlyTagged(marker_aspect_source_flags, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let marker_bundle_specifications = self.marker_bundle_specifications { try coder.serializeSequenceOf(marker_bundle_specifications, identifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+
         }
     }
 }

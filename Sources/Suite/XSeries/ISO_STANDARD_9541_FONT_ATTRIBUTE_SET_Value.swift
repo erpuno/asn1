@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Value: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Value: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case global_Name(ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name)
     case match_String(ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Match_String)
@@ -18,59 +18,60 @@ import Foundation
     case proprietary_Data(ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Proprietary_Data)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .global_Name(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .match_String(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Match_String(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .message(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Message(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .octetString(try ASN1OctetString(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .boolean(try Bool(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .integer(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Integer(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .cardinal(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Cardinal(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .code(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Code(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .rational(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rational(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .rel_Rational(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .angle(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Angle(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .proprietary_Data(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Proprietary_Data(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .global_Name(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .match_String(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Match_String(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .message(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Message(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .octetString(try ASN1OctetString(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .boolean(try Bool(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .integer(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Integer(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .cardinal(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Cardinal(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .code(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Code(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .rational(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rational(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .rel_Rational(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .angle(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Angle(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .proprietary_Data(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Proprietary_Data(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .global_Name(let global_Name): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try global_Name.serialize(into: &coder) }
-            case .match_String(let match_String): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try match_String.serialize(into: &coder) }
-            case .message(let message): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) { coder in try message.serialize(into: &coder) }
-            case .octetString(let octetString): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) { coder in try octetString.serialize(into: &coder) }
-            case .boolean(let boolean): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) { coder in try boolean.serialize(into: &coder) }
-            case .integer(let integer): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) { coder in try integer.serialize(into: &coder) }
-            case .cardinal(let cardinal): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) { coder in try cardinal.serialize(into: &coder) }
-            case .code(let code): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) { coder in try code.serialize(into: &coder) }
-            case .rational(let rational): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) { coder in try rational.serialize(into: &coder) }
-            case .rel_Rational(let rel_Rational): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) { coder in try rel_Rational.serialize(into: &coder) }
-            case .angle(let angle): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) { coder in try angle.serialize(into: &coder) }
-            case .proprietary_Data(let proprietary_Data): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) { coder in try proprietary_Data.serialize(into: &coder) }
+        case .global_Name(let global_Name): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try global_Name.serialize(into: &coder) }
+        case .match_String(let match_String): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try match_String.serialize(into: &coder) }
+        case .message(let message): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) { coder in try message.serialize(into: &coder) }
+        case .octetString(let octetString): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) { coder in try octetString.serialize(into: &coder) }
+        case .boolean(let boolean): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) { coder in try boolean.serialize(into: &coder) }
+        case .integer(let integer): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) { coder in try integer.serialize(into: &coder) }
+        case .cardinal(let cardinal): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) { coder in try cardinal.serialize(into: &coder) }
+        case .code(let code): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) { coder in try code.serialize(into: &coder) }
+        case .rational(let rational): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) { coder in try rational.serialize(into: &coder) }
+        case .rel_Rational(let rel_Rational): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) { coder in try rel_Rational.serialize(into: &coder) }
+        case .angle(let angle): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) { coder in try angle.serialize(into: &coder) }
+        case .proprietary_Data(let proprietary_Data): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) { coder in try proprietary_Data.serialize(into: &coder) }
+
         }
     }
 

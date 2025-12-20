@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Data_Version: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Data_Version: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var major: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Cardinal?
     @usableFromInline var minor: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Cardinal?
@@ -11,6 +11,7 @@ import Foundation
         self.major = major
         self.minor = minor
         self.timestamp = timestamp
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let major: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Cardinal? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let minor: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Cardinal? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let timestamp: UTCTime? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Data_Version(major: major, minor: minor, timestamp: timestamp)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let major = self.major { if let major = self.major { try coder.serializeOptionalImplicitlyTagged(major, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let minor = self.minor { if let minor = self.minor { try coder.serializeOptionalImplicitlyTagged(minor, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let timestamp = self.timestamp { if let timestamp = self.timestamp { try coder.serializeOptionalImplicitlyTagged(timestamp, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let major = self.major { try coder.serializeOptionalImplicitlyTagged(major, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let minor = self.minor { try coder.serializeOptionalImplicitlyTagged(minor, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let timestamp = self.timestamp { try coder.serializeOptionalImplicitlyTagged(timestamp, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

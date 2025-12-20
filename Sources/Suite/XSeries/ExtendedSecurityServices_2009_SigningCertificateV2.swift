@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ExtendedSecurityServices_2009_SigningCertificateV2: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ExtendedSecurityServices_2009_SigningCertificateV2: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var certs: [ExtendedSecurityServices_2009_ESSCertIDv2]
     @usableFromInline var policies: [CertificateExtensions_PolicyInformation]?
     @inlinable init(certs: [ExtendedSecurityServices_2009_ESSCertIDv2], policies: [CertificateExtensions_PolicyInformation]?) {
         self.certs = certs
         self.policies = policies
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let certs: [ExtendedSecurityServices_2009_ESSCertIDv2] = try DER.sequence(of: ExtendedSecurityServices_2009_ESSCertIDv2.self, identifier: .sequence, nodes: &nodes)
             let policies: [CertificateExtensions_PolicyInformation]? = try DER.sequence(of: CertificateExtensions_PolicyInformation.self, identifier: .sequence, nodes: &nodes)
+
             return ExtendedSecurityServices_2009_SigningCertificateV2(certs: certs, policies: policies)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeSequenceOf(certs)
-            if let policies = self.policies { if let policies = self.policies { try coder.serializeSequenceOf(policies) } }
+            if let policies = self.policies { try coder.serializeSequenceOf(policies) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CHAT_Profile: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CHAT_Profile: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var nickname: ASN1OctetString
     @usableFromInline var phone: ASN1OctetString
@@ -27,6 +27,7 @@ import Foundation
         self.update = update
         self.status = status
         self.roster = roster
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -42,6 +43,7 @@ import Foundation
             let update: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let status: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let roster: CHAT_Roster = try CHAT_Roster(derEncoded: &nodes)
+
             return CHAT_Profile(nickname: nickname, phone: phone, session: session, chats: chats, contacts: contacts, keys: keys, servers: servers, settings: settings, update: update, status: status, roster: roster)
         }
     }
@@ -59,6 +61,7 @@ import Foundation
             try coder.serialize(update)
             try coder.serialize(status)
             try coder.serialize(roster)
+
         }
     }
 }

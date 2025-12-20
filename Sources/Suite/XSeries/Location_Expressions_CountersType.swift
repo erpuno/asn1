@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Location_Expressions_CountersType: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Location_Expressions_CountersType: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var start: ArraySlice<UInt8>?
     @usableFromInline var end: ArraySlice<UInt8>?
     @inlinable init(start: ArraySlice<UInt8>?, end: ArraySlice<UInt8>?) {
         self.start = start
         self.end = end
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let start: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let end: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return Location_Expressions_CountersType(start: start, end: end)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let start = self.start { if let start = self.start { try coder.serializeOptionalImplicitlyTagged(start, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let end = self.end { if let end = self.end { try coder.serializeOptionalImplicitlyTagged(end, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let start = self.start { try coder.serializeOptionalImplicitlyTagged(start, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let end = self.end { try coder.serializeOptionalImplicitlyTagged(end, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

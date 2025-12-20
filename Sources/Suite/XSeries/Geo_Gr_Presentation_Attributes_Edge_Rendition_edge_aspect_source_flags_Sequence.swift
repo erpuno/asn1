@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_aspect_source_flags_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_aspect_source_flags_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var edge_type_asf: Geo_Gr_Presentation_Attributes_ASF_Type
     @usableFromInline var edge_width_asf: Geo_Gr_Presentation_Attributes_ASF_Type
@@ -11,6 +11,7 @@ import Foundation
         self.edge_type_asf = edge_type_asf
         self.edge_width_asf = edge_width_asf
         self.edge_colour_asf = edge_colour_asf
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let edge_type_asf: Geo_Gr_Presentation_Attributes_ASF_Type = try Geo_Gr_Presentation_Attributes_ASF_Type(derEncoded: &nodes)
             let edge_width_asf: Geo_Gr_Presentation_Attributes_ASF_Type = try Geo_Gr_Presentation_Attributes_ASF_Type(derEncoded: &nodes)
             let edge_colour_asf: Geo_Gr_Presentation_Attributes_ASF_Type = try Geo_Gr_Presentation_Attributes_ASF_Type(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_aspect_source_flags_Sequence(edge_type_asf: edge_type_asf, edge_width_asf: edge_width_asf, edge_colour_asf: edge_colour_asf)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(edge_type_asf)
             try coder.serialize(edge_width_asf)
             try coder.serialize(edge_colour_asf)
+
         }
     }
 }

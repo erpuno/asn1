@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_OtherHashAlgAndValue: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_OtherHashAlgAndValue: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var hashAlgorithm: DSTU_AlgorithmIdentifier
     @usableFromInline var hashVal: KEP_OtherHashValue
     @inlinable init(hashAlgorithm: DSTU_AlgorithmIdentifier, hashVal: KEP_OtherHashValue) {
         self.hashAlgorithm = hashAlgorithm
         self.hashVal = hashVal
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let hashAlgorithm: DSTU_AlgorithmIdentifier = try DSTU_AlgorithmIdentifier(derEncoded: &nodes)
             let hashVal: KEP_OtherHashValue = try KEP_OtherHashValue(derEncoded: &nodes)
+
             return KEP_OtherHashAlgAndValue(hashAlgorithm: hashAlgorithm, hashVal: hashVal)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(hashAlgorithm)
             try coder.serialize(hashVal)
+
         }
     }
 }

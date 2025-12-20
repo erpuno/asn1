@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1_PSS_OAEP_Algorithms_2009_RSAES_OAEP_params: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1_PSS_OAEP_Algorithms_2009_RSAES_OAEP_params: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var hashFunc: PKIX1_PSS_OAEP_Algorithms_2009_HashAlgorithm?
     @usableFromInline var maskGenFunc: PKIX1_PSS_OAEP_Algorithms_2009_MaskGenAlgorithm?
@@ -11,6 +11,7 @@ import Foundation
         self.hashFunc = hashFunc
         self.maskGenFunc = maskGenFunc
         self.pSourceFunc = pSourceFunc
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let hashFunc: PKIX1_PSS_OAEP_Algorithms_2009_HashAlgorithm = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try PKIX1_PSS_OAEP_Algorithms_2009_HashAlgorithm(derEncoded: node) }
             let maskGenFunc: PKIX1_PSS_OAEP_Algorithms_2009_MaskGenAlgorithm = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try PKIX1_PSS_OAEP_Algorithms_2009_MaskGenAlgorithm(derEncoded: node) }
             let pSourceFunc: PKIX1_PSS_OAEP_Algorithms_2009_PSourceAlgorithm = try DER.explicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try PKIX1_PSS_OAEP_Algorithms_2009_PSourceAlgorithm(derEncoded: node) }
+
             return PKIX1_PSS_OAEP_Algorithms_2009_RSAES_OAEP_params(hashFunc: hashFunc, maskGenFunc: maskGenFunc, pSourceFunc: pSourceFunc)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let hashFunc = self.hashFunc { if let hashFunc = self.hashFunc { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(hashFunc) } } }
-            if let maskGenFunc = self.maskGenFunc { if let maskGenFunc = self.maskGenFunc { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(maskGenFunc) } } }
-            if let pSourceFunc = self.pSourceFunc { if let pSourceFunc = self.pSourceFunc { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(pSourceFunc) } } }
+            if let hashFunc = self.hashFunc { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(hashFunc) } }
+            if let maskGenFunc = self.maskGenFunc { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(maskGenFunc) } }
+            if let pSourceFunc = self.pSourceFunc { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(pSourceFunc) } }
+
         }
     }
 }

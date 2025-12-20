@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2010_ExtendedCertificate: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2010_ExtendedCertificate: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var extendedCertificateInfo: CryptographicMessageSyntax_2010_ExtendedCertificateInfo
     @usableFromInline var signatureAlgorithm: CryptographicMessageSyntax_2010_SignatureAlgorithmIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.extendedCertificateInfo = extendedCertificateInfo
         self.signatureAlgorithm = signatureAlgorithm
         self.signature = signature
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let extendedCertificateInfo: CryptographicMessageSyntax_2010_ExtendedCertificateInfo = try CryptographicMessageSyntax_2010_ExtendedCertificateInfo(derEncoded: &nodes)
             let signatureAlgorithm: CryptographicMessageSyntax_2010_SignatureAlgorithmIdentifier = try CryptographicMessageSyntax_2010_SignatureAlgorithmIdentifier(derEncoded: &nodes)
             let signature: CryptographicMessageSyntax_2010_Signature = try CryptographicMessageSyntax_2010_Signature(derEncoded: &nodes)
+
             return CryptographicMessageSyntax_2010_ExtendedCertificate(extendedCertificateInfo: extendedCertificateInfo, signatureAlgorithm: signatureAlgorithm, signature: signature)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(extendedCertificateInfo)
             try coder.serialize(signatureAlgorithm)
             try coder.serialize(signature)
+
         }
     }
 }

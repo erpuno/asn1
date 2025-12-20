@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_PKIStatusInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_PKIStatusInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var status: KEP_PKIStatus
     @usableFromInline var statusString: KEP_PKIFreeText?
@@ -11,6 +11,7 @@ import Foundation
         self.status = status
         self.statusString = statusString
         self.failInfo = failInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -26,6 +27,7 @@ var peek_failInfo = nodes
 if let next = peek_failInfo.next(), next.identifier == KEP_PKIFailureInfo.defaultIdentifier {
     failInfo = try KEP_PKIFailureInfo(derEncoded: &nodes)
 }
+
             return KEP_PKIStatusInfo(status: status, statusString: statusString, failInfo: failInfo)
         }
     }
@@ -33,8 +35,9 @@ if let next = peek_failInfo.next(), next.identifier == KEP_PKIFailureInfo.defaul
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(status)
-            if let statusString = self.statusString { if let statusString = self.statusString { try coder.serialize(statusString) } }
-            if let failInfo = self.failInfo { if let failInfo = self.failInfo { try coder.serialize(failInfo) } }
+            if let statusString = self.statusString { try coder.serialize(statusString) }
+            if let failInfo = self.failInfo { try coder.serialize(failInfo) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ANSI_X9_62_Characteristic_two: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ANSI_X9_62_Characteristic_two: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var m: ArraySlice<UInt8>
     @usableFromInline var basis: ASN1ObjectIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.m = m
         self.basis = basis
         self.parameters = parameters
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let m: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let basis: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let parameters: ASN1Any = try ASN1Any(derEncoded: &nodes)
+
             return ANSI_X9_62_Characteristic_two(m: m, basis: basis, parameters: parameters)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(m)
             try coder.serialize(basis)
             try coder.serialize(parameters)
+
         }
     }
 }

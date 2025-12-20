@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_TypeAndContextAssertion: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_TypeAndContextAssertion: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var type: PKIX1Explicit88_AttributeType
     @usableFromInline var contextAssertions: DirectoryAbstractService_TypeAndContextAssertion_contextAssertions_Choice
     @inlinable init(type: PKIX1Explicit88_AttributeType, contextAssertions: DirectoryAbstractService_TypeAndContextAssertion_contextAssertions_Choice) {
         self.type = type
         self.contextAssertions = contextAssertions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let type: PKIX1Explicit88_AttributeType = try PKIX1Explicit88_AttributeType(derEncoded: &nodes)
             let contextAssertions: DirectoryAbstractService_TypeAndContextAssertion_contextAssertions_Choice = try DirectoryAbstractService_TypeAndContextAssertion_contextAssertions_Choice(derEncoded: &nodes)
+
             return DirectoryAbstractService_TypeAndContextAssertion(type: type, contextAssertions: contextAssertions)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(type)
             try coder.serialize(contextAssertions)
+
         }
     }
 }

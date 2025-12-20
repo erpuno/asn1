@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CMS_AES_CCM_and_AES_GCM_2009_GCMParameters: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CMS_AES_CCM_and_AES_GCM_2009_GCMParameters: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var aes_nonce: ASN1OctetString
     @usableFromInline var aes_ICVlen: CMS_AES_CCM_and_AES_GCM_2009_AES_GCM_ICVlen?
     @inlinable init(aes_nonce: ASN1OctetString, aes_ICVlen: CMS_AES_CCM_and_AES_GCM_2009_AES_GCM_ICVlen?) {
         self.aes_nonce = aes_nonce
         self.aes_ICVlen = aes_ICVlen
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let aes_nonce: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let aes_ICVlen: CMS_AES_CCM_and_AES_GCM_2009_AES_GCM_ICVlen? = try CMS_AES_CCM_and_AES_GCM_2009_AES_GCM_ICVlen(derEncoded: &nodes)
+
             return CMS_AES_CCM_and_AES_GCM_2009_GCMParameters(aes_nonce: aes_nonce, aes_ICVlen: aes_ICVlen)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(aes_nonce)
-            if let aes_ICVlen = self.aes_ICVlen { if let aes_ICVlen = self.aes_ICVlen { try coder.serialize(aes_ICVlen) } }
+            if let aes_ICVlen = self.aes_ICVlen { try coder.serialize(aes_ICVlen) }
+
         }
     }
 }

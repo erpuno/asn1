@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ExtendedSecurityServices_2009_MLData: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ExtendedSecurityServices_2009_MLData: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var mailListIdentifier: ExtendedSecurityServices_2009_EntityIdentifier
     @usableFromInline var expansionTime: GeneralizedTime
@@ -11,6 +11,7 @@ import Foundation
         self.mailListIdentifier = mailListIdentifier
         self.expansionTime = expansionTime
         self.mlReceiptPolicy = mlReceiptPolicy
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ var peek_mlReceiptPolicy = nodes
 if let next = peek_mlReceiptPolicy.next(), next.identifier == ExtendedSecurityServices_2009_MLReceiptPolicy.defaultIdentifier {
     mlReceiptPolicy = try ExtendedSecurityServices_2009_MLReceiptPolicy(derEncoded: &nodes)
 }
+
             return ExtendedSecurityServices_2009_MLData(mailListIdentifier: mailListIdentifier, expansionTime: expansionTime, mlReceiptPolicy: mlReceiptPolicy)
         }
     }
@@ -30,7 +32,8 @@ if let next = peek_mlReceiptPolicy.next(), next.identifier == ExtendedSecuritySe
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(mailListIdentifier)
             try coder.serialize(expansionTime)
-            if let mlReceiptPolicy = self.mlReceiptPolicy { if let mlReceiptPolicy = self.mlReceiptPolicy { try coder.serialize(mlReceiptPolicy) } }
+            if let mlReceiptPolicy = self.mlReceiptPolicy { try coder.serialize(mlReceiptPolicy) }
+
         }
     }
 }

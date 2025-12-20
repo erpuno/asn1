@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DOR_definition_QoS_level_level_3_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DOR_definition_QoS_level_level_3_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var produce_time: GeneralizedTime
     @usableFromInline var fidelity_time: GeneralizedTime
     @inlinable init(produce_time: GeneralizedTime, fidelity_time: GeneralizedTime) {
         self.produce_time = produce_time
         self.fidelity_time = fidelity_time
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let produce_time: GeneralizedTime = try GeneralizedTime(derEncoded: &nodes)
             let fidelity_time: GeneralizedTime = try GeneralizedTime(derEncoded: &nodes)
+
             return DOR_definition_QoS_level_level_3_Sequence(produce_time: produce_time, fidelity_time: fidelity_time)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(produce_time)
             try coder.serialize(fidelity_time)
+
         }
     }
 }

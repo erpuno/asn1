@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Picture_Dimensions_width_controlled_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Picture_Dimensions_width_controlled_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var minimum_width: ArraySlice<UInt8>
     @usableFromInline var preferred_width: ArraySlice<UInt8>
     @inlinable init(minimum_width: ArraySlice<UInt8>, preferred_width: ArraySlice<UInt8>) {
         self.minimum_width = minimum_width
         self.preferred_width = preferred_width
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let minimum_width: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let preferred_width: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Picture_Dimensions_width_controlled_Sequence(minimum_width: minimum_width, preferred_width: preferred_width)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(minimum_width)
             try coder.serialize(preferred_width)
+
         }
     }
 }

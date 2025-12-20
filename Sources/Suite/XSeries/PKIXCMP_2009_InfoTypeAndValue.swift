@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_InfoTypeAndValue: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_InfoTypeAndValue: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var infoType: ASN1ObjectIdentifier
     @usableFromInline var infoValue: ASN1Any
     @inlinable init(infoType: ASN1ObjectIdentifier, infoValue: ASN1Any) {
         self.infoType = infoType
         self.infoValue = infoValue
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let infoType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let infoValue: ASN1Any = try ASN1Any(derEncoded: &nodes)
+
             return PKIXCMP_2009_InfoTypeAndValue(infoType: infoType, infoValue: infoValue)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(infoType)
             try coder.serialize(infoValue)
+
         }
     }
 }

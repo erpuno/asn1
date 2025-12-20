@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Proprietary_Data: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Proprietary_Data: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var prop_data_message: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Message?
     @usableFromInline var prop_data_key: ASN1OctetString?
@@ -11,6 +11,7 @@ import Foundation
         self.prop_data_message = prop_data_message
         self.prop_data_key = prop_data_key
         self.prop_data = prop_data
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let prop_data_message: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Message? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Message(derEncoded: node) }
             let prop_data_key: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let prop_data: ASN1OctetString = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)))!
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Proprietary_Data(prop_data_message: prop_data_message, prop_data_key: prop_data_key, prop_data: prop_data)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let prop_data_message = self.prop_data_message { if let prop_data_message = self.prop_data_message { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(prop_data_message) } } }
-            if let prop_data_key = self.prop_data_key { if let prop_data_key = self.prop_data_key { try coder.serializeOptionalImplicitlyTagged(prop_data_key, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let prop_data_message = self.prop_data_message { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(prop_data_message) } }
+            if let prop_data_key = self.prop_data_key { try coder.serializeOptionalImplicitlyTagged(prop_data_key, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
             try coder.serializeOptionalImplicitlyTagged(prop_data, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
         }
     }
 }

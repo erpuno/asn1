@@ -2,23 +2,24 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum PKCS_7_SignerInfo_unauthenticatedAttributes_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum PKCS_7_SignerInfo_unauthenticatedAttributes_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case uaSet([PKCS_7_Attribute])
     case uaSequence([PKCS_7_Attribute])
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .uaSet(try DER.set(of: PKCS_7_Attribute.self, identifier: rootNode.identifier, rootNode: rootNode))
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .uaSequence(try DER.sequence(of: PKCS_7_Attribute.self, identifier: rootNode.identifier, rootNode: rootNode))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .uaSet(try DER.set(of: PKCS_7_Attribute.self, identifier: rootNode.identifier, rootNode: rootNode))
+        case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
+            self = .uaSequence(try DER.sequence(of: PKCS_7_Attribute.self, identifier: rootNode.identifier, rootNode: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .uaSet(let uaSet): try coder.serializeSetOf(uaSet, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            case .uaSequence(let uaSequence): try coder.serializeSequenceOf(uaSequence, identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+        case .uaSet(let uaSet): try coder.serializeSetOf(uaSet, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+        case .uaSequence(let uaSequence): try coder.serializeSequenceOf(uaSequence, identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
         }
     }
 

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXAttributeCertificate_2009_Clearance: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXAttributeCertificate_2009_Clearance: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var policyId: ASN1ObjectIdentifier
     @usableFromInline var classList: PKIXAttributeCertificate_2009_ClassList?
@@ -11,6 +11,7 @@ import Foundation
         self.policyId = policyId
         self.classList = classList
         self.securityCategories = securityCategories
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let policyId: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let classList: PKIXAttributeCertificate_2009_ClassList? = try PKIXAttributeCertificate_2009_ClassList(derEncoded: &nodes)
             let securityCategories: [PKIX_CommonTypes_2009_SecurityCategory]? = try DER.set(of: PKIX_CommonTypes_2009_SecurityCategory.self, identifier: .set, nodes: &nodes)
+
             return PKIXAttributeCertificate_2009_Clearance(policyId: policyId, classList: classList, securityCategories: securityCategories)
         }
     }
@@ -25,8 +27,9 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(policyId)
-            if let classList = self.classList { if let classList = self.classList { try coder.serialize(classList) } }
-            if let securityCategories = self.securityCategories { if let securityCategories = self.securityCategories { try coder.serializeSetOf(securityCategories) } }
+            if let classList = self.classList { try coder.serialize(classList) }
+            if let securityCategories = self.securityCategories { try coder.serializeSetOf(securityCategories) }
+
         }
     }
 }

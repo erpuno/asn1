@@ -2,48 +2,49 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum InformationFramework_AttributeValueX: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum InformationFramework_AttributeValueX: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case utf8(ASN1UTF8String)
     case printable(ASN1PrintableString)
     case `else`(ASN1Any)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1UTF8String.defaultIdentifier:
-                self = .utf8(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1PrintableString.defaultIdentifier:
-                self = .printable(try ASN1PrintableString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 9, tagClass: .universal):
-                self = .`else`(ASN1Any(derEncoded: rootNode))
+        case ASN1UTF8String.defaultIdentifier:
+            self = .utf8(try ASN1UTF8String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1PrintableString.defaultIdentifier:
+            self = .printable(try ASN1PrintableString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 9, tagClass: .universal):
+            self = .`else`(ASN1Any(derEncoded: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .utf8(let utf8):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(utf8)
-                                }
-                            } else {
+        case .utf8(let utf8):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(utf8)
                             }
-            case .printable(let printable):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(printable)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(utf8)
+                        }
+        case .printable(let printable):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(printable)
                             }
-            case .`else`(let `else`):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(`else`)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(printable)
+                        }
+        case .`else`(let `else`):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(`else`)
                             }
+                        } else {
+                            try coder.serialize(`else`)
+                        }
+
         }
     }
 

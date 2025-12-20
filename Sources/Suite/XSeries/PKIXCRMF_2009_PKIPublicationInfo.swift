@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCRMF_2009_PKIPublicationInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCRMF_2009_PKIPublicationInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var action: PKIXCRMF_2009_PKIPublicationInfo_action_IntEnum
     @usableFromInline var pubInfos: [PKIXCRMF_2009_SinglePubInfo]?
     @inlinable init(action: PKIXCRMF_2009_PKIPublicationInfo_action_IntEnum, pubInfos: [PKIXCRMF_2009_SinglePubInfo]?) {
         self.action = action
         self.pubInfos = pubInfos
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let action = try PKIXCRMF_2009_PKIPublicationInfo_action_IntEnum(rawValue: Int(derEncoded: &nodes))
             let pubInfos: [PKIXCRMF_2009_SinglePubInfo]? = try DER.sequence(of: PKIXCRMF_2009_SinglePubInfo.self, identifier: .sequence, nodes: &nodes)
+
             return PKIXCRMF_2009_PKIPublicationInfo(action: action, pubInfos: pubInfos)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(action.rawValue)
-            if let pubInfos = self.pubInfos { if let pubInfos = self.pubInfos { try coder.serializeSequenceOf(pubInfos) } }
+            try action.serialize(into: &coder, withIdentifier: identifier)
+            if let pubInfos = self.pubInfos { try coder.serializeSequenceOf(pubInfos) }
+
         }
     }
 }

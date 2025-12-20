@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_RGB: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_RGB: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var red: ASN1Any
     @usableFromInline var green: ASN1Any
@@ -11,6 +11,7 @@ import Foundation
         self.red = red
         self.green = green
         self.blue = blue
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let red: ASN1Any = try ASN1Any(derEncoded: &nodes)
             let green: ASN1Any = try ASN1Any(derEncoded: &nodes)
             let blue: ASN1Any = try ASN1Any(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_RGB(red: red, green: green, blue: blue)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(red)
             try coder.serialize(green)
             try coder.serialize(blue)
+
         }
     }
 }

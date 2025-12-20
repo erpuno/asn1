@@ -2,23 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum DSTU_BinaryField_p_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum DSTU_BinaryField_p_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case t(DSTU_Trinomial)
     case p(DSTU_Pentanomial)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .application):
-                self = .t(try DSTU_Trinomial(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .application):
-                self = .p(try DSTU_Pentanomial(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case DSTU_Trinomial.defaultIdentifier:
+            self = .t(try DSTU_Trinomial(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case DSTU_Pentanomial.defaultIdentifier:
+            self = .p(try DSTU_Pentanomial(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .t(let t): try t.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .application))
-            case .p(let p): try p.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .application))
+        case .t(let t):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(t)
+                            }
+                        } else {
+                            try coder.serialize(t)
+                        }
+        case .p(let p):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(p)
+                            }
+                        } else {
+                            try coder.serialize(p)
+                        }
+
         }
     }
 

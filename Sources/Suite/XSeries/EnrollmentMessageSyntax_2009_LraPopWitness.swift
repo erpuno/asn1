@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_LraPopWitness: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_LraPopWitness: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var pkiDataBodyid: EnrollmentMessageSyntax_2009_BodyPartID
     @usableFromInline var bodyIds: [EnrollmentMessageSyntax_2009_BodyPartID]
     @inlinable init(pkiDataBodyid: EnrollmentMessageSyntax_2009_BodyPartID, bodyIds: [EnrollmentMessageSyntax_2009_BodyPartID]) {
         self.pkiDataBodyid = pkiDataBodyid
         self.bodyIds = bodyIds
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let pkiDataBodyid: EnrollmentMessageSyntax_2009_BodyPartID = try EnrollmentMessageSyntax_2009_BodyPartID(derEncoded: &nodes)
             let bodyIds: [EnrollmentMessageSyntax_2009_BodyPartID] = try DER.sequence(of: EnrollmentMessageSyntax_2009_BodyPartID.self, identifier: .sequence, nodes: &nodes)
+
             return EnrollmentMessageSyntax_2009_LraPopWitness(pkiDataBodyid: pkiDataBodyid, bodyIds: bodyIds)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(pkiDataBodyid)
             try coder.serializeSequenceOf(bodyIds)
+
         }
     }
 }

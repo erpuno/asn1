@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Align_Properties: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Align_Properties: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var iso_standard_9541_alignoffsetx: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational?
     @usableFromInline var iso_standard_9541_alignoffsety: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational?
@@ -15,6 +15,7 @@ import Foundation
         self.iso_standard_9541_alignscalex = iso_standard_9541_alignscalex
         self.iso_standard_9541_alignscaley = iso_standard_9541_alignscaley
         self.non_iso_properties = non_iso_properties
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,17 +25,19 @@ import Foundation
             let iso_standard_9541_alignscalex: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rational? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let iso_standard_9541_alignscaley: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rational? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             let non_iso_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Align_Properties(iso_standard_9541_alignoffsetx: iso_standard_9541_alignoffsetx, iso_standard_9541_alignoffsety: iso_standard_9541_alignoffsety, iso_standard_9541_alignscalex: iso_standard_9541_alignscalex, iso_standard_9541_alignscaley: iso_standard_9541_alignscaley, non_iso_properties: non_iso_properties)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let iso_standard_9541_alignoffsetx = self.iso_standard_9541_alignoffsetx { if let iso_standard_9541_alignoffsetx = self.iso_standard_9541_alignoffsetx { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_alignoffsetx, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_alignoffsety = self.iso_standard_9541_alignoffsety { if let iso_standard_9541_alignoffsety = self.iso_standard_9541_alignoffsety { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_alignoffsety, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_alignscalex = self.iso_standard_9541_alignscalex { if let iso_standard_9541_alignscalex = self.iso_standard_9541_alignscalex { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_alignscalex, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_alignscaley = self.iso_standard_9541_alignscaley { if let iso_standard_9541_alignscaley = self.iso_standard_9541_alignscaley { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_alignscaley, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let non_iso_properties = self.non_iso_properties { if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
+            if let iso_standard_9541_alignoffsetx = self.iso_standard_9541_alignoffsetx { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_alignoffsetx, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_alignoffsety = self.iso_standard_9541_alignoffsety { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_alignoffsety, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_alignscalex = self.iso_standard_9541_alignscalex { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_alignscalex, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_alignscaley = self.iso_standard_9541_alignscaley { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_alignscaley, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+
         }
     }
 }

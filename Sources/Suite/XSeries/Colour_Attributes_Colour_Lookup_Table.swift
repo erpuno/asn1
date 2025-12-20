@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_Colour_Lookup_Table: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_Colour_Lookup_Table: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var number_of_entries: ArraySlice<UInt8>
     @usableFromInline var m: ArraySlice<UInt8>
@@ -13,6 +13,7 @@ import Foundation
         self.m = m
         self.n = n
         self.colour_table = colour_table
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let m: ArraySlice<UInt8> = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
             let n: ArraySlice<UInt8> = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)))!
             let colour_table: [Colour_Attributes_Colour_Table_Entry] = try DER.set(of: Colour_Attributes_Colour_Table_Entry.self, identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific), nodes: &nodes)
+
             return Colour_Attributes_Colour_Lookup_Table(number_of_entries: number_of_entries, m: m, n: n, colour_table: colour_table)
         }
     }
@@ -31,6 +33,7 @@ import Foundation
             try coder.serializeOptionalImplicitlyTagged(m, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(n, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             try coder.serializeSetOf(colour_table, identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct OCSP_SingleResponse: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct OCSP_SingleResponse: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var certID: OCSP_CertID
     @usableFromInline var certStatus: OCSP_CertStatus
@@ -15,6 +15,7 @@ import Foundation
         self.thisUpdate = thisUpdate
         self.nextUpdate = nextUpdate
         self.singleExtensions = singleExtensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,6 +25,7 @@ import Foundation
             let thisUpdate: GeneralizedTime = try GeneralizedTime(derEncoded: &nodes)
             let nextUpdate: GeneralizedTime? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try GeneralizedTime(derEncoded: node) }
             let singleExtensions: AuthenticationFramework_Extensions? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try AuthenticationFramework_Extensions(derEncoded: node) }
+
             return OCSP_SingleResponse(certID: certID, certStatus: certStatus, thisUpdate: thisUpdate, nextUpdate: nextUpdate, singleExtensions: singleExtensions)
         }
     }
@@ -33,8 +35,9 @@ import Foundation
             try coder.serialize(certID)
             try coder.serialize(certStatus)
             try coder.serialize(thisUpdate)
-            if let nextUpdate = self.nextUpdate { if let nextUpdate = self.nextUpdate { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(nextUpdate) } } }
-            if let singleExtensions = self.singleExtensions { if let singleExtensions = self.singleExtensions { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(singleExtensions) } } }
+            if let nextUpdate = self.nextUpdate { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(nextUpdate) } }
+            if let singleExtensions = self.singleExtensions { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(singleExtensions) } }
+
         }
     }
 }

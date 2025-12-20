@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_7_EncryptedContentInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_7_EncryptedContentInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var contentType: ASN1ObjectIdentifier
     @usableFromInline var contentEncryptionAlgorithm: AuthenticationFramework_AlgorithmIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.contentType = contentType
         self.contentEncryptionAlgorithm = contentEncryptionAlgorithm
         self.encryptedContent = encryptedContent
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let contentType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let contentEncryptionAlgorithm: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let encryptedContent: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+
             return PKCS_7_EncryptedContentInfo(contentType: contentType, contentEncryptionAlgorithm: contentEncryptionAlgorithm, encryptedContent: encryptedContent)
         }
     }
@@ -26,7 +28,8 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(contentType)
             try coder.serialize(contentEncryptionAlgorithm)
-            if let encryptedContent = self.encryptedContent { if let encryptedContent = self.encryptedContent { try coder.serializeOptionalImplicitlyTagged(encryptedContent, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let encryptedContent = self.encryptedContent { try coder.serializeOptionalImplicitlyTagged(encryptedContent, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+
         }
     }
 }

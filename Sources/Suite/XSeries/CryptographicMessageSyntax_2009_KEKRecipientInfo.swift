@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2009_KEKRecipientInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2009_KEKRecipientInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: CryptographicMessageSyntax_2009_CMSVersion
     @usableFromInline var kekid: CryptographicMessageSyntax_2009_KEKIdentifier
@@ -13,6 +13,7 @@ import Foundation
         self.kekid = kekid
         self.keyEncryptionAlgorithm = keyEncryptionAlgorithm
         self.encryptedKey = encryptedKey
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let kekid: CryptographicMessageSyntax_2009_KEKIdentifier = try CryptographicMessageSyntax_2009_KEKIdentifier(derEncoded: &nodes)
             let keyEncryptionAlgorithm: CryptographicMessageSyntax_2009_KeyEncryptionAlgorithmIdentifier = try CryptographicMessageSyntax_2009_KeyEncryptionAlgorithmIdentifier(derEncoded: &nodes)
             let encryptedKey: CryptographicMessageSyntax_2009_EncryptedKey = try CryptographicMessageSyntax_2009_EncryptedKey(derEncoded: &nodes)
+
             return CryptographicMessageSyntax_2009_KEKRecipientInfo(version: version, kekid: kekid, keyEncryptionAlgorithm: keyEncryptionAlgorithm, encryptedKey: encryptedKey)
         }
     }
@@ -31,6 +33,7 @@ import Foundation
             try coder.serialize(kekid)
             try coder.serialize(keyEncryptionAlgorithm)
             try coder.serialize(encryptedKey)
+
         }
     }
 }

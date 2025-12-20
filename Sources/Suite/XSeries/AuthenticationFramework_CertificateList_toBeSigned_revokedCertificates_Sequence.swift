@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct AuthenticationFramework_CertificateList_toBeSigned_revokedCertificates_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct AuthenticationFramework_CertificateList_toBeSigned_revokedCertificates_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var userCertificate: AuthenticationFramework_CertificateSerialNumber
     @usableFromInline var revocationDate: AuthenticationFramework_Time
@@ -11,6 +11,7 @@ import Foundation
         self.userCertificate = userCertificate
         self.revocationDate = revocationDate
         self.crlEntryExtensions = crlEntryExtensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ var peek_crlEntryExtensions = nodes
 if let next = peek_crlEntryExtensions.next(), next.identifier == AuthenticationFramework_Extensions.defaultIdentifier {
     crlEntryExtensions = try AuthenticationFramework_Extensions(derEncoded: &nodes)
 }
+
             return AuthenticationFramework_CertificateList_toBeSigned_revokedCertificates_Sequence(userCertificate: userCertificate, revocationDate: revocationDate, crlEntryExtensions: crlEntryExtensions)
         }
     }
@@ -30,7 +32,8 @@ if let next = peek_crlEntryExtensions.next(), next.identifier == AuthenticationF
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(userCertificate)
             try coder.serialize(revocationDate)
-            if let crlEntryExtensions = self.crlEntryExtensions { if let crlEntryExtensions = self.crlEntryExtensions { try coder.serialize(crlEntryExtensions) } }
+            if let crlEntryExtensions = self.crlEntryExtensions { try coder.serialize(crlEntryExtensions) }
+
         }
     }
 }

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct BasicAccessControl_ACIItem_itemOrUserFirst_Choice_itemFirst_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct BasicAccessControl_ACIItem_itemOrUserFirst_Choice_itemFirst_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var protectedItems: BasicAccessControl_ProtectedItems
     @usableFromInline var itemPermissions: [BasicAccessControl_ItemPermission]
     @inlinable init(protectedItems: BasicAccessControl_ProtectedItems, itemPermissions: [BasicAccessControl_ItemPermission]) {
         self.protectedItems = protectedItems
         self.itemPermissions = itemPermissions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let protectedItems: BasicAccessControl_ProtectedItems = try BasicAccessControl_ProtectedItems(derEncoded: &nodes)
             let itemPermissions: [BasicAccessControl_ItemPermission] = try DER.set(of: BasicAccessControl_ItemPermission.self, identifier: .set, nodes: &nodes)
+
             return BasicAccessControl_ACIItem_itemOrUserFirst_Choice_itemFirst_Sequence(protectedItems: protectedItems, itemPermissions: itemPermissions)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(protectedItems)
             try coder.serializeSetOf(itemPermissions)
+
         }
     }
 }

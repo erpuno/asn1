@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_DITContentRule: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_DITContentRule: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var structuralObjectClass: ASN1ObjectIdentifier
     @usableFromInline var auxiliaries: [ASN1ObjectIdentifier]?
@@ -15,6 +15,7 @@ import Foundation
         self.mandatory = mandatory
         self.`optional` = `optional`
         self.precluded = precluded
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,6 +25,7 @@ import Foundation
             let mandatory: [ASN1ObjectIdentifier]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.set(of: ASN1ObjectIdentifier.self, identifier: .set, rootNode: node) }
             let `optional`: [ASN1ObjectIdentifier]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.set(of: ASN1ObjectIdentifier.self, identifier: .set, rootNode: node) }
             let precluded: [ASN1ObjectIdentifier]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in try DER.set(of: ASN1ObjectIdentifier.self, identifier: .set, rootNode: node) }
+
             return InformationFramework_DITContentRule(structuralObjectClass: structuralObjectClass, auxiliaries: auxiliaries, mandatory: mandatory, `optional`: `optional`, precluded: precluded)
         }
     }
@@ -31,10 +33,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(structuralObjectClass)
-            if let auxiliaries = self.auxiliaries { if let auxiliaries = self.auxiliaries { try coder.serializeSetOf(auxiliaries) } }
-            if let mandatory = self.mandatory { if let mandatory = self.mandatory { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(mandatory) } } }
-            if let `optional` = self.`optional` { if let `optional` = self.`optional` { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(`optional`) } } }
-            if let precluded = self.precluded { if let precluded = self.precluded { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(precluded) } } }
+            if let auxiliaries = self.auxiliaries { try coder.serializeSetOf(auxiliaries) }
+            if let mandatory = self.mandatory { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(mandatory) } }
+            if let `optional` = self.`optional` { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(`optional`) } }
+            if let precluded = self.precluded { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(precluded) } }
+
         }
     }
 }

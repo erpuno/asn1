@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_RevDetails: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_RevDetails: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var certDetails: PKIXCRMF_2009_CertTemplate
     @usableFromInline var crlEntryDetails: PKIX1Explicit88_Extensions?
     @inlinable init(certDetails: PKIXCRMF_2009_CertTemplate, crlEntryDetails: PKIX1Explicit88_Extensions?) {
         self.certDetails = certDetails
         self.crlEntryDetails = crlEntryDetails
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,6 +20,7 @@ var peek_crlEntryDetails = nodes
 if let next = peek_crlEntryDetails.next(), next.identifier == PKIX1Explicit88_Extensions.defaultIdentifier {
     crlEntryDetails = try PKIX1Explicit88_Extensions(derEncoded: &nodes)
 }
+
             return PKIXCMP_2009_RevDetails(certDetails: certDetails, crlEntryDetails: crlEntryDetails)
         }
     }
@@ -26,7 +28,8 @@ if let next = peek_crlEntryDetails.next(), next.identifier == PKIX1Explicit88_Ex
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(certDetails)
-            if let crlEntryDetails = self.crlEntryDetails { if let crlEntryDetails = self.crlEntryDetails { try coder.serialize(crlEntryDetails) } }
+            if let crlEntryDetails = self.crlEntryDetails { try coder.serialize(crlEntryDetails) }
+
         }
     }
 }

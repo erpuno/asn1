@@ -2,37 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum PKCS_9_PKCS9String: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum PKCS_9_PKCS9String: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case ia5String(ASN1IA5String)
     case directoryString(PKIX1Explicit88_DirectoryString)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1IA5String.defaultIdentifier:
-                self = .ia5String(try ASN1IA5String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case PKIX1Explicit88_DirectoryString.defaultIdentifier:
-                self = .directoryString(try PKIX1Explicit88_DirectoryString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1IA5String.defaultIdentifier:
+            self = .ia5String(try ASN1IA5String(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case PKIX1Explicit88_DirectoryString.defaultIdentifier:
+            self = .directoryString(try PKIX1Explicit88_DirectoryString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .ia5String(let ia5String):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(ia5String)
-                                }
-                            } else {
+        case .ia5String(let ia5String):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(ia5String)
                             }
-            case .directoryString(let directoryString):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(directoryString)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(ia5String)
+                        }
+        case .directoryString(let directoryString):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(directoryString)
                             }
+                        } else {
+                            try coder.serialize(directoryString)
+                        }
+
         }
     }
 

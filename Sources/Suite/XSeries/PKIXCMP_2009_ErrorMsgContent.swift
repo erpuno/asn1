@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_ErrorMsgContent: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_ErrorMsgContent: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var pKIStatusInfo: PKIXCMP_2009_PKIStatusInfo
     @usableFromInline var errorCode: ArraySlice<UInt8>?
@@ -11,6 +11,7 @@ import Foundation
         self.pKIStatusInfo = pKIStatusInfo
         self.errorCode = errorCode
         self.errorDetails = errorDetails
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -26,6 +27,7 @@ var peek_errorDetails = nodes
 if let next = peek_errorDetails.next(), next.identifier == PKIXCMP_2009_PKIFreeText.defaultIdentifier {
     errorDetails = try PKIXCMP_2009_PKIFreeText(derEncoded: &nodes)
 }
+
             return PKIXCMP_2009_ErrorMsgContent(pKIStatusInfo: pKIStatusInfo, errorCode: errorCode, errorDetails: errorDetails)
         }
     }
@@ -33,8 +35,9 @@ if let next = peek_errorDetails.next(), next.identifier == PKIXCMP_2009_PKIFreeT
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(pKIStatusInfo)
-            if let errorCode = self.errorCode { if let errorCode = self.errorCode { try coder.serialize(errorCode) } }
-            if let errorDetails = self.errorDetails { if let errorDetails = self.errorDetails { try coder.serialize(errorDetails) } }
+            if let errorCode = self.errorCode { try coder.serialize(errorCode) }
+            if let errorDetails = self.errorDetails { try coder.serialize(errorDetails) }
+
         }
     }
 }

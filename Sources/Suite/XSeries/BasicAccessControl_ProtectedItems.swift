@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct BasicAccessControl_ProtectedItems: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct BasicAccessControl_ProtectedItems: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var entry: ASN1Null?
     @usableFromInline var allUserAttributeTypes: ASN1Null?
@@ -31,6 +31,7 @@ import Foundation
         self.restrictedBy = restrictedBy
         self.contexts = contexts
         self.classes = classes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -48,25 +49,27 @@ import Foundation
             let restrictedBy: [BasicAccessControl_RestrictedValue]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 10, tagClass: .contextSpecific) { node in try DER.set(of: BasicAccessControl_RestrictedValue.self, identifier: .set, rootNode: node) }
             let contexts: [InformationFramework_ContextAssertion]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 11, tagClass: .contextSpecific) { node in try DER.set(of: InformationFramework_ContextAssertion.self, identifier: .set, rootNode: node) }
             let classes: InformationFramework_Refinement? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 12, tagClass: .contextSpecific) { node in return try InformationFramework_Refinement(derEncoded: node) }
+
             return BasicAccessControl_ProtectedItems(entry: entry, allUserAttributeTypes: allUserAttributeTypes, attributeType: attributeType, allAttributeValues: allAttributeValues, allUserAttributeTypesAndValues: allUserAttributeTypesAndValues, attributeValue: attributeValue, selfValue: selfValue, rangeOfValues: rangeOfValues, maxValueCount: maxValueCount, maxImmSub: maxImmSub, restrictedBy: restrictedBy, contexts: contexts, classes: classes)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let entry = self.entry { if let entry = self.entry { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(entry) } } }
-            if let allUserAttributeTypes = self.allUserAttributeTypes { if let allUserAttributeTypes = self.allUserAttributeTypes { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(allUserAttributeTypes) } } }
-            if let attributeType = self.attributeType { if let attributeType = self.attributeType { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(attributeType) } } }
-            if let allAttributeValues = self.allAttributeValues { if let allAttributeValues = self.allAttributeValues { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(allAttributeValues) } } }
-            if let allUserAttributeTypesAndValues = self.allUserAttributeTypesAndValues { if let allUserAttributeTypesAndValues = self.allUserAttributeTypesAndValues { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(allUserAttributeTypesAndValues) } } }
-            if let attributeValue = self.attributeValue { if let attributeValue = self.attributeValue { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(attributeValue) } } }
-            if let selfValue = self.selfValue { if let selfValue = self.selfValue { try coder.serialize(explicitlyTaggedWithTagNumber: 6, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(selfValue) } } }
-            if let rangeOfValues = self.rangeOfValues { if let rangeOfValues = self.rangeOfValues { try coder.serialize(explicitlyTaggedWithTagNumber: 7, tagClass: .contextSpecific) { codec in try codec.serialize(rangeOfValues) } } }
-            if let maxValueCount = self.maxValueCount { if let maxValueCount = self.maxValueCount { try coder.serialize(explicitlyTaggedWithTagNumber: 8, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(maxValueCount) } } }
-            if let maxImmSub = self.maxImmSub { if let maxImmSub = self.maxImmSub { try coder.serialize(explicitlyTaggedWithTagNumber: 9, tagClass: .contextSpecific) { codec in try codec.serialize(maxImmSub) } } }
-            if let restrictedBy = self.restrictedBy { if let restrictedBy = self.restrictedBy { try coder.serialize(explicitlyTaggedWithTagNumber: 10, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(restrictedBy) } } }
-            if let contexts = self.contexts { if let contexts = self.contexts { try coder.serialize(explicitlyTaggedWithTagNumber: 11, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(contexts) } } }
-            if let classes = self.classes { if let classes = self.classes { try coder.serialize(explicitlyTaggedWithTagNumber: 12, tagClass: .contextSpecific) { codec in try codec.serialize(classes) } } }
+            if let entry = self.entry { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(entry) } }
+            if let allUserAttributeTypes = self.allUserAttributeTypes { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(allUserAttributeTypes) } }
+            if let attributeType = self.attributeType { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(attributeType) } }
+            if let allAttributeValues = self.allAttributeValues { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(allAttributeValues) } }
+            if let allUserAttributeTypesAndValues = self.allUserAttributeTypesAndValues { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serialize(allUserAttributeTypesAndValues) } }
+            if let attributeValue = self.attributeValue { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(attributeValue) } }
+            if let selfValue = self.selfValue { try coder.serialize(explicitlyTaggedWithTagNumber: 6, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(selfValue) } }
+            if let rangeOfValues = self.rangeOfValues { try coder.serialize(explicitlyTaggedWithTagNumber: 7, tagClass: .contextSpecific) { codec in try codec.serialize(rangeOfValues) } }
+            if let maxValueCount = self.maxValueCount { try coder.serialize(explicitlyTaggedWithTagNumber: 8, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(maxValueCount) } }
+            if let maxImmSub = self.maxImmSub { try coder.serialize(explicitlyTaggedWithTagNumber: 9, tagClass: .contextSpecific) { codec in try codec.serialize(maxImmSub) } }
+            if let restrictedBy = self.restrictedBy { try coder.serialize(explicitlyTaggedWithTagNumber: 10, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(restrictedBy) } }
+            if let contexts = self.contexts { try coder.serialize(explicitlyTaggedWithTagNumber: 11, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(contexts) } }
+            if let classes = self.classes { try coder.serialize(explicitlyTaggedWithTagNumber: 12, tagClass: .contextSpecific) { codec in try codec.serialize(classes) } }
+
         }
     }
 }

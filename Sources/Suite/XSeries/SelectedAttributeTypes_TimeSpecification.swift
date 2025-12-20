@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SelectedAttributeTypes_TimeSpecification: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SelectedAttributeTypes_TimeSpecification: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var time: SelectedAttributeTypes_TimeSpecification_time_Choice
     @usableFromInline var notThisTime: Bool?
@@ -11,6 +11,7 @@ import Foundation
         self.time = time
         self.notThisTime = notThisTime
         self.timeZone = timeZone
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ var peek_timeZone = nodes
 if let next = peek_timeZone.next(), next.identifier == SelectedAttributeTypes_TimeZone.defaultIdentifier {
     timeZone = try SelectedAttributeTypes_TimeZone(derEncoded: &nodes)
 }
+
             return SelectedAttributeTypes_TimeSpecification(time: time, notThisTime: notThisTime, timeZone: timeZone)
         }
     }
@@ -29,8 +31,9 @@ if let next = peek_timeZone.next(), next.identifier == SelectedAttributeTypes_Ti
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(time)
-            if let notThisTime = self.notThisTime { if let notThisTime = self.notThisTime { try coder.serialize(notThisTime) } }
-            if let timeZone = self.timeZone { if let timeZone = self.timeZone { try coder.serialize(timeZone) } }
+            if let notThisTime = self.notThisTime { try coder.serialize(notThisTime) }
+            if let timeZone = self.timeZone { try coder.serialize(timeZone) }
+
         }
     }
 }

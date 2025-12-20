@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DSTU_RDNSequence: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct DSTU_RDNSequence: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var value: [DSTU_RelativeDistinguishedName]
     @inlinable public init(_ value: [DSTU_RelativeDistinguishedName]) { self.value = value }

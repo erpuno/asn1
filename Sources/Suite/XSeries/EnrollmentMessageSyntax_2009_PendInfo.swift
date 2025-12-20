@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_PendInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_PendInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var pendToken: ASN1OctetString
     @usableFromInline var pendTime: GeneralizedTime
     @inlinable init(pendToken: ASN1OctetString, pendTime: GeneralizedTime) {
         self.pendToken = pendToken
         self.pendTime = pendTime
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let pendToken: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let pendTime: GeneralizedTime = try GeneralizedTime(derEncoded: &nodes)
+
             return EnrollmentMessageSyntax_2009_PendInfo(pendToken: pendToken, pendTime: pendTime)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(pendToken)
             try coder.serialize(pendTime)
+
         }
     }
 }

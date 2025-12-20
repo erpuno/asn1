@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_CertificationRequest: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_CertificationRequest: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var certificationRequestInfo: EnrollmentMessageSyntax_2009_CertificationRequest_certificationRequestInfo_Sequence
     @usableFromInline var signatureAlgorithm: AuthenticationFramework_AlgorithmIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.certificationRequestInfo = certificationRequestInfo
         self.signatureAlgorithm = signatureAlgorithm
         self.signature = signature
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let certificationRequestInfo: EnrollmentMessageSyntax_2009_CertificationRequest_certificationRequestInfo_Sequence = try EnrollmentMessageSyntax_2009_CertificationRequest_certificationRequestInfo_Sequence(derEncoded: &nodes)
             let signatureAlgorithm: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let signature: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
+
             return EnrollmentMessageSyntax_2009_CertificationRequest(certificationRequestInfo: certificationRequestInfo, signatureAlgorithm: signatureAlgorithm, signature: signature)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(certificationRequestInfo)
             try coder.serialize(signatureAlgorithm)
             try coder.serialize(signature)
+
         }
     }
 }

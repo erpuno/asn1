@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_CMCStatusInfoV2_otherInfo_Choice_extendedFailInfo_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_CMCStatusInfoV2_otherInfo_Choice_extendedFailInfo_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var failInfoOID: ASN1ObjectIdentifier
     @usableFromInline var failInfoValue: ASN1Any
     @inlinable init(failInfoOID: ASN1ObjectIdentifier, failInfoValue: ASN1Any) {
         self.failInfoOID = failInfoOID
         self.failInfoValue = failInfoValue
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let failInfoOID: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let failInfoValue: ASN1Any = try ASN1Any(derEncoded: &nodes)
+
             return EnrollmentMessageSyntax_2009_CMCStatusInfoV2_otherInfo_Choice_extendedFailInfo_Sequence(failInfoOID: failInfoOID, failInfoValue: failInfoValue)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(failInfoOID)
             try coder.serialize(failInfoValue)
+
         }
     }
 }

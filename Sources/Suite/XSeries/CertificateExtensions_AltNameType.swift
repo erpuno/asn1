@@ -2,37 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum CertificateExtensions_AltNameType: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum CertificateExtensions_AltNameType: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case builtinNameForm(CertificateExtensions_AltNameType_builtinNameForm_Enum)
     case otherNameForm(ASN1ObjectIdentifier)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case CertificateExtensions_AltNameType_builtinNameForm_Enum.defaultIdentifier:
-                self = .builtinNameForm(try CertificateExtensions_AltNameType_builtinNameForm_Enum(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1ObjectIdentifier.defaultIdentifier:
-                self = .otherNameForm(try ASN1ObjectIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case CertificateExtensions_AltNameType_builtinNameForm_Enum.defaultIdentifier:
+            self = .builtinNameForm(try CertificateExtensions_AltNameType_builtinNameForm_Enum(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1ObjectIdentifier.defaultIdentifier:
+            self = .otherNameForm(try ASN1ObjectIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .builtinNameForm(let builtinNameForm):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(builtinNameForm)
-                                }
-                            } else {
+        case .builtinNameForm(let builtinNameForm):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(builtinNameForm)
                             }
-            case .otherNameForm(let otherNameForm):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(otherNameForm)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(builtinNameForm)
+                        }
+        case .otherNameForm(let otherNameForm):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(otherNameForm)
                             }
+                        } else {
+                            try coder.serialize(otherNameForm)
+                        }
+
         }
     }
 

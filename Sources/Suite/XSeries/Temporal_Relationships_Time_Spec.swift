@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Temporal_Relationships_Time_Spec: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Temporal_Relationships_Time_Spec: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var start_offset: ArraySlice<UInt8>?
     @usableFromInline var end_offset: ArraySlice<UInt8>?
@@ -13,6 +13,7 @@ import Foundation
         self.end_offset = end_offset
         self.start_separation = start_separation
         self.end_separation = end_separation
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let end_offset: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let start_separation: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let end_separation: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
             return Temporal_Relationships_Time_Spec(start_offset: start_offset, end_offset: end_offset, start_separation: start_separation, end_separation: end_separation)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let start_offset = self.start_offset { if let start_offset = self.start_offset { try coder.serializeOptionalImplicitlyTagged(start_offset, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let end_offset = self.end_offset { if let end_offset = self.end_offset { try coder.serializeOptionalImplicitlyTagged(end_offset, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let start_separation = self.start_separation { if let start_separation = self.start_separation { try coder.serializeOptionalImplicitlyTagged(start_separation, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let end_separation = self.end_separation { if let end_separation = self.end_separation { try coder.serializeOptionalImplicitlyTagged(end_separation, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
+            if let start_offset = self.start_offset { try coder.serializeOptionalImplicitlyTagged(start_offset, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let end_offset = self.end_offset { try coder.serializeOptionalImplicitlyTagged(end_offset, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let start_separation = self.start_separation { try coder.serializeOptionalImplicitlyTagged(start_separation, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let end_separation = self.end_separation { try coder.serializeOptionalImplicitlyTagged(end_separation, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+
         }
     }
 }

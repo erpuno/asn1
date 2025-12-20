@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Sealed_Doc_Profiles_Element: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Sealed_Doc_Profiles_Element: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var sealed_doc_prof_descriptor_id: Identifiers_and_Expressions_Protected_Part_Identifier
     @usableFromInline var privileged_recipients: [Document_Profile_Descriptor_Personal_Name]?
@@ -11,6 +11,7 @@ import Foundation
         self.sealed_doc_prof_descriptor_id = sealed_doc_prof_descriptor_id
         self.privileged_recipients = privileged_recipients
         self.doc_prof_seal = doc_prof_seal
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let sealed_doc_prof_descriptor_id: Identifiers_and_Expressions_Protected_Part_Identifier = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let privileged_recipients: [Document_Profile_Descriptor_Personal_Name]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.set(of: Document_Profile_Descriptor_Personal_Name.self, identifier: node.identifier, rootNode: node) }
             let doc_prof_seal: Document_Profile_Descriptor_Seal_Data = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)))!
+
             return Document_Profile_Descriptor_Sealed_Doc_Profiles_Element(sealed_doc_prof_descriptor_id: sealed_doc_prof_descriptor_id, privileged_recipients: privileged_recipients, doc_prof_seal: doc_prof_seal)
         }
     }
@@ -25,8 +27,9 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(sealed_doc_prof_descriptor_id, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            if let privileged_recipients = self.privileged_recipients { if let privileged_recipients = self.privileged_recipients { try coder.serializeSetOf(privileged_recipients, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let privileged_recipients = self.privileged_recipients { try coder.serializeSetOf(privileged_recipients, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
             try coder.serializeOptionalImplicitlyTagged(doc_prof_seal, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
         }
     }
 }

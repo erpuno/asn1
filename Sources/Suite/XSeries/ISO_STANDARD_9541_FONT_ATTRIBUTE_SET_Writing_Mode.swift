@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Writing_Mode: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Writing_Mode: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var iso_standard_9541_wrmodename: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name
     @usableFromInline var wrmode_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Modal_Properties
     @inlinable init(iso_standard_9541_wrmodename: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name, wrmode_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Modal_Properties) {
         self.iso_standard_9541_wrmodename = iso_standard_9541_wrmodename
         self.wrmode_properties = wrmode_properties
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let iso_standard_9541_wrmodename: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let wrmode_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Modal_Properties = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Writing_Mode(iso_standard_9541_wrmodename: iso_standard_9541_wrmodename, wrmode_properties: wrmode_properties)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_wrmodename, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(wrmode_properties, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
         }
     }
 }

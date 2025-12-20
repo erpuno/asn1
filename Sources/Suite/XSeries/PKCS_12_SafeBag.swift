@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_12_SafeBag: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_12_SafeBag: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var bagId: ASN1ObjectIdentifier
     @usableFromInline var bagValue: ASN1Any
@@ -11,6 +11,7 @@ import Foundation
         self.bagId = bagId
         self.bagValue = bagValue
         self.bagAttributes = bagAttributes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let bagId: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let bagValue: ASN1Any = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try ASN1Any(derEncoded: node) }
             let bagAttributes: [PKCS_12_PKCS12Attribute]? = try DER.set(of: PKCS_12_PKCS12Attribute.self, identifier: .set, nodes: &nodes)
+
             return PKCS_12_SafeBag(bagId: bagId, bagValue: bagValue, bagAttributes: bagAttributes)
         }
     }
@@ -26,7 +28,8 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(bagId)
             try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(bagValue) }
-            if let bagAttributes = self.bagAttributes { if let bagAttributes = self.bagAttributes { try coder.serializeSetOf(bagAttributes) } }
+            if let bagAttributes = self.bagAttributes { try coder.serializeSetOf(bagAttributes) }
+
         }
     }
 }

@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline typealias LDAP_MatchingRuleId = LDAP_LDAPString
+@usableFromInline typealias LDAP_MatchingRuleId = LDAP_String

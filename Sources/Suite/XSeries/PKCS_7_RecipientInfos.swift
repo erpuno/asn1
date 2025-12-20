@@ -2,23 +2,24 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum PKCS_7_RecipientInfos: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum PKCS_7_RecipientInfos: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case riSet([PKCS_7_RecipientInfo])
     case riSequence([PKCS_7_RecipientInfo])
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier.set:
-                self = .riSet(try DER.set(of: PKCS_7_RecipientInfo.self, identifier: .set, rootNode: rootNode))
-            case ASN1Identifier.sequence:
-                self = .riSequence(try DER.sequence(of: PKCS_7_RecipientInfo.self, identifier: .sequence, rootNode: rootNode))
+        case ASN1Identifier.set:
+            self = .riSet(try DER.set(of: PKCS_7_RecipientInfo.self, identifier: .set, rootNode: rootNode))
+        case ASN1Identifier.sequence:
+            self = .riSequence(try DER.sequence(of: PKCS_7_RecipientInfo.self, identifier: .sequence, rootNode: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .riSet(let riSet): try coder.serializeSetOf(riSet)
-            case .riSequence(let riSequence): try coder.serializeSequenceOf(riSequence)
+        case .riSet(let riSet): try coder.serializeSetOf(riSet)
+        case .riSequence(let riSequence): try coder.serializeSequenceOf(riSequence)
+
         }
     }
 

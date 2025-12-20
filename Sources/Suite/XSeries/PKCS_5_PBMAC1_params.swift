@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_5_PBMAC1_params: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_5_PBMAC1_params: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var keyDerivationFunc: AuthenticationFramework_AlgorithmIdentifier
     @usableFromInline var messageAuthScheme: AuthenticationFramework_AlgorithmIdentifier
     @inlinable init(keyDerivationFunc: AuthenticationFramework_AlgorithmIdentifier, messageAuthScheme: AuthenticationFramework_AlgorithmIdentifier) {
         self.keyDerivationFunc = keyDerivationFunc
         self.messageAuthScheme = messageAuthScheme
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let keyDerivationFunc: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let messageAuthScheme: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
+
             return PKCS_5_PBMAC1_params(keyDerivationFunc: keyDerivationFunc, messageAuthScheme: messageAuthScheme)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(keyDerivationFunc)
             try coder.serialize(messageAuthScheme)
+
         }
     }
 }

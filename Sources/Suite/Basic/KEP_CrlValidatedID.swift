@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_CrlValidatedID: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_CrlValidatedID: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var crlHash: KEP_OtherHash
     @usableFromInline var crlIdentifier: KEP_CrlIdentifier?
     @inlinable init(crlHash: KEP_OtherHash, crlIdentifier: KEP_CrlIdentifier?) {
         self.crlHash = crlHash
         self.crlIdentifier = crlIdentifier
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,6 +20,7 @@ var peek_crlIdentifier = nodes
 if let next = peek_crlIdentifier.next(), next.identifier == KEP_CrlIdentifier.defaultIdentifier {
     crlIdentifier = try KEP_CrlIdentifier(derEncoded: &nodes)
 }
+
             return KEP_CrlValidatedID(crlHash: crlHash, crlIdentifier: crlIdentifier)
         }
     }
@@ -26,7 +28,8 @@ if let next = peek_crlIdentifier.next(), next.identifier == KEP_CrlIdentifier.de
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(crlHash)
-            if let crlIdentifier = self.crlIdentifier { if let crlIdentifier = self.crlIdentifier { try coder.serialize(crlIdentifier) } }
+            if let crlIdentifier = self.crlIdentifier { try coder.serialize(crlIdentifier) }
+
         }
     }
 }

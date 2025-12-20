@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLUseKEK: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLUseKEK: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var glInfo: SMIMESymmetricKeyDistribution_2009_GLInfo
     @usableFromInline var glOwnerInfo: [SMIMESymmetricKeyDistribution_2009_GLOwnerInfo]
@@ -13,6 +13,7 @@ import Foundation
         self.glOwnerInfo = glOwnerInfo
         self.glAdministration = glAdministration
         self.glKeyAttributes = glKeyAttributes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -25,6 +26,7 @@ var peek_glKeyAttributes = nodes
 if let next = peek_glKeyAttributes.next(), next.identifier == SMIMESymmetricKeyDistribution_2009_GLKeyAttributes.defaultIdentifier {
     glKeyAttributes = try SMIMESymmetricKeyDistribution_2009_GLKeyAttributes(derEncoded: &nodes)
 }
+
             return SMIMESymmetricKeyDistribution_2009_GLUseKEK(glInfo: glInfo, glOwnerInfo: glOwnerInfo, glAdministration: glAdministration, glKeyAttributes: glKeyAttributes)
         }
     }
@@ -33,8 +35,9 @@ if let next = peek_glKeyAttributes.next(), next.identifier == SMIMESymmetricKeyD
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(glInfo)
             try coder.serializeSequenceOf(glOwnerInfo)
-            if let glAdministration = self.glAdministration { if let glAdministration = self.glAdministration { try coder.serialize(glAdministration) } }
-            if let glKeyAttributes = self.glKeyAttributes { if let glKeyAttributes = self.glKeyAttributes { try coder.serialize(glKeyAttributes) } }
+            if let glAdministration = self.glAdministration { try coder.serialize(glAdministration) }
+            if let glKeyAttributes = self.glKeyAttributes { try coder.serialize(glKeyAttributes) }
+
         }
     }
 }

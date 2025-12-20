@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Seal_Data: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Seal_Data: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var seal_method: Document_Profile_Descriptor_Seal_Method?
     @usableFromInline var sealed_information: Document_Profile_Descriptor_Sealed_Information?
@@ -11,6 +11,7 @@ import Foundation
         self.seal_method = seal_method
         self.sealed_information = sealed_information
         self.seal = seal
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let seal_method: Document_Profile_Descriptor_Seal_Method? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let sealed_information: Document_Profile_Descriptor_Sealed_Information? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let seal: ASN1OctetString = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)))!
+
             return Document_Profile_Descriptor_Seal_Data(seal_method: seal_method, sealed_information: sealed_information, seal: seal)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let seal_method = self.seal_method { if let seal_method = self.seal_method { try coder.serializeOptionalImplicitlyTagged(seal_method, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let sealed_information = self.sealed_information { if let sealed_information = self.sealed_information { try coder.serializeOptionalImplicitlyTagged(sealed_information, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let seal_method = self.seal_method { try coder.serializeOptionalImplicitlyTagged(seal_method, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let sealed_information = self.sealed_information { try coder.serializeOptionalImplicitlyTagged(sealed_information, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
             try coder.serializeOptionalImplicitlyTagged(seal, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
         }
     }
 }

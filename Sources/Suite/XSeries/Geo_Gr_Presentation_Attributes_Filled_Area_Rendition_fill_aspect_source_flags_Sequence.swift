@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Filled_Area_Rendition_fill_aspect_source_flags_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Filled_Area_Rendition_fill_aspect_source_flags_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var interior_style_asf: Geo_Gr_Presentation_Attributes_ASF_Type
     @usableFromInline var fill_colour_asf: Geo_Gr_Presentation_Attributes_ASF_Type
@@ -13,6 +13,7 @@ import Foundation
         self.fill_colour_asf = fill_colour_asf
         self.hatch_index_asf = hatch_index_asf
         self.pattern_index_asf = pattern_index_asf
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let fill_colour_asf: Geo_Gr_Presentation_Attributes_ASF_Type = try Geo_Gr_Presentation_Attributes_ASF_Type(derEncoded: &nodes)
             let hatch_index_asf: Geo_Gr_Presentation_Attributes_ASF_Type = try Geo_Gr_Presentation_Attributes_ASF_Type(derEncoded: &nodes)
             let pattern_index_asf: Geo_Gr_Presentation_Attributes_ASF_Type = try Geo_Gr_Presentation_Attributes_ASF_Type(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Filled_Area_Rendition_fill_aspect_source_flags_Sequence(interior_style_asf: interior_style_asf, fill_colour_asf: fill_colour_asf, hatch_index_asf: hatch_index_asf, pattern_index_asf: pattern_index_asf)
         }
     }
@@ -31,6 +33,7 @@ import Foundation
             try coder.serialize(fill_colour_asf)
             try coder.serialize(hatch_index_asf)
             try coder.serialize(pattern_index_asf)
+
         }
     }
 }

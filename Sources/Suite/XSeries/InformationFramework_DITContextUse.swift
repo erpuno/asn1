@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_DITContextUse: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_DITContextUse: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var attributeType: ASN1ObjectIdentifier
     @usableFromInline var mandatoryContexts: [ASN1ObjectIdentifier]?
@@ -11,6 +11,7 @@ import Foundation
         self.attributeType = attributeType
         self.mandatoryContexts = mandatoryContexts
         self.optionalContexts = optionalContexts
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let attributeType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let mandatoryContexts: [ASN1ObjectIdentifier]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.set(of: ASN1ObjectIdentifier.self, identifier: .set, rootNode: node) }
             let optionalContexts: [ASN1ObjectIdentifier]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.set(of: ASN1ObjectIdentifier.self, identifier: .set, rootNode: node) }
+
             return InformationFramework_DITContextUse(attributeType: attributeType, mandatoryContexts: mandatoryContexts, optionalContexts: optionalContexts)
         }
     }
@@ -25,8 +27,9 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(attributeType)
-            if let mandatoryContexts = self.mandatoryContexts { if let mandatoryContexts = self.mandatoryContexts { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(mandatoryContexts) } } }
-            if let optionalContexts = self.optionalContexts { if let optionalContexts = self.optionalContexts { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(optionalContexts) } } }
+            if let mandatoryContexts = self.mandatoryContexts { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(mandatoryContexts) } }
+            if let optionalContexts = self.optionalContexts { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(optionalContexts) } }
+
         }
     }
 }

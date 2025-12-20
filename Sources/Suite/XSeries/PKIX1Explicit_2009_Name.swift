@@ -2,13 +2,13 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum PKIX1Explicit_2009_Name: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum PKIX1Explicit_2009_Name: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { PKIX1Explicit_2009_RDNSequence.defaultIdentifier }
         case rdnSequence(PKIX1Explicit_2009_RDNSequence)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case PKIX1Explicit_2009_RDNSequence.defaultIdentifier:
-                self = .rdnSequence(try PKIX1Explicit_2009_RDNSequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case PKIX1Explicit_2009_RDNSequence.defaultIdentifier:
+            self = .rdnSequence(try PKIX1Explicit_2009_RDNSequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
 default:
     if identifier == rootNode.identifier {
         if case .constructed(let nodes) = rootNode.content {
@@ -29,14 +29,15 @@ default:
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .rdnSequence(let rdnSequence):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(rdnSequence)
-                                }
-                            } else {
+        case .rdnSequence(let rdnSequence):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(rdnSequence)
                             }
+                        } else {
+                            try coder.serialize(rdnSequence)
+                        }
+
         }
     }
 

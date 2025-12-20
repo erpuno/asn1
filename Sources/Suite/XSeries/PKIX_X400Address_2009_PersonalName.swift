@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX_X400Address_2009_PersonalName: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX_X400Address_2009_PersonalName: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var surname: ASN1PrintableString
     @usableFromInline var given_name: ASN1PrintableString?
@@ -13,6 +13,7 @@ import Foundation
         self.given_name = given_name
         self.initials = initials
         self.generation_qualifier = generation_qualifier
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let given_name: ASN1PrintableString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let initials: ASN1PrintableString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let generation_qualifier: ASN1PrintableString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
             return PKIX_X400Address_2009_PersonalName(surname: surname, given_name: given_name, initials: initials, generation_qualifier: generation_qualifier)
         }
     }
@@ -28,9 +30,10 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(surname, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            if let given_name = self.given_name { if let given_name = self.given_name { try coder.serializeOptionalImplicitlyTagged(given_name, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let initials = self.initials { if let initials = self.initials { try coder.serializeOptionalImplicitlyTagged(initials, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let generation_qualifier = self.generation_qualifier { if let generation_qualifier = self.generation_qualifier { try coder.serializeOptionalImplicitlyTagged(generation_qualifier, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
+            if let given_name = self.given_name { try coder.serializeOptionalImplicitlyTagged(given_name, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let initials = self.initials { try coder.serializeOptionalImplicitlyTagged(initials, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let generation_qualifier = self.generation_qualifier { try coder.serializeOptionalImplicitlyTagged(generation_qualifier, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+
         }
     }
 }

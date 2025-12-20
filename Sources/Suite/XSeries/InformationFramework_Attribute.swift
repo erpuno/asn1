@@ -2,27 +2,28 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_Attribute: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_Attribute: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var type: ASN1ObjectIdentifier
-    @usableFromInline var values: [ASN1Any]
-    @inlinable init(type: ASN1ObjectIdentifier, values: [ASN1Any]) {
-        self.type = type
-        self.values = values
+    @usableFromInline var algorithm: ASN1ObjectIdentifier
+    @usableFromInline var parameters: ASN1Any?
+    @inlinable init(algorithm: ASN1ObjectIdentifier, parameters: ASN1Any? = nil) {
+        self.algorithm = algorithm
+        self.parameters = parameters
     }
-    @inlinable init(derEncoded root: ASN1Node,
-        withIdentifier identifier: ASN1Identifier) throws {
+    @inlinable init(derEncoded root: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let type: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let values: [ASN1Any] = try DER.set(of: ASN1Any.self, identifier: .set, nodes: &nodes)
-            return InformationFramework_Attribute(type: type, values: values)
+            let algorithm = try ASN1ObjectIdentifier(derEncoded: &nodes)
+            var parameters: ASN1Any? = nil
+            if let nextNode = nodes.next() {
+                parameters = try ASN1Any(derEncoded: nextNode)
+            }
+            return InformationFramework_Attribute(algorithm: algorithm, parameters: parameters)
         }
     }
-    @inlinable func serialize(into coder: inout DER.Serializer,
-        withIdentifier identifier: ASN1Identifier) throws {
+    @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(type)
-            try coder.serializeSetOf(values)
+            try coder.serialize(algorithm)
+            if let parameters = parameters { try coder.serialize(parameters) }
         }
     }
 }

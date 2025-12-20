@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ExtendedSecurityServices_2009_Receipt: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ExtendedSecurityServices_2009_Receipt: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: ExtendedSecurityServices_2009_ESSVersion
     @usableFromInline var contentType: CryptographicMessageSyntax_2010_ContentType
@@ -13,6 +13,7 @@ import Foundation
         self.contentType = contentType
         self.signedContentIdentifier = signedContentIdentifier
         self.originatorSignatureValue = originatorSignatureValue
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let contentType: CryptographicMessageSyntax_2010_ContentType = try CryptographicMessageSyntax_2010_ContentType(derEncoded: &nodes)
             let signedContentIdentifier: ExtendedSecurityServices_2009_ContentIdentifier = try ExtendedSecurityServices_2009_ContentIdentifier(derEncoded: &nodes)
             let originatorSignatureValue: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return ExtendedSecurityServices_2009_Receipt(version: version, contentType: contentType, signedContentIdentifier: signedContentIdentifier, originatorSignatureValue: originatorSignatureValue)
         }
     }
@@ -31,6 +33,7 @@ import Foundation
             try coder.serialize(contentType)
             try coder.serialize(signedContentIdentifier)
             try coder.serialize(originatorSignatureValue)
+
         }
     }
 }

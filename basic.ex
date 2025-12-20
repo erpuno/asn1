@@ -1,7 +1,7 @@
 #!/usr/bin/env elixir
 
 # Load the compiler module
-Code.require_file("asn2.ex", ".")
+Code.require_file("asn1.ex", ".")
 
 # ============================================================================
 # DependencyAnalyzer - Handles import parsing, topological sort, and cycle detection

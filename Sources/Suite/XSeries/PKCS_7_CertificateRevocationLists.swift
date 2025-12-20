@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_7_CertificateRevocationLists: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct PKCS_7_CertificateRevocationLists: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var value: [AuthenticationFramework_CertificateList]
     @inlinable public init(_ value: [AuthenticationFramework_CertificateList]) { self.value = value }

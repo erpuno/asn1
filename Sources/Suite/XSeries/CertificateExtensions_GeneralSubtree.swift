@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CertificateExtensions_GeneralSubtree: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CertificateExtensions_GeneralSubtree: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var base: CertificateExtensions_GeneralName
     @usableFromInline var minimum: CertificateExtensions_BaseDistance?
@@ -11,6 +11,7 @@ import Foundation
         self.base = base
         self.minimum = minimum
         self.maximum = maximum
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let base: CertificateExtensions_GeneralName = try CertificateExtensions_GeneralName(derEncoded: &nodes)
             let minimum: CertificateExtensions_BaseDistance = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let maximum: CertificateExtensions_BaseDistance? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return CertificateExtensions_GeneralSubtree(base: base, minimum: minimum, maximum: maximum)
         }
     }
@@ -25,8 +27,9 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(base)
-            if let minimum = self.minimum { if let minimum = self.minimum { try coder.serializeOptionalImplicitlyTagged(minimum, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let maximum = self.maximum { if let maximum = self.maximum { try coder.serializeOptionalImplicitlyTagged(maximum, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let minimum = self.minimum { try coder.serializeOptionalImplicitlyTagged(minimum, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let maximum = self.maximum { try coder.serializeOptionalImplicitlyTagged(maximum, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

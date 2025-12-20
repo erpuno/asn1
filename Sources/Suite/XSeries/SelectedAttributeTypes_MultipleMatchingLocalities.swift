@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SelectedAttributeTypes_MultipleMatchingLocalities: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SelectedAttributeTypes_MultipleMatchingLocalities: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var matchingRuleUsed: ASN1ObjectIdentifier?
     @usableFromInline var attributeList: [InformationFramework_AttributeValueAssertion]
     @inlinable init(matchingRuleUsed: ASN1ObjectIdentifier?, attributeList: [InformationFramework_AttributeValueAssertion]) {
         self.matchingRuleUsed = matchingRuleUsed
         self.attributeList = attributeList
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,14 +20,16 @@ if let next = peek_matchingRuleUsed.next(), next.identifier == ASN1ObjectIdentif
     matchingRuleUsed = try ASN1ObjectIdentifier(derEncoded: &nodes)
 }
             let attributeList: [InformationFramework_AttributeValueAssertion] = try DER.sequence(of: InformationFramework_AttributeValueAssertion.self, identifier: .sequence, nodes: &nodes)
+
             return SelectedAttributeTypes_MultipleMatchingLocalities(matchingRuleUsed: matchingRuleUsed, attributeList: attributeList)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let matchingRuleUsed = self.matchingRuleUsed { if let matchingRuleUsed = self.matchingRuleUsed { try coder.serialize(matchingRuleUsed) } }
+            if let matchingRuleUsed = self.matchingRuleUsed { try coder.serialize(matchingRuleUsed) }
             try coder.serializeSequenceOf(attributeList)
+
         }
     }
 }

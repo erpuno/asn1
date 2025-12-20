@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ANSI_X9_62_Curve: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ANSI_X9_62_Curve: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var a: ANSI_X9_62_FieldElement
     @usableFromInline var b: ANSI_X9_62_FieldElement
@@ -11,6 +11,7 @@ import Foundation
         self.a = a
         self.b = b
         self.seed = seed
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ var peek_seed = nodes
 if let next = peek_seed.next(), next.identifier == ASN1BitString.defaultIdentifier {
     seed = try ASN1BitString(derEncoded: &nodes)
 }
+
             return ANSI_X9_62_Curve(a: a, b: b, seed: seed)
         }
     }
@@ -30,7 +32,8 @@ if let next = peek_seed.next(), next.identifier == ASN1BitString.defaultIdentifi
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(a)
             try coder.serialize(b)
-            if let seed = self.seed { if let seed = self.seed { try coder.serialize(seed) } }
+            if let seed = self.seed { try coder.serialize(seed) }
+
         }
     }
 }

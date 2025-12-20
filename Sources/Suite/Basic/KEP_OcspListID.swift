@@ -2,16 +2,18 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_OcspListID: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_OcspListID: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var ocspResponses: [KEP_OcspResponsesID]
     @inlinable init(ocspResponses: [KEP_OcspResponsesID]) {
         self.ocspResponses = ocspResponses
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let ocspResponses: [KEP_OcspResponsesID] = try DER.sequence(of: KEP_OcspResponsesID.self, identifier: .sequence, nodes: &nodes)
+
             return KEP_OcspListID(ocspResponses: ocspResponses)
         }
     }
@@ -19,6 +21,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeSequenceOf(ocspResponses)
+
         }
     }
 }

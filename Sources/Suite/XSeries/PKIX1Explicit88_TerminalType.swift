@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct PKIX1Explicit88_TerminalType : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct PKIX1Explicit88_TerminalType : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: PKIX1Explicit88_TerminalType, rhs: PKIX1Explicit88_TerminalType) -> Bool { lhs.rawValue < rhs.rawValue }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_12_PFX: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_12_PFX: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: PKCS_12_PFX_version_IntEnum
     @usableFromInline var authSafe: CryptographicMessageSyntax_2010_ContentInfo
@@ -11,6 +11,7 @@ import Foundation
         self.version = version
         self.authSafe = authSafe
         self.macData = macData
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,15 +23,17 @@ var peek_macData = nodes
 if let next = peek_macData.next(), next.identifier == PKCS_12_MacData.defaultIdentifier {
     macData = try PKCS_12_MacData(derEncoded: &nodes)
 }
+
             return PKCS_12_PFX(version: version, authSafe: authSafe, macData: macData)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(version.rawValue)
+            try version.serialize(into: &coder, withIdentifier: identifier)
             try coder.serialize(authSafe)
-            if let macData = self.macData { if let macData = self.macData { try coder.serialize(macData) } }
+            if let macData = self.macData { try coder.serialize(macData) }
+
         }
     }
 }

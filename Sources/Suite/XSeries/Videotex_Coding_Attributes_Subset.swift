@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct Videotex_Coding_Attributes_Subset : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct Videotex_Coding_Attributes_Subset : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: Videotex_Coding_Attributes_Subset, rhs: Videotex_Coding_Attributes_Subset) -> Bool { lhs.rawValue < rhs.rawValue }

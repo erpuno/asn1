@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2010_AuthenticatedData: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2010_AuthenticatedData: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: CryptographicMessageSyntax_2010_CMSVersion
     @usableFromInline var originatorInfo: CryptographicMessageSyntax_2010_OriginatorInfo?
@@ -23,6 +23,7 @@ import Foundation
         self.authAttrs = authAttrs
         self.mac = mac
         self.unauthAttrs = unauthAttrs
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -36,6 +37,7 @@ import Foundation
             let authAttrs: CryptographicMessageSyntax_2010_AuthAttributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let mac: CryptographicMessageSyntax_2010_MessageAuthenticationCode = try CryptographicMessageSyntax_2010_MessageAuthenticationCode(derEncoded: &nodes)
             let unauthAttrs: CryptographicMessageSyntax_2010_UnauthAttributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
             return CryptographicMessageSyntax_2010_AuthenticatedData(version: version, originatorInfo: originatorInfo, recipientInfos: recipientInfos, macAlgorithm: macAlgorithm, digestAlgorithm: digestAlgorithm, encapContentInfo: encapContentInfo, authAttrs: authAttrs, mac: mac, unauthAttrs: unauthAttrs)
         }
     }
@@ -43,14 +45,15 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(version)
-            if let originatorInfo = self.originatorInfo { if let originatorInfo = self.originatorInfo { try coder.serializeOptionalImplicitlyTagged(originatorInfo, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let originatorInfo = self.originatorInfo { try coder.serializeOptionalImplicitlyTagged(originatorInfo, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
             try coder.serialize(recipientInfos)
             try coder.serialize(macAlgorithm)
-            if let digestAlgorithm = self.digestAlgorithm { if let digestAlgorithm = self.digestAlgorithm { try coder.serializeOptionalImplicitlyTagged(digestAlgorithm, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let digestAlgorithm = self.digestAlgorithm { try coder.serializeOptionalImplicitlyTagged(digestAlgorithm, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
             try coder.serialize(encapContentInfo)
-            if let authAttrs = self.authAttrs { if let authAttrs = self.authAttrs { try coder.serializeOptionalImplicitlyTagged(authAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let authAttrs = self.authAttrs { try coder.serializeOptionalImplicitlyTagged(authAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
             try coder.serialize(mac)
-            if let unauthAttrs = self.unauthAttrs { if let unauthAttrs = self.unauthAttrs { try coder.serializeOptionalImplicitlyTagged(unauthAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
+            if let unauthAttrs = self.unauthAttrs { try coder.serializeOptionalImplicitlyTagged(unauthAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+
         }
     }
 }

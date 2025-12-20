@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Doc_Appl_Profile_Defaults: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Doc_Appl_Profile_Defaults: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var document_architecture_defaults: Document_Profile_Descriptor_Document_Architecture_Defaults?
     @usableFromInline var character_content_defaults: Character_Profile_Attributes_Character_Content_Defaults?
@@ -15,6 +15,7 @@ import Foundation
         self.raster_gr_content_defaults = raster_gr_content_defaults
         self.geo_gr_content_defaults = geo_gr_content_defaults
         self.external_content_architecture_defaults = external_content_architecture_defaults
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,17 +25,19 @@ import Foundation
             let raster_gr_content_defaults: Raster_Gr_Profile_Attributes_Raster_Gr_Content_Defaults? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let geo_gr_content_defaults: Geo_Gr_Profile_Attributes_Geo_Gr_Content_Defaults? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             let external_content_architecture_defaults: [EXTERNAL]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 7, tagClass: .contextSpecific) { node in try DER.sequence(of: EXTERNAL.self, identifier: node.identifier, rootNode: node) }
+
             return Document_Profile_Descriptor_Doc_Appl_Profile_Defaults(document_architecture_defaults: document_architecture_defaults, character_content_defaults: character_content_defaults, raster_gr_content_defaults: raster_gr_content_defaults, geo_gr_content_defaults: geo_gr_content_defaults, external_content_architecture_defaults: external_content_architecture_defaults)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let document_architecture_defaults = self.document_architecture_defaults { if let document_architecture_defaults = self.document_architecture_defaults { try coder.serializeOptionalImplicitlyTagged(document_architecture_defaults, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let character_content_defaults = self.character_content_defaults { if let character_content_defaults = self.character_content_defaults { try coder.serializeOptionalImplicitlyTagged(character_content_defaults, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let raster_gr_content_defaults = self.raster_gr_content_defaults { if let raster_gr_content_defaults = self.raster_gr_content_defaults { try coder.serializeOptionalImplicitlyTagged(raster_gr_content_defaults, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let geo_gr_content_defaults = self.geo_gr_content_defaults { if let geo_gr_content_defaults = self.geo_gr_content_defaults { try coder.serializeOptionalImplicitlyTagged(geo_gr_content_defaults, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let external_content_architecture_defaults = self.external_content_architecture_defaults { if let external_content_architecture_defaults = self.external_content_architecture_defaults { try coder.serializeSequenceOf(external_content_architecture_defaults, identifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) } }
+            if let document_architecture_defaults = self.document_architecture_defaults { try coder.serializeOptionalImplicitlyTagged(document_architecture_defaults, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let character_content_defaults = self.character_content_defaults { try coder.serializeOptionalImplicitlyTagged(character_content_defaults, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let raster_gr_content_defaults = self.raster_gr_content_defaults { try coder.serializeOptionalImplicitlyTagged(raster_gr_content_defaults, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let geo_gr_content_defaults = self.geo_gr_content_defaults { try coder.serializeOptionalImplicitlyTagged(geo_gr_content_defaults, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let external_content_architecture_defaults = self.external_content_architecture_defaults { try coder.serializeSequenceOf(external_content_architecture_defaults, identifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) }
+
         }
     }
 }

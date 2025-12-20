@@ -2,27 +2,28 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Identifiers_and_Expressions_Construction_Type: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Identifiers_and_Expressions_Construction_Type: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case sequence_construction(Identifiers_and_Expressions_Term_Sequence)
     case aggregate_construction(Identifiers_and_Expressions_Term_Sequence)
     case choice_construction(Identifiers_and_Expressions_Term_Sequence)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .sequence_construction(try Identifiers_and_Expressions_Term_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .aggregate_construction(try Identifiers_and_Expressions_Term_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .choice_construction(try Identifiers_and_Expressions_Term_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .sequence_construction(try Identifiers_and_Expressions_Term_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .aggregate_construction(try Identifiers_and_Expressions_Term_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+            self = .choice_construction(try Identifiers_and_Expressions_Term_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .sequence_construction(let sequence_construction): try sequence_construction.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .aggregate_construction(let aggregate_construction): try aggregate_construction.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            case .choice_construction(let choice_construction): try choice_construction.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+        case .sequence_construction(let sequence_construction): try sequence_construction.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+        case .aggregate_construction(let aggregate_construction): try aggregate_construction.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+        case .choice_construction(let choice_construction): try choice_construction.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
         }
     }
 

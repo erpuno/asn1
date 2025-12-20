@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_Value: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_Value: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case value(ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Value)
     case value_list(ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Value_List)
@@ -11,31 +11,32 @@ import Foundation
     case ordered_property_list(ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Ordered_Property_List)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .value(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Value(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .value_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Value_List(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .ordered_value_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Ordered_Value_List(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .property_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .ordered_property_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Ordered_Property_List(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .value(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Value(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .value_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Value_List(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .ordered_value_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Ordered_Value_List(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .property_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .ordered_property_list(try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Ordered_Property_List(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .value(let value): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try value.serialize(into: &coder) }
-            case .value_list(let value_list): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try value_list.serialize(into: &coder) }
-            case .ordered_value_list(let ordered_value_list): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) { coder in try ordered_value_list.serialize(into: &coder) }
-            case .property_list(let property_list): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) { coder in try property_list.serialize(into: &coder) }
-            case .ordered_property_list(let ordered_property_list): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) { coder in try ordered_property_list.serialize(into: &coder) }
+        case .value(let value): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try value.serialize(into: &coder) }
+        case .value_list(let value_list): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try value_list.serialize(into: &coder) }
+        case .ordered_value_list(let ordered_value_list): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) { coder in try ordered_value_list.serialize(into: &coder) }
+        case .property_list(let property_list): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) { coder in try property_list.serialize(into: &coder) }
+        case .ordered_property_list(let ordered_property_list): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) { coder in try ordered_property_list.serialize(into: &coder) }
+
         }
     }
 

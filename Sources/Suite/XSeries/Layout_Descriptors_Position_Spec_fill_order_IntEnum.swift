@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct Layout_Descriptors_Position_Spec_fill_order_IntEnum : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct Layout_Descriptors_Position_Spec_fill_order_IntEnum : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: Layout_Descriptors_Position_Spec_fill_order_IntEnum, rhs: Layout_Descriptors_Position_Spec_fill_order_IntEnum) -> Bool { lhs.rawValue < rhs.rawValue }

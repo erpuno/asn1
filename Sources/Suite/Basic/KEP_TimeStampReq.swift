@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_TimeStampReq: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_TimeStampReq: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: KEP_TimeStampReq_version_IntEnum
     @usableFromInline var messageImprint: KEP_MessageImprint
@@ -17,6 +17,7 @@ import Foundation
         self.nonce = nonce
         self.certReq = certReq
         self.extensions = extensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -35,18 +36,20 @@ if let next = peek_nonce.next(), next.identifier == ArraySlice<UInt8>.defaultIde
 }
             let certReq: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
             let extensions: DSTU_Extensions? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+
             return KEP_TimeStampReq(version: version, messageImprint: messageImprint, reqPolicy: reqPolicy, nonce: nonce, certReq: certReq, extensions: extensions)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(version.rawValue)
+            try version.serialize(into: &coder, withIdentifier: identifier)
             try coder.serialize(messageImprint)
-            if let reqPolicy = self.reqPolicy { if let reqPolicy = self.reqPolicy { try coder.serialize(reqPolicy) } }
-            if let nonce = self.nonce { if let nonce = self.nonce { try coder.serialize(nonce) } }
-            if let certReq = self.certReq { if let certReq = self.certReq { try coder.serialize(certReq) } }
-            if let extensions = self.extensions { if let extensions = self.extensions { try coder.serializeOptionalImplicitlyTagged(extensions, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let reqPolicy = self.reqPolicy { try coder.serialize(reqPolicy) }
+            if let nonce = self.nonce { try coder.serialize(nonce) }
+            if let certReq = self.certReq { try coder.serialize(certReq) }
+            if let extensions = self.extensions { try coder.serializeOptionalImplicitlyTagged(extensions, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+
         }
     }
 }

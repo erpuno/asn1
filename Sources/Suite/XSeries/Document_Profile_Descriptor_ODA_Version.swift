@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_ODA_Version: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_ODA_Version: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var standard_or_recommendation: Document_Profile_Descriptor_Character_Data
     @usableFromInline var publication_date: Document_Profile_Descriptor_Date_and_Time
     @inlinable init(standard_or_recommendation: Document_Profile_Descriptor_Character_Data, publication_date: Document_Profile_Descriptor_Date_and_Time) {
         self.standard_or_recommendation = standard_or_recommendation
         self.publication_date = publication_date
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let standard_or_recommendation: Document_Profile_Descriptor_Character_Data = try Document_Profile_Descriptor_Character_Data(derEncoded: &nodes)
             let publication_date: Document_Profile_Descriptor_Date_and_Time = try Document_Profile_Descriptor_Date_and_Time(derEncoded: &nodes)
+
             return Document_Profile_Descriptor_ODA_Version(standard_or_recommendation: standard_or_recommendation, publication_date: publication_date)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(standard_or_recommendation)
             try coder.serialize(publication_date)
+
         }
     }
 }

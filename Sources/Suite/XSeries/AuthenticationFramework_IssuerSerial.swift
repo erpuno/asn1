@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct AuthenticationFramework_IssuerSerial: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct AuthenticationFramework_IssuerSerial: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var issuer: PKIX1Implicit_2009_GeneralNames
     @usableFromInline var serial: AuthenticationFramework_CertificateSerialNumber
@@ -11,6 +11,7 @@ import Foundation
         self.issuer = issuer
         self.serial = serial
         self.issuerUID = issuerUID
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ var peek_issuerUID = nodes
 if let next = peek_issuerUID.next(), next.identifier == SelectedAttributeTypes_UniqueIdentifier.defaultIdentifier {
     issuerUID = try SelectedAttributeTypes_UniqueIdentifier(derEncoded: &nodes)
 }
+
             return AuthenticationFramework_IssuerSerial(issuer: issuer, serial: serial, issuerUID: issuerUID)
         }
     }
@@ -30,7 +32,8 @@ if let next = peek_issuerUID.next(), next.identifier == SelectedAttributeTypes_U
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(issuer)
             try coder.serialize(serial)
-            if let issuerUID = self.issuerUID { if let issuerUID = self.issuerUID { try coder.serialize(issuerUID) } }
+            if let issuerUID = self.issuerUID { try coder.serialize(issuerUID) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DSTU_Certificate: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DSTU_Certificate: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var tbsCertificate: DSTU_TBSCertificate
     @usableFromInline var signatureAlgorithm: DSTU_AlgorithmIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.tbsCertificate = tbsCertificate
         self.signatureAlgorithm = signatureAlgorithm
         self.signatureValue = signatureValue
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let tbsCertificate: DSTU_TBSCertificate = try DSTU_TBSCertificate(derEncoded: &nodes)
             let signatureAlgorithm: DSTU_AlgorithmIdentifier = try DSTU_AlgorithmIdentifier(derEncoded: &nodes)
             let signatureValue: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
+
             return DSTU_Certificate(tbsCertificate: tbsCertificate, signatureAlgorithm: signatureAlgorithm, signatureValue: signatureValue)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(tbsCertificate)
             try coder.serialize(signatureAlgorithm)
             try coder.serialize(signatureValue)
+
         }
     }
 }

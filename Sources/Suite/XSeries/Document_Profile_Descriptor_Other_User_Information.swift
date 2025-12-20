@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Other_User_Information: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Other_User_Information: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var copyright: [Document_Profile_Descriptor_Other_User_Information_copyright_Set]?
     @usableFromInline var status: Document_Profile_Descriptor_Character_Data?
@@ -15,6 +15,7 @@ import Foundation
         self.user_specific_codes = user_specific_codes
         self.distribution_list = distribution_list
         self.additional_information = additional_information
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,17 +25,19 @@ import Foundation
             let user_specific_codes: [Document_Profile_Descriptor_Character_Data]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.set(of: Document_Profile_Descriptor_Character_Data.self, identifier: node.identifier, rootNode: node) }
             let distribution_list: [Document_Profile_Descriptor_Other_User_Information_distribution_list_Set]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in try DER.sequence(of: Document_Profile_Descriptor_Other_User_Information_distribution_list_Set.self, identifier: node.identifier, rootNode: node) }
             let additional_information: ASN1Any? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 5, tagClass: .contextSpecific) { node in return try ASN1Any(derEncoded: node) }
+
             return Document_Profile_Descriptor_Other_User_Information(copyright: copyright, status: status, user_specific_codes: user_specific_codes, distribution_list: distribution_list, additional_information: additional_information)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let copyright = self.copyright { if let copyright = self.copyright { try coder.serializeSetOf(copyright, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let status = self.status { if let status = self.status { try coder.serializeOptionalImplicitlyTagged(status, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let user_specific_codes = self.user_specific_codes { if let user_specific_codes = self.user_specific_codes { try coder.serializeSetOf(user_specific_codes, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let distribution_list = self.distribution_list { if let distribution_list = self.distribution_list { try coder.serializeSequenceOf(distribution_list, identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let additional_information = self.additional_information { if let additional_information = self.additional_information { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serialize(additional_information) } } }
+            if let copyright = self.copyright { try coder.serializeSetOf(copyright, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let status = self.status { try coder.serializeOptionalImplicitlyTagged(status, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let user_specific_codes = self.user_specific_codes { try coder.serializeSetOf(user_specific_codes, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let distribution_list = self.distribution_list { try coder.serializeSequenceOf(distribution_list, identifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let additional_information = self.additional_information { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serialize(additional_information) } }
+
         }
     }
 }

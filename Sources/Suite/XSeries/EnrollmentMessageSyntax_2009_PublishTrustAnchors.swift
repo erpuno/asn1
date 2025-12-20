@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_PublishTrustAnchors: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_PublishTrustAnchors: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var seqNumber: ArraySlice<UInt8>
     @usableFromInline var hashAlgorithm: AuthenticationFramework_AlgorithmIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.seqNumber = seqNumber
         self.hashAlgorithm = hashAlgorithm
         self.anchorHashes = anchorHashes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let seqNumber: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let hashAlgorithm: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let anchorHashes: [ASN1OctetString] = try DER.sequence(of: ASN1OctetString.self, identifier: .sequence, nodes: &nodes)
+
             return EnrollmentMessageSyntax_2009_PublishTrustAnchors(seqNumber: seqNumber, hashAlgorithm: hashAlgorithm, anchorHashes: anchorHashes)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(seqNumber)
             try coder.serialize(hashAlgorithm)
             try coder.serializeSequenceOf(anchorHashes)
+
         }
     }
 }

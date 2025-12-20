@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct External_References_List_Element: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct External_References_List_Element: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var reference_name: External_References_Reference_Name
     @usableFromInline var external_entity: External_References_External_Entity
@@ -11,6 +11,7 @@ import Foundation
         self.reference_name = reference_name
         self.external_entity = external_entity
         self.location_rule = location_rule
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let reference_name: External_References_Reference_Name = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
             let external_entity: External_References_External_Entity = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)))!
             let location_rule: Location_Expressions_Location_Expression? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
             return External_References_List_Element(reference_name: reference_name, external_entity: external_entity, location_rule: location_rule)
         }
     }
@@ -26,7 +28,8 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(reference_name, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(external_entity, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
-            if let location_rule = self.location_rule { if let location_rule = self.location_rule { try coder.serializeOptionalImplicitlyTagged(location_rule, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
+            if let location_rule = self.location_rule { try coder.serializeOptionalImplicitlyTagged(location_rule, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+
         }
     }
 }

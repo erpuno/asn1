@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_Specified_Tolerance: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_Specified_Tolerance: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var tolerance_value: Colour_Attributes_Real_Or_Int
     @usableFromInline var tolerance_space: Colour_Attributes_Specified_Tolerance_tolerance_space_IntEnum
     @inlinable init(tolerance_value: Colour_Attributes_Real_Or_Int, tolerance_space: Colour_Attributes_Specified_Tolerance_tolerance_space_IntEnum) {
         self.tolerance_value = tolerance_value
         self.tolerance_space = tolerance_space
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let tolerance_value: Colour_Attributes_Real_Or_Int = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try Colour_Attributes_Real_Or_Int(derEncoded: node) }
             let tolerance_space = try Colour_Attributes_Specified_Tolerance_tolerance_space_IntEnum(rawValue: Int(derEncoded: &nodes))
+
             return Colour_Attributes_Specified_Tolerance(tolerance_value: tolerance_value, tolerance_space: tolerance_space)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(tolerance_value) }
             try coder.serialize(tolerance_space.rawValue, explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific)
+
         }
     }
 }

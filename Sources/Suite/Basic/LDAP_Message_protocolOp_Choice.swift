@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum LDAP_Message_protocolOp_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum LDAP_Message_protocolOp_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case bindRequest(LDAP_BindRequest)
     case bindResponse(LDAP_BindResponse)
@@ -27,74 +27,223 @@ import Foundation
     case intermediateResponse(LDAP_IntermediateResponse)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .application):
-                self = .bindRequest(try LDAP_BindRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .application):
-                self = .bindResponse(try LDAP_BindResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .application):
-                self = .unbindRequest(try LDAP_UnbindRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .application):
-                self = .searchRequest(try LDAP_SearchRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 4, tagClass: .application):
-                self = .searchResEntry(try LDAP_SearchResultEntry(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 5, tagClass: .application):
-                self = .searchResDone(try LDAP_SearchResultDone(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 6, tagClass: .application):
-                self = .searchResRef(try LDAP_SearchResultReference(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 7, tagClass: .application):
-                self = .modifyRequest(try LDAP_ModifyRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 8, tagClass: .application):
-                self = .modifyResponse(try LDAP_ModifyResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 9, tagClass: .application):
-                self = .addRequest(try LDAP_AddRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 10, tagClass: .application):
-                self = .addResponse(try LDAP_AddResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 11, tagClass: .application):
-                self = .delRequest(try LDAP_DelRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 12, tagClass: .application):
-                self = .delResponse(try LDAP_DelResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 13, tagClass: .application):
-                self = .modDNRequest(try LDAP_ModifyDNRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 14, tagClass: .application):
-                self = .modDNResponse(try LDAP_ModifyDNResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 15, tagClass: .application):
-                self = .compareRequest(try LDAP_CompareRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 16, tagClass: .application):
-                self = .compareResponse(try LDAP_CompareResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 17, tagClass: .application):
-                self = .abandonRequest(try LDAP_AbandonRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 18, tagClass: .application):
-                self = .extendedReq(try LDAP_ExtendedRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 19, tagClass: .application):
-                self = .extendedResp(try LDAP_ExtendedResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 21, tagClass: .application):
-                self = .intermediateResponse(try LDAP_IntermediateResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_BindRequest.defaultIdentifier:
+            self = .bindRequest(try LDAP_BindRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_BindResponse.defaultIdentifier:
+            self = .bindResponse(try LDAP_BindResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_UnbindRequest.defaultIdentifier:
+            self = .unbindRequest(try LDAP_UnbindRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_SearchRequest.defaultIdentifier:
+            self = .searchRequest(try LDAP_SearchRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_SearchResultEntry.defaultIdentifier:
+            self = .searchResEntry(try LDAP_SearchResultEntry(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_SearchResultDone.defaultIdentifier:
+            self = .searchResDone(try LDAP_SearchResultDone(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_SearchResultReference.defaultIdentifier:
+            self = .searchResRef(try LDAP_SearchResultReference(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_ModifyRequest.defaultIdentifier:
+            self = .modifyRequest(try LDAP_ModifyRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_ModifyResponse.defaultIdentifier:
+            self = .modifyResponse(try LDAP_ModifyResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_AddRequest.defaultIdentifier:
+            self = .addRequest(try LDAP_AddRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_AddResponse.defaultIdentifier:
+            self = .addResponse(try LDAP_AddResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_DelRequest.defaultIdentifier:
+            self = .delRequest(try LDAP_DelRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_DelResponse.defaultIdentifier:
+            self = .delResponse(try LDAP_DelResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_ModifyDNRequest.defaultIdentifier:
+            self = .modDNRequest(try LDAP_ModifyDNRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_ModifyDNResponse.defaultIdentifier:
+            self = .modDNResponse(try LDAP_ModifyDNResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_CompareRequest.defaultIdentifier:
+            self = .compareRequest(try LDAP_CompareRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_CompareResponse.defaultIdentifier:
+            self = .compareResponse(try LDAP_CompareResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_AbandonRequest.defaultIdentifier:
+            self = .abandonRequest(try LDAP_AbandonRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_ExtendedRequest.defaultIdentifier:
+            self = .extendedReq(try LDAP_ExtendedRequest(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case LDAP_ExtendedResponse.defaultIdentifier:
+            self = .extendedResp(try LDAP_ExtendedResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+
+        case LDAP_IntermediateResponse.defaultIdentifier:
+            self = .intermediateResponse(try LDAP_IntermediateResponse(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .bindRequest(let bindRequest): try bindRequest.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .application))
-            case .bindResponse(let bindResponse): try bindResponse.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .application))
-            case .unbindRequest(let unbindRequest): try unbindRequest.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .application))
-            case .searchRequest(let searchRequest): try searchRequest.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .application))
-            case .searchResEntry(let searchResEntry): try searchResEntry.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .application))
-            case .searchResDone(let searchResDone): try searchResDone.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .application))
-            case .searchResRef(let searchResRef): try searchResRef.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .application))
-            case .modifyRequest(let modifyRequest): try modifyRequest.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .application))
-            case .modifyResponse(let modifyResponse): try modifyResponse.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .application))
-            case .addRequest(let addRequest): try addRequest.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .application))
-            case .addResponse(let addResponse): try addResponse.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .application))
-            case .delRequest(let delRequest): try delRequest.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .application))
-            case .delResponse(let delResponse): try delResponse.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 12, tagClass: .application))
-            case .modDNRequest(let modDNRequest): try modDNRequest.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 13, tagClass: .application))
-            case .modDNResponse(let modDNResponse): try modDNResponse.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 14, tagClass: .application))
-            case .compareRequest(let compareRequest): try compareRequest.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 15, tagClass: .application))
-            case .compareResponse(let compareResponse): try compareResponse.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 16, tagClass: .application))
-            case .abandonRequest(let abandonRequest): try abandonRequest.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 17, tagClass: .application))
-            case .extendedReq(let extendedReq): try extendedReq.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 18, tagClass: .application))
-            case .extendedResp(let extendedResp): try extendedResp.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 19, tagClass: .application))
-            case .intermediateResponse(let intermediateResponse): try intermediateResponse.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 21, tagClass: .application))
+        case .bindRequest(let bindRequest):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(bindRequest)
+                            }
+                        } else {
+                            try coder.serialize(bindRequest)
+                        }
+        case .bindResponse(let bindResponse):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(bindResponse)
+                            }
+                        } else {
+                            try coder.serialize(bindResponse)
+                        }
+        case .unbindRequest(let unbindRequest):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(unbindRequest)
+                            }
+                        } else {
+                            try coder.serialize(unbindRequest)
+                        }
+        case .searchRequest(let searchRequest):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(searchRequest)
+                            }
+                        } else {
+                            try coder.serialize(searchRequest)
+                        }
+        case .searchResEntry(let searchResEntry):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(searchResEntry)
+                            }
+                        } else {
+                            try coder.serialize(searchResEntry)
+                        }
+        case .searchResDone(let searchResDone):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(searchResDone)
+                            }
+                        } else {
+                            try coder.serialize(searchResDone)
+                        }
+        case .searchResRef(let searchResRef):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(searchResRef)
+                            }
+                        } else {
+                            try coder.serialize(searchResRef)
+                        }
+        case .modifyRequest(let modifyRequest):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(modifyRequest)
+                            }
+                        } else {
+                            try coder.serialize(modifyRequest)
+                        }
+        case .modifyResponse(let modifyResponse):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(modifyResponse)
+                            }
+                        } else {
+                            try coder.serialize(modifyResponse)
+                        }
+        case .addRequest(let addRequest):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(addRequest)
+                            }
+                        } else {
+                            try coder.serialize(addRequest)
+                        }
+        case .addResponse(let addResponse):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(addResponse)
+                            }
+                        } else {
+                            try coder.serialize(addResponse)
+                        }
+        case .delRequest(let delRequest):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(delRequest)
+                            }
+                        } else {
+                            try coder.serialize(delRequest)
+                        }
+        case .delResponse(let delResponse):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(delResponse)
+                            }
+                        } else {
+                            try coder.serialize(delResponse)
+                        }
+        case .modDNRequest(let modDNRequest):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(modDNRequest)
+                            }
+                        } else {
+                            try coder.serialize(modDNRequest)
+                        }
+        case .modDNResponse(let modDNResponse):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(modDNResponse)
+                            }
+                        } else {
+                            try coder.serialize(modDNResponse)
+                        }
+        case .compareRequest(let compareRequest):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(compareRequest)
+                            }
+                        } else {
+                            try coder.serialize(compareRequest)
+                        }
+        case .compareResponse(let compareResponse):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(compareResponse)
+                            }
+                        } else {
+                            try coder.serialize(compareResponse)
+                        }
+        case .abandonRequest(let abandonRequest):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(abandonRequest)
+                            }
+                        } else {
+                            try coder.serialize(abandonRequest)
+                        }
+        case .extendedReq(let extendedReq):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(extendedReq)
+                            }
+                        } else {
+                            try coder.serialize(extendedReq)
+                        }
+        case .extendedResp(let extendedResp):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(extendedResp)
+                            }
+                        } else {
+                            try coder.serialize(extendedResp)
+                        }
+        case .intermediateResponse(let intermediateResponse):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(intermediateResponse)
+                            }
+                        } else {
+                            try coder.serialize(intermediateResponse)
+                        }
+
         }
     }
 

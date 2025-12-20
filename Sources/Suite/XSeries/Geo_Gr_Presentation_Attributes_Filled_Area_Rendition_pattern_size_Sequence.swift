@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Filled_Area_Rendition_pattern_size_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Filled_Area_Rendition_pattern_size_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var height_x_component: Geo_Gr_Presentation_Attributes_VDC_Value
     @usableFromInline var height_y_component: Geo_Gr_Presentation_Attributes_VDC_Value
@@ -13,6 +13,7 @@ import Foundation
         self.height_y_component = height_y_component
         self.width_x_component = width_x_component
         self.width_y_component = width_y_component
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let height_y_component: Geo_Gr_Presentation_Attributes_VDC_Value = try Geo_Gr_Presentation_Attributes_VDC_Value(derEncoded: &nodes)
             let width_x_component: Geo_Gr_Presentation_Attributes_VDC_Value = try Geo_Gr_Presentation_Attributes_VDC_Value(derEncoded: &nodes)
             let width_y_component: Geo_Gr_Presentation_Attributes_VDC_Value = try Geo_Gr_Presentation_Attributes_VDC_Value(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Filled_Area_Rendition_pattern_size_Sequence(height_x_component: height_x_component, height_y_component: height_y_component, width_x_component: width_x_component, width_y_component: width_y_component)
         }
     }
@@ -31,6 +33,7 @@ import Foundation
             try coder.serialize(height_y_component)
             try coder.serialize(width_x_component)
             try coder.serialize(width_y_component)
+
         }
     }
 }

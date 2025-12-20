@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ExtendedSecurityServices_2009_ESSCertID: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ExtendedSecurityServices_2009_ESSCertID: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var certHash: ExtendedSecurityServices_2009_Hash
     @usableFromInline var issuerSerial: AuthenticationFramework_IssuerSerial?
     @inlinable init(certHash: ExtendedSecurityServices_2009_Hash, issuerSerial: AuthenticationFramework_IssuerSerial?) {
         self.certHash = certHash
         self.issuerSerial = issuerSerial
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,6 +20,7 @@ var peek_issuerSerial = nodes
 if let next = peek_issuerSerial.next(), next.identifier == AuthenticationFramework_IssuerSerial.defaultIdentifier {
     issuerSerial = try AuthenticationFramework_IssuerSerial(derEncoded: &nodes)
 }
+
             return ExtendedSecurityServices_2009_ESSCertID(certHash: certHash, issuerSerial: issuerSerial)
         }
     }
@@ -26,7 +28,8 @@ if let next = peek_issuerSerial.next(), next.identifier == AuthenticationFramewo
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(certHash)
-            if let issuerSerial = self.issuerSerial { if let issuerSerial = self.issuerSerial { try coder.serialize(issuerSerial) } }
+            if let issuerSerial = self.issuerSerial { try coder.serialize(issuerSerial) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CHAT_FileDesc: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CHAT_FileDesc: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var id: ASN1OctetString
     @usableFromInline var mime: ASN1OctetString
@@ -15,6 +15,7 @@ import Foundation
         self.payload = payload
         self.parentid = parentid
         self.data = data
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,6 +25,7 @@ import Foundation
             let payload: ASN1Any = try ASN1Any(derEncoded: &nodes)
             let parentid: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let data: [CHAT_Feature] = try DER.sequence(of: CHAT_Feature.self, identifier: .sequence, nodes: &nodes)
+
             return CHAT_FileDesc(id: id, mime: mime, payload: payload, parentid: parentid, data: data)
         }
     }
@@ -35,6 +37,7 @@ import Foundation
             try coder.serialize(payload)
             try coder.serialize(parentid)
             try coder.serializeSequenceOf(data)
+
         }
     }
 }

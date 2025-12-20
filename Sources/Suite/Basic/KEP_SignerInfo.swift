@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_SignerInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_SignerInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: KEP_CMSVersion
     @usableFromInline var sid: KEP_SignerIdentifier
@@ -19,6 +19,7 @@ import Foundation
         self.signatureAlgorithm = signatureAlgorithm
         self.signature = signature
         self.unsignedAttrs = unsignedAttrs
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -30,6 +31,7 @@ import Foundation
             let signatureAlgorithm: KEP_SignatureAlgorithmIdentifier = try KEP_SignatureAlgorithmIdentifier(derEncoded: &nodes)
             let signature: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let unsignedAttrs: KEP_UnsignedAttributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return KEP_SignerInfo(version: version, sid: sid, digestAlgorithm: digestAlgorithm, signedAttrs: signedAttrs, signatureAlgorithm: signatureAlgorithm, signature: signature, unsignedAttrs: unsignedAttrs)
         }
     }
@@ -39,10 +41,11 @@ import Foundation
             try coder.serialize(version)
             try coder.serialize(sid)
             try coder.serialize(digestAlgorithm)
-            if let signedAttrs = self.signedAttrs { if let signedAttrs = self.signedAttrs { try coder.serializeOptionalImplicitlyTagged(signedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let signedAttrs = self.signedAttrs { try coder.serializeOptionalImplicitlyTagged(signedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
             try coder.serialize(signatureAlgorithm)
             try coder.serialize(signature)
-            if let unsignedAttrs = self.unsignedAttrs { if let unsignedAttrs = self.unsignedAttrs { try coder.serializeOptionalImplicitlyTagged(unsignedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let unsignedAttrs = self.unsignedAttrs { try coder.serializeOptionalImplicitlyTagged(unsignedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

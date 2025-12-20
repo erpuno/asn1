@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Explicit88_Validity: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Explicit88_Validity: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var notBefore: PKIX1Explicit88_Time
     @usableFromInline var notAfter: PKIX1Explicit88_Time
     @inlinable init(notBefore: PKIX1Explicit88_Time, notAfter: PKIX1Explicit88_Time) {
         self.notBefore = notBefore
         self.notAfter = notAfter
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let notBefore: PKIX1Explicit88_Time = try PKIX1Explicit88_Time(derEncoded: &nodes)
             let notAfter: PKIX1Explicit88_Time = try PKIX1Explicit88_Time(derEncoded: &nodes)
+
             return PKIX1Explicit88_Validity(notBefore: notBefore, notAfter: notAfter)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(notBefore)
             try coder.serialize(notAfter)
+
         }
     }
 }

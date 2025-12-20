@@ -2,34 +2,35 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum CryptographicMessageSyntax_2009_OriginatorIdentifierOrKey: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum CryptographicMessageSyntax_2009_OriginatorIdentifierOrKey: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case issuerAndSerialNumber(CryptographicMessageSyntax_2009_IssuerAndSerialNumber)
     case subjectKeyIdentifier(CryptographicMessageSyntax_2009_SubjectKeyIdentifier)
     case originatorKey(CryptographicMessageSyntax_2009_OriginatorPublicKey)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case CryptographicMessageSyntax_2009_IssuerAndSerialNumber.defaultIdentifier:
-                self = .issuerAndSerialNumber(try CryptographicMessageSyntax_2009_IssuerAndSerialNumber(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .subjectKeyIdentifier(try CryptographicMessageSyntax_2009_SubjectKeyIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .originatorKey(try CryptographicMessageSyntax_2009_OriginatorPublicKey(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case CryptographicMessageSyntax_2009_IssuerAndSerialNumber.defaultIdentifier:
+            self = .issuerAndSerialNumber(try CryptographicMessageSyntax_2009_IssuerAndSerialNumber(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .subjectKeyIdentifier(try CryptographicMessageSyntax_2009_SubjectKeyIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .originatorKey(try CryptographicMessageSyntax_2009_OriginatorPublicKey(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .issuerAndSerialNumber(let issuerAndSerialNumber):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(issuerAndSerialNumber)
-                                }
-                            } else {
+        case .issuerAndSerialNumber(let issuerAndSerialNumber):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(issuerAndSerialNumber)
                             }
-            case .subjectKeyIdentifier(let subjectKeyIdentifier): try subjectKeyIdentifier.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .originatorKey(let originatorKey): try originatorKey.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+                        } else {
+                            try coder.serialize(issuerAndSerialNumber)
+                        }
+        case .subjectKeyIdentifier(let subjectKeyIdentifier): try subjectKeyIdentifier.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+        case .originatorKey(let originatorKey): try originatorKey.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
         }
     }
 

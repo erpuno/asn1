@@ -2,23 +2,31 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum PKIXCRMF_2009_POPOSigningKeyInput_authInfo_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum PKIXCRMF_2009_POPOSigningKeyInput_authInfo_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case sender(PKIX1Implicit88_GeneralName)
     case publicKeyMAC(PKIXCRMF_2009_PKMACValue)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .sender(try PKIX1Implicit88_GeneralName(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .application):
-                self = .publicKeyMAC(try PKIXCRMF_2009_PKMACValue(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .sender(try PKIX1Implicit88_GeneralName(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case PKIXCRMF_2009_PKMACValue.defaultIdentifier:
+            self = .publicKeyMAC(try PKIXCRMF_2009_PKMACValue(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .sender(let sender): try sender.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .publicKeyMAC(let publicKeyMAC): try publicKeyMAC.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .application))
+        case .sender(let sender): try sender.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+        case .publicKeyMAC(let publicKeyMAC):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(publicKeyMAC)
+                            }
+                        } else {
+                            try coder.serialize(publicKeyMAC)
+                        }
+
         }
     }
 

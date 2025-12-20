@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct Location_Expressions_Constituent_Type: DERImplicitlyTaggable, Hashable, Sendable, RawRepresentable {
+public struct Location_Expressions_Constituent_Type: DERImplicitlyTaggable, Sendable, RawRepresentable {
     public static var defaultIdentifier: ASN1Identifier { .enumerated }
     public var rawValue: Int
     public init(rawValue: Int) { self.rawValue = rawValue }

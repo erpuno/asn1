@@ -2,4 +2,4 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline typealias LDAP_DelRequest = LDAP_LDAPDN
+@usableFromInline typealias LDAP_DelRequest = LDAP_DN

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Text_Rendition_text_bundle_specifications_Sequence_text_bundle_representation_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Text_Rendition_text_bundle_specifications_Sequence_text_bundle_representation_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var text_font_index: ArraySlice<UInt8>
     @usableFromInline var text_precision: Geo_Gr_Presentation_Attributes_Text_Rendition_text_bundle_specifications_Sequence_text_bundle_representation_Sequence_text_precision_Enum
@@ -15,6 +15,7 @@ import Foundation
         self.character_expansion_factor = character_expansion_factor
         self.character_spacing = character_spacing
         self.text_colour = text_colour
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,6 +25,7 @@ import Foundation
             let character_expansion_factor: ASN1Any = try ASN1Any(derEncoded: &nodes)
             let character_spacing: ASN1Any = try ASN1Any(derEncoded: &nodes)
             let text_colour: Geo_Gr_Presentation_Attributes_Colour = try Geo_Gr_Presentation_Attributes_Colour(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Text_Rendition_text_bundle_specifications_Sequence_text_bundle_representation_Sequence(text_font_index: text_font_index, text_precision: text_precision, character_expansion_factor: character_expansion_factor, character_spacing: character_spacing, text_colour: text_colour)
         }
     }
@@ -35,6 +37,7 @@ import Foundation
             try coder.serialize(character_expansion_factor)
             try coder.serialize(character_spacing)
             try coder.serialize(text_colour)
+
         }
     }
 }

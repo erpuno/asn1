@@ -2,26 +2,28 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct LDAP_Control: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct LDAP_Control: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var controlType: LDAP_LDAPOID
+    @usableFromInline var controlType: LDAP_OID
     @usableFromInline var criticality: Bool?
     @usableFromInline var controlValue: ASN1OctetString?
-    @inlinable init(controlType: LDAP_LDAPOID, criticality: Bool?, controlValue: ASN1OctetString?) {
+    @inlinable init(controlType: LDAP_OID, criticality: Bool?, controlValue: ASN1OctetString?) {
         self.controlType = controlType
         self.criticality = criticality
         self.controlValue = controlValue
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let controlType: LDAP_LDAPOID = try LDAP_LDAPOID(derEncoded: &nodes)
+            let controlType: LDAP_OID = try LDAP_OID(derEncoded: &nodes)
             let criticality: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
             var controlValue: ASN1OctetString? = nil
 var peek_controlValue = nodes
 if let next = peek_controlValue.next(), next.identifier == ASN1OctetString.defaultIdentifier {
     controlValue = try ASN1OctetString(derEncoded: &nodes)
 }
+
             return LDAP_Control(controlType: controlType, criticality: criticality, controlValue: controlValue)
         }
     }
@@ -29,8 +31,9 @@ if let next = peek_controlValue.next(), next.identifier == ASN1OctetString.defau
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(controlType)
-            if let criticality = self.criticality { if let criticality = self.criticality { try coder.serialize(criticality) } }
-            if let controlValue = self.controlValue { if let controlValue = self.controlValue { try coder.serialize(controlValue) } }
+            if let criticality = self.criticality { try coder.serialize(criticality) }
+            if let controlValue = self.controlValue { try coder.serialize(controlValue) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Edge_Rendition: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Edge_Rendition: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var edge_width_spec_mode: Geo_Gr_Presentation_Attributes_SpecificationMode?
     @usableFromInline var edge_visibility: Geo_Gr_Presentation_Attributes_On_or_Off?
@@ -21,6 +21,7 @@ import Foundation
         self.edge_colour = edge_colour
         self.edge_aspect_source_flags = edge_aspect_source_flags
         self.edge_bundle_specifications = edge_bundle_specifications
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -33,20 +34,22 @@ import Foundation
             let edge_colour: Geo_Gr_Presentation_Attributes_Colour? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
             let edge_aspect_source_flags: Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_aspect_source_flags_Sequence? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
             let edge_bundle_specifications: [Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_bundle_specifications_Sequence]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 7, tagClass: .contextSpecific) { node in try DER.sequence(of: Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_bundle_specifications_Sequence.self, identifier: node.identifier, rootNode: node) }
+
             return Geo_Gr_Presentation_Attributes_Edge_Rendition(edge_width_spec_mode: edge_width_spec_mode, edge_visibility: edge_visibility, edge_bundle_index: edge_bundle_index, edge_type: edge_type, edge_width: edge_width, edge_colour: edge_colour, edge_aspect_source_flags: edge_aspect_source_flags, edge_bundle_specifications: edge_bundle_specifications)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let edge_width_spec_mode = self.edge_width_spec_mode { if let edge_width_spec_mode = self.edge_width_spec_mode { try coder.serializeOptionalImplicitlyTagged(edge_width_spec_mode, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let edge_visibility = self.edge_visibility { if let edge_visibility = self.edge_visibility { try coder.serializeOptionalImplicitlyTagged(edge_visibility, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let edge_bundle_index = self.edge_bundle_index { if let edge_bundle_index = self.edge_bundle_index { try coder.serializeOptionalImplicitlyTagged(edge_bundle_index, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let edge_type = self.edge_type { if let edge_type = self.edge_type { try coder.serializeOptionalImplicitlyTagged(edge_type, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let edge_width = self.edge_width { if let edge_width = self.edge_width { try coder.serializeOptionalImplicitlyTagged(edge_width, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let edge_colour = self.edge_colour { if let edge_colour = self.edge_colour { try coder.serializeOptionalImplicitlyTagged(edge_colour, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let edge_aspect_source_flags = self.edge_aspect_source_flags { if let edge_aspect_source_flags = self.edge_aspect_source_flags { try coder.serializeOptionalImplicitlyTagged(edge_aspect_source_flags, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let edge_bundle_specifications = self.edge_bundle_specifications { if let edge_bundle_specifications = self.edge_bundle_specifications { try coder.serializeSequenceOf(edge_bundle_specifications, identifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) } }
+            if let edge_width_spec_mode = self.edge_width_spec_mode { try coder.serializeOptionalImplicitlyTagged(edge_width_spec_mode, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let edge_visibility = self.edge_visibility { try coder.serializeOptionalImplicitlyTagged(edge_visibility, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let edge_bundle_index = self.edge_bundle_index { try coder.serializeOptionalImplicitlyTagged(edge_bundle_index, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let edge_type = self.edge_type { try coder.serializeOptionalImplicitlyTagged(edge_type, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let edge_width = self.edge_width { try coder.serializeOptionalImplicitlyTagged(edge_width, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let edge_colour = self.edge_colour { try coder.serializeOptionalImplicitlyTagged(edge_colour, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let edge_aspect_source_flags = self.edge_aspect_source_flags { try coder.serializeOptionalImplicitlyTagged(edge_aspect_source_flags, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+            if let edge_bundle_specifications = self.edge_bundle_specifications { try coder.serializeSequenceOf(edge_bundle_specifications, identifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) }
+
         }
     }
 }

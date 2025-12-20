@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SelectedAttributeTypes_TelexNumber: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SelectedAttributeTypes_TelexNumber: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var telexNumber: ASN1PrintableString
     @usableFromInline var countryCode: ASN1PrintableString
@@ -11,6 +11,7 @@ import Foundation
         self.telexNumber = telexNumber
         self.countryCode = countryCode
         self.answerback = answerback
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let telexNumber: ASN1PrintableString = try ASN1PrintableString(derEncoded: &nodes)
             let countryCode: ASN1PrintableString = try ASN1PrintableString(derEncoded: &nodes)
             let answerback: ASN1PrintableString = try ASN1PrintableString(derEncoded: &nodes)
+
             return SelectedAttributeTypes_TelexNumber(telexNumber: telexNumber, countryCode: countryCode, answerback: answerback)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(telexNumber)
             try coder.serialize(countryCode)
             try coder.serialize(answerback)
+
         }
     }
 }

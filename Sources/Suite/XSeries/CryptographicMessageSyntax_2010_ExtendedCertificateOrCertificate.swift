@@ -2,30 +2,31 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum CryptographicMessageSyntax_2010_ExtendedCertificateOrCertificate: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum CryptographicMessageSyntax_2010_ExtendedCertificateOrCertificate: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case certificate(AuthenticationFramework_Certificate)
     case extendedCertificate(CryptographicMessageSyntax_2010_ExtendedCertificate)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case AuthenticationFramework_Certificate.defaultIdentifier:
-                self = .certificate(try AuthenticationFramework_Certificate(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .extendedCertificate(try CryptographicMessageSyntax_2010_ExtendedCertificate(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case AuthenticationFramework_Certificate.defaultIdentifier:
+            self = .certificate(try AuthenticationFramework_Certificate(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .extendedCertificate(try CryptographicMessageSyntax_2010_ExtendedCertificate(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .certificate(let certificate):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(certificate)
-                                }
-                            } else {
+        case .certificate(let certificate):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(certificate)
                             }
-            case .extendedCertificate(let extendedCertificate): try extendedCertificate.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+                        } else {
+                            try coder.serialize(certificate)
+                        }
+        case .extendedCertificate(let extendedCertificate): try extendedCertificate.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+
         }
     }
 

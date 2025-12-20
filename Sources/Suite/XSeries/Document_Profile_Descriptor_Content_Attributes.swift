@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Content_Attributes: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Content_Attributes: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var document_size: ArraySlice<UInt8>?
     @usableFromInline var number_of_pages: ArraySlice<UInt8>?
@@ -11,6 +11,7 @@ import Foundation
         self.document_size = document_size
         self.number_of_pages = number_of_pages
         self.languages = languages
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let document_size: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let number_of_pages: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let languages: [Document_Profile_Descriptor_Character_Data]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in try DER.set(of: Document_Profile_Descriptor_Character_Data.self, identifier: node.identifier, rootNode: node) }
+
             return Document_Profile_Descriptor_Content_Attributes(document_size: document_size, number_of_pages: number_of_pages, languages: languages)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let document_size = self.document_size { if let document_size = self.document_size { try coder.serializeOptionalImplicitlyTagged(document_size, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let number_of_pages = self.number_of_pages { if let number_of_pages = self.number_of_pages { try coder.serializeOptionalImplicitlyTagged(number_of_pages, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let languages = self.languages { if let languages = self.languages { try coder.serializeSetOf(languages, identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
+            if let document_size = self.document_size { try coder.serializeOptionalImplicitlyTagged(document_size, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let number_of_pages = self.number_of_pages { try coder.serializeOptionalImplicitlyTagged(number_of_pages, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let languages = self.languages { try coder.serializeSetOf(languages, identifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+
         }
     }
 }

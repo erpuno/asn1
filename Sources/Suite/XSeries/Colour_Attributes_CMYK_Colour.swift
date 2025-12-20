@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_CMYK_Colour: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_CMYK_Colour: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var c_value: Colour_Attributes_Real_Or_Int
     @usableFromInline var m_value: Colour_Attributes_Real_Or_Int
@@ -13,6 +13,7 @@ import Foundation
         self.m_value = m_value
         self.y_value = y_value
         self.k_value = k_value
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let m_value: Colour_Attributes_Real_Or_Int = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try Colour_Attributes_Real_Or_Int(derEncoded: node) }
             let y_value: Colour_Attributes_Real_Or_Int = try DER.explicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try Colour_Attributes_Real_Or_Int(derEncoded: node) }
             let k_value: Colour_Attributes_Real_Or_Int? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try Colour_Attributes_Real_Or_Int(derEncoded: node) }
+
             return Colour_Attributes_CMYK_Colour(c_value: c_value, m_value: m_value, y_value: y_value, k_value: k_value)
         }
     }
@@ -30,7 +32,8 @@ import Foundation
             try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(c_value) }
             try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(m_value) }
             try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(y_value) }
-            if let k_value = self.k_value { if let k_value = self.k_value { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(k_value) } } }
+            if let k_value = self.k_value { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(k_value) } }
+
         }
     }
 }

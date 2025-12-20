@@ -2,37 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum CryptographicMessageSyntax_2010_Time: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum CryptographicMessageSyntax_2010_Time: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case utcTime(UTCTime)
     case generalTime(GeneralizedTime)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case UTCTime.defaultIdentifier:
-                self = .utcTime(try UTCTime(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case GeneralizedTime.defaultIdentifier:
-                self = .generalTime(try GeneralizedTime(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case UTCTime.defaultIdentifier:
+            self = .utcTime(try UTCTime(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case GeneralizedTime.defaultIdentifier:
+            self = .generalTime(try GeneralizedTime(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .utcTime(let utcTime):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(utcTime)
-                                }
-                            } else {
+        case .utcTime(let utcTime):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(utcTime)
                             }
-            case .generalTime(let generalTime):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(generalTime)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(utcTime)
+                        }
+        case .generalTime(let generalTime):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(generalTime)
                             }
+                        } else {
+                            try coder.serialize(generalTime)
+                        }
+
         }
     }
 

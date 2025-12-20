@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_DecryptedPOP: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_DecryptedPOP: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var bodyPartID: EnrollmentMessageSyntax_2009_BodyPartID
     @usableFromInline var thePOPAlgID: AuthenticationFramework_AlgorithmIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.bodyPartID = bodyPartID
         self.thePOPAlgID = thePOPAlgID
         self.thePOP = thePOP
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let bodyPartID: EnrollmentMessageSyntax_2009_BodyPartID = try EnrollmentMessageSyntax_2009_BodyPartID(derEncoded: &nodes)
             let thePOPAlgID: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let thePOP: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return EnrollmentMessageSyntax_2009_DecryptedPOP(bodyPartID: bodyPartID, thePOPAlgID: thePOPAlgID, thePOP: thePOP)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(bodyPartID)
             try coder.serialize(thePOPAlgID)
             try coder.serialize(thePOP)
+
         }
     }
 }

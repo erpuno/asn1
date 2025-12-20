@@ -2,37 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum ExtendedSecurityServices_2009_EntityIdentifier: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum ExtendedSecurityServices_2009_EntityIdentifier: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case issuerAndSerialNumber(CryptographicMessageSyntax_2010_IssuerAndSerialNumber)
     case subjectKeyIdentifier(CryptographicMessageSyntax_2010_SubjectKeyIdentifier)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case CryptographicMessageSyntax_2010_IssuerAndSerialNumber.defaultIdentifier:
-                self = .issuerAndSerialNumber(try CryptographicMessageSyntax_2010_IssuerAndSerialNumber(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case CryptographicMessageSyntax_2010_SubjectKeyIdentifier.defaultIdentifier:
-                self = .subjectKeyIdentifier(try CryptographicMessageSyntax_2010_SubjectKeyIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case CryptographicMessageSyntax_2010_IssuerAndSerialNumber.defaultIdentifier:
+            self = .issuerAndSerialNumber(try CryptographicMessageSyntax_2010_IssuerAndSerialNumber(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case CryptographicMessageSyntax_2010_SubjectKeyIdentifier.defaultIdentifier:
+            self = .subjectKeyIdentifier(try CryptographicMessageSyntax_2010_SubjectKeyIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .issuerAndSerialNumber(let issuerAndSerialNumber):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(issuerAndSerialNumber)
-                                }
-                            } else {
+        case .issuerAndSerialNumber(let issuerAndSerialNumber):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(issuerAndSerialNumber)
                             }
-            case .subjectKeyIdentifier(let subjectKeyIdentifier):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(subjectKeyIdentifier)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(issuerAndSerialNumber)
+                        }
+        case .subjectKeyIdentifier(let subjectKeyIdentifier):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(subjectKeyIdentifier)
                             }
+                        } else {
+                            try coder.serialize(subjectKeyIdentifier)
+                        }
+
         }
     }
 

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Explicit88_BuiltInStandardAttributes: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Explicit88_BuiltInStandardAttributes: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var country_name: PKIX1Explicit88_CountryName?
     @usableFromInline var administration_domain_name: PKIX1Explicit88_AdministrationDomainName?
@@ -23,6 +23,7 @@ import Foundation
         self.numeric_user_identifier = numeric_user_identifier
         self.personal_name = personal_name
         self.organizational_unit_names = organizational_unit_names
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -44,21 +45,23 @@ if let next = peek_administration_domain_name.next(), next.identifier == PKIX1Ex
             let numeric_user_identifier: PKIX1Explicit88_NumericUserIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
             let personal_name: PKIX1Explicit88_PersonalName? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
             let organizational_unit_names: PKIX1Explicit88_OrganizationalUnitNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
+
             return PKIX1Explicit88_BuiltInStandardAttributes(country_name: country_name, administration_domain_name: administration_domain_name, network_address: network_address, terminal_identifier: terminal_identifier, private_domain_name: private_domain_name, organization_name: organization_name, numeric_user_identifier: numeric_user_identifier, personal_name: personal_name, organizational_unit_names: organizational_unit_names)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let country_name = self.country_name { if let country_name = self.country_name { try coder.serialize(country_name) } }
-            if let administration_domain_name = self.administration_domain_name { if let administration_domain_name = self.administration_domain_name { try coder.serialize(administration_domain_name) } }
-            if let network_address = self.network_address { if let network_address = self.network_address { try coder.serializeOptionalImplicitlyTagged(network_address, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let terminal_identifier = self.terminal_identifier { if let terminal_identifier = self.terminal_identifier { try coder.serializeOptionalImplicitlyTagged(terminal_identifier, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let private_domain_name = self.private_domain_name { if let private_domain_name = self.private_domain_name { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(private_domain_name) } } }
-            if let organization_name = self.organization_name { if let organization_name = self.organization_name { try coder.serializeOptionalImplicitlyTagged(organization_name, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let numeric_user_identifier = self.numeric_user_identifier { if let numeric_user_identifier = self.numeric_user_identifier { try coder.serializeOptionalImplicitlyTagged(numeric_user_identifier, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let personal_name = self.personal_name { if let personal_name = self.personal_name { try coder.serializeOptionalImplicitlyTagged(personal_name, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let organizational_unit_names = self.organizational_unit_names { if let organizational_unit_names = self.organizational_unit_names { try coder.serializeOptionalImplicitlyTagged(organizational_unit_names, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
+            if let country_name = self.country_name { try coder.serialize(country_name) }
+            if let administration_domain_name = self.administration_domain_name { try coder.serialize(administration_domain_name) }
+            if let network_address = self.network_address { try coder.serializeOptionalImplicitlyTagged(network_address, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let terminal_identifier = self.terminal_identifier { try coder.serializeOptionalImplicitlyTagged(terminal_identifier, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let private_domain_name = self.private_domain_name { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(private_domain_name) } }
+            if let organization_name = self.organization_name { try coder.serializeOptionalImplicitlyTagged(organization_name, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let numeric_user_identifier = self.numeric_user_identifier { try coder.serializeOptionalImplicitlyTagged(numeric_user_identifier, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let personal_name = self.personal_name { try coder.serializeOptionalImplicitlyTagged(personal_name, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let organizational_unit_names = self.organizational_unit_names { try coder.serializeOptionalImplicitlyTagged(organizational_unit_names, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+
         }
     }
 }

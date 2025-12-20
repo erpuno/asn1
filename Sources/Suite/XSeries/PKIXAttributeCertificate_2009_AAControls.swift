@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXAttributeCertificate_2009_AAControls: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXAttributeCertificate_2009_AAControls: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var pathLenConstraint: ArraySlice<UInt8>?
     @usableFromInline var permittedAttrs: PKIXAttributeCertificate_2009_AttrSpec?
@@ -13,6 +13,7 @@ import Foundation
         self.permittedAttrs = permittedAttrs
         self.excludedAttrs = excludedAttrs
         self.permitUnSpecified = permitUnSpecified
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -25,16 +26,18 @@ if let next = peek_pathLenConstraint.next(), next.identifier == ArraySlice<UInt8
             let permittedAttrs: PKIXAttributeCertificate_2009_AttrSpec? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let excludedAttrs: PKIXAttributeCertificate_2009_AttrSpec? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let permitUnSpecified: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
+
             return PKIXAttributeCertificate_2009_AAControls(pathLenConstraint: pathLenConstraint, permittedAttrs: permittedAttrs, excludedAttrs: excludedAttrs, permitUnSpecified: permitUnSpecified)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let pathLenConstraint = self.pathLenConstraint { if let pathLenConstraint = self.pathLenConstraint { try coder.serialize(pathLenConstraint) } }
-            if let permittedAttrs = self.permittedAttrs { if let permittedAttrs = self.permittedAttrs { try coder.serializeOptionalImplicitlyTagged(permittedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let excludedAttrs = self.excludedAttrs { if let excludedAttrs = self.excludedAttrs { try coder.serializeOptionalImplicitlyTagged(excludedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let permitUnSpecified = self.permitUnSpecified { if let permitUnSpecified = self.permitUnSpecified { try coder.serialize(permitUnSpecified) } }
+            if let pathLenConstraint = self.pathLenConstraint { try coder.serialize(pathLenConstraint) }
+            if let permittedAttrs = self.permittedAttrs { try coder.serializeOptionalImplicitlyTagged(permittedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let excludedAttrs = self.excludedAttrs { try coder.serializeOptionalImplicitlyTagged(excludedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let permitUnSpecified = self.permitUnSpecified { try coder.serialize(permitUnSpecified) }
+
         }
     }
 }

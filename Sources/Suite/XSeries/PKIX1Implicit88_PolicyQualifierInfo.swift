@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Implicit88_PolicyQualifierInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Implicit88_PolicyQualifierInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var policyQualifierId: PKIX1Implicit88_PolicyQualifierId
     @usableFromInline var qualifier: ASN1Any
     @inlinable init(policyQualifierId: PKIX1Implicit88_PolicyQualifierId, qualifier: ASN1Any) {
         self.policyQualifierId = policyQualifierId
         self.qualifier = qualifier
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let policyQualifierId: PKIX1Implicit88_PolicyQualifierId = try PKIX1Implicit88_PolicyQualifierId(derEncoded: &nodes)
             let qualifier: ASN1Any = try ASN1Any(derEncoded: &nodes)
+
             return PKIX1Implicit88_PolicyQualifierInfo(policyQualifierId: policyQualifierId, qualifier: qualifier)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(policyQualifierId)
             try coder.serialize(qualifier)
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Priv_Recipients_Info: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Priv_Recipients_Info: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var privileged_recipients: [Document_Profile_Descriptor_Personal_Name]?
     @usableFromInline var encipherment_method_info: Document_Profile_Descriptor_Method_Information?
@@ -11,6 +11,7 @@ import Foundation
         self.privileged_recipients = privileged_recipients
         self.encipherment_method_info = encipherment_method_info
         self.encipherment_key_info = encipherment_key_info
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let privileged_recipients: [Document_Profile_Descriptor_Personal_Name]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in try DER.set(of: Document_Profile_Descriptor_Personal_Name.self, identifier: node.identifier, rootNode: node) }
             let encipherment_method_info: Document_Profile_Descriptor_Method_Information? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let encipherment_key_info: Document_Profile_Descriptor_Key_Information? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return Document_Profile_Descriptor_Priv_Recipients_Info(privileged_recipients: privileged_recipients, encipherment_method_info: encipherment_method_info, encipherment_key_info: encipherment_key_info)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let privileged_recipients = self.privileged_recipients { if let privileged_recipients = self.privileged_recipients { try coder.serializeSetOf(privileged_recipients, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let encipherment_method_info = self.encipherment_method_info { if let encipherment_method_info = self.encipherment_method_info { try coder.serializeOptionalImplicitlyTagged(encipherment_method_info, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let encipherment_key_info = self.encipherment_key_info { if let encipherment_key_info = self.encipherment_key_info { try coder.serializeOptionalImplicitlyTagged(encipherment_key_info, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let privileged_recipients = self.privileged_recipients { try coder.serializeSetOf(privileged_recipients, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let encipherment_method_info = self.encipherment_method_info { try coder.serializeOptionalImplicitlyTagged(encipherment_method_info, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let encipherment_key_info = self.encipherment_key_info { try coder.serializeOptionalImplicitlyTagged(encipherment_key_info, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

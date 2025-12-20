@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CMSECCAlgs_2009_02_MQVuserKeyingMaterial: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CMSECCAlgs_2009_02_MQVuserKeyingMaterial: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var ephemeralPublicKey: CryptographicMessageSyntax_2010_OriginatorPublicKey
     @usableFromInline var addedukm: CryptographicMessageSyntax_2010_UserKeyingMaterial?
     @inlinable init(ephemeralPublicKey: CryptographicMessageSyntax_2010_OriginatorPublicKey, addedukm: CryptographicMessageSyntax_2010_UserKeyingMaterial?) {
         self.ephemeralPublicKey = ephemeralPublicKey
         self.addedukm = addedukm
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let ephemeralPublicKey: CryptographicMessageSyntax_2010_OriginatorPublicKey = try CryptographicMessageSyntax_2010_OriginatorPublicKey(derEncoded: &nodes)
             let addedukm: CryptographicMessageSyntax_2010_UserKeyingMaterial? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try CryptographicMessageSyntax_2010_UserKeyingMaterial(derEncoded: node) }
+
             return CMSECCAlgs_2009_02_MQVuserKeyingMaterial(ephemeralPublicKey: ephemeralPublicKey, addedukm: addedukm)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(ephemeralPublicKey)
-            if let addedukm = self.addedukm { if let addedukm = self.addedukm { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(addedukm) } } }
+            if let addedukm = self.addedukm { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(addedukm) } }
+
         }
     }
 }

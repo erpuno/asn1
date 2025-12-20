@@ -2,16 +2,18 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_ControlsProcessed: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_ControlsProcessed: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var bodyList: [EnrollmentMessageSyntax_2009_BodyPartReference]
     @inlinable init(bodyList: [EnrollmentMessageSyntax_2009_BodyPartReference]) {
         self.bodyList = bodyList
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let bodyList: [EnrollmentMessageSyntax_2009_BodyPartReference] = try DER.sequence(of: EnrollmentMessageSyntax_2009_BodyPartReference.self, identifier: .sequence, nodes: &nodes)
+
             return EnrollmentMessageSyntax_2009_ControlsProcessed(bodyList: bodyList)
         }
     }
@@ -19,6 +21,7 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeSequenceOf(bodyList)
+
         }
     }
 }

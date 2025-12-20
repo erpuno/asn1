@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_VDC_Pair: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_VDC_Pair: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var x: Geo_Gr_Presentation_Attributes_VDC_Value
     @usableFromInline var y: Geo_Gr_Presentation_Attributes_VDC_Value
     @inlinable init(x: Geo_Gr_Presentation_Attributes_VDC_Value, y: Geo_Gr_Presentation_Attributes_VDC_Value) {
         self.x = x
         self.y = y
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let x: Geo_Gr_Presentation_Attributes_VDC_Value = try Geo_Gr_Presentation_Attributes_VDC_Value(derEncoded: &nodes)
             let y: Geo_Gr_Presentation_Attributes_VDC_Value = try Geo_Gr_Presentation_Attributes_VDC_Value(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_VDC_Pair(x: x, y: y)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(x)
             try coder.serialize(y)
+
         }
     }
 }

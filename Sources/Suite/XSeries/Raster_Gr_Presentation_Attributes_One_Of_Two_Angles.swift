@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct Raster_Gr_Presentation_Attributes_One_Of_Two_Angles : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct Raster_Gr_Presentation_Attributes_One_Of_Two_Angles : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: Raster_Gr_Presentation_Attributes_One_Of_Two_Angles, rhs: Raster_Gr_Presentation_Attributes_One_Of_Two_Angles) -> Bool { lhs.rawValue < rhs.rawValue }

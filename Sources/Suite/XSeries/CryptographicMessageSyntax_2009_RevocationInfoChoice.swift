@@ -2,32 +2,32 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum CryptographicMessageSyntax_2009_RevocationInfoChoice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum CryptographicMessageSyntax_2009_RevocationInfoChoice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case crl(AuthenticationFramework_CertificateList)
     case other(CryptographicMessageSyntax_2009_OtherRevocationInfoFormat)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case AuthenticationFramework_CertificateList.defaultIdentifier:
-                self = .crl(try AuthenticationFramework_CertificateList(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case AuthenticationFramework_CertificateList.defaultIdentifier:
+            self = .crl(try AuthenticationFramework_CertificateList(derEncoded: rootNode, withIdentifier: rootNode.identifier))
 
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .other(try CryptographicMessageSyntax_2009_OtherRevocationInfoFormat(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .other(try CryptographicMessageSyntax_2009_OtherRevocationInfoFormat(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .crl(let crl):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(crl)
-                                }
-                            } else {
+        case .crl(let crl):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(crl)
                             }
+                        } else {
+                            try coder.serialize(crl)
+                        }
+        case .other(let other): try other.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
 
-            case .other(let other): try other.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
         }
     }
 

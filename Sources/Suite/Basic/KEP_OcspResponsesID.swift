@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_OcspResponsesID: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_OcspResponsesID: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var ocspIdentifier: KEP_OcspIdentifier
     @usableFromInline var ocspRepHash: KEP_OtherHash?
     @inlinable init(ocspIdentifier: KEP_OcspIdentifier, ocspRepHash: KEP_OtherHash?) {
         self.ocspIdentifier = ocspIdentifier
         self.ocspRepHash = ocspRepHash
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,6 +20,7 @@ var peek_ocspRepHash = nodes
 if let next = peek_ocspRepHash.next(), next.identifier == KEP_OtherHash.defaultIdentifier {
     ocspRepHash = try KEP_OtherHash(derEncoded: &nodes)
 }
+
             return KEP_OcspResponsesID(ocspIdentifier: ocspIdentifier, ocspRepHash: ocspRepHash)
         }
     }
@@ -26,7 +28,8 @@ if let next = peek_ocspRepHash.next(), next.identifier == KEP_OtherHash.defaultI
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(ocspIdentifier)
-            if let ocspRepHash = self.ocspRepHash { if let ocspRepHash = self.ocspRepHash { try coder.serialize(ocspRepHash) } }
+            if let ocspRepHash = self.ocspRepHash { try coder.serialize(ocspRepHash) }
+
         }
     }
 }

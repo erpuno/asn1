@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCRMF_2009_CertTemplate: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCRMF_2009_CertTemplate: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: PKIX1Explicit88_Version?
     @usableFromInline var serialNumber: ArraySlice<UInt8>?
@@ -25,6 +25,7 @@ import Foundation
         self.issuerUID = issuerUID
         self.subjectUID = subjectUID
         self.extensions = extensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -39,22 +40,24 @@ import Foundation
             let issuerUID: PKIX1Explicit88_UniqueIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific))
             let subjectUID: PKIX1Explicit88_UniqueIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific))
             let extensions: PKIX1Explicit88_Extensions? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
+
             return PKIXCRMF_2009_CertTemplate(version: version, serialNumber: serialNumber, signingAlg: signingAlg, issuer: issuer, validity: validity, subject: subject, publicKey: publicKey, issuerUID: issuerUID, subjectUID: subjectUID, extensions: extensions)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let version = self.version { if let version = self.version { try coder.serializeOptionalImplicitlyTagged(version, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let serialNumber = self.serialNumber { if let serialNumber = self.serialNumber { try coder.serializeOptionalImplicitlyTagged(serialNumber, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let signingAlg = self.signingAlg { if let signingAlg = self.signingAlg { try coder.serializeOptionalImplicitlyTagged(signingAlg, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let issuer = self.issuer { if let issuer = self.issuer { try coder.serializeOptionalImplicitlyTagged(issuer, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let validity = self.validity { if let validity = self.validity { try coder.serializeOptionalImplicitlyTagged(validity, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let subject = self.subject { if let subject = self.subject { try coder.serializeOptionalImplicitlyTagged(subject, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let publicKey = self.publicKey { if let publicKey = self.publicKey { try coder.serializeOptionalImplicitlyTagged(publicKey, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let issuerUID = self.issuerUID { if let issuerUID = self.issuerUID { try coder.serializeOptionalImplicitlyTagged(issuerUID, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) } }
-            if let subjectUID = self.subjectUID { if let subjectUID = self.subjectUID { try coder.serializeOptionalImplicitlyTagged(subjectUID, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) } }
-            if let extensions = self.extensions { if let extensions = self.extensions { try coder.serializeOptionalImplicitlyTagged(extensions, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) } }
+            if let version = self.version { try coder.serializeOptionalImplicitlyTagged(version, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let serialNumber = self.serialNumber { try coder.serializeOptionalImplicitlyTagged(serialNumber, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let signingAlg = self.signingAlg { try coder.serializeOptionalImplicitlyTagged(signingAlg, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let issuer = self.issuer { try coder.serializeOptionalImplicitlyTagged(issuer, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let validity = self.validity { try coder.serializeOptionalImplicitlyTagged(validity, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let subject = self.subject { try coder.serializeOptionalImplicitlyTagged(subject, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let publicKey = self.publicKey { try coder.serializeOptionalImplicitlyTagged(publicKey, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+            if let issuerUID = self.issuerUID { try coder.serializeOptionalImplicitlyTagged(issuerUID, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) }
+            if let subjectUID = self.subjectUID { try coder.serializeOptionalImplicitlyTagged(subjectUID, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) }
+            if let extensions = self.extensions { try coder.serializeOptionalImplicitlyTagged(extensions, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) }
+
         }
     }
 }

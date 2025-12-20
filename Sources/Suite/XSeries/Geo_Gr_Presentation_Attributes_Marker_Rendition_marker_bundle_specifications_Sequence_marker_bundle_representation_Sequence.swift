@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_bundle_specifications_Sequence_marker_bundle_representation_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_bundle_specifications_Sequence_marker_bundle_representation_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var marker_type: ArraySlice<UInt8>
     @usableFromInline var marker_size: Geo_Gr_Presentation_Attributes_Scaled_or_Absolute
@@ -11,6 +11,7 @@ import Foundation
         self.marker_type = marker_type
         self.marker_size = marker_size
         self.marker_colour = marker_colour
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let marker_type: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let marker_size: Geo_Gr_Presentation_Attributes_Scaled_or_Absolute = try Geo_Gr_Presentation_Attributes_Scaled_or_Absolute(derEncoded: &nodes)
             let marker_colour: Geo_Gr_Presentation_Attributes_Colour = try Geo_Gr_Presentation_Attributes_Colour(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Marker_Rendition_marker_bundle_specifications_Sequence_marker_bundle_representation_Sequence(marker_type: marker_type, marker_size: marker_size, marker_colour: marker_colour)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(marker_type)
             try coder.serialize(marker_size)
             try coder.serialize(marker_colour)
+
         }
     }
 }

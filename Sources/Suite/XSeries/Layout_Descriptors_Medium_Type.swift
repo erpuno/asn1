@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Layout_Descriptors_Medium_Type: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Layout_Descriptors_Medium_Type: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var nominal_page_size: Layout_Descriptors_Measure_Pair?
     @usableFromInline var side_of_sheet: Layout_Descriptors_Medium_Type_side_of_sheet_IntEnum?
@@ -11,6 +11,7 @@ import Foundation
         self.nominal_page_size = nominal_page_size
         self.side_of_sheet = side_of_sheet
         self.colour_of_medium = colour_of_medium
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,15 +23,17 @@ if let next = peek_nominal_page_size.next(), next.identifier == Layout_Descripto
 }
             let side_of_sheet = try Layout_Descriptors_Medium_Type_side_of_sheet_IntEnum(rawValue: Int(derEncoded: &nodes))
             let colour_of_medium: Layout_Descriptors_Colour_Of_Medium? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try Layout_Descriptors_Colour_Of_Medium(derEncoded: node) }
+
             return Layout_Descriptors_Medium_Type(nominal_page_size: nominal_page_size, side_of_sheet: side_of_sheet, colour_of_medium: colour_of_medium)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let nominal_page_size = self.nominal_page_size { if let nominal_page_size = self.nominal_page_size { try coder.serialize(nominal_page_size) } }
-            if let side_of_sheet = self.side_of_sheet { try coder.serialize(side_of_sheet.rawValue) }
-            if let colour_of_medium = self.colour_of_medium { if let colour_of_medium = self.colour_of_medium { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(colour_of_medium) } } }
+            if let nominal_page_size = self.nominal_page_size { try coder.serialize(nominal_page_size) }
+            if let side_of_sheet = self.side_of_sheet { try side_of_sheet.serialize(into: &coder, withIdentifier: identifier) }
+            if let colour_of_medium = self.colour_of_medium { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(colour_of_medium) } }
+
         }
     }
 }

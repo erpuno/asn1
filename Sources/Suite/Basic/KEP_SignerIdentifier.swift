@@ -2,30 +2,31 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum KEP_SignerIdentifier: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum KEP_SignerIdentifier: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case issuerAndSerialNumber(KEP_IssuerAndSerialNumber)
     case subjectKeyIdentifier(KEP_SubjectKeyIdentifier)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case KEP_IssuerAndSerialNumber.defaultIdentifier:
-                self = .issuerAndSerialNumber(try KEP_IssuerAndSerialNumber(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .subjectKeyIdentifier(try KEP_SubjectKeyIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case KEP_IssuerAndSerialNumber.defaultIdentifier:
+            self = .issuerAndSerialNumber(try KEP_IssuerAndSerialNumber(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .subjectKeyIdentifier(try KEP_SubjectKeyIdentifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .issuerAndSerialNumber(let issuerAndSerialNumber):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(issuerAndSerialNumber)
-                                }
-                            } else {
+        case .issuerAndSerialNumber(let issuerAndSerialNumber):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(issuerAndSerialNumber)
                             }
-            case .subjectKeyIdentifier(let subjectKeyIdentifier): try subjectKeyIdentifier.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+                        } else {
+                            try coder.serialize(issuerAndSerialNumber)
+                        }
+        case .subjectKeyIdentifier(let subjectKeyIdentifier): try subjectKeyIdentifier.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+
         }
     }
 

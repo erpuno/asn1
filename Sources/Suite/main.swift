@@ -139,7 +139,7 @@ func pbkdf(password: Data, salt: Data, iterations: Int) -> Data {
     return Data()
 }
 
-#if false
+// #if false
 import Security
 
 // MARK: - Pure Swift CSR Generation (No OpenSSL)
@@ -279,7 +279,7 @@ func buildCSR(subject: String, countryCode: String = "UA", state: String = "Kyiv
     print(": CSR built successfully!")
     return (csr, privateKey)
 }
-#endif
+// #endif
 
 public class Console {
 
@@ -316,7 +316,7 @@ public class Console {
   }
 
   public static func showLDAPMessage(data: Array<UInt8>) throws {
-     let msg: LDAP_LDAPMessage? = try LDAP_LDAPMessage(derEncoded: data)
+     let msg: LDAP_Message? = try LDAP_Message(derEncoded: data)
      var serializer = DER.Serializer()
      try msg!.serialize(into: &serializer)
      print(": LDAPMessage.DER \(data)")
@@ -325,7 +325,7 @@ public class Console {
   }
 
   public static func showCHATMessage(data: Array<UInt8>) throws {
-     let msg: CHAT_CHATMessage? = try CHAT_CHATMessage(derEncoded: data)
+     let msg: CHAT_Message? = try CHAT_Message(derEncoded: data)
      var serializer = DER.Serializer()
      try msg!.serialize(into: &serializer)
      print(": CHATMessage.DER \(data)")
@@ -789,7 +789,7 @@ public class Console {
 
   /// Complete CMP flow with pure Swift CSR generation - NO OpenSSL needed
   /// Generates key pair, builds CSR, sends CMP p10cr request to CA
-  #if false
+  
   public static func generateAndSendCMP(
      subject: String = "swift_robot",
      countryCode: String = "UA",
@@ -991,9 +991,7 @@ public class Console {
             print(": No protection node found")
         }
    }
-   
-   #endif
-
+  
   public static func suite() -> Int32 {
      let argv = CommandLine.arguments
      if argv.count >= 2, argv[1] == "cms" {
@@ -1038,7 +1036,7 @@ public class Console {
        try testCMPWorkflow(csrFile: "dima.csr")
 
        // PURE SWIFT CMP FLOW: Generate CSR and send to ca.synrc.com:8829
-       #if false
+       
        print("\n: Running pure Swift CMP flow to ca.synrc.com:8829...")
        let semaphore = DispatchSemaphore(value: 0)
        Task {
@@ -1049,7 +1047,7 @@ public class Console {
                 state: "Kyiv",
                 org: "SYNRC",
                 server: "localhost",
-                port: 8829,
+                port: 8121,
                 secret: "0000",
                 reference: "cmptestp10cr"
              )
@@ -1060,8 +1058,7 @@ public class Console {
           semaphore.signal()
        }
        _ = semaphore.wait(timeout: .now() + 30)  // Wait up to 30 seconds
-       #endif
-
+       
        print(": PASSED")
 
        try showDirectoryString(data: [19,3,49,50,51])

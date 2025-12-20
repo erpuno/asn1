@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_AttributeTypeAndValue: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_AttributeTypeAndValue: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var type: InformationFramework_AttributeTypeX
     @usableFromInline var value: InformationFramework_AttributeValueX
     @inlinable init(type: InformationFramework_AttributeTypeX, value: InformationFramework_AttributeValueX) {
         self.type = type
         self.value = value
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let type: InformationFramework_AttributeTypeX = try InformationFramework_AttributeTypeX(derEncoded: &nodes)
             let value: InformationFramework_AttributeValueX = try InformationFramework_AttributeValueX(derEncoded: &nodes)
+
             return InformationFramework_AttributeTypeAndValue(type: type, value: value)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(type)
             try coder.serialize(value)
+
         }
     }
 }

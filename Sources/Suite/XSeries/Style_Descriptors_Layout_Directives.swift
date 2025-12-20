@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Style_Descriptors_Layout_Directives: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Style_Descriptors_Layout_Directives: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var indivisibility: Style_Descriptors_Layout_Directives_indivisibility_Choice?
     @usableFromInline var separation: Style_Descriptors_Separation?
@@ -33,6 +33,7 @@ import Foundation
         self.synchronization = synchronization
         self.block_alignment = block_alignment
         self.floatability_range = floatability_range
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -63,26 +64,28 @@ if let next = peek_synchronization.next(), next.identifier == Style_Descriptors_
 }
             let block_alignment: Style_Descriptors_Block_Alignment? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific))
             let floatability_range: Style_Descriptors_Floatability_Range? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific))
+
             return Style_Descriptors_Layout_Directives(indivisibility: indivisibility, separation: separation, offset: offset, fill_order: fill_order, concatenation: concatenation, new_layout_object: new_layout_object, same_layout_object: same_layout_object, layout_object_class: layout_object_class, logical_stream_category: logical_stream_category, logical_stream_sub_category: logical_stream_sub_category, layout_category: layout_category, synchronization: synchronization, block_alignment: block_alignment, floatability_range: floatability_range)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let indivisibility = self.indivisibility { if let indivisibility = self.indivisibility { try coder.serialize(indivisibility) } }
-            if let separation = self.separation { if let separation = self.separation { try coder.serializeOptionalImplicitlyTagged(separation, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let offset = self.offset { if let offset = self.offset { try coder.serializeOptionalImplicitlyTagged(offset, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let fill_order = self.fill_order { if let fill_order = self.fill_order { try coder.serializeOptionalImplicitlyTagged(fill_order, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let concatenation = self.concatenation { if let concatenation = self.concatenation { try coder.serializeOptionalImplicitlyTagged(concatenation, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let new_layout_object = self.new_layout_object { if let new_layout_object = self.new_layout_object { try coder.serialize(new_layout_object) } }
-            if let same_layout_object = self.same_layout_object { if let same_layout_object = self.same_layout_object { try coder.serializeOptionalImplicitlyTagged(same_layout_object, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) } }
-            if let layout_object_class = self.layout_object_class { if let layout_object_class = self.layout_object_class { try coder.serializeOptionalImplicitlyTagged(layout_object_class, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) } }
-            if let logical_stream_category = self.logical_stream_category { if let logical_stream_category = self.logical_stream_category { try coder.serializeOptionalImplicitlyTagged(logical_stream_category, withIdentifier: ASN1Identifier(tagWithNumber: 19, tagClass: .contextSpecific)) } }
-            if let logical_stream_sub_category = self.logical_stream_sub_category { if let logical_stream_sub_category = self.logical_stream_sub_category { try coder.serializeOptionalImplicitlyTagged(logical_stream_sub_category, withIdentifier: ASN1Identifier(tagWithNumber: 20, tagClass: .contextSpecific)) } }
-            if let layout_category = self.layout_category { if let layout_category = self.layout_category { try coder.serializeOptionalImplicitlyTagged(layout_category, withIdentifier: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific)) } }
-            if let synchronization = self.synchronization { if let synchronization = self.synchronization { try coder.serialize(synchronization) } }
-            if let block_alignment = self.block_alignment { if let block_alignment = self.block_alignment { try coder.serializeOptionalImplicitlyTagged(block_alignment, withIdentifier: ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific)) } }
-            if let floatability_range = self.floatability_range { if let floatability_range = self.floatability_range { try coder.serializeOptionalImplicitlyTagged(floatability_range, withIdentifier: ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific)) } }
+            if let indivisibility = self.indivisibility { try coder.serialize(indivisibility) }
+            if let separation = self.separation { try coder.serializeOptionalImplicitlyTagged(separation, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let offset = self.offset { try coder.serializeOptionalImplicitlyTagged(offset, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let fill_order = self.fill_order { try coder.serializeOptionalImplicitlyTagged(fill_order, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let concatenation = self.concatenation { try coder.serializeOptionalImplicitlyTagged(concatenation, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+            if let new_layout_object = self.new_layout_object { try coder.serialize(new_layout_object) }
+            if let same_layout_object = self.same_layout_object { try coder.serializeOptionalImplicitlyTagged(same_layout_object, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) }
+            if let layout_object_class = self.layout_object_class { try coder.serializeOptionalImplicitlyTagged(layout_object_class, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) }
+            if let logical_stream_category = self.logical_stream_category { try coder.serializeOptionalImplicitlyTagged(logical_stream_category, withIdentifier: ASN1Identifier(tagWithNumber: 19, tagClass: .contextSpecific)) }
+            if let logical_stream_sub_category = self.logical_stream_sub_category { try coder.serializeOptionalImplicitlyTagged(logical_stream_sub_category, withIdentifier: ASN1Identifier(tagWithNumber: 20, tagClass: .contextSpecific)) }
+            if let layout_category = self.layout_category { try coder.serializeOptionalImplicitlyTagged(layout_category, withIdentifier: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific)) }
+            if let synchronization = self.synchronization { try coder.serialize(synchronization) }
+            if let block_alignment = self.block_alignment { try coder.serializeOptionalImplicitlyTagged(block_alignment, withIdentifier: ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific)) }
+            if let floatability_range = self.floatability_range { try coder.serializeOptionalImplicitlyTagged(floatability_range, withIdentifier: ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific)) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCRMF_2009_CertReqMsg: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCRMF_2009_CertReqMsg: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var certReq: PKIXCRMF_2009_CertRequest
     @usableFromInline var popo: PKIXCRMF_2009_ProofOfPossession?
@@ -11,6 +11,7 @@ import Foundation
         self.certReq = certReq
         self.popo = popo
         self.regInfo = regInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ if let next = peek_popo.next(), next.identifier == PKIXCRMF_2009_ProofOfPossessi
     popo = try PKIXCRMF_2009_ProofOfPossession(derEncoded: &nodes)
 }
             let regInfo: [PKIX_CommonTypes_2009_SingleAttribute]? = try DER.sequence(of: PKIX_CommonTypes_2009_SingleAttribute.self, identifier: .sequence, nodes: &nodes)
+
             return PKIXCRMF_2009_CertReqMsg(certReq: certReq, popo: popo, regInfo: regInfo)
         }
     }
@@ -29,8 +31,9 @@ if let next = peek_popo.next(), next.identifier == PKIXCRMF_2009_ProofOfPossessi
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(certReq)
-            if let popo = self.popo { if let popo = self.popo { try coder.serialize(popo) } }
-            if let regInfo = self.regInfo { if let regInfo = self.regInfo { try coder.serializeSequenceOf(regInfo) } }
+            if let popo = self.popo { try coder.serialize(popo) }
+            if let regInfo = self.regInfo { try coder.serializeSequenceOf(regInfo) }
+
         }
     }
 }

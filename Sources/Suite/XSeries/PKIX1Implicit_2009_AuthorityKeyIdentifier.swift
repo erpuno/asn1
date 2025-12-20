@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Implicit_2009_AuthorityKeyIdentifier: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Implicit_2009_AuthorityKeyIdentifier: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var keyIdentifier: PKIX1Implicit_2009_KeyIdentifier?
     @usableFromInline var authorityCertIssuer: PKIX1Implicit_2009_GeneralNames?
@@ -11,6 +11,7 @@ import Foundation
         self.keyIdentifier = keyIdentifier
         self.authorityCertIssuer = authorityCertIssuer
         self.authorityCertSerialNumber = authorityCertSerialNumber
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let keyIdentifier: PKIX1Implicit_2009_KeyIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let authorityCertIssuer: PKIX1Implicit_2009_GeneralNames? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let authorityCertSerialNumber: PKIX1Explicit88_CertificateSerialNumber? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return PKIX1Implicit_2009_AuthorityKeyIdentifier(keyIdentifier: keyIdentifier, authorityCertIssuer: authorityCertIssuer, authorityCertSerialNumber: authorityCertSerialNumber)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let keyIdentifier = self.keyIdentifier { if let keyIdentifier = self.keyIdentifier { try coder.serializeOptionalImplicitlyTagged(keyIdentifier, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let authorityCertIssuer = self.authorityCertIssuer { if let authorityCertIssuer = self.authorityCertIssuer { try coder.serializeOptionalImplicitlyTagged(authorityCertIssuer, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let authorityCertSerialNumber = self.authorityCertSerialNumber { if let authorityCertSerialNumber = self.authorityCertSerialNumber { try coder.serializeOptionalImplicitlyTagged(authorityCertSerialNumber, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let keyIdentifier = self.keyIdentifier { try coder.serializeOptionalImplicitlyTagged(keyIdentifier, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let authorityCertIssuer = self.authorityCertIssuer { try coder.serializeOptionalImplicitlyTagged(authorityCertIssuer, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let authorityCertSerialNumber = self.authorityCertSerialNumber { try coder.serializeOptionalImplicitlyTagged(authorityCertSerialNumber, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

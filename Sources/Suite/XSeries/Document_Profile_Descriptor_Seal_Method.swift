@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Seal_Method: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Seal_Method: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var fingerprint_method: Document_Profile_Descriptor_Method_Information?
     @usableFromInline var fingerprint_key_information: Document_Profile_Descriptor_Key_Information?
@@ -13,6 +13,7 @@ import Foundation
         self.fingerprint_key_information = fingerprint_key_information
         self.sealing_method = sealing_method
         self.sealing_key_information = sealing_key_information
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let fingerprint_key_information: Document_Profile_Descriptor_Key_Information? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let sealing_method: Document_Profile_Descriptor_Method_Information? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let sealing_key_information: Document_Profile_Descriptor_Key_Information? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
             return Document_Profile_Descriptor_Seal_Method(fingerprint_method: fingerprint_method, fingerprint_key_information: fingerprint_key_information, sealing_method: sealing_method, sealing_key_information: sealing_key_information)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let fingerprint_method = self.fingerprint_method { if let fingerprint_method = self.fingerprint_method { try coder.serializeOptionalImplicitlyTagged(fingerprint_method, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let fingerprint_key_information = self.fingerprint_key_information { if let fingerprint_key_information = self.fingerprint_key_information { try coder.serializeOptionalImplicitlyTagged(fingerprint_key_information, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let sealing_method = self.sealing_method { if let sealing_method = self.sealing_method { try coder.serializeOptionalImplicitlyTagged(sealing_method, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let sealing_key_information = self.sealing_key_information { if let sealing_key_information = self.sealing_key_information { try coder.serializeOptionalImplicitlyTagged(sealing_key_information, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
+            if let fingerprint_method = self.fingerprint_method { try coder.serializeOptionalImplicitlyTagged(fingerprint_method, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let fingerprint_key_information = self.fingerprint_key_information { try coder.serializeOptionalImplicitlyTagged(fingerprint_key_information, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let sealing_method = self.sealing_method { try coder.serializeOptionalImplicitlyTagged(sealing_method, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let sealing_key_information = self.sealing_key_information { try coder.serializeOptionalImplicitlyTagged(sealing_key_information, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+
         }
     }
 }

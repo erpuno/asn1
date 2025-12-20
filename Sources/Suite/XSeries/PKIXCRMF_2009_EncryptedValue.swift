@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCRMF_2009_EncryptedValue: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCRMF_2009_EncryptedValue: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var intendedAlg: PKIX1Explicit88_AlgorithmIdentifier?
     @usableFromInline var symmAlg: PKIX1Explicit88_AlgorithmIdentifier?
@@ -17,6 +17,7 @@ import Foundation
         self.keyAlg = keyAlg
         self.valueHint = valueHint
         self.encValue = encValue
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -27,18 +28,20 @@ import Foundation
             let keyAlg: PKIX1Explicit88_AlgorithmIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             let valueHint: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
             let encValue: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
+
             return PKIXCRMF_2009_EncryptedValue(intendedAlg: intendedAlg, symmAlg: symmAlg, encSymmKey: encSymmKey, keyAlg: keyAlg, valueHint: valueHint, encValue: encValue)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let intendedAlg = self.intendedAlg { if let intendedAlg = self.intendedAlg { try coder.serializeOptionalImplicitlyTagged(intendedAlg, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let symmAlg = self.symmAlg { if let symmAlg = self.symmAlg { try coder.serializeOptionalImplicitlyTagged(symmAlg, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let encSymmKey = self.encSymmKey { if let encSymmKey = self.encSymmKey { try coder.serializeOptionalImplicitlyTagged(encSymmKey, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let keyAlg = self.keyAlg { if let keyAlg = self.keyAlg { try coder.serializeOptionalImplicitlyTagged(keyAlg, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let valueHint = self.valueHint { if let valueHint = self.valueHint { try coder.serializeOptionalImplicitlyTagged(valueHint, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
+            if let intendedAlg = self.intendedAlg { try coder.serializeOptionalImplicitlyTagged(intendedAlg, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let symmAlg = self.symmAlg { try coder.serializeOptionalImplicitlyTagged(symmAlg, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let encSymmKey = self.encSymmKey { try coder.serializeOptionalImplicitlyTagged(encSymmKey, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let keyAlg = self.keyAlg { try coder.serializeOptionalImplicitlyTagged(keyAlg, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let valueHint = self.valueHint { try coder.serializeOptionalImplicitlyTagged(valueHint, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
             try coder.serialize(encValue)
+
         }
     }
 }

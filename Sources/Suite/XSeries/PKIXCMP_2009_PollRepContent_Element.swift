@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_PollRepContent_Element: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_PollRepContent_Element: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var certReqId: ArraySlice<UInt8>
     @usableFromInline var checkAfter: ArraySlice<UInt8>
@@ -11,6 +11,7 @@ import Foundation
         self.certReqId = certReqId
         self.checkAfter = checkAfter
         self.reason = reason
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ var peek_reason = nodes
 if let next = peek_reason.next(), next.identifier == PKIXCMP_2009_PKIFreeText.defaultIdentifier {
     reason = try PKIXCMP_2009_PKIFreeText(derEncoded: &nodes)
 }
+
             return PKIXCMP_2009_PollRepContent_Element(certReqId: certReqId, checkAfter: checkAfter, reason: reason)
         }
     }
@@ -30,7 +32,8 @@ if let next = peek_reason.next(), next.identifier == PKIXCMP_2009_PKIFreeText.de
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(certReqId)
             try coder.serialize(checkAfter)
-            if let reason = self.reason { if let reason = self.reason { try coder.serialize(reason) } }
+            if let reason = self.reason { try coder.serialize(reason) }
+
         }
     }
 }

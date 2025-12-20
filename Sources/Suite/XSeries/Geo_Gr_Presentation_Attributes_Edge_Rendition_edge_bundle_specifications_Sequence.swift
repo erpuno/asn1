@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_bundle_specifications_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_bundle_specifications_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var edge_bundle_index: ArraySlice<UInt8>
     @usableFromInline var edge_bundle_representation: Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_bundle_specifications_Sequence_edge_bundle_representation_Sequence
     @inlinable init(edge_bundle_index: ArraySlice<UInt8>, edge_bundle_representation: Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_bundle_specifications_Sequence_edge_bundle_representation_Sequence) {
         self.edge_bundle_index = edge_bundle_index
         self.edge_bundle_representation = edge_bundle_representation
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let edge_bundle_index: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let edge_bundle_representation: Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_bundle_specifications_Sequence_edge_bundle_representation_Sequence = try Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_bundle_specifications_Sequence_edge_bundle_representation_Sequence(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Edge_Rendition_edge_bundle_specifications_Sequence(edge_bundle_index: edge_bundle_index, edge_bundle_representation: edge_bundle_representation)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(edge_bundle_index)
             try coder.serialize(edge_bundle_representation)
+
         }
     }
 }

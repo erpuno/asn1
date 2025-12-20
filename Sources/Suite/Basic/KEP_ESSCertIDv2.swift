@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_ESSCertIDv2: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_ESSCertIDv2: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var hashAlgorithm: DSTU_AlgorithmIdentifier
     @usableFromInline var certHash: KEP_Hash
@@ -11,6 +11,7 @@ import Foundation
         self.hashAlgorithm = hashAlgorithm
         self.certHash = certHash
         self.issuerSerial = issuerSerial
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let hashAlgorithm: DSTU_AlgorithmIdentifier = try DSTU_AlgorithmIdentifier(derEncoded: &nodes)
             let certHash: KEP_Hash = try KEP_Hash(derEncoded: &nodes)
             let issuerSerial: AuthenticationFramework_IssuerSerial = try AuthenticationFramework_IssuerSerial(derEncoded: &nodes)
+
             return KEP_ESSCertIDv2(hashAlgorithm: hashAlgorithm, certHash: certHash, issuerSerial: issuerSerial)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(hashAlgorithm)
             try coder.serialize(certHash)
             try coder.serialize(issuerSerial)
+
         }
     }
 }

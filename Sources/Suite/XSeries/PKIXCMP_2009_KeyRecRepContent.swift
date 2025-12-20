@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_KeyRecRepContent: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_KeyRecRepContent: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var status: PKIXCMP_2009_PKIStatusInfo
     @usableFromInline var newSigCert: PKIXCMP_2009_CMPCertificate?
@@ -13,6 +13,7 @@ import Foundation
         self.newSigCert = newSigCert
         self.caCerts = caCerts
         self.keyPairHist = keyPairHist
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let newSigCert: PKIXCMP_2009_CMPCertificate? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try PKIXCMP_2009_CMPCertificate(derEncoded: node) }
             let caCerts: [PKIXCMP_2009_CMPCertificate]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.sequence(of: PKIXCMP_2009_CMPCertificate.self, identifier: .sequence, rootNode: node) }
             let keyPairHist: [PKIXCMP_2009_CertifiedKeyPair]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.sequence(of: PKIXCMP_2009_CertifiedKeyPair.self, identifier: .sequence, rootNode: node) }
+
             return PKIXCMP_2009_KeyRecRepContent(status: status, newSigCert: newSigCert, caCerts: caCerts, keyPairHist: keyPairHist)
         }
     }
@@ -28,9 +30,10 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(status)
-            if let newSigCert = self.newSigCert { if let newSigCert = self.newSigCert { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(newSigCert) } } }
-            if let caCerts = self.caCerts { if let caCerts = self.caCerts { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(caCerts) } } }
-            if let keyPairHist = self.keyPairHist { if let keyPairHist = self.keyPairHist { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(keyPairHist) } } }
+            if let newSigCert = self.newSigCert { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(newSigCert) } }
+            if let caCerts = self.caCerts { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(caCerts) } }
+            if let keyPairHist = self.keyPairHist { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(keyPairHist) } }
+
         }
     }
 }

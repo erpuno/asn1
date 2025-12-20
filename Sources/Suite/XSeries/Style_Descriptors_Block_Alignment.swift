@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct Style_Descriptors_Block_Alignment : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct Style_Descriptors_Block_Alignment : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: Style_Descriptors_Block_Alignment, rhs: Style_Descriptors_Block_Alignment) -> Bool { lhs.rawValue < rhs.rawValue }

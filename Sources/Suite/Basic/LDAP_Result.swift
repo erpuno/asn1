@@ -2,25 +2,27 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct LDAP_Result: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct LDAP_Result: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var resultCode: LDAP_Result_resultCode_Enum
-    @usableFromInline var matchedDN: LDAP_LDAPDN
-    @usableFromInline var diagnosticMessage: LDAP_LDAPString
+    @usableFromInline var matchedDN: LDAP_DN
+    @usableFromInline var diagnosticMessage: LDAP_String
     @usableFromInline var referral: LDAP_Referral?
-    @inlinable init(resultCode: LDAP_Result_resultCode_Enum, matchedDN: LDAP_LDAPDN, diagnosticMessage: LDAP_LDAPString, referral: LDAP_Referral?) {
+    @inlinable init(resultCode: LDAP_Result_resultCode_Enum, matchedDN: LDAP_DN, diagnosticMessage: LDAP_String, referral: LDAP_Referral?) {
         self.resultCode = resultCode
         self.matchedDN = matchedDN
         self.diagnosticMessage = diagnosticMessage
         self.referral = referral
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let resultCode: LDAP_Result_resultCode_Enum = try LDAP_Result_resultCode_Enum(derEncoded: &nodes)
-            let matchedDN: LDAP_LDAPDN = try LDAP_LDAPDN(derEncoded: &nodes)
-            let diagnosticMessage: LDAP_LDAPString = try LDAP_LDAPString(derEncoded: &nodes)
+            let matchedDN: LDAP_DN = try LDAP_DN(derEncoded: &nodes)
+            let diagnosticMessage: LDAP_String = try LDAP_String(derEncoded: &nodes)
             let referral: LDAP_Referral? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
             return LDAP_Result(resultCode: resultCode, matchedDN: matchedDN, diagnosticMessage: diagnosticMessage, referral: referral)
         }
     }
@@ -30,7 +32,8 @@ import Foundation
             try coder.serialize(resultCode)
             try coder.serialize(matchedDN)
             try coder.serialize(diagnosticMessage)
-            if let referral = self.referral { if let referral = self.referral { try coder.serializeOptionalImplicitlyTagged(referral, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
+            if let referral = self.referral { try coder.serializeOptionalImplicitlyTagged(referral, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+
         }
     }
 }

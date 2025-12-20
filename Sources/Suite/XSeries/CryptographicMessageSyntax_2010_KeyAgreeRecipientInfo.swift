@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2010_KeyAgreeRecipientInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2010_KeyAgreeRecipientInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: CryptographicMessageSyntax_2010_CMSVersion
     @usableFromInline var originator: CryptographicMessageSyntax_2010_OriginatorIdentifierOrKey
@@ -15,6 +15,7 @@ import Foundation
         self.ukm = ukm
         self.keyEncryptionAlgorithm = keyEncryptionAlgorithm
         self.recipientEncryptedKeys = recipientEncryptedKeys
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,6 +25,7 @@ import Foundation
             let ukm: CryptographicMessageSyntax_2010_UserKeyingMaterial? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try CryptographicMessageSyntax_2010_UserKeyingMaterial(derEncoded: node) }
             let keyEncryptionAlgorithm: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let recipientEncryptedKeys: CryptographicMessageSyntax_2010_RecipientEncryptedKeys = try CryptographicMessageSyntax_2010_RecipientEncryptedKeys(derEncoded: &nodes)
+
             return CryptographicMessageSyntax_2010_KeyAgreeRecipientInfo(version: version, originator: originator, ukm: ukm, keyEncryptionAlgorithm: keyEncryptionAlgorithm, recipientEncryptedKeys: recipientEncryptedKeys)
         }
     }
@@ -32,9 +34,10 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(version)
             try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(originator) }
-            if let ukm = self.ukm { if let ukm = self.ukm { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(ukm) } } }
+            if let ukm = self.ukm { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(ukm) } }
             try coder.serialize(keyEncryptionAlgorithm)
             try coder.serialize(recipientEncryptedKeys)
+
         }
     }
 }

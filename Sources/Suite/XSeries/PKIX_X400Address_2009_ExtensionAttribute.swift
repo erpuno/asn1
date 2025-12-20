@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX_X400Address_2009_ExtensionAttribute: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX_X400Address_2009_ExtensionAttribute: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var extension_attribute_type: ASN1ObjectIdentifier
     @usableFromInline var extension_attribute_value: ASN1Any
     @inlinable init(extension_attribute_type: ASN1ObjectIdentifier, extension_attribute_value: ASN1Any) {
         self.extension_attribute_type = extension_attribute_type
         self.extension_attribute_value = extension_attribute_value
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let extension_attribute_type: ASN1ObjectIdentifier = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let extension_attribute_value: ASN1Any = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try ASN1Any(derEncoded: node) }
+
             return PKIX_X400Address_2009_ExtensionAttribute(extension_attribute_type: extension_attribute_type, extension_attribute_value: extension_attribute_value)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serializeOptionalImplicitlyTagged(extension_attribute_type, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+            try coder.serialize(extension_attribute_type)
             try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(extension_attribute_value) }
+
         }
     }
 }

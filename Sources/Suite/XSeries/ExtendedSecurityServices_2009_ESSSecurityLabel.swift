@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ExtendedSecurityServices_2009_ESSSecurityLabel: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ExtendedSecurityServices_2009_ESSSecurityLabel: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var security_policy_identifier: ExtendedSecurityServices_2009_SecurityPolicyIdentifier
     @usableFromInline var security_classification: ExtendedSecurityServices_2009_SecurityClassification?
@@ -13,6 +13,7 @@ import Foundation
         self.security_classification = security_classification
         self.privacy_mark = privacy_mark
         self.security_categories = security_categories
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -33,6 +34,7 @@ var peek_security_categories = nodes
 if let next = peek_security_categories.next(), next.identifier == ExtendedSecurityServices_2009_SecurityCategories.defaultIdentifier {
     security_categories = try ExtendedSecurityServices_2009_SecurityCategories(derEncoded: &nodes)
 }
+
             return ExtendedSecurityServices_2009_ESSSecurityLabel(security_policy_identifier: security_policy_identifier, security_classification: security_classification, privacy_mark: privacy_mark, security_categories: security_categories)
         }
     }
@@ -40,9 +42,10 @@ if let next = peek_security_categories.next(), next.identifier == ExtendedSecuri
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(security_policy_identifier)
-            if let security_classification = self.security_classification { if let security_classification = self.security_classification { try coder.serialize(security_classification) } }
-            if let privacy_mark = self.privacy_mark { if let privacy_mark = self.privacy_mark { try coder.serialize(privacy_mark) } }
-            if let security_categories = self.security_categories { if let security_categories = self.security_categories { try coder.serialize(security_categories) } }
+            if let security_classification = self.security_classification { try coder.serialize(security_classification) }
+            if let privacy_mark = self.privacy_mark { try coder.serialize(privacy_mark) }
+            if let security_categories = self.security_categories { try coder.serialize(security_categories) }
+
         }
     }
 }

@@ -2,25 +2,26 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum BasicAccessControl_ACIItem_itemOrUserFirst_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum BasicAccessControl_ACIItem_itemOrUserFirst_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case itemFirst(BasicAccessControl_ACIItem_itemOrUserFirst_Choice_itemFirst_Sequence)
     case userFirst(BasicAccessControl_ACIItem_itemOrUserFirst_Choice_userFirst_Sequence)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .itemFirst(try BasicAccessControl_ACIItem_itemOrUserFirst_Choice_itemFirst_Sequence(derEncoded: inner))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
-                self = .userFirst(try BasicAccessControl_ACIItem_itemOrUserFirst_Choice_userFirst_Sequence(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .itemFirst(try BasicAccessControl_ACIItem_itemOrUserFirst_Choice_itemFirst_Sequence(derEncoded: inner))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            guard case .constructed(let nodes) = rootNode.content, var iterator = Optional(nodes.makeIterator()), let inner = iterator.next() else { throw ASN1Error.invalidASN1Object(reason: "Invalid explicit tag content") }
+            self = .userFirst(try BasicAccessControl_ACIItem_itemOrUserFirst_Choice_userFirst_Sequence(derEncoded: inner))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .itemFirst(let itemFirst): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try itemFirst.serialize(into: &coder) }
-            case .userFirst(let userFirst): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try userFirst.serialize(into: &coder) }
+        case .itemFirst(let itemFirst): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) { coder in try itemFirst.serialize(into: &coder) }
+        case .userFirst(let userFirst): try coder.appendConstructedNode(identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) { coder in try userFirst.serialize(into: &coder) }
+
         }
     }
 

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct OCSP_RevokedInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct OCSP_RevokedInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var revocationTime: GeneralizedTime
     @usableFromInline var revocationReason: CertificateExtensions_CRLReason?
     @inlinable init(revocationTime: GeneralizedTime, revocationReason: CertificateExtensions_CRLReason?) {
         self.revocationTime = revocationTime
         self.revocationReason = revocationReason
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let revocationTime: GeneralizedTime = try GeneralizedTime(derEncoded: &nodes)
             let revocationReason: CertificateExtensions_CRLReason? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try CertificateExtensions_CRLReason(derEncoded: node) }
+
             return OCSP_RevokedInfo(revocationTime: revocationTime, revocationReason: revocationReason)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(revocationTime)
-            if let revocationReason = self.revocationReason { if let revocationReason = self.revocationReason { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(revocationReason) } } }
+            if let revocationReason = self.revocationReason { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(revocationReason) } }
+
         }
     }
 }

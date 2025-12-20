@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SelectedAttributeTypes_Period: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SelectedAttributeTypes_Period: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var timesOfDay: [SelectedAttributeTypes_DayTimeBand]?
     @usableFromInline var days: SelectedAttributeTypes_Period_days_Choice?
@@ -15,6 +15,7 @@ import Foundation
         self.weeks = weeks
         self.months = months
         self.years = years
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,17 +25,19 @@ import Foundation
             let weeks: SelectedAttributeTypes_Period_weeks_Choice? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try SelectedAttributeTypes_Period_weeks_Choice(derEncoded: node) }
             let months: SelectedAttributeTypes_Period_months_Choice? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try SelectedAttributeTypes_Period_months_Choice(derEncoded: node) }
             let years: [ArraySlice<UInt8>]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: node) }
+
             return SelectedAttributeTypes_Period(timesOfDay: timesOfDay, days: days, weeks: weeks, months: months, years: years)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let timesOfDay = self.timesOfDay { if let timesOfDay = self.timesOfDay { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(timesOfDay) } } }
-            if let days = self.days { if let days = self.days { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(days) } } }
-            if let weeks = self.weeks { if let weeks = self.weeks { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(weeks) } } }
-            if let months = self.months { if let months = self.months { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(months) } } }
-            if let years = self.years { if let years = self.years { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(years) } } }
+            if let timesOfDay = self.timesOfDay { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(timesOfDay) } }
+            if let days = self.days { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(days) } }
+            if let weeks = self.weeks { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(weeks) } }
+            if let months = self.months { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(months) } }
+            if let years = self.years { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(years) } }
+
         }
     }
 }

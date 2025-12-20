@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_P_Adjust_Properties: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_P_Adjust_Properties: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var iso_standard_9541_peax: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_P_Adjust_Properties_iso_standard_9541_peax_Sequence]?
     @usableFromInline var iso_standard_9541_peay: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_P_Adjust_Properties_iso_standard_9541_peay_Sequence]?
@@ -19,6 +19,7 @@ import Foundation
         self.iso_standard_9541_speabackwdx = iso_standard_9541_speabackwdx
         self.iso_standard_9541_speabackwdy = iso_standard_9541_speabackwdy
         self.non_iso_properties = non_iso_properties
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -30,19 +31,21 @@ import Foundation
             let iso_standard_9541_speabackwdx: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in try DER.sequence(of: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational.self, identifier: .sequence, rootNode: node) }
             let iso_standard_9541_speabackwdy: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 5, tagClass: .contextSpecific) { node in try DER.sequence(of: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational.self, identifier: .sequence, rootNode: node) }
             let non_iso_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_P_Adjust_Properties(iso_standard_9541_peax: iso_standard_9541_peax, iso_standard_9541_peay: iso_standard_9541_peay, iso_standard_9541_speaforwdx: iso_standard_9541_speaforwdx, iso_standard_9541_speaforwdy: iso_standard_9541_speaforwdy, iso_standard_9541_speabackwdx: iso_standard_9541_speabackwdx, iso_standard_9541_speabackwdy: iso_standard_9541_speabackwdy, non_iso_properties: non_iso_properties)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let iso_standard_9541_peax = self.iso_standard_9541_peax { if let iso_standard_9541_peax = self.iso_standard_9541_peax { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_peax) } } }
-            if let iso_standard_9541_peay = self.iso_standard_9541_peay { if let iso_standard_9541_peay = self.iso_standard_9541_peay { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_peay) } } }
-            if let iso_standard_9541_speaforwdx = self.iso_standard_9541_speaforwdx { if let iso_standard_9541_speaforwdx = self.iso_standard_9541_speaforwdx { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_speaforwdx) } } }
-            if let iso_standard_9541_speaforwdy = self.iso_standard_9541_speaforwdy { if let iso_standard_9541_speaforwdy = self.iso_standard_9541_speaforwdy { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_speaforwdy) } } }
-            if let iso_standard_9541_speabackwdx = self.iso_standard_9541_speabackwdx { if let iso_standard_9541_speabackwdx = self.iso_standard_9541_speabackwdx { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_speabackwdx) } } }
-            if let iso_standard_9541_speabackwdy = self.iso_standard_9541_speabackwdy { if let iso_standard_9541_speabackwdy = self.iso_standard_9541_speabackwdy { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_speabackwdy) } } }
-            if let non_iso_properties = self.non_iso_properties { if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
+            if let iso_standard_9541_peax = self.iso_standard_9541_peax { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_peax) } }
+            if let iso_standard_9541_peay = self.iso_standard_9541_peay { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_peay) } }
+            if let iso_standard_9541_speaforwdx = self.iso_standard_9541_speaforwdx { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_speaforwdx) } }
+            if let iso_standard_9541_speaforwdy = self.iso_standard_9541_speaforwdy { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_speaforwdy) } }
+            if let iso_standard_9541_speabackwdx = self.iso_standard_9541_speabackwdx { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_speabackwdx) } }
+            if let iso_standard_9541_speabackwdy = self.iso_standard_9541_speabackwdy { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_speabackwdy) } }
+            if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct AttributeCertificateVersion1_2009_AttributeCertificateInfoV1: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct AttributeCertificateVersion1_2009_AttributeCertificateInfoV1: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: AttributeCertificateVersion1_2009_AttCertVersionV1?
     @usableFromInline var subject: AttributeCertificateVersion1_2009_AttributeCertificateInfoV1_subject_Choice
@@ -23,6 +23,7 @@ import Foundation
         self.attributes = attributes
         self.issuerUniqueID = issuerUniqueID
         self.extensions = extensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -44,21 +45,23 @@ var peek_extensions = nodes
 if let next = peek_extensions.next(), next.identifier == PKIX1Explicit88_Extensions.defaultIdentifier {
     extensions = try PKIX1Explicit88_Extensions(derEncoded: &nodes)
 }
+
             return AttributeCertificateVersion1_2009_AttributeCertificateInfoV1(version: version, subject: subject, issuer: issuer, signature: signature, serialNumber: serialNumber, attCertValidityPeriod: attCertValidityPeriod, attributes: attributes, issuerUniqueID: issuerUniqueID, extensions: extensions)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let version = self.version { if let version = self.version { try coder.serialize(version) } }
+            if let version = self.version { try coder.serialize(version) }
             try coder.serialize(subject)
             try coder.serialize(issuer)
             try coder.serialize(signature)
             try coder.serialize(serialNumber)
             try coder.serialize(attCertValidityPeriod)
             try coder.serializeSequenceOf(attributes)
-            if let issuerUniqueID = self.issuerUniqueID { if let issuerUniqueID = self.issuerUniqueID { try coder.serialize(issuerUniqueID) } }
-            if let extensions = self.extensions { if let extensions = self.extensions { try coder.serialize(extensions) } }
+            if let issuerUniqueID = self.issuerUniqueID { try coder.serialize(issuerUniqueID) }
+            if let extensions = self.extensions { try coder.serialize(extensions) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_ServiceControls: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_ServiceControls: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var options: DirectoryAbstractService_ServiceControlOptions?
     @usableFromInline var priority: DirectoryAbstractService_ServiceControls_priority_IntEnum?
@@ -23,6 +23,7 @@ import Foundation
         self.manageDSAITPlaneRef = manageDSAITPlaneRef
         self.serviceType = serviceType
         self.userClass = userClass
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -36,21 +37,23 @@ import Foundation
             let manageDSAITPlaneRef: DirectoryAbstractService_ServiceControls_manageDSAITPlaneRef_Sequence? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 6, tagClass: .contextSpecific) { node in return try DirectoryAbstractService_ServiceControls_manageDSAITPlaneRef_Sequence(derEncoded: node) }
             let serviceType: ASN1ObjectIdentifier? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 7, tagClass: .contextSpecific) { node in return try ASN1ObjectIdentifier(derEncoded: node) }
             let userClass: ArraySlice<UInt8>? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 8, tagClass: .contextSpecific) { node in return try ArraySlice<UInt8>(derEncoded: node) }
+
             return DirectoryAbstractService_ServiceControls(options: options, priority: priority, timeLimit: timeLimit, sizeLimit: sizeLimit, scopeOfReferral: scopeOfReferral, attributeSizeLimit: attributeSizeLimit, manageDSAITPlaneRef: manageDSAITPlaneRef, serviceType: serviceType, userClass: userClass)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let options = self.options { if let options = self.options { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(options) } } }
+            if let options = self.options { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(options) } }
             if let priority = self.priority { try coder.serialize(priority.rawValue, explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) }
-            if let timeLimit = self.timeLimit { if let timeLimit = self.timeLimit { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(timeLimit) } } }
-            if let sizeLimit = self.sizeLimit { if let sizeLimit = self.sizeLimit { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(sizeLimit) } } }
+            if let timeLimit = self.timeLimit { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(timeLimit) } }
+            if let sizeLimit = self.sizeLimit { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(sizeLimit) } }
             if let scopeOfReferral = self.scopeOfReferral { try coder.serialize(scopeOfReferral.rawValue, explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) }
-            if let attributeSizeLimit = self.attributeSizeLimit { if let attributeSizeLimit = self.attributeSizeLimit { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serialize(attributeSizeLimit) } } }
-            if let manageDSAITPlaneRef = self.manageDSAITPlaneRef { if let manageDSAITPlaneRef = self.manageDSAITPlaneRef { try coder.serialize(explicitlyTaggedWithTagNumber: 6, tagClass: .contextSpecific) { codec in try codec.serialize(manageDSAITPlaneRef) } } }
-            if let serviceType = self.serviceType { if let serviceType = self.serviceType { try coder.serialize(explicitlyTaggedWithTagNumber: 7, tagClass: .contextSpecific) { codec in try codec.serialize(serviceType) } } }
-            if let userClass = self.userClass { if let userClass = self.userClass { try coder.serialize(explicitlyTaggedWithTagNumber: 8, tagClass: .contextSpecific) { codec in try codec.serialize(userClass) } } }
+            if let attributeSizeLimit = self.attributeSizeLimit { try coder.serialize(explicitlyTaggedWithTagNumber: 5, tagClass: .contextSpecific) { codec in try codec.serialize(attributeSizeLimit) } }
+            if let manageDSAITPlaneRef = self.manageDSAITPlaneRef { try coder.serialize(explicitlyTaggedWithTagNumber: 6, tagClass: .contextSpecific) { codec in try codec.serialize(manageDSAITPlaneRef) } }
+            if let serviceType = self.serviceType { try coder.serialize(explicitlyTaggedWithTagNumber: 7, tagClass: .contextSpecific) { codec in try codec.serialize(serviceType) } }
+            if let userClass = self.userClass { try coder.serialize(explicitlyTaggedWithTagNumber: 8, tagClass: .contextSpecific) { codec in try codec.serialize(userClass) } }
+
         }
     }
 }

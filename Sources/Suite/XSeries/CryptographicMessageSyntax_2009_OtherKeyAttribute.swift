@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2009_OtherKeyAttribute: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2009_OtherKeyAttribute: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var keyAttrId: ASN1ObjectIdentifier
     @usableFromInline var keyAttr: ASN1Any
     @inlinable init(keyAttrId: ASN1ObjectIdentifier, keyAttr: ASN1Any) {
         self.keyAttrId = keyAttrId
         self.keyAttr = keyAttr
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let keyAttrId: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let keyAttr: ASN1Any = try ASN1Any(derEncoded: &nodes)
+
             return CryptographicMessageSyntax_2009_OtherKeyAttribute(keyAttrId: keyAttrId, keyAttr: keyAttr)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(keyAttrId)
             try coder.serialize(keyAttr)
+
         }
     }
 }

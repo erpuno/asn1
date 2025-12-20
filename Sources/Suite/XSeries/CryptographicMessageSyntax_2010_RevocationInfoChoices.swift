@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2010_RevocationInfoChoices: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2010_RevocationInfoChoices: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var value: [CryptographicMessageSyntax_2010_RevocationInfoChoice]
     @inlinable public init(_ value: [CryptographicMessageSyntax_2010_RevocationInfoChoice]) { self.value = value }

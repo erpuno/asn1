@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Location_Expressions_Start_End_Object_Locator: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Location_Expressions_Start_End_Object_Locator: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var object: Location_Expressions_Object_Locator
     @usableFromInline var not_included: Bool?
     @inlinable init(object: Location_Expressions_Object_Locator, not_included: Bool?) {
         self.object = object
         self.not_included = not_included
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let object: Location_Expressions_Object_Locator = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let not_included: Bool = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
+
             return Location_Expressions_Start_End_Object_Locator(object: object, not_included: not_included)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(object, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            if let not_included = self.not_included { if let not_included = self.not_included { try coder.serializeOptionalImplicitlyTagged(not_included, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let not_included = self.not_included { try coder.serializeOptionalImplicitlyTagged(not_included, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

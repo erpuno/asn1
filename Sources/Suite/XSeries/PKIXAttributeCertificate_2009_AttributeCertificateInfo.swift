@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXAttributeCertificate_2009_AttributeCertificateInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXAttributeCertificate_2009_AttributeCertificateInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: PKIXAttributeCertificate_2009_AttCertVersion
     @usableFromInline var holder: PKIXAttributeCertificate_2009_Holder
@@ -23,6 +23,7 @@ import Foundation
         self.attributes = attributes
         self.issuerUniqueID = issuerUniqueID
         self.extensions = extensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -44,6 +45,7 @@ var peek_extensions = nodes
 if let next = peek_extensions.next(), next.identifier == PKIX1Explicit88_Extensions.defaultIdentifier {
     extensions = try PKIX1Explicit88_Extensions(derEncoded: &nodes)
 }
+
             return PKIXAttributeCertificate_2009_AttributeCertificateInfo(version: version, holder: holder, issuer: issuer, signature: signature, serialNumber: serialNumber, attrCertValidityPeriod: attrCertValidityPeriod, attributes: attributes, issuerUniqueID: issuerUniqueID, extensions: extensions)
         }
     }
@@ -57,8 +59,9 @@ if let next = peek_extensions.next(), next.identifier == PKIX1Explicit88_Extensi
             try coder.serialize(serialNumber)
             try coder.serialize(attrCertValidityPeriod)
             try coder.serializeSequenceOf(attributes)
-            if let issuerUniqueID = self.issuerUniqueID { if let issuerUniqueID = self.issuerUniqueID { try coder.serialize(issuerUniqueID) } }
-            if let extensions = self.extensions { if let extensions = self.extensions { try coder.serialize(extensions) } }
+            if let issuerUniqueID = self.issuerUniqueID { try coder.serialize(issuerUniqueID) }
+            if let extensions = self.extensions { try coder.serialize(extensions) }
+
         }
     }
 }

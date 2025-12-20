@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Style_Descriptors_Floatability_Range_forward_limit_Sequence_layout_object_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Style_Descriptors_Floatability_Range_forward_limit_Sequence_layout_object_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case to_layout_object_class(Identifiers_and_Expressions_Object_or_Class_Identifier)
     case to_stream_root_category(Identifiers_and_Expressions_Category_Name)
@@ -12,29 +12,30 @@ import Foundation
     case d(ASN1Null)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
-                self = .to_layout_object_class(try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
-                self = .to_stream_root_category(try Identifiers_and_Expressions_Category_Name(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
-                self = .to_stream_sub_category(try Identifiers_and_Expressions_Category_Name(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific):
-                self = .to_layout_category(try Identifiers_and_Expressions_Category_Name(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific):
-                self = .to_layout_object_type(try Layout_Descriptors_Layout_Object_Type(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific):
-                self = .d(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific):
+            self = .to_layout_object_class(try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific):
+            self = .to_stream_root_category(try Identifiers_and_Expressions_Category_Name(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific):
+            self = .to_stream_sub_category(try Identifiers_and_Expressions_Category_Name(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific):
+            self = .to_layout_category(try Identifiers_and_Expressions_Category_Name(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific):
+            self = .to_layout_object_type(try Layout_Descriptors_Layout_Object_Type(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific):
+            self = .d(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .to_layout_object_class(let to_layout_object_class): try to_layout_object_class.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
-            case .to_stream_root_category(let to_stream_root_category): try to_stream_root_category.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
-            case .to_stream_sub_category(let to_stream_sub_category): try to_stream_sub_category.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific))
-            case .to_layout_category(let to_layout_category): try to_layout_category.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific))
-            case .to_layout_object_type(let to_layout_object_type): try to_layout_object_type.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
-            case .d(let d): try d.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
+        case .to_layout_object_class(let to_layout_object_class): try to_layout_object_class.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
+        case .to_stream_root_category(let to_stream_root_category): try to_stream_root_category.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
+        case .to_stream_sub_category(let to_stream_sub_category): try to_stream_sub_category.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific))
+        case .to_layout_category(let to_layout_category): try to_layout_category.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific))
+        case .to_layout_object_type(let to_layout_object_type): try to_layout_object_type.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
+        case .d(let d): try d.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific))
+
         }
     }
 

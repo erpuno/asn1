@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct OCSP_ResponseBytes: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct OCSP_ResponseBytes: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var responseType: ASN1ObjectIdentifier
     @usableFromInline var response: ASN1OctetString
     @inlinable init(responseType: ASN1ObjectIdentifier, response: ASN1OctetString) {
         self.responseType = responseType
         self.response = response
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let responseType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let response: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return OCSP_ResponseBytes(responseType: responseType, response: response)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(responseType)
             try coder.serialize(response)
+
         }
     }
 }

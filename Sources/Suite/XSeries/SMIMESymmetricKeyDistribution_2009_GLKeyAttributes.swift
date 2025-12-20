@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLKeyAttributes: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLKeyAttributes: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var rekeyControlledByGLO: Bool?
     @usableFromInline var recipientsNotMutuallyAware: Bool?
@@ -15,6 +15,7 @@ import Foundation
         self.duration = duration
         self.generationCounter = generationCounter
         self.requestedAlgorithm = requestedAlgorithm
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,17 +25,19 @@ import Foundation
             let duration: ArraySlice<UInt8> = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)))!
             let generationCounter: ArraySlice<UInt8> = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)))!
             let requestedAlgorithm: SMIMESymmetricKeyDistribution_2009_KeyWrapAlgorithm = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)))!
+
             return SMIMESymmetricKeyDistribution_2009_GLKeyAttributes(rekeyControlledByGLO: rekeyControlledByGLO, recipientsNotMutuallyAware: recipientsNotMutuallyAware, duration: duration, generationCounter: generationCounter, requestedAlgorithm: requestedAlgorithm)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let rekeyControlledByGLO = self.rekeyControlledByGLO { if let rekeyControlledByGLO = self.rekeyControlledByGLO { try coder.serializeOptionalImplicitlyTagged(rekeyControlledByGLO, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let recipientsNotMutuallyAware = self.recipientsNotMutuallyAware { if let recipientsNotMutuallyAware = self.recipientsNotMutuallyAware { try coder.serializeOptionalImplicitlyTagged(recipientsNotMutuallyAware, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let duration = self.duration { if let duration = self.duration { try coder.serializeOptionalImplicitlyTagged(duration, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let generationCounter = self.generationCounter { if let generationCounter = self.generationCounter { try coder.serializeOptionalImplicitlyTagged(generationCounter, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let requestedAlgorithm = self.requestedAlgorithm { if let requestedAlgorithm = self.requestedAlgorithm { try coder.serializeOptionalImplicitlyTagged(requestedAlgorithm, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
+            if let rekeyControlledByGLO = self.rekeyControlledByGLO { try coder.serializeOptionalImplicitlyTagged(rekeyControlledByGLO, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let recipientsNotMutuallyAware = self.recipientsNotMutuallyAware { try coder.serializeOptionalImplicitlyTagged(recipientsNotMutuallyAware, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let duration = self.duration { try coder.serializeOptionalImplicitlyTagged(duration, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let generationCounter = self.generationCounter { try coder.serializeOptionalImplicitlyTagged(generationCounter, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let requestedAlgorithm = self.requestedAlgorithm { try coder.serializeOptionalImplicitlyTagged(requestedAlgorithm, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+
         }
     }
 }

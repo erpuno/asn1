@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CertificateExtensions_NameConstraintsSyntax: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CertificateExtensions_NameConstraintsSyntax: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var permittedSubtrees: CertificateExtensions_GeneralSubtrees?
     @usableFromInline var excludedSubtrees: CertificateExtensions_GeneralSubtrees?
@@ -11,6 +11,7 @@ import Foundation
         self.permittedSubtrees = permittedSubtrees
         self.excludedSubtrees = excludedSubtrees
         self.requiredNameForms = requiredNameForms
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let permittedSubtrees: CertificateExtensions_GeneralSubtrees? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let excludedSubtrees: CertificateExtensions_GeneralSubtrees? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let requiredNameForms: CertificateExtensions_NameForms? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+
             return CertificateExtensions_NameConstraintsSyntax(permittedSubtrees: permittedSubtrees, excludedSubtrees: excludedSubtrees, requiredNameForms: requiredNameForms)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let permittedSubtrees = self.permittedSubtrees { if let permittedSubtrees = self.permittedSubtrees { try coder.serializeOptionalImplicitlyTagged(permittedSubtrees, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let excludedSubtrees = self.excludedSubtrees { if let excludedSubtrees = self.excludedSubtrees { try coder.serializeOptionalImplicitlyTagged(excludedSubtrees, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let requiredNameForms = self.requiredNameForms { if let requiredNameForms = self.requiredNameForms { try coder.serializeOptionalImplicitlyTagged(requiredNameForms, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
+            if let permittedSubtrees = self.permittedSubtrees { try coder.serializeOptionalImplicitlyTagged(permittedSubtrees, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let excludedSubtrees = self.excludedSubtrees { try coder.serializeOptionalImplicitlyTagged(excludedSubtrees, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let requiredNameForms = self.requiredNameForms { try coder.serializeOptionalImplicitlyTagged(requiredNameForms, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Font_Attribute_Set: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Font_Attribute_Set: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var name_prefixes: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Name_Prefix]?
     @usableFromInline var iso_standard_9541_fontname: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name?
@@ -15,6 +15,7 @@ import Foundation
         self.iso_standard_9541_fontdescription = iso_standard_9541_fontdescription
         self.iso_standard_9541_wrmodes = iso_standard_9541_wrmodes
         self.non_iso_properties = non_iso_properties
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,17 +25,19 @@ import Foundation
             let iso_standard_9541_fontdescription: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Font_Description? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let iso_standard_9541_wrmodes: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Writing_Modes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             let non_iso_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Font_Attribute_Set(name_prefixes: name_prefixes, iso_standard_9541_fontname: iso_standard_9541_fontname, iso_standard_9541_fontdescription: iso_standard_9541_fontdescription, iso_standard_9541_wrmodes: iso_standard_9541_wrmodes, non_iso_properties: non_iso_properties)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let name_prefixes = self.name_prefixes { if let name_prefixes = self.name_prefixes { try coder.serializeSetOf(name_prefixes, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_fontname = self.iso_standard_9541_fontname { if let iso_standard_9541_fontname = self.iso_standard_9541_fontname { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_fontname, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_fontdescription = self.iso_standard_9541_fontdescription { if let iso_standard_9541_fontdescription = self.iso_standard_9541_fontdescription { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_fontdescription, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_wrmodes = self.iso_standard_9541_wrmodes { if let iso_standard_9541_wrmodes = self.iso_standard_9541_wrmodes { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_wrmodes, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let non_iso_properties = self.non_iso_properties { if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
+            if let name_prefixes = self.name_prefixes { try coder.serializeSetOf(name_prefixes, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_fontname = self.iso_standard_9541_fontname { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_fontname, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_fontdescription = self.iso_standard_9541_fontdescription { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_fontdescription, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_wrmodes = self.iso_standard_9541_wrmodes { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_wrmodes, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+
         }
     }
 }

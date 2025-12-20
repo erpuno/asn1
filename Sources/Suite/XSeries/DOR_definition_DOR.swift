@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DOR_definition_DOR: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DOR_definition_DOR: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var ae_identifier: DOR_definition_AE_Identifier?
     @usableFromInline var local_reference: DOR_definition_Local_reference
@@ -15,6 +15,7 @@ import Foundation
         self.data_object_type = data_object_type
         self.quality_of_service = quality_of_service
         self.token = token
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,17 +25,19 @@ import Foundation
             let data_object_type: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let quality_of_service: DOR_definition_Quality_of_Service = try DER.explicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try DOR_definition_Quality_of_Service(derEncoded: node) }
             let token: DOR_definition_Token? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try DOR_definition_Token(derEncoded: node) }
+
             return DOR_definition_DOR(ae_identifier: ae_identifier, local_reference: local_reference, data_object_type: data_object_type, quality_of_service: quality_of_service, token: token)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let ae_identifier = self.ae_identifier { if let ae_identifier = self.ae_identifier { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(ae_identifier) } } }
+            if let ae_identifier = self.ae_identifier { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(ae_identifier) } }
             try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(local_reference) }
             try coder.serialize(data_object_type)
-            if let quality_of_service = self.quality_of_service { if let quality_of_service = self.quality_of_service { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(quality_of_service) } } }
-            if let token = self.token { if let token = self.token { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(token) } } }
+            if let quality_of_service = self.quality_of_service { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(quality_of_service) } }
+            if let token = self.token { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(token) } }
+
         }
     }
 }

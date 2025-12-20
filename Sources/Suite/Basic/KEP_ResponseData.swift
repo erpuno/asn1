@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct KEP_ResponseData: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct KEP_ResponseData: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: DSTU_Version?
     @usableFromInline var responderID: KEP_ResponderID
@@ -15,6 +15,7 @@ import Foundation
         self.producedAt = producedAt
         self.responses = responses
         self.responseExtensions = responseExtensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,17 +25,19 @@ import Foundation
             let producedAt: GeneralizedTime = try GeneralizedTime(derEncoded: &nodes)
             let responses: [KEP_SingleResponse] = try DER.sequence(of: KEP_SingleResponse.self, identifier: .sequence, nodes: &nodes)
             let responseExtensions: DSTU_Extensions? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try DSTU_Extensions(derEncoded: node) }
+
             return KEP_ResponseData(version: version, responderID: responderID, producedAt: producedAt, responses: responses, responseExtensions: responseExtensions)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let version = self.version { if let version = self.version { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) } } }
+            if let version = self.version { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) } }
             try coder.serialize(responderID)
             try coder.serialize(producedAt)
             try coder.serializeSequenceOf(responses)
-            if let responseExtensions = self.responseExtensions { if let responseExtensions = self.responseExtensions { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(responseExtensions) } } }
+            if let responseExtensions = self.responseExtensions { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(responseExtensions) } }
+
         }
     }
 }

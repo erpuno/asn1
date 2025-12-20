@@ -2,23 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Temporal_Relationships_Cyclic_number_of_cycles_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Temporal_Relationships_Cyclic_number_of_cycles_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case indefinite(Temporal_Relationships_Indefinite)
     case a(ArraySlice<UInt8>)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .application):
-                self = .indefinite(try Temporal_Relationships_Indefinite(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .application):
-                self = .a(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case Temporal_Relationships_Indefinite.defaultIdentifier:
+            self = .indefinite(try Temporal_Relationships_Indefinite(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ArraySlice<UInt8>.defaultIdentifier:
+            self = .a(try ArraySlice<UInt8>(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .indefinite(let indefinite): try indefinite.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .application))
-            case .a(let a): try a.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .application))
+        case .indefinite(let indefinite):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(indefinite)
+                            }
+                        } else {
+                            try coder.serialize(indefinite)
+                        }
+        case .a(let a):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(a)
+                            }
+                        } else {
+                            try coder.serialize(a)
+                        }
+
         }
     }
 

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_ServiceControls_manageDSAITPlaneRef_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_ServiceControls_manageDSAITPlaneRef_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var dsaName: PKIX1Explicit88_Name
     @usableFromInline var agreementID: DirectoryAbstractService_AgreementID
     @inlinable init(dsaName: PKIX1Explicit88_Name, agreementID: DirectoryAbstractService_AgreementID) {
         self.dsaName = dsaName
         self.agreementID = agreementID
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let dsaName: PKIX1Explicit88_Name = try PKIX1Explicit88_Name(derEncoded: &nodes)
             let agreementID: DirectoryAbstractService_AgreementID = try DirectoryAbstractService_AgreementID(derEncoded: &nodes)
+
             return DirectoryAbstractService_ServiceControls_manageDSAITPlaneRef_Sequence(dsaName: dsaName, agreementID: agreementID)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(dsaName)
             try coder.serialize(agreementID)
+
         }
     }
 }

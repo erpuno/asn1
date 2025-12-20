@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DOR_definition_AE_title: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DOR_definition_AE_title: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var ap: DOR_definition_AP_title
     @usableFromInline var ae: DOR_definition_AE_qualifier
     @inlinable init(ap: DOR_definition_AP_title, ae: DOR_definition_AE_qualifier) {
         self.ap = ap
         self.ae = ae
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let ap: DOR_definition_AP_title = try DOR_definition_AP_title(derEncoded: &nodes)
             let ae: DOR_definition_AE_qualifier = try DOR_definition_AE_qualifier(derEncoded: &nodes)
+
             return DOR_definition_AE_title(ap: ap, ae: ae)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(ap)
             try coder.serialize(ae)
+
         }
     }
 }

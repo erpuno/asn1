@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_ChopSpecification: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_ChopSpecification: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var specificExclusions: [InformationFramework_ChopSpecification_specificExclusions_Choice]?
     @usableFromInline var minimum: InformationFramework_BaseDistance?
@@ -11,6 +11,7 @@ import Foundation
         self.specificExclusions = specificExclusions
         self.minimum = minimum
         self.maximum = maximum
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let specificExclusions: [InformationFramework_ChopSpecification_specificExclusions_Choice]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.set(of: InformationFramework_ChopSpecification_specificExclusions_Choice.self, identifier: .set, rootNode: node) }
             let minimum: InformationFramework_BaseDistance = try DER.explicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try InformationFramework_BaseDistance(derEncoded: node) }
             let maximum: InformationFramework_BaseDistance? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try InformationFramework_BaseDistance(derEncoded: node) }
+
             return InformationFramework_ChopSpecification(specificExclusions: specificExclusions, minimum: minimum, maximum: maximum)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let specificExclusions = self.specificExclusions { if let specificExclusions = self.specificExclusions { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(specificExclusions) } } }
-            if let minimum = self.minimum { if let minimum = self.minimum { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(minimum) } } }
-            if let maximum = self.maximum { if let maximum = self.maximum { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(maximum) } } }
+            if let specificExclusions = self.specificExclusions { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(specificExclusions) } }
+            if let minimum = self.minimum { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(minimum) } }
+            if let maximum = self.maximum { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(maximum) } }
+
         }
     }
 }

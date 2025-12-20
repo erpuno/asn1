@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Style_Descriptors_Floatability_Range_backward_limit_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Style_Descriptors_Floatability_Range_backward_limit_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var logical_object: Style_Descriptors_Floatability_Range_backward_limit_Sequence_logical_object_Choice
     @usableFromInline var layout_object: Style_Descriptors_Floatability_Range_backward_limit_Sequence_layout_object_Choice?
     @inlinable init(logical_object: Style_Descriptors_Floatability_Range_backward_limit_Sequence_logical_object_Choice, layout_object: Style_Descriptors_Floatability_Range_backward_limit_Sequence_layout_object_Choice?) {
         self.logical_object = logical_object
         self.layout_object = layout_object
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,6 +20,7 @@ var peek_layout_object = nodes
 if let next = peek_layout_object.next(), next.identifier == Style_Descriptors_Floatability_Range_backward_limit_Sequence_layout_object_Choice.defaultIdentifier {
     layout_object = try Style_Descriptors_Floatability_Range_backward_limit_Sequence_layout_object_Choice(derEncoded: &nodes)
 }
+
             return Style_Descriptors_Floatability_Range_backward_limit_Sequence(logical_object: logical_object, layout_object: layout_object)
         }
     }
@@ -26,7 +28,8 @@ if let next = peek_layout_object.next(), next.identifier == Style_Descriptors_Fl
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(logical_object)
-            if let layout_object = self.layout_object { if let layout_object = self.layout_object { try coder.serialize(layout_object) } }
+            if let layout_object = self.layout_object { try coder.serialize(layout_object) }
+
         }
     }
 }

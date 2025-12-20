@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_7_EncryptedData: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_7_EncryptedData: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: PKCS_7_EncryptedData_version_IntEnum
     @usableFromInline var encryptedContentInfo: PKCS_7_EncryptedContentInfo
     @inlinable init(version: PKCS_7_EncryptedData_version_IntEnum, encryptedContentInfo: PKCS_7_EncryptedContentInfo) {
         self.version = version
         self.encryptedContentInfo = encryptedContentInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let version = try PKCS_7_EncryptedData_version_IntEnum(rawValue: Int(derEncoded: &nodes))
             let encryptedContentInfo: PKCS_7_EncryptedContentInfo = try PKCS_7_EncryptedContentInfo(derEncoded: &nodes)
+
             return PKCS_7_EncryptedData(version: version, encryptedContentInfo: encryptedContentInfo)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(version.rawValue)
+            try version.serialize(into: &coder, withIdentifier: identifier)
             try coder.serialize(encryptedContentInfo)
+
         }
     }
 }

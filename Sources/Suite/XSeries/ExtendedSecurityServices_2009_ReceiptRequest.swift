@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ExtendedSecurityServices_2009_ReceiptRequest: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ExtendedSecurityServices_2009_ReceiptRequest: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var signedContentIdentifier: ExtendedSecurityServices_2009_ContentIdentifier
     @usableFromInline var receiptsFrom: ExtendedSecurityServices_2009_ReceiptsFrom
@@ -11,6 +11,7 @@ import Foundation
         self.signedContentIdentifier = signedContentIdentifier
         self.receiptsFrom = receiptsFrom
         self.receiptsTo = receiptsTo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let signedContentIdentifier: ExtendedSecurityServices_2009_ContentIdentifier = try ExtendedSecurityServices_2009_ContentIdentifier(derEncoded: &nodes)
             let receiptsFrom: ExtendedSecurityServices_2009_ReceiptsFrom = try ExtendedSecurityServices_2009_ReceiptsFrom(derEncoded: &nodes)
             let receiptsTo: [PKIX1Implicit_2009_GeneralNames] = try DER.sequence(of: PKIX1Implicit_2009_GeneralNames.self, identifier: .sequence, nodes: &nodes)
+
             return ExtendedSecurityServices_2009_ReceiptRequest(signedContentIdentifier: signedContentIdentifier, receiptsFrom: receiptsFrom, receiptsTo: receiptsTo)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(signedContentIdentifier)
             try coder.serialize(receiptsFrom)
             try coder.serializeSequenceOf(receiptsTo)
+
         }
     }
 }

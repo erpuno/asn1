@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Logical_Descriptors_Logical_Class_Descriptor: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Logical_Descriptors_Logical_Class_Descriptor: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var object_type: Logical_Descriptors_Logical_Object_Type
     @usableFromInline var descriptor_body: Logical_Descriptors_Logical_Class_Descriptor_Body
     @inlinable init(object_type: Logical_Descriptors_Logical_Object_Type, descriptor_body: Logical_Descriptors_Logical_Class_Descriptor_Body) {
         self.object_type = object_type
         self.descriptor_body = descriptor_body
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let object_type: Logical_Descriptors_Logical_Object_Type = try Logical_Descriptors_Logical_Object_Type(derEncoded: &nodes)
             let descriptor_body: Logical_Descriptors_Logical_Class_Descriptor_Body = try Logical_Descriptors_Logical_Class_Descriptor_Body(derEncoded: &nodes)
+
             return Logical_Descriptors_Logical_Class_Descriptor(object_type: object_type, descriptor_body: descriptor_body)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(object_type)
             try coder.serialize(descriptor_body)
+
         }
     }
 }

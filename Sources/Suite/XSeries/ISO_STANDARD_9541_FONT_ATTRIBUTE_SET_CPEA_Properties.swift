@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_CPEA_Properties: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_CPEA_Properties: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var iso_standard_9541_ncpeaforwd: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Cardinal
     @usableFromInline var iso_standard_9541_ncpeabackwd: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Cardinal
@@ -15,6 +15,7 @@ import Foundation
         self.iso_standard_9541_cpeax = iso_standard_9541_cpeax
         self.iso_standard_9541_cpeay = iso_standard_9541_cpeay
         self.non_iso_properties = non_iso_properties
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,6 +25,7 @@ import Foundation
             let iso_standard_9541_cpeax: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.sequence(of: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational.self, identifier: .sequence, rootNode: node) }
             let iso_standard_9541_cpeay: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in try DER.sequence(of: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational.self, identifier: .sequence, rootNode: node) }
             let non_iso_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_CPEA_Properties(iso_standard_9541_ncpeaforwd: iso_standard_9541_ncpeaforwd, iso_standard_9541_ncpeabackwd: iso_standard_9541_ncpeabackwd, iso_standard_9541_cpeax: iso_standard_9541_cpeax, iso_standard_9541_cpeay: iso_standard_9541_cpeay, non_iso_properties: non_iso_properties)
         }
     }
@@ -32,9 +34,10 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_ncpeaforwd, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_ncpeabackwd, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            if let iso_standard_9541_cpeax = self.iso_standard_9541_cpeax { if let iso_standard_9541_cpeax = self.iso_standard_9541_cpeax { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_cpeax) } } }
-            if let iso_standard_9541_cpeay = self.iso_standard_9541_cpeay { if let iso_standard_9541_cpeay = self.iso_standard_9541_cpeay { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_cpeay) } } }
-            if let non_iso_properties = self.non_iso_properties { if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
+            if let iso_standard_9541_cpeax = self.iso_standard_9541_cpeax { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_cpeax) } }
+            if let iso_standard_9541_cpeay = self.iso_standard_9541_cpeay { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(iso_standard_9541_cpeay) } }
+            if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+
         }
     }
 }

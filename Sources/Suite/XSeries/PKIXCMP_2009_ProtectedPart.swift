@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_ProtectedPart: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_ProtectedPart: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var header: PKIXCMP_2009_PKIHeader
     @usableFromInline var body: PKIXCMP_2009_PKIBody
     @inlinable init(header: PKIXCMP_2009_PKIHeader, body: PKIXCMP_2009_PKIBody) {
         self.header = header
         self.body = body
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let header: PKIXCMP_2009_PKIHeader = try PKIXCMP_2009_PKIHeader(derEncoded: &nodes)
             let body: PKIXCMP_2009_PKIBody = try PKIXCMP_2009_PKIBody(derEncoded: &nodes)
+
             return PKIXCMP_2009_ProtectedPart(header: header, body: body)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(header)
             try coder.serialize(body)
+
         }
     }
 }

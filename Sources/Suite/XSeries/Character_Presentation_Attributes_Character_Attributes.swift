@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Character_Presentation_Attributes_Character_Attributes: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Character_Presentation_Attributes_Character_Attributes: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var character_path: Character_Presentation_Attributes_One_Of_Four_Angles?
     @usableFromInline var line_progression: Character_Presentation_Attributes_One_Of_Two_Angles?
@@ -49,6 +49,7 @@ import Foundation
         self.pairwise_kerning = pairwise_kerning
         self.first_line_offset = first_line_offset
         self.code_extension_announcers = code_extension_announcers
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -75,34 +76,36 @@ import Foundation
             let pairwise_kerning: Character_Presentation_Attributes_Pairwise_Kerning? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 22, tagClass: .contextSpecific))
             let first_line_offset: ArraySlice<UInt8>? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 23, tagClass: .contextSpecific))
             let code_extension_announcers: ASN1OctetString? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific))
+
             return Character_Presentation_Attributes_Character_Attributes(character_path: character_path, line_progression: line_progression, character_orientation: character_orientation, initial_offset: initial_offset, character_spacing: character_spacing, line_spacing: line_spacing, alignment: alignment, line_layout_table: line_layout_table, graphic_rendition: graphic_rendition, formatting_indicator: formatting_indicator, character_fonts: character_fonts, graphic_char_subrepertoire: graphic_char_subrepertoire, itemization: itemization, widow_size: widow_size, orphan_size: orphan_size, graphic_character_sets: graphic_character_sets, indentation: indentation, kerning_offset: kerning_offset, proportional_line_spacing: proportional_line_spacing, pairwise_kerning: pairwise_kerning, first_line_offset: first_line_offset, code_extension_announcers: code_extension_announcers)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let character_path = self.character_path { if let character_path = self.character_path { try coder.serializeOptionalImplicitlyTagged(character_path, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let line_progression = self.line_progression { if let line_progression = self.line_progression { try coder.serializeOptionalImplicitlyTagged(line_progression, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let character_orientation = self.character_orientation { if let character_orientation = self.character_orientation { try coder.serializeOptionalImplicitlyTagged(character_orientation, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let initial_offset = self.initial_offset { if let initial_offset = self.initial_offset { try coder.serializeOptionalImplicitlyTagged(initial_offset, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let character_spacing = self.character_spacing { if let character_spacing = self.character_spacing { try coder.serializeOptionalImplicitlyTagged(character_spacing, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let line_spacing = self.line_spacing { if let line_spacing = self.line_spacing { try coder.serializeOptionalImplicitlyTagged(line_spacing, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) } }
-            if let alignment = self.alignment { if let alignment = self.alignment { try coder.serializeOptionalImplicitlyTagged(alignment, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) } }
-            if let line_layout_table = self.line_layout_table { if let line_layout_table = self.line_layout_table { try coder.serializeOptionalImplicitlyTagged(line_layout_table, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) } }
-            if let graphic_rendition = self.graphic_rendition { if let graphic_rendition = self.graphic_rendition { try coder.serializeOptionalImplicitlyTagged(graphic_rendition, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) } }
-            if let formatting_indicator = self.formatting_indicator { if let formatting_indicator = self.formatting_indicator { try coder.serializeOptionalImplicitlyTagged(formatting_indicator, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) } }
-            if let character_fonts = self.character_fonts { if let character_fonts = self.character_fonts { try coder.serializeOptionalImplicitlyTagged(character_fonts, withIdentifier: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific)) } }
-            if let graphic_char_subrepertoire = self.graphic_char_subrepertoire { if let graphic_char_subrepertoire = self.graphic_char_subrepertoire { try coder.serializeOptionalImplicitlyTagged(graphic_char_subrepertoire, withIdentifier: ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific)) } }
-            if let itemization = self.itemization { if let itemization = self.itemization { try coder.serializeOptionalImplicitlyTagged(itemization, withIdentifier: ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific)) } }
-            if let widow_size = self.widow_size { if let widow_size = self.widow_size { try coder.serializeOptionalImplicitlyTagged(widow_size, withIdentifier: ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific)) } }
-            if let orphan_size = self.orphan_size { if let orphan_size = self.orphan_size { try coder.serializeOptionalImplicitlyTagged(orphan_size, withIdentifier: ASN1Identifier(tagWithNumber: 16, tagClass: .contextSpecific)) } }
-            if let graphic_character_sets = self.graphic_character_sets { if let graphic_character_sets = self.graphic_character_sets { try coder.serializeOptionalImplicitlyTagged(graphic_character_sets, withIdentifier: ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific)) } }
-            if let indentation = self.indentation { if let indentation = self.indentation { try coder.serializeOptionalImplicitlyTagged(indentation, withIdentifier: ASN1Identifier(tagWithNumber: 19, tagClass: .contextSpecific)) } }
-            if let kerning_offset = self.kerning_offset { if let kerning_offset = self.kerning_offset { try coder.serializeOptionalImplicitlyTagged(kerning_offset, withIdentifier: ASN1Identifier(tagWithNumber: 20, tagClass: .contextSpecific)) } }
-            if let proportional_line_spacing = self.proportional_line_spacing { if let proportional_line_spacing = self.proportional_line_spacing { try coder.serializeOptionalImplicitlyTagged(proportional_line_spacing, withIdentifier: ASN1Identifier(tagWithNumber: 21, tagClass: .contextSpecific)) } }
-            if let pairwise_kerning = self.pairwise_kerning { if let pairwise_kerning = self.pairwise_kerning { try coder.serializeOptionalImplicitlyTagged(pairwise_kerning, withIdentifier: ASN1Identifier(tagWithNumber: 22, tagClass: .contextSpecific)) } }
-            if let first_line_offset = self.first_line_offset { if let first_line_offset = self.first_line_offset { try coder.serializeOptionalImplicitlyTagged(first_line_offset, withIdentifier: ASN1Identifier(tagWithNumber: 23, tagClass: .contextSpecific)) } }
-            if let code_extension_announcers = self.code_extension_announcers { if let code_extension_announcers = self.code_extension_announcers { try coder.serializeOptionalImplicitlyTagged(code_extension_announcers, withIdentifier: ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific)) } }
+            if let character_path = self.character_path { try coder.serializeOptionalImplicitlyTagged(character_path, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let line_progression = self.line_progression { try coder.serializeOptionalImplicitlyTagged(line_progression, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let character_orientation = self.character_orientation { try coder.serializeOptionalImplicitlyTagged(character_orientation, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let initial_offset = self.initial_offset { try coder.serializeOptionalImplicitlyTagged(initial_offset, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let character_spacing = self.character_spacing { try coder.serializeOptionalImplicitlyTagged(character_spacing, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+            if let line_spacing = self.line_spacing { try coder.serializeOptionalImplicitlyTagged(line_spacing, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) }
+            if let alignment = self.alignment { try coder.serializeOptionalImplicitlyTagged(alignment, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) }
+            if let line_layout_table = self.line_layout_table { try coder.serializeOptionalImplicitlyTagged(line_layout_table, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) }
+            if let graphic_rendition = self.graphic_rendition { try coder.serializeOptionalImplicitlyTagged(graphic_rendition, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) }
+            if let formatting_indicator = self.formatting_indicator { try coder.serializeOptionalImplicitlyTagged(formatting_indicator, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) }
+            if let character_fonts = self.character_fonts { try coder.serializeOptionalImplicitlyTagged(character_fonts, withIdentifier: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific)) }
+            if let graphic_char_subrepertoire = self.graphic_char_subrepertoire { try coder.serializeOptionalImplicitlyTagged(graphic_char_subrepertoire, withIdentifier: ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific)) }
+            if let itemization = self.itemization { try coder.serializeOptionalImplicitlyTagged(itemization, withIdentifier: ASN1Identifier(tagWithNumber: 14, tagClass: .contextSpecific)) }
+            if let widow_size = self.widow_size { try coder.serializeOptionalImplicitlyTagged(widow_size, withIdentifier: ASN1Identifier(tagWithNumber: 15, tagClass: .contextSpecific)) }
+            if let orphan_size = self.orphan_size { try coder.serializeOptionalImplicitlyTagged(orphan_size, withIdentifier: ASN1Identifier(tagWithNumber: 16, tagClass: .contextSpecific)) }
+            if let graphic_character_sets = self.graphic_character_sets { try coder.serializeOptionalImplicitlyTagged(graphic_character_sets, withIdentifier: ASN1Identifier(tagWithNumber: 17, tagClass: .contextSpecific)) }
+            if let indentation = self.indentation { try coder.serializeOptionalImplicitlyTagged(indentation, withIdentifier: ASN1Identifier(tagWithNumber: 19, tagClass: .contextSpecific)) }
+            if let kerning_offset = self.kerning_offset { try coder.serializeOptionalImplicitlyTagged(kerning_offset, withIdentifier: ASN1Identifier(tagWithNumber: 20, tagClass: .contextSpecific)) }
+            if let proportional_line_spacing = self.proportional_line_spacing { try coder.serializeOptionalImplicitlyTagged(proportional_line_spacing, withIdentifier: ASN1Identifier(tagWithNumber: 21, tagClass: .contextSpecific)) }
+            if let pairwise_kerning = self.pairwise_kerning { try coder.serializeOptionalImplicitlyTagged(pairwise_kerning, withIdentifier: ASN1Identifier(tagWithNumber: 22, tagClass: .contextSpecific)) }
+            if let first_line_offset = self.first_line_offset { try coder.serializeOptionalImplicitlyTagged(first_line_offset, withIdentifier: ASN1Identifier(tagWithNumber: 23, tagClass: .contextSpecific)) }
+            if let code_extension_announcers = self.code_extension_announcers { try coder.serializeOptionalImplicitlyTagged(code_extension_announcers, withIdentifier: ASN1Identifier(tagWithNumber: 24, tagClass: .contextSpecific)) }
+
         }
     }
 }

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CertificateExtensions_PolicyMappingsSyntax_Element: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CertificateExtensions_PolicyMappingsSyntax_Element: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var issuerDomainPolicy: CertificateExtensions_CertPolicyId
     @usableFromInline var subjectDomainPolicy: CertificateExtensions_CertPolicyId
     @inlinable init(issuerDomainPolicy: CertificateExtensions_CertPolicyId, subjectDomainPolicy: CertificateExtensions_CertPolicyId) {
         self.issuerDomainPolicy = issuerDomainPolicy
         self.subjectDomainPolicy = subjectDomainPolicy
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let issuerDomainPolicy: CertificateExtensions_CertPolicyId = try CertificateExtensions_CertPolicyId(derEncoded: &nodes)
             let subjectDomainPolicy: CertificateExtensions_CertPolicyId = try CertificateExtensions_CertPolicyId(derEncoded: &nodes)
+
             return CertificateExtensions_PolicyMappingsSyntax_Element(issuerDomainPolicy: issuerDomainPolicy, subjectDomainPolicy: subjectDomainPolicy)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(issuerDomainPolicy)
             try coder.serialize(subjectDomainPolicy)
+
         }
     }
 }

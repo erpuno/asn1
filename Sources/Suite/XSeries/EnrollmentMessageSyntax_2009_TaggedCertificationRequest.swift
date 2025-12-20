@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_TaggedCertificationRequest: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_TaggedCertificationRequest: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var bodyPartID: EnrollmentMessageSyntax_2009_BodyPartID
     @usableFromInline var certificationRequest: EnrollmentMessageSyntax_2009_CertificationRequest
     @inlinable init(bodyPartID: EnrollmentMessageSyntax_2009_BodyPartID, certificationRequest: EnrollmentMessageSyntax_2009_CertificationRequest) {
         self.bodyPartID = bodyPartID
         self.certificationRequest = certificationRequest
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let bodyPartID: EnrollmentMessageSyntax_2009_BodyPartID = try EnrollmentMessageSyntax_2009_BodyPartID(derEncoded: &nodes)
             let certificationRequest: EnrollmentMessageSyntax_2009_CertificationRequest = try EnrollmentMessageSyntax_2009_CertificationRequest(derEncoded: &nodes)
+
             return EnrollmentMessageSyntax_2009_TaggedCertificationRequest(bodyPartID: bodyPartID, certificationRequest: certificationRequest)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(bodyPartID)
             try coder.serialize(certificationRequest)
+
         }
     }
 }

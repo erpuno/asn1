@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Implicit88_BasicConstraints: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Implicit88_BasicConstraints: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var cA: Bool?
     @usableFromInline var pathLenConstraint: ArraySlice<UInt8>?
     @inlinable init(cA: Bool?, pathLenConstraint: ArraySlice<UInt8>?) {
         self.cA = cA
         self.pathLenConstraint = pathLenConstraint
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,14 +20,16 @@ var peek_pathLenConstraint = nodes
 if let next = peek_pathLenConstraint.next(), next.identifier == ArraySlice<UInt8>.defaultIdentifier {
     pathLenConstraint = try ArraySlice<UInt8>(derEncoded: &nodes)
 }
+
             return PKIX1Implicit88_BasicConstraints(cA: cA, pathLenConstraint: pathLenConstraint)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let cA = self.cA { if let cA = self.cA { try coder.serialize(cA) } }
-            if let pathLenConstraint = self.pathLenConstraint { if let pathLenConstraint = self.pathLenConstraint { try coder.serialize(pathLenConstraint) } }
+            if let cA = self.cA { try coder.serialize(cA) }
+            if let pathLenConstraint = self.pathLenConstraint { try coder.serialize(pathLenConstraint) }
+
         }
     }
 }

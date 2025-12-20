@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct OCSP_TBSRequest: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct OCSP_TBSRequest: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: OCSP_Version?
     @usableFromInline var requestorName: CertificateExtensions_GeneralName?
@@ -13,6 +13,7 @@ import Foundation
         self.requestorName = requestorName
         self.requestList = requestList
         self.requestExtensions = requestExtensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let requestorName: CertificateExtensions_GeneralName? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try CertificateExtensions_GeneralName(derEncoded: node) }
             let requestList: [OCSP_Request] = try DER.sequence(of: OCSP_Request.self, identifier: .sequence, nodes: &nodes)
             let requestExtensions: AuthenticationFramework_Extensions? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try AuthenticationFramework_Extensions(derEncoded: node) }
+
             return OCSP_TBSRequest(version: version, requestorName: requestorName, requestList: requestList, requestExtensions: requestExtensions)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let version = self.version { if let version = self.version { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) } } }
-            if let requestorName = self.requestorName { if let requestorName = self.requestorName { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(requestorName) } } }
+            if let version = self.version { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) } }
+            if let requestorName = self.requestorName { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(requestorName) } }
             try coder.serializeSequenceOf(requestList)
-            if let requestExtensions = self.requestExtensions { if let requestExtensions = self.requestExtensions { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(requestExtensions) } } }
+            if let requestExtensions = self.requestExtensions { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(requestExtensions) } }
+
         }
     }
 }

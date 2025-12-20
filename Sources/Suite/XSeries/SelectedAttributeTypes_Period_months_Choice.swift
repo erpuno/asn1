@@ -2,27 +2,42 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum SelectedAttributeTypes_Period_months_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum SelectedAttributeTypes_Period_months_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case allMonths(ASN1Null)
     case intMonth([ArraySlice<UInt8>])
     case bitMonth(ASN1BitString)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .application):
-                self = .allMonths(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .application):
-                self = .intMonth(try DER.set(of: ArraySlice<UInt8>.self, identifier: rootNode.identifier, rootNode: rootNode))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .application):
-                self = .bitMonth(try ASN1BitString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Null.defaultIdentifier:
+            self = .allMonths(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier.set:
+            self = .intMonth(try DER.set(of: ArraySlice<UInt8>.self, identifier: .set, rootNode: rootNode))
+        case ASN1BitString.defaultIdentifier:
+            self = .bitMonth(try ASN1BitString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .allMonths(let allMonths): try allMonths.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .application))
-            case .intMonth(let intMonth): try coder.serializeSetOf(intMonth, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .application))
-            case .bitMonth(let bitMonth): try bitMonth.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .application))
+        case .allMonths(let allMonths):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(allMonths)
+                            }
+                        } else {
+                            try coder.serialize(allMonths)
+                        }
+        case .intMonth(let intMonth): try coder.serializeSetOf(intMonth)
+        case .bitMonth(let bitMonth):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(bitMonth)
+                            }
+                        } else {
+                            try coder.serialize(bitMonth)
+                        }
+
         }
     }
 

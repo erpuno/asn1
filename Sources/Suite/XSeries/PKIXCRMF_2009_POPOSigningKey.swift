@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCRMF_2009_POPOSigningKey: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCRMF_2009_POPOSigningKey: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var poposkInput: PKIXCRMF_2009_POPOSigningKeyInput?
     @usableFromInline var algorithmIdentifier: PKIX1Explicit88_AlgorithmIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.poposkInput = poposkInput
         self.algorithmIdentifier = algorithmIdentifier
         self.signature = signature
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,15 +19,17 @@ import Foundation
             let poposkInput: PKIXCRMF_2009_POPOSigningKeyInput? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let algorithmIdentifier: PKIX1Explicit88_AlgorithmIdentifier = try PKIX1Explicit88_AlgorithmIdentifier(derEncoded: &nodes)
             let signature: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
+
             return PKIXCRMF_2009_POPOSigningKey(poposkInput: poposkInput, algorithmIdentifier: algorithmIdentifier, signature: signature)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let poposkInput = self.poposkInput { if let poposkInput = self.poposkInput { try coder.serializeOptionalImplicitlyTagged(poposkInput, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let poposkInput = self.poposkInput { try coder.serializeOptionalImplicitlyTagged(poposkInput, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
             try coder.serialize(algorithmIdentifier)
             try coder.serialize(signature)
+
         }
     }
 }

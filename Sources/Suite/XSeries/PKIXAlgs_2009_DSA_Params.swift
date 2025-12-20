@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXAlgs_2009_DSA_Params: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXAlgs_2009_DSA_Params: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var p: ArraySlice<UInt8>
     @usableFromInline var q: ArraySlice<UInt8>
@@ -11,6 +11,7 @@ import Foundation
         self.p = p
         self.q = q
         self.g = g
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let p: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let q: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let g: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return PKIXAlgs_2009_DSA_Params(p: p, q: q, g: g)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(p)
             try coder.serialize(q)
             try coder.serialize(g)
+
         }
     }
 }

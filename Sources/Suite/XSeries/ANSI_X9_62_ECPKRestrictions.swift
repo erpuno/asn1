@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ANSI_X9_62_ECPKRestrictions: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ANSI_X9_62_ECPKRestrictions: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var ecDomain: ANSI_X9_62_ECDomainParameters
     @usableFromInline var eccAlgorithms: ANSI_X9_62_ECCAlgorithms
     @inlinable init(ecDomain: ANSI_X9_62_ECDomainParameters, eccAlgorithms: ANSI_X9_62_ECCAlgorithms) {
         self.ecDomain = ecDomain
         self.eccAlgorithms = eccAlgorithms
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let ecDomain: ANSI_X9_62_ECDomainParameters = try ANSI_X9_62_ECDomainParameters(derEncoded: &nodes)
             let eccAlgorithms: ANSI_X9_62_ECCAlgorithms = try ANSI_X9_62_ECCAlgorithms(derEncoded: &nodes)
+
             return ANSI_X9_62_ECPKRestrictions(ecDomain: ecDomain, eccAlgorithms: eccAlgorithms)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(ecDomain)
             try coder.serialize(eccAlgorithms)
+
         }
     }
 }

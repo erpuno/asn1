@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_Mapping: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_Mapping: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var mappingFunction: ASN1ObjectIdentifier
     @usableFromInline var level: ArraySlice<UInt8>?
     @inlinable init(mappingFunction: ASN1ObjectIdentifier, level: ArraySlice<UInt8>?) {
         self.mappingFunction = mappingFunction
         self.level = level
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let mappingFunction: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let level: ArraySlice<UInt8>? = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return InformationFramework_Mapping(mappingFunction: mappingFunction, level: level)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(mappingFunction)
-            if let level = self.level { if let level = self.level { try coder.serialize(level) } }
+            if let level = self.level { try coder.serialize(level) }
+
         }
     }
 }

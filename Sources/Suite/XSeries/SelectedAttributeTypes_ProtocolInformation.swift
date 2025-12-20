@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SelectedAttributeTypes_ProtocolInformation: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SelectedAttributeTypes_ProtocolInformation: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var nAddress: ASN1OctetString
     @usableFromInline var profiles: [ASN1ObjectIdentifier]
     @inlinable init(nAddress: ASN1OctetString, profiles: [ASN1ObjectIdentifier]) {
         self.nAddress = nAddress
         self.profiles = profiles
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let nAddress: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let profiles: [ASN1ObjectIdentifier] = try DER.set(of: ASN1ObjectIdentifier.self, identifier: .set, nodes: &nodes)
+
             return SelectedAttributeTypes_ProtocolInformation(nAddress: nAddress, profiles: profiles)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(nAddress)
             try coder.serializeSetOf(profiles)
+
         }
     }
 }

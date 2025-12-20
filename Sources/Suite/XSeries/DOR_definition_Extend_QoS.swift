@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DOR_definition_Extend_QoS: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DOR_definition_Extend_QoS: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var qoS_level: DOR_definition_Requested_QoS_level?
     @usableFromInline var usage_of_reference: DOR_definition_Single_use_of_reference?
     @inlinable init(qoS_level: DOR_definition_Requested_QoS_level?, usage_of_reference: DOR_definition_Single_use_of_reference?) {
         self.qoS_level = qoS_level
         self.usage_of_reference = usage_of_reference
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,14 +20,16 @@ var peek_usage_of_reference = nodes
 if let next = peek_usage_of_reference.next(), next.identifier == DOR_definition_Single_use_of_reference.defaultIdentifier {
     usage_of_reference = try DOR_definition_Single_use_of_reference(derEncoded: &nodes)
 }
+
             return DOR_definition_Extend_QoS(qoS_level: qoS_level, usage_of_reference: usage_of_reference)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let qoS_level = self.qoS_level { if let qoS_level = self.qoS_level { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(qoS_level) } } }
-            if let usage_of_reference = self.usage_of_reference { if let usage_of_reference = self.usage_of_reference { try coder.serialize(usage_of_reference) } }
+            if let qoS_level = self.qoS_level { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(qoS_level) } }
+            if let usage_of_reference = self.usage_of_reference { try coder.serialize(usage_of_reference) }
+
         }
     }
 }

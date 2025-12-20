@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SelectedAttributeTypes_NameAndOptionalUID: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SelectedAttributeTypes_NameAndOptionalUID: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var dn: PKIX1Explicit88_DistinguishedName
     @usableFromInline var uid: SelectedAttributeTypes_UniqueIdentifier?
     @inlinable init(dn: PKIX1Explicit88_DistinguishedName, uid: SelectedAttributeTypes_UniqueIdentifier?) {
         self.dn = dn
         self.uid = uid
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,6 +20,7 @@ var peek_uid = nodes
 if let next = peek_uid.next(), next.identifier == SelectedAttributeTypes_UniqueIdentifier.defaultIdentifier {
     uid = try SelectedAttributeTypes_UniqueIdentifier(derEncoded: &nodes)
 }
+
             return SelectedAttributeTypes_NameAndOptionalUID(dn: dn, uid: uid)
         }
     }
@@ -26,7 +28,8 @@ if let next = peek_uid.next(), next.identifier == SelectedAttributeTypes_UniqueI
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(dn)
-            if let uid = self.uid { if let uid = self.uid { try coder.serialize(uid) } }
+            if let uid = self.uid { try coder.serialize(uid) }
+
         }
     }
 }

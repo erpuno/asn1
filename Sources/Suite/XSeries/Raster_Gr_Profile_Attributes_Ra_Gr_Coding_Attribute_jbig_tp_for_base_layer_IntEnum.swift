@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct Raster_Gr_Profile_Attributes_Ra_Gr_Coding_Attribute_jbig_tp_for_base_layer_IntEnum : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct Raster_Gr_Profile_Attributes_Ra_Gr_Coding_Attribute_jbig_tp_for_base_layer_IntEnum : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: Raster_Gr_Profile_Attributes_Ra_Gr_Coding_Attribute_jbig_tp_for_base_layer_IntEnum, rhs: Raster_Gr_Profile_Attributes_Ra_Gr_Coding_Attribute_jbig_tp_for_base_layer_IntEnum) -> Bool { lhs.rawValue < rhs.rawValue }

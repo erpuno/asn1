@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_P_Adjust_Properties_iso_standard_9541_peax_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_P_Adjust_Properties_iso_standard_9541_peax_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var global_name: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name
     @usableFromInline var rel_rational: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational
     @inlinable init(global_name: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name, rel_rational: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational) {
         self.global_name = global_name
         self.rel_rational = rel_rational
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let global_name: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let rel_rational: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_P_Adjust_Properties_iso_standard_9541_peax_Sequence(global_name: global_name, rel_rational: rel_rational)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(global_name, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(rel_rational, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
         }
     }
 }

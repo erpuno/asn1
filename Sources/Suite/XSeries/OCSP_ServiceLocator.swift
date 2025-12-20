@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct OCSP_ServiceLocator: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct OCSP_ServiceLocator: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var issuer: InformationFramework_Name
     @usableFromInline var locator: PKIX1Implicit88_AuthorityInfoAccessSyntax
     @inlinable init(issuer: InformationFramework_Name, locator: PKIX1Implicit88_AuthorityInfoAccessSyntax) {
         self.issuer = issuer
         self.locator = locator
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let issuer: InformationFramework_Name = try InformationFramework_Name(derEncoded: &nodes)
             let locator: PKIX1Implicit88_AuthorityInfoAccessSyntax = try PKIX1Implicit88_AuthorityInfoAccessSyntax(derEncoded: &nodes)
+
             return OCSP_ServiceLocator(issuer: issuer, locator: locator)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(issuer)
             try coder.serialize(locator)
+
         }
     }
 }

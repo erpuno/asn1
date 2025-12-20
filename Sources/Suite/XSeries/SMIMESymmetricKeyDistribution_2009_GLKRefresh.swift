@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLKRefresh: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLKRefresh: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var glName: PKIX1Implicit88_GeneralName
     @usableFromInline var dates: [SMIMESymmetricKeyDistribution_2009_Date]
     @inlinable init(glName: PKIX1Implicit88_GeneralName, dates: [SMIMESymmetricKeyDistribution_2009_Date]) {
         self.glName = glName
         self.dates = dates
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let glName: PKIX1Implicit88_GeneralName = try PKIX1Implicit88_GeneralName(derEncoded: &nodes)
             let dates: [SMIMESymmetricKeyDistribution_2009_Date] = try DER.sequence(of: SMIMESymmetricKeyDistribution_2009_Date.self, identifier: .sequence, nodes: &nodes)
+
             return SMIMESymmetricKeyDistribution_2009_GLKRefresh(glName: glName, dates: dates)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(glName)
             try coder.serializeSequenceOf(dates)
+
         }
     }
 }

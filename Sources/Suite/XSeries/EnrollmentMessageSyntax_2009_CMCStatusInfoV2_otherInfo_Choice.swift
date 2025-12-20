@@ -2,27 +2,42 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum EnrollmentMessageSyntax_2009_CMCStatusInfoV2_otherInfo_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum EnrollmentMessageSyntax_2009_CMCStatusInfoV2_otherInfo_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case failInfo(EnrollmentMessageSyntax_2009_CMCFailInfo)
     case pendInfo(EnrollmentMessageSyntax_2009_PendInfo)
     case extendedFailInfo(EnrollmentMessageSyntax_2009_CMCStatusInfoV2_otherInfo_Choice_extendedFailInfo_Sequence)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .application):
-                self = .failInfo(try EnrollmentMessageSyntax_2009_CMCFailInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .application):
-                self = .pendInfo(try EnrollmentMessageSyntax_2009_PendInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .extendedFailInfo(try EnrollmentMessageSyntax_2009_CMCStatusInfoV2_otherInfo_Choice_extendedFailInfo_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case EnrollmentMessageSyntax_2009_CMCFailInfo.defaultIdentifier:
+            self = .failInfo(try EnrollmentMessageSyntax_2009_CMCFailInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case EnrollmentMessageSyntax_2009_PendInfo.defaultIdentifier:
+            self = .pendInfo(try EnrollmentMessageSyntax_2009_PendInfo(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .extendedFailInfo(try EnrollmentMessageSyntax_2009_CMCStatusInfoV2_otherInfo_Choice_extendedFailInfo_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .failInfo(let failInfo): try failInfo.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .application))
-            case .pendInfo(let pendInfo): try pendInfo.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .application))
-            case .extendedFailInfo(let extendedFailInfo): try extendedFailInfo.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+        case .failInfo(let failInfo):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(failInfo)
+                            }
+                        } else {
+                            try coder.serialize(failInfo)
+                        }
+        case .pendInfo(let pendInfo):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(pendInfo)
+                            }
+                        } else {
+                            try coder.serialize(pendInfo)
+                        }
+        case .extendedFailInfo(let extendedFailInfo): try extendedFailInfo.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
         }
     }
 

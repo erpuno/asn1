@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Location_Expressions_AttributeValue_Link_Class_Specification_range_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Location_Expressions_AttributeValue_Link_Class_Specification_range_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var start: Location_Expressions_Simple_AttributeValue_Link_Class_Specification?
     @usableFromInline var end: Location_Expressions_Simple_AttributeValue_Link_Class_Specification?
     @inlinable init(start: Location_Expressions_Simple_AttributeValue_Link_Class_Specification?, end: Location_Expressions_Simple_AttributeValue_Link_Class_Specification?) {
         self.start = start
         self.end = end
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let start: Location_Expressions_Simple_AttributeValue_Link_Class_Specification? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let end: Location_Expressions_Simple_AttributeValue_Link_Class_Specification? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return Location_Expressions_AttributeValue_Link_Class_Specification_range_Sequence(start: start, end: end)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let start = self.start { if let start = self.start { try coder.serializeOptionalImplicitlyTagged(start, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let end = self.end { if let end = self.end { try coder.serializeOptionalImplicitlyTagged(end, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let start = self.start { try coder.serializeOptionalImplicitlyTagged(start, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let end = self.end { try coder.serializeOptionalImplicitlyTagged(end, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

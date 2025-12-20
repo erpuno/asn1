@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntaxAlgorithms_2009_RC2CBCParameter: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntaxAlgorithms_2009_RC2CBCParameter: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var rc2ParameterVersion: ArraySlice<UInt8>
     @usableFromInline var iv: ASN1OctetString
     @inlinable init(rc2ParameterVersion: ArraySlice<UInt8>, iv: ASN1OctetString) {
         self.rc2ParameterVersion = rc2ParameterVersion
         self.iv = iv
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let rc2ParameterVersion: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let iv: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return CryptographicMessageSyntaxAlgorithms_2009_RC2CBCParameter(rc2ParameterVersion: rc2ParameterVersion, iv: iv)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(rc2ParameterVersion)
             try coder.serialize(iv)
+
         }
     }
 }

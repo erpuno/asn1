@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_DITStructureRule: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_DITStructureRule: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var ruleIdentifier: InformationFramework_RuleIdentifier
     @usableFromInline var nameForm: ASN1ObjectIdentifier
@@ -11,6 +11,7 @@ import Foundation
         self.ruleIdentifier = ruleIdentifier
         self.nameForm = nameForm
         self.superiorStructureRules = superiorStructureRules
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let ruleIdentifier: InformationFramework_RuleIdentifier = try InformationFramework_RuleIdentifier(derEncoded: &nodes)
             let nameForm: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let superiorStructureRules: [InformationFramework_RuleIdentifier]? = try DER.set(of: InformationFramework_RuleIdentifier.self, identifier: .set, nodes: &nodes)
+
             return InformationFramework_DITStructureRule(ruleIdentifier: ruleIdentifier, nameForm: nameForm, superiorStructureRules: superiorStructureRules)
         }
     }
@@ -26,7 +28,8 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(ruleIdentifier)
             try coder.serialize(nameForm)
-            if let superiorStructureRules = self.superiorStructureRules { if let superiorStructureRules = self.superiorStructureRules { try coder.serializeSetOf(superiorStructureRules) } }
+            if let superiorStructureRules = self.superiorStructureRules { try coder.serializeSetOf(superiorStructureRules) }
+
         }
     }
 }

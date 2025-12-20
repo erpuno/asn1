@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct PKIXCMP_2009_PKIStatus : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct PKIXCMP_2009_PKIStatus : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: PKIXCMP_2009_PKIStatus, rhs: PKIXCMP_2009_PKIStatus) -> Bool { lhs.rawValue < rhs.rawValue }

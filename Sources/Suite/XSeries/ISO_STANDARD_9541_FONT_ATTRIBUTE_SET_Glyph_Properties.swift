@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Glyph_Properties: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Glyph_Properties: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var iso_standard_9541_px: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational?
     @usableFromInline var iso_standard_9541_py: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational?
@@ -33,6 +33,7 @@ import Foundation
         self.iso_standard_9541_maxex = iso_standard_9541_maxex
         self.iso_standard_9541_maxey = iso_standard_9541_maxey
         self.non_iso_properties = non_iso_properties
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -51,26 +52,28 @@ import Foundation
             let iso_standard_9541_maxex: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific))
             let iso_standard_9541_maxey: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rel_Rational? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific))
             let non_iso_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific))
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Glyph_Properties(iso_standard_9541_px: iso_standard_9541_px, iso_standard_9541_py: iso_standard_9541_py, iso_standard_9541_ex: iso_standard_9541_ex, iso_standard_9541_ey: iso_standard_9541_ey, iso_standard_9541_ext: iso_standard_9541_ext, iso_standard_9541_lgs: iso_standard_9541_lgs, iso_standard_9541_peas: iso_standard_9541_peas, iso_standard_9541_cpeai: iso_standard_9541_cpeai, iso_standard_9541_eai: iso_standard_9541_eai, iso_standard_9541_minex: iso_standard_9541_minex, iso_standard_9541_miney: iso_standard_9541_miney, iso_standard_9541_maxex: iso_standard_9541_maxex, iso_standard_9541_maxey: iso_standard_9541_maxey, non_iso_properties: non_iso_properties)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let iso_standard_9541_px = self.iso_standard_9541_px { if let iso_standard_9541_px = self.iso_standard_9541_px { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_px, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_py = self.iso_standard_9541_py { if let iso_standard_9541_py = self.iso_standard_9541_py { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_py, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let iso_standard_9541_px = self.iso_standard_9541_px { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_px, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_py = self.iso_standard_9541_py { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_py, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
             try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_ex, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_ey, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_ext, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific))
-            if let iso_standard_9541_lgs = self.iso_standard_9541_lgs { if let iso_standard_9541_lgs = self.iso_standard_9541_lgs { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_lgs, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_peas = self.iso_standard_9541_peas { if let iso_standard_9541_peas = self.iso_standard_9541_peas { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_peas, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_cpeai = self.iso_standard_9541_cpeai { if let iso_standard_9541_cpeai = self.iso_standard_9541_cpeai { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_cpeai, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_eai = self.iso_standard_9541_eai { if let iso_standard_9541_eai = self.iso_standard_9541_eai { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_eai, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_minex = self.iso_standard_9541_minex { if let iso_standard_9541_minex = self.iso_standard_9541_minex { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_minex, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_miney = self.iso_standard_9541_miney { if let iso_standard_9541_miney = self.iso_standard_9541_miney { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_miney, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_maxex = self.iso_standard_9541_maxex { if let iso_standard_9541_maxex = self.iso_standard_9541_maxex { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_maxex, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) } }
-            if let iso_standard_9541_maxey = self.iso_standard_9541_maxey { if let iso_standard_9541_maxey = self.iso_standard_9541_maxey { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_maxey, withIdentifier: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific)) } }
-            if let non_iso_properties = self.non_iso_properties { if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific)) } }
+            if let iso_standard_9541_lgs = self.iso_standard_9541_lgs { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_lgs, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_peas = self.iso_standard_9541_peas { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_peas, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_cpeai = self.iso_standard_9541_cpeai { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_cpeai, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_eai = self.iso_standard_9541_eai { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_eai, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_minex = self.iso_standard_9541_minex { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_minex, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_miney = self.iso_standard_9541_miney { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_miney, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_maxex = self.iso_standard_9541_maxex { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_maxex, withIdentifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) }
+            if let iso_standard_9541_maxey = self.iso_standard_9541_maxey { try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_maxey, withIdentifier: ASN1Identifier(tagWithNumber: 12, tagClass: .contextSpecific)) }
+            if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 13, tagClass: .contextSpecific)) }
+
         }
     }
 }

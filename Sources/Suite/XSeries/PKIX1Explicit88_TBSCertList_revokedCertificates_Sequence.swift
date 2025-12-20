@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Explicit88_TBSCertList_revokedCertificates_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Explicit88_TBSCertList_revokedCertificates_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var userCertificate: PKIX1Explicit88_CertificateSerialNumber
     @usableFromInline var revocationDate: PKIX1Explicit88_Time
@@ -11,6 +11,7 @@ import Foundation
         self.userCertificate = userCertificate
         self.revocationDate = revocationDate
         self.crlEntryExtensions = crlEntryExtensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ var peek_crlEntryExtensions = nodes
 if let next = peek_crlEntryExtensions.next(), next.identifier == PKIX1Explicit88_Extensions.defaultIdentifier {
     crlEntryExtensions = try PKIX1Explicit88_Extensions(derEncoded: &nodes)
 }
+
             return PKIX1Explicit88_TBSCertList_revokedCertificates_Sequence(userCertificate: userCertificate, revocationDate: revocationDate, crlEntryExtensions: crlEntryExtensions)
         }
     }
@@ -30,7 +32,8 @@ if let next = peek_crlEntryExtensions.next(), next.identifier == PKIX1Explicit88
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(userCertificate)
             try coder.serialize(revocationDate)
-            if let crlEntryExtensions = self.crlEntryExtensions { if let crlEntryExtensions = self.crlEntryExtensions { try coder.serialize(crlEntryExtensions) } }
+            if let crlEntryExtensions = self.crlEntryExtensions { try coder.serialize(crlEntryExtensions) }
+
         }
     }
 }

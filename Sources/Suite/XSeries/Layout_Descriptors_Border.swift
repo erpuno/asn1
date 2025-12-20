@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Layout_Descriptors_Border: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Layout_Descriptors_Border: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var left_hand_edge: Layout_Descriptors_Border_Edge?
     @usableFromInline var right_hand_edge: Layout_Descriptors_Border_Edge?
@@ -13,6 +13,7 @@ import Foundation
         self.right_hand_edge = right_hand_edge
         self.trailing_edge = trailing_edge
         self.leading_edge = leading_edge
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let right_hand_edge: Layout_Descriptors_Border_Edge? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let trailing_edge: Layout_Descriptors_Border_Edge? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let leading_edge: Layout_Descriptors_Border_Edge? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
             return Layout_Descriptors_Border(left_hand_edge: left_hand_edge, right_hand_edge: right_hand_edge, trailing_edge: trailing_edge, leading_edge: leading_edge)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let left_hand_edge = self.left_hand_edge { if let left_hand_edge = self.left_hand_edge { try coder.serializeOptionalImplicitlyTagged(left_hand_edge, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let right_hand_edge = self.right_hand_edge { if let right_hand_edge = self.right_hand_edge { try coder.serializeOptionalImplicitlyTagged(right_hand_edge, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let trailing_edge = self.trailing_edge { if let trailing_edge = self.trailing_edge { try coder.serializeOptionalImplicitlyTagged(trailing_edge, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let leading_edge = self.leading_edge { if let leading_edge = self.leading_edge { try coder.serializeOptionalImplicitlyTagged(leading_edge, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
+            if let left_hand_edge = self.left_hand_edge { try coder.serializeOptionalImplicitlyTagged(left_hand_edge, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let right_hand_edge = self.right_hand_edge { try coder.serializeOptionalImplicitlyTagged(right_hand_edge, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let trailing_edge = self.trailing_edge { try coder.serializeOptionalImplicitlyTagged(trailing_edge, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let leading_edge = self.leading_edge { try coder.serializeOptionalImplicitlyTagged(leading_edge, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+
         }
     }
 }

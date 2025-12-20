@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_RevAnnContent: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_RevAnnContent: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var status: PKIXCMP_2009_PKIStatus
     @usableFromInline var certId: PKIXCRMF_2009_CertId
@@ -15,6 +15,7 @@ import Foundation
         self.willBeRevokedAt = willBeRevokedAt
         self.badSinceDate = badSinceDate
         self.crlDetails = crlDetails
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -28,6 +29,7 @@ var peek_crlDetails = nodes
 if let next = peek_crlDetails.next(), next.identifier == PKIX1Explicit88_Extensions.defaultIdentifier {
     crlDetails = try PKIX1Explicit88_Extensions(derEncoded: &nodes)
 }
+
             return PKIXCMP_2009_RevAnnContent(status: status, certId: certId, willBeRevokedAt: willBeRevokedAt, badSinceDate: badSinceDate, crlDetails: crlDetails)
         }
     }
@@ -38,7 +40,8 @@ if let next = peek_crlDetails.next(), next.identifier == PKIX1Explicit88_Extensi
             try coder.serialize(certId)
             try coder.serialize(willBeRevokedAt)
             try coder.serialize(badSinceDate)
-            if let crlDetails = self.crlDetails { if let crlDetails = self.crlDetails { try coder.serialize(crlDetails) } }
+            if let crlDetails = self.crlDetails { try coder.serialize(crlDetails) }
+
         }
     }
 }

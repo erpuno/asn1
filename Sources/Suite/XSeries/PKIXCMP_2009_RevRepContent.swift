@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXCMP_2009_RevRepContent: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXCMP_2009_RevRepContent: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var status: [PKIXCMP_2009_PKIStatusInfo]
     @usableFromInline var revCerts: [PKIXCRMF_2009_CertId]?
@@ -11,6 +11,7 @@ import Foundation
         self.status = status
         self.revCerts = revCerts
         self.crls = crls
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let status: [PKIXCMP_2009_PKIStatusInfo] = try DER.sequence(of: PKIXCMP_2009_PKIStatusInfo.self, identifier: .sequence, nodes: &nodes)
             let revCerts: [PKIXCRMF_2009_CertId]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in try DER.sequence(of: PKIXCRMF_2009_CertId.self, identifier: .sequence, rootNode: node) }
             let crls: [PKIX1Explicit88_CertificateList]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in try DER.sequence(of: PKIX1Explicit88_CertificateList.self, identifier: .sequence, rootNode: node) }
+
             return PKIXCMP_2009_RevRepContent(status: status, revCerts: revCerts, crls: crls)
         }
     }
@@ -25,8 +27,9 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeSequenceOf(status)
-            if let revCerts = self.revCerts { if let revCerts = self.revCerts { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(revCerts) } } }
-            if let crls = self.crls { if let crls = self.crls { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(crls) } } }
+            if let revCerts = self.revCerts { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(revCerts) } }
+            if let crls = self.crls { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(crls) } }
+
         }
     }
 }

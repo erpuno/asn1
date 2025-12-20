@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_CommonArguments: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_CommonArguments: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var serviceControls: DirectoryAbstractService_ServiceControls?
     @usableFromInline var securityParameters: DirectoryAbstractService_SecurityParameters?
@@ -27,6 +27,7 @@ import Foundation
         self.nameResolveOnMaste = nameResolveOnMaste
         self.operationContexts = operationContexts
         self.familyGrouping = familyGrouping
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -42,23 +43,25 @@ import Foundation
             let nameResolveOnMaste: Bool = try DER.explicitlyTagged(&nodes, tagNumber: 21, tagClass: .contextSpecific) { node in return try Bool(derEncoded: node) }
             let operationContexts: DirectoryAbstractService_ContextSelection? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 20, tagClass: .contextSpecific) { node in return try DirectoryAbstractService_ContextSelection(derEncoded: node) }
             let familyGrouping: DirectoryAbstractService_FamilyGrouping = try DER.explicitlyTagged(&nodes, tagNumber: 19, tagClass: .contextSpecific) { node in return try DirectoryAbstractService_FamilyGrouping(derEncoded: node) }
+
             return DirectoryAbstractService_CommonArguments(serviceControls: serviceControls, securityParameters: securityParameters, requestor: requestor, operationProgress: operationProgress, aliasedRDNs: aliasedRDNs, criticalExtensions: criticalExtensions, referenceType: referenceType, entryOnly: entryOnly, nameResolveOnMaste: nameResolveOnMaste, operationContexts: operationContexts, familyGrouping: familyGrouping)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let serviceControls = self.serviceControls { if let serviceControls = self.serviceControls { try coder.serialize(explicitlyTaggedWithTagNumber: 30, tagClass: .contextSpecific) { codec in try codec.serialize(serviceControls) } } }
-            if let securityParameters = self.securityParameters { if let securityParameters = self.securityParameters { try coder.serialize(explicitlyTaggedWithTagNumber: 29, tagClass: .contextSpecific) { codec in try codec.serialize(securityParameters) } } }
-            if let requestor = self.requestor { if let requestor = self.requestor { try coder.serialize(explicitlyTaggedWithTagNumber: 28, tagClass: .contextSpecific) { codec in try codec.serialize(requestor) } } }
-            if let operationProgress = self.operationProgress { if let operationProgress = self.operationProgress { try coder.serialize(explicitlyTaggedWithTagNumber: 27, tagClass: .contextSpecific) { codec in try codec.serialize(operationProgress) } } }
-            if let aliasedRDNs = self.aliasedRDNs { if let aliasedRDNs = self.aliasedRDNs { try coder.serialize(explicitlyTaggedWithTagNumber: 26, tagClass: .contextSpecific) { codec in try codec.serialize(aliasedRDNs) } } }
-            if let criticalExtensions = self.criticalExtensions { if let criticalExtensions = self.criticalExtensions { try coder.serialize(explicitlyTaggedWithTagNumber: 25, tagClass: .contextSpecific) { codec in try codec.serialize(criticalExtensions) } } }
-            if let referenceType = self.referenceType { if let referenceType = self.referenceType { try coder.serialize(explicitlyTaggedWithTagNumber: 24, tagClass: .contextSpecific) { codec in try codec.serialize(referenceType) } } }
-            if let entryOnly = self.entryOnly { if let entryOnly = self.entryOnly { try coder.serialize(explicitlyTaggedWithTagNumber: 23, tagClass: .contextSpecific) { codec in try codec.serialize(entryOnly) } } }
-            if let nameResolveOnMaste = self.nameResolveOnMaste { if let nameResolveOnMaste = self.nameResolveOnMaste { try coder.serialize(explicitlyTaggedWithTagNumber: 21, tagClass: .contextSpecific) { codec in try codec.serialize(nameResolveOnMaste) } } }
-            if let operationContexts = self.operationContexts { if let operationContexts = self.operationContexts { try coder.serialize(explicitlyTaggedWithTagNumber: 20, tagClass: .contextSpecific) { codec in try codec.serialize(operationContexts) } } }
-            if let familyGrouping = self.familyGrouping { if let familyGrouping = self.familyGrouping { try coder.serialize(explicitlyTaggedWithTagNumber: 19, tagClass: .contextSpecific) { codec in try codec.serialize(familyGrouping) } } }
+            if let serviceControls = self.serviceControls { try coder.serialize(explicitlyTaggedWithTagNumber: 30, tagClass: .contextSpecific) { codec in try codec.serialize(serviceControls) } }
+            if let securityParameters = self.securityParameters { try coder.serialize(explicitlyTaggedWithTagNumber: 29, tagClass: .contextSpecific) { codec in try codec.serialize(securityParameters) } }
+            if let requestor = self.requestor { try coder.serialize(explicitlyTaggedWithTagNumber: 28, tagClass: .contextSpecific) { codec in try codec.serialize(requestor) } }
+            if let operationProgress = self.operationProgress { try coder.serialize(explicitlyTaggedWithTagNumber: 27, tagClass: .contextSpecific) { codec in try codec.serialize(operationProgress) } }
+            if let aliasedRDNs = self.aliasedRDNs { try coder.serialize(explicitlyTaggedWithTagNumber: 26, tagClass: .contextSpecific) { codec in try codec.serialize(aliasedRDNs) } }
+            if let criticalExtensions = self.criticalExtensions { try coder.serialize(explicitlyTaggedWithTagNumber: 25, tagClass: .contextSpecific) { codec in try codec.serialize(criticalExtensions) } }
+            if let referenceType = self.referenceType { try coder.serialize(explicitlyTaggedWithTagNumber: 24, tagClass: .contextSpecific) { codec in try codec.serialize(referenceType) } }
+            if let entryOnly = self.entryOnly { try coder.serialize(explicitlyTaggedWithTagNumber: 23, tagClass: .contextSpecific) { codec in try codec.serialize(entryOnly) } }
+            if let nameResolveOnMaste = self.nameResolveOnMaste { try coder.serialize(explicitlyTaggedWithTagNumber: 21, tagClass: .contextSpecific) { codec in try codec.serialize(nameResolveOnMaste) } }
+            if let operationContexts = self.operationContexts { try coder.serialize(explicitlyTaggedWithTagNumber: 20, tagClass: .contextSpecific) { codec in try codec.serialize(operationContexts) } }
+            if let familyGrouping = self.familyGrouping { try coder.serialize(explicitlyTaggedWithTagNumber: 19, tagClass: .contextSpecific) { codec in try codec.serialize(familyGrouping) } }
+
         }
     }
 }

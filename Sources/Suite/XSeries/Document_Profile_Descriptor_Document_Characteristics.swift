@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Document_Characteristics: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Document_Characteristics: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var document_application_profile: Document_Profile_Descriptor_Document_Characteristics_document_application_profile_Choice?
     @usableFromInline var doc_appl_profile_defaults: Document_Profile_Descriptor_Doc_Appl_Profile_Defaults?
@@ -25,6 +25,7 @@ import Foundation
         self.non_basic_doc_characteristics = non_basic_doc_characteristics
         self.non_basic_struc_characteristics = non_basic_struc_characteristics
         self.additional_doc_characteristics = additional_doc_characteristics
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -43,22 +44,24 @@ if let next = peek_document_application_profile.next(), next.identifier == Docum
             let non_basic_doc_characteristics: Document_Profile_Descriptor_Non_Basic_Doc_Characteristics? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let non_basic_struc_characteristics: Document_Profile_Descriptor_Non_Basic_Struc_Characteristics? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             let additional_doc_characteristics: Document_Profile_Descriptor_Additional_Doc_Characteristics? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
+
             return Document_Profile_Descriptor_Document_Characteristics(document_application_profile: document_application_profile, doc_appl_profile_defaults: doc_appl_profile_defaults, document_architecture_class: document_architecture_class, content_architecture_classes: content_architecture_classes, interchange_format_class: interchange_format_class, oda_version: oda_version, alternative_feature_sets: alternative_feature_sets, non_basic_doc_characteristics: non_basic_doc_characteristics, non_basic_struc_characteristics: non_basic_struc_characteristics, additional_doc_characteristics: additional_doc_characteristics)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let document_application_profile = self.document_application_profile { if let document_application_profile = self.document_application_profile { try coder.serialize(document_application_profile) } }
-            if let doc_appl_profile_defaults = self.doc_appl_profile_defaults { if let doc_appl_profile_defaults = self.doc_appl_profile_defaults { try coder.serializeOptionalImplicitlyTagged(doc_appl_profile_defaults, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) } }
+            if let document_application_profile = self.document_application_profile { try coder.serialize(document_application_profile) }
+            if let doc_appl_profile_defaults = self.doc_appl_profile_defaults { try coder.serializeOptionalImplicitlyTagged(doc_appl_profile_defaults, withIdentifier: ASN1Identifier(tagWithNumber: 10, tagClass: .contextSpecific)) }
             try coder.serialize(document_architecture_class.rawValue, explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific)
             try coder.serializeSetOf(content_architecture_classes, identifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
             try coder.serialize(interchange_format_class.rawValue, explicitlyTaggedWithTagNumber: 6, tagClass: .contextSpecific)
             try coder.serializeOptionalImplicitlyTagged(oda_version, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific))
-            if let alternative_feature_sets = self.alternative_feature_sets { if let alternative_feature_sets = self.alternative_feature_sets { try coder.serializeSetOf(alternative_feature_sets, identifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) } }
-            if let non_basic_doc_characteristics = self.non_basic_doc_characteristics { if let non_basic_doc_characteristics = self.non_basic_doc_characteristics { try coder.serializeOptionalImplicitlyTagged(non_basic_doc_characteristics, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let non_basic_struc_characteristics = self.non_basic_struc_characteristics { if let non_basic_struc_characteristics = self.non_basic_struc_characteristics { try coder.serializeOptionalImplicitlyTagged(non_basic_struc_characteristics, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let additional_doc_characteristics = self.additional_doc_characteristics { if let additional_doc_characteristics = self.additional_doc_characteristics { try coder.serializeOptionalImplicitlyTagged(additional_doc_characteristics, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) } }
+            if let alternative_feature_sets = self.alternative_feature_sets { try coder.serializeSetOf(alternative_feature_sets, identifier: ASN1Identifier(tagWithNumber: 11, tagClass: .contextSpecific)) }
+            if let non_basic_doc_characteristics = self.non_basic_doc_characteristics { try coder.serializeOptionalImplicitlyTagged(non_basic_doc_characteristics, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let non_basic_struc_characteristics = self.non_basic_struc_characteristics { try coder.serializeOptionalImplicitlyTagged(non_basic_struc_characteristics, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let additional_doc_characteristics = self.additional_doc_characteristics { try coder.serializeOptionalImplicitlyTagged(additional_doc_characteristics, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) }
+
         }
     }
 }

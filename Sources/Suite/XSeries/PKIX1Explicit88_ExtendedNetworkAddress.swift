@@ -2,30 +2,31 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum PKIX1Explicit88_ExtendedNetworkAddress: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum PKIX1Explicit88_ExtendedNetworkAddress: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case e163_4_address(PKIX1Explicit88_ExtendedNetworkAddress_e163_4_address_Sequence)
     case psap_address(PKIX1Explicit88_PresentationAddress)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case PKIX1Explicit88_ExtendedNetworkAddress_e163_4_address_Sequence.defaultIdentifier:
-                self = .e163_4_address(try PKIX1Explicit88_ExtendedNetworkAddress_e163_4_address_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .psap_address(try PKIX1Explicit88_PresentationAddress(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case PKIX1Explicit88_ExtendedNetworkAddress_e163_4_address_Sequence.defaultIdentifier:
+            self = .e163_4_address(try PKIX1Explicit88_ExtendedNetworkAddress_e163_4_address_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .psap_address(try PKIX1Explicit88_PresentationAddress(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .e163_4_address(let e163_4_address):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(e163_4_address)
-                                }
-                            } else {
+        case .e163_4_address(let e163_4_address):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(e163_4_address)
                             }
-            case .psap_address(let psap_address): try psap_address.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+                        } else {
+                            try coder.serialize(e163_4_address)
+                        }
+        case .psap_address(let psap_address): try psap_address.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+
         }
     }
 

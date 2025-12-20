@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct EnrollmentMessageSyntax_2009_CMCFailInfo : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct EnrollmentMessageSyntax_2009_CMCFailInfo : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: EnrollmentMessageSyntax_2009_CMCFailInfo, rhs: EnrollmentMessageSyntax_2009_CMCFailInfo) -> Bool { lhs.rawValue < rhs.rawValue }

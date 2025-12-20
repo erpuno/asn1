@@ -2,23 +2,24 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum ExtendedSecurityServices_2009_ReceiptsFrom: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum ExtendedSecurityServices_2009_ReceiptsFrom: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case allOrFirstTier(ExtendedSecurityServices_2009_AllOrFirstTier)
     case receiptList([PKIX1Implicit_2009_GeneralNames])
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .allOrFirstTier(try ExtendedSecurityServices_2009_AllOrFirstTier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .receiptList(try DER.sequence(of: PKIX1Implicit_2009_GeneralNames.self, identifier: rootNode.identifier, rootNode: rootNode))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .allOrFirstTier(try ExtendedSecurityServices_2009_AllOrFirstTier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .receiptList(try DER.sequence(of: PKIX1Implicit_2009_GeneralNames.self, identifier: rootNode.identifier, rootNode: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .allOrFirstTier(let allOrFirstTier): try allOrFirstTier.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            case .receiptList(let receiptList): try coder.serializeSequenceOf(receiptList, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+        case .allOrFirstTier(let allOrFirstTier): try allOrFirstTier.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+        case .receiptList(let receiptList): try coder.serializeSequenceOf(receiptList, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
         }
     }
 

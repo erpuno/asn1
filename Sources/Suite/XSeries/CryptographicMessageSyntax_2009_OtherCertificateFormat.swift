@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2009_OtherCertificateFormat: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2009_OtherCertificateFormat: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var otherCertFormat: ASN1ObjectIdentifier
     @usableFromInline var otherCert: ASN1Any
     @inlinable init(otherCertFormat: ASN1ObjectIdentifier, otherCert: ASN1Any) {
         self.otherCertFormat = otherCertFormat
         self.otherCert = otherCert
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let otherCertFormat: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let otherCert: ASN1Any = try ASN1Any(derEncoded: &nodes)
+
             return CryptographicMessageSyntax_2009_OtherCertificateFormat(otherCertFormat: otherCertFormat, otherCert: otherCert)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(otherCertFormat)
             try coder.serialize(otherCert)
+
         }
     }
 }

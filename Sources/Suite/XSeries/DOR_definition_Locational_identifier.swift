@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DOR_definition_Locational_identifier: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DOR_definition_Locational_identifier: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var presentation_address: SelectedAttributeTypes_PresentationAddress
     @usableFromInline var ae_title: DOR_definition_AE_title?
@@ -11,6 +11,7 @@ import Foundation
         self.presentation_address = presentation_address
         self.ae_title = ae_title
         self.application_contexts = application_contexts
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let presentation_address: SelectedAttributeTypes_PresentationAddress = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try SelectedAttributeTypes_PresentationAddress(derEncoded: node) }
             let ae_title: DOR_definition_AE_title? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try DOR_definition_AE_title(derEncoded: node) }
             let application_contexts: [ASN1ObjectIdentifier] = try DER.set(of: ASN1ObjectIdentifier.self, identifier: .set, nodes: &nodes)
+
             return DOR_definition_Locational_identifier(presentation_address: presentation_address, ae_title: ae_title, application_contexts: application_contexts)
         }
     }
@@ -25,8 +27,9 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(presentation_address) }
-            if let ae_title = self.ae_title { if let ae_title = self.ae_title { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(ae_title) } } }
+            if let ae_title = self.ae_title { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(ae_title) } }
             try coder.serializeSetOf(application_contexts)
+
         }
     }
 }

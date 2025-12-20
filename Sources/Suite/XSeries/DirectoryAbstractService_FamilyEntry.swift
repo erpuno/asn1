@@ -2,22 +2,24 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DirectoryAbstractService_FamilyEntry: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DirectoryAbstractService_FamilyEntry: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var rdn: PKIX1Explicit88_RelativeDistinguishedName
     @usableFromInline var information: [DirectoryAbstractService_FamilyEntry_information_Choice]
-    @usableFromInline var family_info: Box<[DirectoryAbstractService_FamilyEntries]>?
-    @inlinable init(rdn: PKIX1Explicit88_RelativeDistinguishedName, information: [DirectoryAbstractService_FamilyEntry_information_Choice], family_info: Box<[DirectoryAbstractService_FamilyEntries]>?) {
+    @usableFromInline var family_info: [DirectoryAbstractService_FamilyEntries]?
+    @inlinable init(rdn: PKIX1Explicit88_RelativeDistinguishedName, information: [DirectoryAbstractService_FamilyEntry_information_Choice], family_info: [DirectoryAbstractService_FamilyEntries]?) {
         self.rdn = rdn
         self.information = information
         self.family_info = family_info
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let rdn: PKIX1Explicit88_RelativeDistinguishedName = try PKIX1Explicit88_RelativeDistinguishedName(derEncoded: &nodes)
             let information: [DirectoryAbstractService_FamilyEntry_information_Choice] = try DER.sequence(of: DirectoryAbstractService_FamilyEntry_information_Choice.self, identifier: .sequence, nodes: &nodes)
-            let family_info: Box<[DirectoryAbstractService_FamilyEntries]>? = Box(try DER.sequence(of: DirectoryAbstractService_FamilyEntries.self, identifier: .sequence, nodes: &nodes))
+            let family_info: [DirectoryAbstractService_FamilyEntries]? = try DER.sequence(of: DirectoryAbstractService_FamilyEntries.self, identifier: .sequence, nodes: &nodes)
+
             return DirectoryAbstractService_FamilyEntry(rdn: rdn, information: information, family_info: family_info)
         }
     }
@@ -26,7 +28,8 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(rdn)
             try coder.serializeSequenceOf(information)
-            if let family_info = self.family_info { if let family_info = self.family_info { try coder.serializeSequenceOf(family_info.value) } }
+            if let family_info = self.family_info { try coder.serializeSequenceOf(family_info) }
+
         }
     }
 }

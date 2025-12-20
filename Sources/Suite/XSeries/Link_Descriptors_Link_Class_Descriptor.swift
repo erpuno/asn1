@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Link_Descriptors_Link_Class_Descriptor: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Link_Descriptors_Link_Class_Descriptor: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var link_class_identifier: Link_Descriptors_Link_or_Link_Class_Identifier
     @usableFromInline var link_roles: [Link_Descriptors_Link_Role]?
@@ -21,6 +21,7 @@ import Foundation
         self.sealed = sealed
         self.temporal_relations = temporal_relations
         self.presentation_time = presentation_time
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -33,6 +34,7 @@ import Foundation
             let sealed: Layout_Descriptors_Sealed? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 35, tagClass: .contextSpecific))
             let temporal_relations: Temporal_Relationships_Temporal_Relations? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 38, tagClass: .contextSpecific))
             let presentation_time: Temporal_Relationships_Presentation_Time? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 39, tagClass: .contextSpecific))
+
             return Link_Descriptors_Link_Class_Descriptor(link_class_identifier: link_class_identifier, link_roles: link_roles, user_readable_comments: user_readable_comments, user_visible_name: user_visible_name, application_comments: application_comments, sealed: sealed, temporal_relations: temporal_relations, presentation_time: presentation_time)
         }
     }
@@ -40,13 +42,14 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(link_class_identifier)
-            if let link_roles = self.link_roles { if let link_roles = self.link_roles { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(link_roles) } } }
-            if let user_readable_comments = self.user_readable_comments { if let user_readable_comments = self.user_readable_comments { try coder.serializeOptionalImplicitlyTagged(user_readable_comments, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let user_visible_name = self.user_visible_name { if let user_visible_name = self.user_visible_name { try coder.serializeOptionalImplicitlyTagged(user_visible_name, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let application_comments = self.application_comments { if let application_comments = self.application_comments { try coder.serializeOptionalImplicitlyTagged(application_comments, withIdentifier: ASN1Identifier(tagWithNumber: 25, tagClass: .contextSpecific)) } }
-            if let sealed = self.sealed { if let sealed = self.sealed { try coder.serializeOptionalImplicitlyTagged(sealed, withIdentifier: ASN1Identifier(tagWithNumber: 35, tagClass: .contextSpecific)) } }
-            if let temporal_relations = self.temporal_relations { if let temporal_relations = self.temporal_relations { try coder.serializeOptionalImplicitlyTagged(temporal_relations, withIdentifier: ASN1Identifier(tagWithNumber: 38, tagClass: .contextSpecific)) } }
-            if let presentation_time = self.presentation_time { if let presentation_time = self.presentation_time { try coder.serializeOptionalImplicitlyTagged(presentation_time, withIdentifier: ASN1Identifier(tagWithNumber: 39, tagClass: .contextSpecific)) } }
+            if let link_roles = self.link_roles { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serializeSequenceOf(link_roles) } }
+            if let user_readable_comments = self.user_readable_comments { try coder.serializeOptionalImplicitlyTagged(user_readable_comments, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let user_visible_name = self.user_visible_name { try coder.serializeOptionalImplicitlyTagged(user_visible_name, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let application_comments = self.application_comments { try coder.serializeOptionalImplicitlyTagged(application_comments, withIdentifier: ASN1Identifier(tagWithNumber: 25, tagClass: .contextSpecific)) }
+            if let sealed = self.sealed { try coder.serializeOptionalImplicitlyTagged(sealed, withIdentifier: ASN1Identifier(tagWithNumber: 35, tagClass: .contextSpecific)) }
+            if let temporal_relations = self.temporal_relations { try coder.serializeOptionalImplicitlyTagged(temporal_relations, withIdentifier: ASN1Identifier(tagWithNumber: 38, tagClass: .contextSpecific)) }
+            if let presentation_time = self.presentation_time { try coder.serializeOptionalImplicitlyTagged(presentation_time, withIdentifier: ASN1Identifier(tagWithNumber: 39, tagClass: .contextSpecific)) }
+
         }
     }
 }

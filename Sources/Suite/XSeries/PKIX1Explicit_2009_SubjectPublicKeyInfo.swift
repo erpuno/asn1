@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Explicit_2009_SubjectPublicKeyInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Explicit_2009_SubjectPublicKeyInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var algorithm: AuthenticationFramework_AlgorithmIdentifier
     @usableFromInline var subjectPublicKey: ASN1BitString
     @inlinable init(algorithm: AuthenticationFramework_AlgorithmIdentifier, subjectPublicKey: ASN1BitString) {
         self.algorithm = algorithm
         self.subjectPublicKey = subjectPublicKey
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let algorithm: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let subjectPublicKey: ASN1BitString = try ASN1BitString(derEncoded: &nodes)
+
             return PKIX1Explicit_2009_SubjectPublicKeyInfo(algorithm: algorithm, subjectPublicKey: subjectPublicKey)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(algorithm)
             try coder.serialize(subjectPublicKey)
+
         }
     }
 }

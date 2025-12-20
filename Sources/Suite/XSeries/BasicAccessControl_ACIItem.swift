@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct BasicAccessControl_ACIItem: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct BasicAccessControl_ACIItem: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var identificationTag: PKIX1Explicit88_DirectoryString
     @usableFromInline var precedence: BasicAccessControl_Precedence
@@ -13,6 +13,7 @@ import Foundation
         self.precedence = precedence
         self.authenticationLevel = authenticationLevel
         self.itemOrUserFirst = itemOrUserFirst
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,6 +22,7 @@ import Foundation
             let precedence: BasicAccessControl_Precedence = try BasicAccessControl_Precedence(derEncoded: &nodes)
             let authenticationLevel: BasicAccessControl_AuthenticationLevel = try BasicAccessControl_AuthenticationLevel(derEncoded: &nodes)
             let itemOrUserFirst: BasicAccessControl_ACIItem_itemOrUserFirst_Choice = try BasicAccessControl_ACIItem_itemOrUserFirst_Choice(derEncoded: &nodes)
+
             return BasicAccessControl_ACIItem(identificationTag: identificationTag, precedence: precedence, authenticationLevel: authenticationLevel, itemOrUserFirst: itemOrUserFirst)
         }
     }
@@ -31,6 +33,7 @@ import Foundation
             try coder.serialize(precedence)
             try coder.serialize(authenticationLevel)
             try coder.serialize(itemOrUserFirst)
+
         }
     }
 }

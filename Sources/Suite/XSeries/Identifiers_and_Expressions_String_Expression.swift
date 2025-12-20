@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Identifiers_and_Expressions_String_Expression: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline struct Identifiers_and_Expressions_String_Expression: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var value: [Identifiers_and_Expressions_Atomic_String_Expression]
     @inlinable public init(_ value: [Identifiers_and_Expressions_Atomic_String_Expression]) { self.value = value }

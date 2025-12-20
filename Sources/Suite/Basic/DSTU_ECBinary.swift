@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DSTU_ECBinary: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DSTU_ECBinary: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: ArraySlice<UInt8>?
     @usableFromInline var f: DSTU_BinaryField
@@ -17,6 +17,7 @@ import Foundation
         self.b = b
         self.n = n
         self.bp = bp
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -27,18 +28,20 @@ import Foundation
             let b: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
             let n: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let bp: ASN1OctetString = try ASN1OctetString(derEncoded: &nodes)
+
             return DSTU_ECBinary(version: version, f: f, a: a, b: b, n: n, bp: bp)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let version = self.version { if let version = self.version { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) } } }
+            if let version = self.version { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) } }
             try coder.serialize(f)
             try coder.serialize(a)
             try coder.serialize(b)
             try coder.serialize(n)
             try coder.serialize(bp)
+
         }
     }
 }

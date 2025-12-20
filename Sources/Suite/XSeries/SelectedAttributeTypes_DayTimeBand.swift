@@ -2,27 +2,30 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SelectedAttributeTypes_DayTimeBand: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SelectedAttributeTypes_DayTimeBand: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var startDayTime: SelectedAttributeTypes_DayTime?
     @usableFromInline var endDayTime: SelectedAttributeTypes_DayTime?
     @inlinable init(startDayTime: SelectedAttributeTypes_DayTime?, endDayTime: SelectedAttributeTypes_DayTime?) {
         self.startDayTime = startDayTime
         self.endDayTime = endDayTime
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let startDayTime: SelectedAttributeTypes_DayTime = try DER.explicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in return try SelectedAttributeTypes_DayTime(derEncoded: node) }
             let endDayTime: SelectedAttributeTypes_DayTime = try DER.explicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try SelectedAttributeTypes_DayTime(derEncoded: node) }
+
             return SelectedAttributeTypes_DayTimeBand(startDayTime: startDayTime, endDayTime: endDayTime)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let startDayTime = self.startDayTime { if let startDayTime = self.startDayTime { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(startDayTime) } } }
-            if let endDayTime = self.endDayTime { if let endDayTime = self.endDayTime { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(endDayTime) } } }
+            if let startDayTime = self.startDayTime { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(startDayTime) } }
+            if let endDayTime = self.endDayTime { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(endDayTime) } }
+
         }
     }
 }

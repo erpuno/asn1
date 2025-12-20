@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct AuthenticationFramework_Certificate_toBeSigned: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct AuthenticationFramework_Certificate_toBeSigned: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: AuthenticationFramework_Version?
     @usableFromInline var serialNumber: AuthenticationFramework_CertificateSerialNumber
@@ -25,6 +25,7 @@ import Foundation
         self.issuerUniqueIdentifier = issuerUniqueIdentifier
         self.subjectUniqueIdentifier = subjectUniqueIdentifier
         self.extensions = extensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -39,22 +40,24 @@ import Foundation
             let issuerUniqueIdentifier: SelectedAttributeTypes_UniqueIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let subjectUniqueIdentifier: SelectedAttributeTypes_UniqueIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let extensions: AuthenticationFramework_Extensions? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try AuthenticationFramework_Extensions(derEncoded: node) }
+
             return AuthenticationFramework_Certificate_toBeSigned(version: version, serialNumber: serialNumber, signature: signature, issuer: issuer, validity: validity, subject: subject, subjectPublicKeyInfo: subjectPublicKeyInfo, issuerUniqueIdentifier: issuerUniqueIdentifier, subjectUniqueIdentifier: subjectUniqueIdentifier, extensions: extensions)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let version = self.version { if let version = self.version { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) } } }
+            if let version = self.version { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(version) } }
             try coder.serialize(serialNumber)
             try coder.serialize(signature)
             try coder.serialize(issuer)
             try coder.serialize(validity)
             try coder.serialize(subject)
             try coder.serialize(subjectPublicKeyInfo)
-            if let issuerUniqueIdentifier = self.issuerUniqueIdentifier { if let issuerUniqueIdentifier = self.issuerUniqueIdentifier { try coder.serializeOptionalImplicitlyTagged(issuerUniqueIdentifier, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let subjectUniqueIdentifier = self.subjectUniqueIdentifier { if let subjectUniqueIdentifier = self.subjectUniqueIdentifier { try coder.serializeOptionalImplicitlyTagged(subjectUniqueIdentifier, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let extensions = self.extensions { if let extensions = self.extensions { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(extensions) } } }
+            if let issuerUniqueIdentifier = self.issuerUniqueIdentifier { try coder.serializeOptionalImplicitlyTagged(issuerUniqueIdentifier, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let subjectUniqueIdentifier = self.subjectUniqueIdentifier { try coder.serializeOptionalImplicitlyTagged(subjectUniqueIdentifier, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let extensions = self.extensions { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(extensions) } }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Colour_Attributes_Grid_Value: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Colour_Attributes_Grid_Value: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var x_value: ASN1Any
     @usableFromInline var y_value: ASN1Any
@@ -11,6 +11,7 @@ import Foundation
         self.x_value = x_value
         self.y_value = y_value
         self.z_value = z_value
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let x_value: ASN1Any = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 0, tagClass: .contextSpecific) { node in ASN1Any(derEncoded: node) }!
             let y_value: ASN1Any = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in ASN1Any(derEncoded: node) }!
             let z_value: ASN1Any = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in ASN1Any(derEncoded: node) }!
+
             return Colour_Attributes_Grid_Value(x_value: x_value, y_value: y_value, z_value: z_value)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(x_value)
             try coder.serialize(y_value)
             try coder.serialize(z_value)
+
         }
     }
 }

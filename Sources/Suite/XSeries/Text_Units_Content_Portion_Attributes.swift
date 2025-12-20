@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Text_Units_Content_Portion_Attributes: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Text_Units_Content_Portion_Attributes: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var content_identifier_layout: Identifiers_and_Expressions_Content_Portion_Identifier?
     @usableFromInline var content_identifier_logical: Identifiers_and_Expressions_Content_Portion_Identifier?
@@ -15,6 +15,7 @@ import Foundation
         self.type_of_coding = type_of_coding
         self.coding_attributes = coding_attributes
         self.alternative_representation = alternative_representation
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -36,17 +37,19 @@ if let next = peek_coding_attributes.next(), next.identifier == Text_Units_Conte
     coding_attributes = try Text_Units_Content_Portion_Attributes_coding_attributes_Choice(derEncoded: &nodes)
 }
             let alternative_representation: Text_Units_Alternative_Representation? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
             return Text_Units_Content_Portion_Attributes(content_identifier_layout: content_identifier_layout, content_identifier_logical: content_identifier_logical, type_of_coding: type_of_coding, coding_attributes: coding_attributes, alternative_representation: alternative_representation)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let content_identifier_layout = self.content_identifier_layout { if let content_identifier_layout = self.content_identifier_layout { try coder.serialize(content_identifier_layout) } }
-            if let content_identifier_logical = self.content_identifier_logical { if let content_identifier_logical = self.content_identifier_logical { try coder.serializeOptionalImplicitlyTagged(content_identifier_logical, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let type_of_coding = self.type_of_coding { if let type_of_coding = self.type_of_coding { try coder.serialize(type_of_coding) } }
-            if let coding_attributes = self.coding_attributes { if let coding_attributes = self.coding_attributes { try coder.serialize(coding_attributes) } }
-            if let alternative_representation = self.alternative_representation { if let alternative_representation = self.alternative_representation { try coder.serializeOptionalImplicitlyTagged(alternative_representation, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
+            if let content_identifier_layout = self.content_identifier_layout { try coder.serialize(content_identifier_layout) }
+            if let content_identifier_logical = self.content_identifier_logical { try coder.serializeOptionalImplicitlyTagged(content_identifier_logical, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let type_of_coding = self.type_of_coding { try coder.serialize(type_of_coding) }
+            if let coding_attributes = self.coding_attributes { try coder.serialize(coding_attributes) }
+            if let alternative_representation = self.alternative_representation { try coder.serializeOptionalImplicitlyTagged(alternative_representation, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+
         }
     }
 }

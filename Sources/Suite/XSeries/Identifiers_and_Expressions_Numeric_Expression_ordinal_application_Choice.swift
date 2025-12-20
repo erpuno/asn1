@@ -2,37 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Identifiers_and_Expressions_Numeric_Expression_ordinal_application_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Identifiers_and_Expressions_Numeric_Expression_ordinal_application_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case ident(Identifiers_and_Expressions_Object_or_Class_Identifier)
     case expression(Identifiers_and_Expressions_Object_Id_Expression)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case Identifiers_and_Expressions_Object_or_Class_Identifier.defaultIdentifier:
-                self = .ident(try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case Identifiers_and_Expressions_Object_Id_Expression.defaultIdentifier:
-                self = .expression(try Identifiers_and_Expressions_Object_Id_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case Identifiers_and_Expressions_Object_or_Class_Identifier.defaultIdentifier:
+            self = .ident(try Identifiers_and_Expressions_Object_or_Class_Identifier(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case Identifiers_and_Expressions_Object_Id_Expression.defaultIdentifier:
+            self = .expression(try Identifiers_and_Expressions_Object_Id_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .ident(let ident):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(ident)
-                                }
-                            } else {
+        case .ident(let ident):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(ident)
                             }
-            case .expression(let expression):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(expression)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(ident)
+                        }
+        case .expression(let expression):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(expression)
                             }
+                        } else {
+                            try coder.serialize(expression)
+                        }
+
         }
     }
 

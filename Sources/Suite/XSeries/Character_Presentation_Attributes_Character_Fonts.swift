@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Character_Presentation_Attributes_Character_Fonts: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Character_Presentation_Attributes_Character_Fonts: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var primary_font: Character_Presentation_Attributes_Font_Type?
     @usableFromInline var first_alternative_font: Character_Presentation_Attributes_Font_Type?
@@ -25,6 +25,7 @@ import Foundation
         self.seventh_alternative_font = seventh_alternative_font
         self.eighth_alternative_font = eighth_alternative_font
         self.ninth_alternative_font = ninth_alternative_font
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -39,22 +40,24 @@ import Foundation
             let seventh_alternative_font: Character_Presentation_Attributes_Font_Type? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific))
             let eighth_alternative_font: Character_Presentation_Attributes_Font_Type? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific))
             let ninth_alternative_font: Character_Presentation_Attributes_Font_Type? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific))
+
             return Character_Presentation_Attributes_Character_Fonts(primary_font: primary_font, first_alternative_font: first_alternative_font, second_alternative_font: second_alternative_font, third_alternative_font: third_alternative_font, fourth_alternative_font: fourth_alternative_font, fifth_alternative_font: fifth_alternative_font, sixth_alternative_font: sixth_alternative_font, seventh_alternative_font: seventh_alternative_font, eighth_alternative_font: eighth_alternative_font, ninth_alternative_font: ninth_alternative_font)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let primary_font = self.primary_font { if let primary_font = self.primary_font { try coder.serializeOptionalImplicitlyTagged(primary_font, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let first_alternative_font = self.first_alternative_font { if let first_alternative_font = self.first_alternative_font { try coder.serializeOptionalImplicitlyTagged(first_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let second_alternative_font = self.second_alternative_font { if let second_alternative_font = self.second_alternative_font { try coder.serializeOptionalImplicitlyTagged(second_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let third_alternative_font = self.third_alternative_font { if let third_alternative_font = self.third_alternative_font { try coder.serializeOptionalImplicitlyTagged(third_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let fourth_alternative_font = self.fourth_alternative_font { if let fourth_alternative_font = self.fourth_alternative_font { try coder.serializeOptionalImplicitlyTagged(fourth_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let fifth_alternative_font = self.fifth_alternative_font { if let fifth_alternative_font = self.fifth_alternative_font { try coder.serializeOptionalImplicitlyTagged(fifth_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let sixth_alternative_font = self.sixth_alternative_font { if let sixth_alternative_font = self.sixth_alternative_font { try coder.serializeOptionalImplicitlyTagged(sixth_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let seventh_alternative_font = self.seventh_alternative_font { if let seventh_alternative_font = self.seventh_alternative_font { try coder.serializeOptionalImplicitlyTagged(seventh_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) } }
-            if let eighth_alternative_font = self.eighth_alternative_font { if let eighth_alternative_font = self.eighth_alternative_font { try coder.serializeOptionalImplicitlyTagged(eighth_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) } }
-            if let ninth_alternative_font = self.ninth_alternative_font { if let ninth_alternative_font = self.ninth_alternative_font { try coder.serializeOptionalImplicitlyTagged(ninth_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) } }
+            if let primary_font = self.primary_font { try coder.serializeOptionalImplicitlyTagged(primary_font, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let first_alternative_font = self.first_alternative_font { try coder.serializeOptionalImplicitlyTagged(first_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let second_alternative_font = self.second_alternative_font { try coder.serializeOptionalImplicitlyTagged(second_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let third_alternative_font = self.third_alternative_font { try coder.serializeOptionalImplicitlyTagged(third_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let fourth_alternative_font = self.fourth_alternative_font { try coder.serializeOptionalImplicitlyTagged(fourth_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let fifth_alternative_font = self.fifth_alternative_font { try coder.serializeOptionalImplicitlyTagged(fifth_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let sixth_alternative_font = self.sixth_alternative_font { try coder.serializeOptionalImplicitlyTagged(sixth_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+            if let seventh_alternative_font = self.seventh_alternative_font { try coder.serializeOptionalImplicitlyTagged(seventh_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) }
+            if let eighth_alternative_font = self.eighth_alternative_font { try coder.serializeOptionalImplicitlyTagged(eighth_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 8, tagClass: .contextSpecific)) }
+            if let ninth_alternative_font = self.ninth_alternative_font { try coder.serializeOptionalImplicitlyTagged(ninth_alternative_font, withIdentifier: ASN1Identifier(tagWithNumber: 9, tagClass: .contextSpecific)) }
+
         }
     }
 }

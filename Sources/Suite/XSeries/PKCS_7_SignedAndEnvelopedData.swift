@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_7_SignedAndEnvelopedData: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_7_SignedAndEnvelopedData: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: PKCS_7_SignedAndEnvelopedData_version_IntEnum
     @usableFromInline var recipientInfos: PKCS_7_RecipientInfos
@@ -19,6 +19,7 @@ import Foundation
         self.certificates = certificates
         self.crls = crls
         self.signerInfos = signerInfos
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -38,19 +39,21 @@ if let next = peek_crls.next(), next.identifier == PKCS_7_SignedAndEnvelopedData
     crls = try PKCS_7_SignedAndEnvelopedData_crls_Choice(derEncoded: &nodes)
 }
             let signerInfos: PKCS_7_SignerInfos = try PKCS_7_SignerInfos(derEncoded: &nodes)
+
             return PKCS_7_SignedAndEnvelopedData(version: version, recipientInfos: recipientInfos, digestAlgorithms: digestAlgorithms, encryptedContentInfo: encryptedContentInfo, certificates: certificates, crls: crls, signerInfos: signerInfos)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(version.rawValue)
+            try version.serialize(into: &coder, withIdentifier: identifier)
             try coder.serialize(recipientInfos)
             try coder.serialize(digestAlgorithms)
             try coder.serialize(encryptedContentInfo)
-            if let certificates = self.certificates { if let certificates = self.certificates { try coder.serialize(certificates) } }
-            if let crls = self.crls { if let crls = self.crls { try coder.serialize(crls) } }
+            if let certificates = self.certificates { try coder.serialize(certificates) }
+            if let crls = self.crls { try coder.serialize(crls) }
             try coder.serialize(signerInfos)
+
         }
     }
 }

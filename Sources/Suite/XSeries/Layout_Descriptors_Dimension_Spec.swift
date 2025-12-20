@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Layout_Descriptors_Dimension_Spec: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Layout_Descriptors_Dimension_Spec: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var horizontal: Layout_Descriptors_Dimension
     @usableFromInline var vertical: Layout_Descriptors_Dimension
     @inlinable init(horizontal: Layout_Descriptors_Dimension, vertical: Layout_Descriptors_Dimension) {
         self.horizontal = horizontal
         self.vertical = vertical
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let horizontal: Layout_Descriptors_Dimension = try Layout_Descriptors_Dimension(derEncoded: &nodes)
             let vertical: Layout_Descriptors_Dimension = try Layout_Descriptors_Dimension(derEncoded: &nodes)
+
             return Layout_Descriptors_Dimension_Spec(horizontal: horizontal, vertical: vertical)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(horizontal)
             try coder.serialize(vertical)
+
         }
     }
 }

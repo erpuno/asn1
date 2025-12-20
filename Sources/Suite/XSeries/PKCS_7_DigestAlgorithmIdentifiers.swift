@@ -2,23 +2,24 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum PKCS_7_DigestAlgorithmIdentifiers: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum PKCS_7_DigestAlgorithmIdentifiers: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case daSet([PKCS_7_DigestAlgorithmIdentifier])
     case daSequence([PKCS_7_DigestAlgorithmIdentifier])
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier.set:
-                self = .daSet(try DER.set(of: PKCS_7_DigestAlgorithmIdentifier.self, identifier: .set, rootNode: rootNode))
-            case ASN1Identifier.sequence:
-                self = .daSequence(try DER.sequence(of: PKCS_7_DigestAlgorithmIdentifier.self, identifier: .sequence, rootNode: rootNode))
+        case ASN1Identifier.set:
+            self = .daSet(try DER.set(of: PKCS_7_DigestAlgorithmIdentifier.self, identifier: .set, rootNode: rootNode))
+        case ASN1Identifier.sequence:
+            self = .daSequence(try DER.sequence(of: PKCS_7_DigestAlgorithmIdentifier.self, identifier: .sequence, rootNode: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .daSet(let daSet): try coder.serializeSetOf(daSet)
-            case .daSequence(let daSequence): try coder.serializeSequenceOf(daSequence)
+        case .daSet(let daSet): try coder.serializeSetOf(daSet)
+        case .daSequence(let daSequence): try coder.serializeSequenceOf(daSequence)
+
         }
     }
 

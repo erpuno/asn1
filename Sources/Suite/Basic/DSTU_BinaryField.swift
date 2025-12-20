@@ -2,13 +2,14 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DSTU_BinaryField: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DSTU_BinaryField: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var m: ArraySlice<UInt8>
     @usableFromInline var p: DSTU_BinaryField_p_Choice?
     @inlinable init(m: ArraySlice<UInt8>, p: DSTU_BinaryField_p_Choice?) {
         self.m = m
         self.p = p
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -19,6 +20,7 @@ var peek_p = nodes
 if let next = peek_p.next(), next.identifier == DSTU_BinaryField_p_Choice.defaultIdentifier {
     p = try DSTU_BinaryField_p_Choice(derEncoded: &nodes)
 }
+
             return DSTU_BinaryField(m: m, p: p)
         }
     }
@@ -26,7 +28,8 @@ if let next = peek_p.next(), next.identifier == DSTU_BinaryField_p_Choice.defaul
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(m)
-            if let p = self.p { if let p = self.p { try coder.serialize(p) } }
+            if let p = self.p { try coder.serialize(p) }
+
         }
     }
 }

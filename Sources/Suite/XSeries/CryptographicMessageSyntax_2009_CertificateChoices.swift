@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum CryptographicMessageSyntax_2009_CertificateChoices: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum CryptographicMessageSyntax_2009_CertificateChoices: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case certificate(AuthenticationFramework_Certificate)
     case extendedCertificate(CryptographicMessageSyntax_2009_ExtendedCertificate)
@@ -11,35 +11,35 @@ import Foundation
     case other(CryptographicMessageSyntax_2009_OtherCertificateFormat)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case AuthenticationFramework_Certificate.defaultIdentifier:
-                self = .certificate(try AuthenticationFramework_Certificate(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
-                self = .extendedCertificate(try CryptographicMessageSyntax_2009_ExtendedCertificate(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case AuthenticationFramework_Certificate.defaultIdentifier:
+            self = .certificate(try AuthenticationFramework_Certificate(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific):
+            self = .extendedCertificate(try CryptographicMessageSyntax_2009_ExtendedCertificate(derEncoded: rootNode, withIdentifier: rootNode.identifier))
 
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
-                self = .v1AttrCert(try AttributeCertificateVersion1_2009_AttributeCertificateV1(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
-                self = .v2AttrCert(try CryptographicMessageSyntax_2009_AttributeCertificateV2(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .other(try CryptographicMessageSyntax_2009_OtherCertificateFormat(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific):
+            self = .v1AttrCert(try AttributeCertificateVersion1_2009_AttributeCertificateV1(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific):
+            self = .v2AttrCert(try CryptographicMessageSyntax_2009_AttributeCertificateV2(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
+            self = .other(try CryptographicMessageSyntax_2009_OtherCertificateFormat(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .certificate(let certificate):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(certificate)
-                                }
-                            } else {
+        case .certificate(let certificate):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(certificate)
                             }
-            case .extendedCertificate(let extendedCertificate): try extendedCertificate.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+                        } else {
+                            try coder.serialize(certificate)
+                        }
+        case .extendedCertificate(let extendedCertificate): try extendedCertificate.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
+        case .v1AttrCert(let v1AttrCert): try v1AttrCert.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+        case .v2AttrCert(let v2AttrCert): try v2AttrCert.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
+        case .other(let other): try other.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
 
-            case .v1AttrCert(let v1AttrCert): try v1AttrCert.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
-            case .v2AttrCert(let v2AttrCert): try v2AttrCert.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
-            case .other(let other): try other.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
         }
     }
 

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_7_RecipientInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_7_RecipientInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: PKCS_7_RecipientInfo_version_IntEnum
     @usableFromInline var issuerAndSerialNumber: PKCS_7_IssuerAndSerialNumber
@@ -13,6 +13,7 @@ import Foundation
         self.issuerAndSerialNumber = issuerAndSerialNumber
         self.keyEncryptionAlgorithm = keyEncryptionAlgorithm
         self.encryptedKey = encryptedKey
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let issuerAndSerialNumber: PKCS_7_IssuerAndSerialNumber = try PKCS_7_IssuerAndSerialNumber(derEncoded: &nodes)
             let keyEncryptionAlgorithm: PKCS_7_KeyEncryptionAlgorithmIdentifier = try PKCS_7_KeyEncryptionAlgorithmIdentifier(derEncoded: &nodes)
             let encryptedKey: PKCS_7_EncryptedKey = try PKCS_7_EncryptedKey(derEncoded: &nodes)
+
             return PKCS_7_RecipientInfo(version: version, issuerAndSerialNumber: issuerAndSerialNumber, keyEncryptionAlgorithm: keyEncryptionAlgorithm, encryptedKey: encryptedKey)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(version.rawValue)
+            try version.serialize(into: &coder, withIdentifier: identifier)
             try coder.serialize(issuerAndSerialNumber)
             try coder.serialize(keyEncryptionAlgorithm)
             try coder.serialize(encryptedKey)
+
         }
     }
 }

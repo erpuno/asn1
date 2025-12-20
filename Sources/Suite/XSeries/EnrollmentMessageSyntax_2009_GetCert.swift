@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct EnrollmentMessageSyntax_2009_GetCert: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct EnrollmentMessageSyntax_2009_GetCert: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var issuerName: CertificateExtensions_GeneralName
     @usableFromInline var serialNumber: ArraySlice<UInt8>
     @inlinable init(issuerName: CertificateExtensions_GeneralName, serialNumber: ArraySlice<UInt8>) {
         self.issuerName = issuerName
         self.serialNumber = serialNumber
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let issuerName: CertificateExtensions_GeneralName = try CertificateExtensions_GeneralName(derEncoded: &nodes)
             let serialNumber: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return EnrollmentMessageSyntax_2009_GetCert(issuerName: issuerName, serialNumber: serialNumber)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(issuerName)
             try coder.serialize(serialNumber)
+
         }
     }
 }

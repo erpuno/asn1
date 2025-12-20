@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Layout_Descriptors_Position_Spec: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Layout_Descriptors_Position_Spec: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var offset: Layout_Descriptors_Position_Spec_offset_Set?
     @usableFromInline var separation: Layout_Descriptors_Position_Spec_separation_Set?
@@ -13,6 +13,7 @@ import Foundation
         self.separation = separation
         self.alignment = alignment
         self.fill_order = fill_order
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let separation: Layout_Descriptors_Position_Spec_separation_Set? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let alignment = try Layout_Descriptors_Position_Spec_alignment_IntEnum(rawValue: Int(derEncoded: &nodes))
             let fill_order = try Layout_Descriptors_Position_Spec_fill_order_IntEnum(rawValue: Int(derEncoded: &nodes))
+
             return Layout_Descriptors_Position_Spec(offset: offset, separation: separation, alignment: alignment, fill_order: fill_order)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let offset = self.offset { if let offset = self.offset { try coder.serializeOptionalImplicitlyTagged(offset, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let separation = self.separation { if let separation = self.separation { try coder.serializeOptionalImplicitlyTagged(separation, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let offset = self.offset { try coder.serializeOptionalImplicitlyTagged(offset, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let separation = self.separation { try coder.serializeOptionalImplicitlyTagged(separation, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
             if let alignment = self.alignment { try coder.serialize(alignment.rawValue, explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) }
             if let fill_order = self.fill_order { try coder.serialize(fill_order.rawValue, explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Subprofiles_Dates_and_Times: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Subprofiles_Dates_and_Times: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var document_fragment_date_and_time: Document_Profile_Descriptor_Date_and_Time?
     @usableFromInline var creation_date_and_time: Document_Profile_Descriptor_Date_and_Time?
@@ -21,6 +21,7 @@ import Foundation
         self.purge_date_and_time = purge_date_and_time
         self.release_date_and_time = release_date_and_time
         self.revision_history = revision_history
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -33,20 +34,22 @@ import Foundation
             let purge_date_and_time: Document_Profile_Descriptor_Date_and_Time? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific))
             let release_date_and_time: Document_Profile_Descriptor_Date_and_Time? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific))
             let revision_history: [Subprofiles_Dates_and_Times_revision_history_Set]? = try DER.optionalImplicitlyTagged(&nodes, tagNumber: 7, tagClass: .contextSpecific) { node in try DER.sequence(of: Subprofiles_Dates_and_Times_revision_history_Set.self, identifier: node.identifier, rootNode: node) }
+
             return Subprofiles_Dates_and_Times(document_fragment_date_and_time: document_fragment_date_and_time, creation_date_and_time: creation_date_and_time, local_filing_date_and_time: local_filing_date_and_time, expiry_date_and_time: expiry_date_and_time, start_date_and_time: start_date_and_time, purge_date_and_time: purge_date_and_time, release_date_and_time: release_date_and_time, revision_history: revision_history)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let document_fragment_date_and_time = self.document_fragment_date_and_time { if let document_fragment_date_and_time = self.document_fragment_date_and_time { try coder.serializeOptionalImplicitlyTagged(document_fragment_date_and_time, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let creation_date_and_time = self.creation_date_and_time { if let creation_date_and_time = self.creation_date_and_time { try coder.serializeOptionalImplicitlyTagged(creation_date_and_time, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let local_filing_date_and_time = self.local_filing_date_and_time { if let local_filing_date_and_time = self.local_filing_date_and_time { try coder.serializeSequenceOf(local_filing_date_and_time, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let expiry_date_and_time = self.expiry_date_and_time { if let expiry_date_and_time = self.expiry_date_and_time { try coder.serializeOptionalImplicitlyTagged(expiry_date_and_time, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let start_date_and_time = self.start_date_and_time { if let start_date_and_time = self.start_date_and_time { try coder.serializeOptionalImplicitlyTagged(start_date_and_time, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let purge_date_and_time = self.purge_date_and_time { if let purge_date_and_time = self.purge_date_and_time { try coder.serializeOptionalImplicitlyTagged(purge_date_and_time, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
-            if let release_date_and_time = self.release_date_and_time { if let release_date_and_time = self.release_date_and_time { try coder.serializeOptionalImplicitlyTagged(release_date_and_time, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) } }
-            if let revision_history = self.revision_history { if let revision_history = self.revision_history { try coder.serializeSequenceOf(revision_history, identifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) } }
+            if let document_fragment_date_and_time = self.document_fragment_date_and_time { try coder.serializeOptionalImplicitlyTagged(document_fragment_date_and_time, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let creation_date_and_time = self.creation_date_and_time { try coder.serializeOptionalImplicitlyTagged(creation_date_and_time, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let local_filing_date_and_time = self.local_filing_date_and_time { try coder.serializeSequenceOf(local_filing_date_and_time, identifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let expiry_date_and_time = self.expiry_date_and_time { try coder.serializeOptionalImplicitlyTagged(expiry_date_and_time, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let start_date_and_time = self.start_date_and_time { try coder.serializeOptionalImplicitlyTagged(start_date_and_time, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let purge_date_and_time = self.purge_date_and_time { try coder.serializeOptionalImplicitlyTagged(purge_date_and_time, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+            if let release_date_and_time = self.release_date_and_time { try coder.serializeOptionalImplicitlyTagged(release_date_and_time, withIdentifier: ASN1Identifier(tagWithNumber: 6, tagClass: .contextSpecific)) }
+            if let revision_history = self.revision_history { try coder.serializeSequenceOf(revision_history, identifier: ASN1Identifier(tagWithNumber: 7, tagClass: .contextSpecific)) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIX1Implicit_2009_IssuingDistributionPoint: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIX1Implicit_2009_IssuingDistributionPoint: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var distributionPoint: PKIX1Implicit_2009_DistributionPointName?
     @usableFromInline var onlyContainsUserCerts: Bool?
@@ -17,6 +17,7 @@ import Foundation
         self.onlySomeReasons = onlySomeReasons
         self.indirectCRL = indirectCRL
         self.onlyContainsAttributeCerts = onlyContainsAttributeCerts
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -27,18 +28,20 @@ import Foundation
             let onlySomeReasons: PKIX1Implicit_2009_ReasonFlags? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
             let indirectCRL: Bool = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)))!
             let onlyContainsAttributeCerts: Bool = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)))!
+
             return PKIX1Implicit_2009_IssuingDistributionPoint(distributionPoint: distributionPoint, onlyContainsUserCerts: onlyContainsUserCerts, onlyContainsCACerts: onlyContainsCACerts, onlySomeReasons: onlySomeReasons, indirectCRL: indirectCRL, onlyContainsAttributeCerts: onlyContainsAttributeCerts)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let distributionPoint = self.distributionPoint { if let distributionPoint = self.distributionPoint { try coder.serializeOptionalImplicitlyTagged(distributionPoint, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let onlyContainsUserCerts = self.onlyContainsUserCerts { if let onlyContainsUserCerts = self.onlyContainsUserCerts { try coder.serializeOptionalImplicitlyTagged(onlyContainsUserCerts, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let onlyContainsCACerts = self.onlyContainsCACerts { if let onlyContainsCACerts = self.onlyContainsCACerts { try coder.serializeOptionalImplicitlyTagged(onlyContainsCACerts, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let onlySomeReasons = self.onlySomeReasons { if let onlySomeReasons = self.onlySomeReasons { try coder.serializeOptionalImplicitlyTagged(onlySomeReasons, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
-            if let indirectCRL = self.indirectCRL { if let indirectCRL = self.indirectCRL { try coder.serializeOptionalImplicitlyTagged(indirectCRL, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) } }
-            if let onlyContainsAttributeCerts = self.onlyContainsAttributeCerts { if let onlyContainsAttributeCerts = self.onlyContainsAttributeCerts { try coder.serializeOptionalImplicitlyTagged(onlyContainsAttributeCerts, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) } }
+            if let distributionPoint = self.distributionPoint { try coder.serializeOptionalImplicitlyTagged(distributionPoint, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let onlyContainsUserCerts = self.onlyContainsUserCerts { try coder.serializeOptionalImplicitlyTagged(onlyContainsUserCerts, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let onlyContainsCACerts = self.onlyContainsCACerts { try coder.serializeOptionalImplicitlyTagged(onlyContainsCACerts, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let onlySomeReasons = self.onlySomeReasons { try coder.serializeOptionalImplicitlyTagged(onlySomeReasons, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+            if let indirectCRL = self.indirectCRL { try coder.serializeOptionalImplicitlyTagged(indirectCRL, withIdentifier: ASN1Identifier(tagWithNumber: 4, tagClass: .contextSpecific)) }
+            if let onlyContainsAttributeCerts = self.onlyContainsAttributeCerts { try coder.serializeOptionalImplicitlyTagged(onlyContainsAttributeCerts, withIdentifier: ASN1Identifier(tagWithNumber: 5, tagClass: .contextSpecific)) }
+
         }
     }
 }

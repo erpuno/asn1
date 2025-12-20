@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2010_SignedData: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2010_SignedData: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: CryptographicMessageSyntax_2010_CMSVersion
     @usableFromInline var digestAlgorithms: [CryptographicMessageSyntax_2010_DigestAlgorithmIdentifier]
@@ -17,6 +17,7 @@ import Foundation
         self.certificates = certificates
         self.crls = crls
         self.signerInfos = signerInfos
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -27,6 +28,7 @@ import Foundation
             let certificates: CryptographicMessageSyntax_2010_CertificateSet? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             let crls: CryptographicMessageSyntax_2010_RevocationInfoChoices? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let signerInfos: CryptographicMessageSyntax_2010_SignerInfos = try CryptographicMessageSyntax_2010_SignerInfos(derEncoded: &nodes)
+
             return CryptographicMessageSyntax_2010_SignedData(version: version, digestAlgorithms: digestAlgorithms, encapContentInfo: encapContentInfo, certificates: certificates, crls: crls, signerInfos: signerInfos)
         }
     }
@@ -36,9 +38,10 @@ import Foundation
             try coder.serialize(version)
             try coder.serializeSetOf(digestAlgorithms)
             try coder.serialize(encapContentInfo)
-            if let certificates = self.certificates { if let certificates = self.certificates { try coder.serializeOptionalImplicitlyTagged(certificates, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let crls = self.crls { if let crls = self.crls { try coder.serializeOptionalImplicitlyTagged(crls, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let certificates = self.certificates { try coder.serializeOptionalImplicitlyTagged(certificates, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let crls = self.crls { try coder.serializeOptionalImplicitlyTagged(crls, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
             try coder.serialize(signerInfos)
+
         }
     }
 }

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct LDAP_AddRequest: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct LDAP_AddRequest: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var entry: LDAP_LDAPDN
+    @usableFromInline var entry: LDAP_DN
     @usableFromInline var attributes: LDAP_AttributeList
-    @inlinable init(entry: LDAP_LDAPDN, attributes: LDAP_AttributeList) {
+    @inlinable init(entry: LDAP_DN, attributes: LDAP_AttributeList) {
         self.entry = entry
         self.attributes = attributes
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let entry: LDAP_LDAPDN = try LDAP_LDAPDN(derEncoded: &nodes)
+            let entry: LDAP_DN = try LDAP_DN(derEncoded: &nodes)
             let attributes: LDAP_AttributeList = try LDAP_AttributeList(derEncoded: &nodes)
+
             return LDAP_AddRequest(entry: entry, attributes: attributes)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(entry)
             try coder.serialize(attributes)
+
         }
     }
 }

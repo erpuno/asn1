@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKIXAttributeCertificate_2009_IssuerSerial: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKIXAttributeCertificate_2009_IssuerSerial: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var issuer: PKIX1Implicit_2009_GeneralNames
     @usableFromInline var serial: PKIX1Explicit88_CertificateSerialNumber
@@ -11,6 +11,7 @@ import Foundation
         self.issuer = issuer
         self.serial = serial
         self.issuerUID = issuerUID
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,6 +23,7 @@ var peek_issuerUID = nodes
 if let next = peek_issuerUID.next(), next.identifier == PKIX1Explicit88_UniqueIdentifier.defaultIdentifier {
     issuerUID = try PKIX1Explicit88_UniqueIdentifier(derEncoded: &nodes)
 }
+
             return PKIXAttributeCertificate_2009_IssuerSerial(issuer: issuer, serial: serial, issuerUID: issuerUID)
         }
     }
@@ -30,7 +32,8 @@ if let next = peek_issuerUID.next(), next.identifier == PKIX1Explicit88_UniqueId
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(issuer)
             try coder.serialize(serial)
-            if let issuerUID = self.issuerUID { if let issuerUID = self.issuerUID { try coder.serialize(issuerUID) } }
+            if let issuerUID = self.issuerUID { try coder.serialize(issuerUID) }
+
         }
     }
 }

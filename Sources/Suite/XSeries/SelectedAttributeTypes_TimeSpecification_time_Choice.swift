@@ -2,23 +2,31 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum SelectedAttributeTypes_TimeSpecification_time_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum SelectedAttributeTypes_TimeSpecification_time_Choice: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case absolute(SelectedAttributeTypes_TimeSpecification_time_Choice_absolute_Sequence)
     case periodic([SelectedAttributeTypes_Period])
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 0, tagClass: .application):
-                self = .absolute(try SelectedAttributeTypes_TimeSpecification_time_Choice_absolute_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1Identifier(tagWithNumber: 1, tagClass: .application):
-                self = .periodic(try DER.set(of: SelectedAttributeTypes_Period.self, identifier: rootNode.identifier, rootNode: rootNode))
+        case SelectedAttributeTypes_TimeSpecification_time_Choice_absolute_Sequence.defaultIdentifier:
+            self = .absolute(try SelectedAttributeTypes_TimeSpecification_time_Choice_absolute_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier.set:
+            self = .periodic(try DER.set(of: SelectedAttributeTypes_Period.self, identifier: .set, rootNode: rootNode))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .absolute(let absolute): try absolute.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .application))
-            case .periodic(let periodic): try coder.serializeSetOf(periodic, identifier: ASN1Identifier(tagWithNumber: 1, tagClass: .application))
+        case .absolute(let absolute):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
+                                try coder.serialize(absolute)
+                            }
+                        } else {
+                            try coder.serialize(absolute)
+                        }
+        case .periodic(let periodic): try coder.serializeSetOf(periodic)
+
         }
     }
 

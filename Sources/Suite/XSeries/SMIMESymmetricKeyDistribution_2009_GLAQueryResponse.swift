@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLAQueryResponse: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct SMIMESymmetricKeyDistribution_2009_GLAQueryResponse: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var glaResponseType: ASN1ObjectIdentifier
     @usableFromInline var glaResponseValue: ASN1Any
     @inlinable init(glaResponseType: ASN1ObjectIdentifier, glaResponseValue: ASN1Any) {
         self.glaResponseType = glaResponseType
         self.glaResponseValue = glaResponseValue
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let glaResponseType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let glaResponseValue: ASN1Any = try ASN1Any(derEncoded: &nodes)
+
             return SMIMESymmetricKeyDistribution_2009_GLAQueryResponse(glaResponseType: glaResponseType, glaResponseValue: glaResponseValue)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(glaResponseType)
             try coder.serialize(glaResponseValue)
+
         }
     }
 }

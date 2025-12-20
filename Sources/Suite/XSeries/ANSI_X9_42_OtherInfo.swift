@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ANSI_X9_42_OtherInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ANSI_X9_42_OtherInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var keyInfo: AuthenticationFramework_AlgorithmIdentifier
     @usableFromInline var partyUInfo: ASN1OctetString?
@@ -15,6 +15,7 @@ import Foundation
         self.partyVInfo = partyVInfo
         self.suppPubInfo = suppPubInfo
         self.suppPrivInfo = suppPrivInfo
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,6 +25,7 @@ import Foundation
             let partyVInfo: ASN1OctetString? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 1, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
             let suppPubInfo: ASN1OctetString? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
             let suppPrivInfo: ASN1OctetString? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in return try ASN1OctetString(derEncoded: node) }
+
             return ANSI_X9_42_OtherInfo(keyInfo: keyInfo, partyUInfo: partyUInfo, partyVInfo: partyVInfo, suppPubInfo: suppPubInfo, suppPrivInfo: suppPrivInfo)
         }
     }
@@ -31,10 +33,11 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(keyInfo)
-            if let partyUInfo = self.partyUInfo { if let partyUInfo = self.partyUInfo { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(partyUInfo) } } }
-            if let partyVInfo = self.partyVInfo { if let partyVInfo = self.partyVInfo { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(partyVInfo) } } }
-            if let suppPubInfo = self.suppPubInfo { if let suppPubInfo = self.suppPubInfo { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(suppPubInfo) } } }
-            if let suppPrivInfo = self.suppPrivInfo { if let suppPrivInfo = self.suppPrivInfo { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(suppPrivInfo) } } }
+            if let partyUInfo = self.partyUInfo { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(partyUInfo) } }
+            if let partyVInfo = self.partyVInfo { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(partyVInfo) } }
+            if let suppPubInfo = self.suppPubInfo { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serialize(suppPubInfo) } }
+            if let suppPrivInfo = self.suppPrivInfo { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serialize(suppPrivInfo) } }
+
         }
     }
 }

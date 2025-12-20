@@ -2,30 +2,31 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum Layout_Descriptors_Border_Line_Colour: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum Layout_Descriptors_Border_Line_Colour: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case implementation_defined(ASN1Null)
     case colour_expression(Colour_Attributes_Colour_Expression)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
-                self = .implementation_defined(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case Colour_Attributes_Colour_Expression.defaultIdentifier:
-                self = .colour_expression(try Colour_Attributes_Colour_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific):
+            self = .implementation_defined(try ASN1Null(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case Colour_Attributes_Colour_Expression.defaultIdentifier:
+            self = .colour_expression(try Colour_Attributes_Colour_Expression(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .implementation_defined(let implementation_defined): try implementation_defined.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
-            case .colour_expression(let colour_expression):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(colour_expression)
-                                }
-                            } else {
+        case .implementation_defined(let implementation_defined): try implementation_defined.serialize(into: &coder, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+        case .colour_expression(let colour_expression):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(colour_expression)
                             }
+                        } else {
+                            try coder.serialize(colour_expression)
+                        }
+
         }
     }
 

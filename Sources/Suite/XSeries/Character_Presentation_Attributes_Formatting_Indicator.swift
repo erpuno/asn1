@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct Character_Presentation_Attributes_Formatting_Indicator : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct Character_Presentation_Attributes_Formatting_Indicator : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: Character_Presentation_Attributes_Formatting_Indicator, rhs: Character_Presentation_Attributes_Formatting_Indicator) -> Bool { lhs.rawValue < rhs.rawValue }

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rational: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rational: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var numerator: ArraySlice<UInt8>
     @usableFromInline var denominator: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rational_denominator_IntEnum?
     @inlinable init(numerator: ArraySlice<UInt8>, denominator: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rational_denominator_IntEnum?) {
         self.numerator = numerator
         self.denominator = denominator
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let numerator: ArraySlice<UInt8> = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let denominator = try ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rational_denominator_IntEnum(rawValue: Int(derEncoded: &nodes))
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Rational(numerator: numerator, denominator: denominator)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(numerator, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             if let denominator = self.denominator { try coder.serialize(denominator.rawValue, explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) }
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct BasicAccessControl_UserClasses: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct BasicAccessControl_UserClasses: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var allUsers: ASN1Null?
     @usableFromInline var thisEntry: ASN1Null?
@@ -15,6 +15,7 @@ import Foundation
         self.name = name
         self.userGroup = userGroup
         self.subtree = subtree
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,17 +25,19 @@ import Foundation
             let name: [SelectedAttributeTypes_NameAndOptionalUID]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 2, tagClass: .contextSpecific) { node in try DER.set(of: SelectedAttributeTypes_NameAndOptionalUID.self, identifier: .set, rootNode: node) }
             let userGroup: [SelectedAttributeTypes_NameAndOptionalUID]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 3, tagClass: .contextSpecific) { node in try DER.set(of: SelectedAttributeTypes_NameAndOptionalUID.self, identifier: .set, rootNode: node) }
             let subtree: [InformationFramework_SubtreeSpecification]? = try DER.optionalExplicitlyTagged(&nodes, tagNumber: 4, tagClass: .contextSpecific) { node in try DER.set(of: InformationFramework_SubtreeSpecification.self, identifier: .set, rootNode: node) }
+
             return BasicAccessControl_UserClasses(allUsers: allUsers, thisEntry: thisEntry, name: name, userGroup: userGroup, subtree: subtree)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let allUsers = self.allUsers { if let allUsers = self.allUsers { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(allUsers) } } }
-            if let thisEntry = self.thisEntry { if let thisEntry = self.thisEntry { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(thisEntry) } } }
-            if let name = self.name { if let name = self.name { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(name) } } }
-            if let userGroup = self.userGroup { if let userGroup = self.userGroup { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(userGroup) } } }
-            if let subtree = self.subtree { if let subtree = self.subtree { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(subtree) } } }
+            if let allUsers = self.allUsers { try coder.serialize(explicitlyTaggedWithTagNumber: 0, tagClass: .contextSpecific) { codec in try codec.serialize(allUsers) } }
+            if let thisEntry = self.thisEntry { try coder.serialize(explicitlyTaggedWithTagNumber: 1, tagClass: .contextSpecific) { codec in try codec.serialize(thisEntry) } }
+            if let name = self.name { try coder.serialize(explicitlyTaggedWithTagNumber: 2, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(name) } }
+            if let userGroup = self.userGroup { try coder.serialize(explicitlyTaggedWithTagNumber: 3, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(userGroup) } }
+            if let subtree = self.subtree { try coder.serialize(explicitlyTaggedWithTagNumber: 4, tagClass: .contextSpecific) { codec in try codec.serializeSetOf(subtree) } }
+
         }
     }
 }

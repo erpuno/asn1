@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct External_References_Associated_Information_Name: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct External_References_Associated_Information_Name: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var string: ASN1PrintableString
     @usableFromInline var object_id: ASN1ObjectIdentifier?
     @inlinable init(string: ASN1PrintableString, object_id: ASN1ObjectIdentifier?) {
         self.string = string
         self.object_id = object_id
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let string: ASN1PrintableString = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let object_id: ASN1ObjectIdentifier? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return External_References_Associated_Information_Name(string: string, object_id: object_id)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(string, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            if let object_id = self.object_id { if let object_id = self.object_id { try coder.serializeOptionalImplicitlyTagged(object_id, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let object_id = self.object_id { try coder.serializeOptionalImplicitlyTagged(object_id, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

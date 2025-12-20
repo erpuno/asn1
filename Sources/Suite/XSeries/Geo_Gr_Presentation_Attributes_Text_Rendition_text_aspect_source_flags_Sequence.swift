@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Geo_Gr_Presentation_Attributes_Text_Rendition_text_aspect_source_flags_Sequence: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Geo_Gr_Presentation_Attributes_Text_Rendition_text_aspect_source_flags_Sequence: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var text_font_asf: Geo_Gr_Presentation_Attributes_ASF_Type
     @usableFromInline var text_precision_asf: Geo_Gr_Presentation_Attributes_ASF_Type
@@ -15,6 +15,7 @@ import Foundation
         self.character_expansion_factor_asf = character_expansion_factor_asf
         self.character_spacing_asf = character_spacing_asf
         self.text_colour_asf = text_colour_asf
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -24,6 +25,7 @@ import Foundation
             let character_expansion_factor_asf: Geo_Gr_Presentation_Attributes_ASF_Type = try Geo_Gr_Presentation_Attributes_ASF_Type(derEncoded: &nodes)
             let character_spacing_asf: Geo_Gr_Presentation_Attributes_ASF_Type = try Geo_Gr_Presentation_Attributes_ASF_Type(derEncoded: &nodes)
             let text_colour_asf: Geo_Gr_Presentation_Attributes_ASF_Type = try Geo_Gr_Presentation_Attributes_ASF_Type(derEncoded: &nodes)
+
             return Geo_Gr_Presentation_Attributes_Text_Rendition_text_aspect_source_flags_Sequence(text_font_asf: text_font_asf, text_precision_asf: text_precision_asf, character_expansion_factor_asf: character_expansion_factor_asf, character_spacing_asf: character_spacing_asf, text_colour_asf: text_colour_asf)
         }
     }
@@ -35,6 +37,7 @@ import Foundation
             try coder.serialize(character_expansion_factor_asf)
             try coder.serialize(character_spacing_asf)
             try coder.serialize(text_colour_asf)
+
         }
     }
 }

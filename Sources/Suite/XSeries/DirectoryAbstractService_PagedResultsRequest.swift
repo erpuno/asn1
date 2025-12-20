@@ -2,37 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum DirectoryAbstractService_PagedResultsRequest: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum DirectoryAbstractService_PagedResultsRequest: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case newRequest(DirectoryAbstractService_PagedResultsRequest_newRequest_Sequence)
     case queryReference(ASN1OctetString)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case DirectoryAbstractService_PagedResultsRequest_newRequest_Sequence.defaultIdentifier:
-                self = .newRequest(try DirectoryAbstractService_PagedResultsRequest_newRequest_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1OctetString.defaultIdentifier:
-                self = .queryReference(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case DirectoryAbstractService_PagedResultsRequest_newRequest_Sequence.defaultIdentifier:
+            self = .newRequest(try DirectoryAbstractService_PagedResultsRequest_newRequest_Sequence(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1OctetString.defaultIdentifier:
+            self = .queryReference(try ASN1OctetString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .newRequest(let newRequest):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(newRequest)
-                                }
-                            } else {
+        case .newRequest(let newRequest):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(newRequest)
                             }
-            case .queryReference(let queryReference):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(queryReference)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(newRequest)
+                        }
+        case .queryReference(let queryReference):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(queryReference)
                             }
+                        } else {
+                            try coder.serialize(queryReference)
+                        }
+
         }
     }
 

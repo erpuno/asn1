@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-public struct PKCS_12_PFX_version_IntEnum : DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable, Comparable {
+public struct PKCS_12_PFX_version_IntEnum : DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable, Comparable {
     public static var defaultIdentifier: ASN1Identifier { .integer }
     @usableFromInline  var rawValue: Int
     @inlinable public static func < (lhs: PKCS_12_PFX_version_IntEnum, rhs: PKCS_12_PFX_version_IntEnum) -> Bool { lhs.rawValue < rhs.rawValue }

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_12_PKCS12Attribute: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_12_PKCS12Attribute: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var attrId: ASN1ObjectIdentifier
     @usableFromInline var attrValues: [ASN1Any]
     @inlinable init(attrId: ASN1ObjectIdentifier, attrValues: [ASN1Any]) {
         self.attrId = attrId
         self.attrValues = attrValues
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let attrId: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
             let attrValues: [ASN1Any] = try DER.set(of: ASN1Any.self, identifier: .set, nodes: &nodes)
+
             return PKCS_12_PKCS12Attribute(attrId: attrId, attrValues: attrValues)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(attrId)
             try coder.serializeSetOf(attrValues)
+
         }
     }
 }

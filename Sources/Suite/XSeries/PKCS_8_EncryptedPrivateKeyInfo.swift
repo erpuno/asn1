@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_8_EncryptedPrivateKeyInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_8_EncryptedPrivateKeyInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var encryptionAlgorithm: AuthenticationFramework_AlgorithmIdentifier
     @usableFromInline var encryptedData: PKCS_8_EncryptedData
     @inlinable init(encryptionAlgorithm: AuthenticationFramework_AlgorithmIdentifier, encryptedData: PKCS_8_EncryptedData) {
         self.encryptionAlgorithm = encryptionAlgorithm
         self.encryptedData = encryptedData
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let encryptionAlgorithm: AuthenticationFramework_AlgorithmIdentifier = try AuthenticationFramework_AlgorithmIdentifier(derEncoded: &nodes)
             let encryptedData: PKCS_8_EncryptedData = try PKCS_8_EncryptedData(derEncoded: &nodes)
+
             return PKCS_8_EncryptedPrivateKeyInfo(encryptionAlgorithm: encryptionAlgorithm, encryptedData: encryptedData)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(encryptionAlgorithm)
             try coder.serialize(encryptedData)
+
         }
     }
 }

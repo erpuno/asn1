@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct BasicAccessControl_UserPermission: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct BasicAccessControl_UserPermission: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var precedence: BasicAccessControl_Precedence?
     @usableFromInline var protectedItems: BasicAccessControl_ProtectedItems
@@ -11,6 +11,7 @@ import Foundation
         self.precedence = precedence
         self.protectedItems = protectedItems
         self.grantsAndDenials = grantsAndDenials
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -22,15 +23,17 @@ if let next = peek_precedence.next(), next.identifier == BasicAccessControl_Prec
 }
             let protectedItems: BasicAccessControl_ProtectedItems = try BasicAccessControl_ProtectedItems(derEncoded: &nodes)
             let grantsAndDenials: BasicAccessControl_GrantsAndDenials = try BasicAccessControl_GrantsAndDenials(derEncoded: &nodes)
+
             return BasicAccessControl_UserPermission(precedence: precedence, protectedItems: protectedItems, grantsAndDenials: grantsAndDenials)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let precedence = self.precedence { if let precedence = self.precedence { try coder.serialize(precedence) } }
+            if let precedence = self.precedence { try coder.serialize(precedence) }
             try coder.serialize(protectedItems)
             try coder.serialize(grantsAndDenials)
+
         }
     }
 }

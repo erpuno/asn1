@@ -2,37 +2,38 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline indirect enum PKIX_X400Address_2009_PrivateDomainName: DERImplicitlyTaggable, DERParseable, DERSerializable, Hashable, Sendable {
+@usableFromInline indirect enum PKIX_X400Address_2009_PrivateDomainName: DERImplicitlyTaggable, DERParseable, DERSerializable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .enumerated }
         case numeric(ASN1PrintableString)
     case printable(ASN1PrintableString)
     @inlinable init(derEncoded rootNode: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         switch rootNode.identifier {
-            case ASN1PrintableString.defaultIdentifier:
-                self = .numeric(try ASN1PrintableString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
-            case ASN1PrintableString.defaultIdentifier:
-                self = .printable(try ASN1PrintableString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1PrintableString.defaultIdentifier:
+            self = .numeric(try ASN1PrintableString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
+        case ASN1PrintableString.defaultIdentifier:
+            self = .printable(try ASN1PrintableString(derEncoded: rootNode, withIdentifier: rootNode.identifier))
             default: throw ASN1Error.unexpectedFieldType(rootNode.identifier)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         switch self {
-            case .numeric(let numeric):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(numeric)
-                                }
-                            } else {
+        case .numeric(let numeric):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(numeric)
                             }
-            case .printable(let printable):
-                            if identifier != Self.defaultIdentifier {
-                                try coder.appendConstructedNode(identifier: identifier) { coder in
-                                    try coder.serialize(printable)
-                                }
-                            } else {
+                        } else {
+                            try coder.serialize(numeric)
+                        }
+        case .printable(let printable):
+                        if identifier != Self.defaultIdentifier {
+                            try coder.appendConstructedNode(identifier: identifier) { coder in
                                 try coder.serialize(printable)
                             }
+                        } else {
+                            try coder.serialize(printable)
+                        }
+
         }
     }
 

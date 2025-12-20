@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CryptographicMessageSyntax_2009_SignerInfo: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CryptographicMessageSyntax_2009_SignerInfo: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: CryptographicMessageSyntax_2009_CMSVersion
     @usableFromInline var sid: CryptographicMessageSyntax_2009_SignerIdentifier
@@ -19,6 +19,7 @@ import Foundation
         self.signatureAlgorithm = signatureAlgorithm
         self.signature = signature
         self.unsignedAttrs = unsignedAttrs
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -30,6 +31,7 @@ import Foundation
             let signatureAlgorithm: CryptographicMessageSyntax_2009_SignatureAlgorithmIdentifier = try CryptographicMessageSyntax_2009_SignatureAlgorithmIdentifier(derEncoded: &nodes)
             let signature: CryptographicMessageSyntax_2009_SignatureValue = try CryptographicMessageSyntax_2009_SignatureValue(derEncoded: &nodes)
             let unsignedAttrs: CryptographicMessageSyntax_2009_Attributes? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return CryptographicMessageSyntax_2009_SignerInfo(version: version, sid: sid, digestAlgorithm: digestAlgorithm, signedAttrs: signedAttrs, signatureAlgorithm: signatureAlgorithm, signature: signature, unsignedAttrs: unsignedAttrs)
         }
     }
@@ -39,10 +41,11 @@ import Foundation
             try coder.serialize(version)
             try coder.serialize(sid)
             try coder.serialize(digestAlgorithm)
-            if let signedAttrs = self.signedAttrs { if let signedAttrs = self.signedAttrs { try coder.serializeOptionalImplicitlyTagged(signedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
+            if let signedAttrs = self.signedAttrs { try coder.serializeOptionalImplicitlyTagged(signedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
             try coder.serialize(signatureAlgorithm)
             try coder.serialize(signature)
-            if let unsignedAttrs = self.unsignedAttrs { if let unsignedAttrs = self.unsignedAttrs { try coder.serializeOptionalImplicitlyTagged(unsignedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let unsignedAttrs = self.unsignedAttrs { try coder.serializeOptionalImplicitlyTagged(unsignedAttrs, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }

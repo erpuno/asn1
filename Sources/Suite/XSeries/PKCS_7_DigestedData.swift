@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct PKCS_7_DigestedData: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct PKCS_7_DigestedData: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var version: PKCS_7_DigestedData_version_IntEnum
     @usableFromInline var digestAlgorithm: PKCS_7_DigestAlgorithmIdentifier
@@ -13,6 +13,7 @@ import Foundation
         self.digestAlgorithm = digestAlgorithm
         self.contentInfo = contentInfo
         self.digest = digest
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let digestAlgorithm: PKCS_7_DigestAlgorithmIdentifier = try PKCS_7_DigestAlgorithmIdentifier(derEncoded: &nodes)
             let contentInfo: PKCS_7_ContentInfo = try PKCS_7_ContentInfo(derEncoded: &nodes)
             let digest: PKCS_7_Digest = try PKCS_7_Digest(derEncoded: &nodes)
+
             return PKCS_7_DigestedData(version: version, digestAlgorithm: digestAlgorithm, contentInfo: contentInfo, digest: digest)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(version.rawValue)
+            try version.serialize(into: &coder, withIdentifier: identifier)
             try coder.serialize(digestAlgorithm)
             try coder.serialize(contentInfo)
             try coder.serialize(digest)
+
         }
     }
 }

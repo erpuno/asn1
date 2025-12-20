@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Assured_Reproduction_Areas_Element_assured_reproduction_area_Set: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Assured_Reproduction_Areas_Element_assured_reproduction_area_Set: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var position: Character_Presentation_Attributes_Measure_Pair
     @usableFromInline var dimensions: Character_Presentation_Attributes_Measure_Pair
     @inlinable init(position: Character_Presentation_Attributes_Measure_Pair, dimensions: Character_Presentation_Attributes_Measure_Pair) {
         self.position = position
         self.dimensions = dimensions
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let position: Character_Presentation_Attributes_Measure_Pair = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let dimensions: Character_Presentation_Attributes_Measure_Pair = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
+
             return Document_Profile_Descriptor_Assured_Reproduction_Areas_Element_assured_reproduction_area_Set(position: position, dimensions: dimensions)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(position, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(dimensions, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct CHAT_Search: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct CHAT_Search: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var dn: ASN1OctetString
     @usableFromInline var id: ASN1OctetString
@@ -19,6 +19,7 @@ import Foundation
         self.criteria = criteria
         self.type = type
         self.status = status
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -30,6 +31,7 @@ import Foundation
             let criteria: CHAT_Criteria = try CHAT_Criteria(derEncoded: &nodes)
             let type: CHAT_Scope = try CHAT_Scope(derEncoded: &nodes)
             let status: CHAT_SearchStatus = try CHAT_SearchStatus(derEncoded: &nodes)
+
             return CHAT_Search(dn: dn, id: id, field: field, value: value, criteria: criteria, type: type, status: status)
         }
     }
@@ -43,6 +45,7 @@ import Foundation
             try coder.serialize(criteria)
             try coder.serialize(type)
             try coder.serialize(status)
+
         }
     }
 }

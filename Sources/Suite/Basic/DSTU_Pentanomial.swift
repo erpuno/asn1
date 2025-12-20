@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DSTU_Pentanomial: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DSTU_Pentanomial: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var k: ArraySlice<UInt8>
     @usableFromInline var j: ArraySlice<UInt8>
@@ -11,6 +11,7 @@ import Foundation
         self.k = k
         self.j = j
         self.l = l
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -18,6 +19,7 @@ import Foundation
             let k: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let j: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
             let l: ArraySlice<UInt8> = try ArraySlice<UInt8>(derEncoded: &nodes)
+
             return DSTU_Pentanomial(k: k, j: j, l: l)
         }
     }
@@ -27,6 +29,7 @@ import Foundation
             try coder.serialize(k)
             try coder.serialize(j)
             try coder.serialize(l)
+
         }
     }
 }

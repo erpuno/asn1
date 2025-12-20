@@ -2,7 +2,7 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct Document_Profile_Descriptor_Sealed_Information: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct Document_Profile_Descriptor_Sealed_Information: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var fingerprint: ASN1OctetString?
     @usableFromInline var time: Document_Profile_Descriptor_Date_and_Time?
@@ -13,6 +13,7 @@ import Foundation
         self.time = time
         self.sealing_orig_id = sealing_orig_id
         self.location = location
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
@@ -21,16 +22,18 @@ import Foundation
             let time: Document_Profile_Descriptor_Date_and_Time? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
             let sealing_orig_id: Document_Profile_Descriptor_Personal_Name? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific))
             let location: Document_Profile_Descriptor_Location? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific))
+
             return Document_Profile_Descriptor_Sealed_Information(fingerprint: fingerprint, time: time, sealing_orig_id: sealing_orig_id, location: location)
         }
     }
     @inlinable func serialize(into coder: inout DER.Serializer,
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            if let fingerprint = self.fingerprint { if let fingerprint = self.fingerprint { try coder.serializeOptionalImplicitlyTagged(fingerprint, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) } }
-            if let time = self.time { if let time = self.time { try coder.serializeOptionalImplicitlyTagged(time, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
-            if let sealing_orig_id = self.sealing_orig_id { if let sealing_orig_id = self.sealing_orig_id { try coder.serializeOptionalImplicitlyTagged(sealing_orig_id, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) } }
-            if let location = self.location { if let location = self.location { try coder.serializeOptionalImplicitlyTagged(location, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) } }
+            if let fingerprint = self.fingerprint { try coder.serializeOptionalImplicitlyTagged(fingerprint, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)) }
+            if let time = self.time { try coder.serializeOptionalImplicitlyTagged(time, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+            if let sealing_orig_id = self.sealing_orig_id { try coder.serializeOptionalImplicitlyTagged(sealing_orig_id, withIdentifier: ASN1Identifier(tagWithNumber: 2, tagClass: .contextSpecific)) }
+            if let location = self.location { try coder.serializeOptionalImplicitlyTagged(location, withIdentifier: ASN1Identifier(tagWithNumber: 3, tagClass: .contextSpecific)) }
+
         }
     }
 }

@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Adjust: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Adjust: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var iso_standard_9541_escadjname: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name
     @usableFromInline var adjust_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Adjust_Properties
     @inlinable init(iso_standard_9541_escadjname: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name, adjust_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Adjust_Properties) {
         self.iso_standard_9541_escadjname = iso_standard_9541_escadjname
         self.adjust_properties = adjust_properties
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let iso_standard_9541_escadjname: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Global_Name = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific)))!
             let adjust_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Adjust_Properties = (try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)))!
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Adjust(iso_standard_9541_escadjname: iso_standard_9541_escadjname, adjust_properties: adjust_properties)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeOptionalImplicitlyTagged(iso_standard_9541_escadjname, withIdentifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
             try coder.serializeOptionalImplicitlyTagged(adjust_properties, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
         }
     }
 }

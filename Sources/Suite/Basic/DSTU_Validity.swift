@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct DSTU_Validity: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct DSTU_Validity: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
     @usableFromInline var notBefore: DSTU_Time
     @usableFromInline var notAfter: DSTU_Time
     @inlinable init(notBefore: DSTU_Time, notAfter: DSTU_Time) {
         self.notBefore = notBefore
         self.notAfter = notAfter
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
             let notBefore: DSTU_Time = try DSTU_Time(derEncoded: &nodes)
             let notAfter: DSTU_Time = try DSTU_Time(derEncoded: &nodes)
+
             return DSTU_Validity(notBefore: notBefore, notAfter: notAfter)
         }
     }
@@ -23,6 +25,7 @@ import Foundation
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serialize(notBefore)
             try coder.serialize(notAfter)
+
         }
     }
 }

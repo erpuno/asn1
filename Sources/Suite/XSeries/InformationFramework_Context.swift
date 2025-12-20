@@ -2,31 +2,28 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct InformationFramework_Context: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct InformationFramework_Context: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .sequence }
-    @usableFromInline var contextType: ASN1ObjectIdentifier
-    @usableFromInline var contextValues: [ASN1Any]
-    @usableFromInline var fallback: Bool?
-    @inlinable init(contextType: ASN1ObjectIdentifier, contextValues: [ASN1Any], fallback: Bool?) {
-        self.contextType = contextType
-        self.contextValues = contextValues
-        self.fallback = fallback
+    @usableFromInline var algorithm: ASN1ObjectIdentifier
+    @usableFromInline var parameters: ASN1Any?
+    @inlinable init(algorithm: ASN1ObjectIdentifier, parameters: ASN1Any? = nil) {
+        self.algorithm = algorithm
+        self.parameters = parameters
     }
-    @inlinable init(derEncoded root: ASN1Node,
-        withIdentifier identifier: ASN1Identifier) throws {
+    @inlinable init(derEncoded root: ASN1Node, withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.sequence(root, identifier: identifier) { nodes in
-            let contextType: ASN1ObjectIdentifier = try ASN1ObjectIdentifier(derEncoded: &nodes)
-            let contextValues: [ASN1Any] = try DER.set(of: ASN1Any.self, identifier: .set, nodes: &nodes)
-            let fallback: Bool = try DER.decodeDefault(&nodes, defaultValue: false)
-            return InformationFramework_Context(contextType: contextType, contextValues: contextValues, fallback: fallback)
+            let algorithm = try ASN1ObjectIdentifier(derEncoded: &nodes)
+            var parameters: ASN1Any? = nil
+            if let nextNode = nodes.next() {
+                parameters = try ASN1Any(derEncoded: nextNode)
+            }
+            return InformationFramework_Context(algorithm: algorithm, parameters: parameters)
         }
     }
-    @inlinable func serialize(into coder: inout DER.Serializer,
-        withIdentifier identifier: ASN1Identifier) throws {
+    @inlinable func serialize(into coder: inout DER.Serializer, withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
-            try coder.serialize(contextType)
-            try coder.serializeSetOf(contextValues)
-            if let fallback = self.fallback { if let fallback = self.fallback { try coder.serialize(fallback) } }
+            try coder.serialize(algorithm)
+            if let parameters = parameters { try coder.serialize(parameters) }
         }
     }
 }

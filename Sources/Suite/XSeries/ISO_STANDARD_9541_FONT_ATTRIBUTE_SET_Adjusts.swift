@@ -2,19 +2,21 @@
 import SwiftASN1
 import Foundation
 
-@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Adjusts: DERImplicitlyTaggable, Hashable, Sendable {
+@usableFromInline struct ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Adjusts: DERImplicitlyTaggable, Sendable {
     @inlinable static var defaultIdentifier: ASN1Identifier { .set }
     @usableFromInline var iso_standard_9541_adjust: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Adjust]
     @usableFromInline var non_iso_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List?
     @inlinable init(iso_standard_9541_adjust: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Adjust], non_iso_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List?) {
         self.iso_standard_9541_adjust = iso_standard_9541_adjust
         self.non_iso_properties = non_iso_properties
+
     }
     @inlinable init(derEncoded root: ASN1Node,
         withIdentifier identifier: ASN1Identifier) throws {
         self = try DER.set(root, identifier: identifier) { nodes in
             let iso_standard_9541_adjust: [ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Adjust] = try DER.set(of: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Adjust.self, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific), nodes: &nodes)
             let non_iso_properties: ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Property_List? = try DER.optionalImplicitlyTagged(&nodes, tag: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific))
+
             return ISO_STANDARD_9541_FONT_ATTRIBUTE_SET_Adjusts(iso_standard_9541_adjust: iso_standard_9541_adjust, non_iso_properties: non_iso_properties)
         }
     }
@@ -22,7 +24,8 @@ import Foundation
         withIdentifier identifier: ASN1Identifier) throws {
         try coder.appendConstructedNode(identifier: identifier) { coder in
             try coder.serializeSetOf(iso_standard_9541_adjust, identifier: ASN1Identifier(tagWithNumber: 0, tagClass: .contextSpecific))
-            if let non_iso_properties = self.non_iso_properties { if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) } }
+            if let non_iso_properties = self.non_iso_properties { try coder.serializeOptionalImplicitlyTagged(non_iso_properties, withIdentifier: ASN1Identifier(tagWithNumber: 1, tagClass: .contextSpecific)) }
+
         }
     }
 }
