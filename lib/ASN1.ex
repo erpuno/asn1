@@ -87,10 +87,16 @@ defmodule ASN1 do
         {:typedef, _, _, name, _} ->
           swiftName = name(name, modname)
           setEnv(name, swiftName)
+          # Metadata for resolution
+          setEnvGlobal("meta_mod_" <> swiftName, modname)
+          setEnvGlobal("meta_orig_" <> swiftName, bin(name))
 
         {:ptypedef, _, _, name, _args, _} ->
           swiftName = name(name, modname)
           setEnv(name, swiftName)
+          # Metadata for resolution
+          setEnvGlobal("meta_mod_" <> swiftName, modname)
+          setEnvGlobal("meta_orig_" <> swiftName, bin(name))
 
         {:valuedef, _, _, name, _, _, _} ->
           swiftName = name(name, modname)
@@ -124,6 +130,8 @@ defmodule ASN1 do
                 {:Externaltypereference, _, _, type} ->
                   swiftName = name(type, modName)
                   setEnvGlobal(type, swiftName)
+                  setEnvGlobal("meta_mod_" <> swiftName, modName)
+                  setEnvGlobal("meta_orig_" <> swiftName, bin(type))
 
                 {:Externalvaluereference, _, _, val} ->
                   swiftName = name(val, modName)
@@ -197,6 +205,8 @@ defmodule ASN1 do
   end
 
   def compileType(pos, name, typeDefinition, modname, save \\ true) do
+    IO.puts("DEBUG: compileType name=#{inspect(name)} mod=#{modname}")
+
     res =
       case typeDefinition do
         {:type, _, {:INTEGER, cases}, _, _, :no} ->
@@ -366,6 +376,9 @@ defmodule ASN1 do
           sequence(name, fields, modname, save)
 
         {:type, _, {:pt, {:Externaltypereference, _, pt_mod, pt_type}, args}, _, [], :no} ->
+          # Force AlgorithmIdentifier to be treated as a simple type (RawValue)
+          force_simple = pt_type == :AlgorithmIdentifier or pt_type == "AlgorithmIdentifier"
+
           # Look up parameterized type definition for expansion
           ptype_def = :application.get_env(:asn1scg, {:ptype_def, pt_mod, pt_type}, nil)
           # Check if this is a simple type parameter (not IOC-based)
@@ -383,6 +396,11 @@ defmodule ASN1 do
             end
 
           case ptype_def do
+            _ when force_simple ->
+              # Force fallback for AlgorithmIdentifier
+              target = substituteType(lookup(bin(pt_type)))
+              typealias(name, target, modname, save)
+
             nil ->
               # Fallback: create typealias to substituted type
               target = substituteType(lookup(bin(pt_type)))
@@ -391,6 +409,7 @@ defmodule ASN1 do
             {_param_names, _template_type} when not has_simple_params ->
               # Complex IOC-based type - fallback to typealias
               target = substituteType(lookup(bin(pt_type)))
+
               typealias(name, target, modname, save)
 
             {param_names, template_type} ->
@@ -499,8 +518,8 @@ defmodule ASN1 do
           typealias(name, builtinType(:ASN1ObjectIdentifier), modname, save)
 
         {:type, _, {:ObjectClassFieldType, _, _class, _field, _}, _, _, :no} ->
-          # TYPE-IDENTIFIER.&Type patterns -> ASN1Any typealias
-          typealias(name, builtinType(:ASN1Any), modname, save)
+          # TYPE-IDENTIFIER.&Type patterns -> treat as generic ANY RawValue
+          typealias(name, builtinType(:ANY), modname, save)
 
         {:type, _, {:pt, _, _}, _, [], _} ->
           :skip

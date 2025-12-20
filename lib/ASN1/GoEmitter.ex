@@ -1,13 +1,40 @@
 defmodule ASN1.GoEmitter do
   @behaviour ASN1.Emitter
   import ASN1,
-    only: [bin: 1, normalizeName: 1, getEnv: 2, setEnv: 2, print: 2, save: 4]
+    only: [bin: 1, normalizeName: 1, getEnv: 2, setEnv: 2, setEnvGlobal: 2, print: 2, save: 4]
 
   @reserved_words ~w(break default func interface select case defer go map struct chan else goto package switch const fallthrough if range type continue for import return var)
 
   def fileExtension, do: ".go"
 
-  defp add_import(pkg) do
+  defp registry_file, do: "priv/go_registry.etf"
+
+  defp load_registry do
+    case File.read(registry_file()) do
+      {:ok, binary} -> :erlang.binary_to_term(binary)
+      _ -> %{modules: %{}, packages: %{}}
+    end
+  end
+
+  defp save_registry(reg) do
+    File.write(registry_file(), :erlang.term_to_binary(reg))
+  end
+
+  defp register_module(mod, pkg, base) do
+    reg = load_registry()
+    modules = Map.put(reg.modules, bin(mod), base)
+    # Note: simple package mapping might be ambiguous if multiple bases define same package
+    # but we use it as fallback.
+    packages = Map.put(reg.packages, pkg, base)
+    save_registry(%{reg | modules: modules, packages: packages})
+  end
+
+  defp lookup_base(mod, pkg) do
+    reg = load_registry()
+    Map.get(reg.modules, bin(mod)) || Map.get(reg.packages, pkg)
+  end
+
+  defp add_import(pkg, mod \\ nil) do
     current_pkg = Process.get(:current_pkg, "")
 
     if pkg != "" do
@@ -18,7 +45,7 @@ defmodule ASN1.GoEmitter do
           _ -> pkg
         end
 
-      # Strip 'chat/' prefix if it's already there to avoid double prefix
+      # Strip 'chat/' prefix if it's already there to avoid double prefix (legacy support)
       clean_pkg =
         if String.starts_with?(actual_pkg, "chat/") do
           String.replace_prefix(actual_pkg, "chat/", "")
@@ -31,8 +58,20 @@ defmodule ASN1.GoEmitter do
       current_pkg = String.downcase(current_pkg)
 
       if clean_pkg != "" and clean_pkg != current_pkg and not String.contains?(clean_pkg, "*") do
+        # Resolve base
+        base =
+          if mod do
+            lookup_base(mod, clean_pkg)
+          else
+            lookup_base(nil, clean_pkg)
+          end
+
+        # Fallback to current output or default "chat" if not found
+        final_base = base || System.get_env("ASN1_OUTPUT") || "chat"
+
         imports = Process.get(:go_imports, MapSet.new())
-        Process.put(:go_imports, MapSet.put(imports, clean_pkg))
+        # Store {pkg, base} tuple
+        Process.put(:go_imports, MapSet.put(imports, {clean_pkg, final_base}))
       else
         if clean_pkg == current_pkg and clean_pkg != "" do
           # IO.inspect({:skipping_self_import, clean_pkg, actual_pkg, pkg})
@@ -51,13 +90,34 @@ defmodule ASN1.GoEmitter do
 
   # Go-specific type lookups - map ASN.1 type names to valid Go types
   defp go_lookup("ASN1ObjectIdentifier"), do: "asn1.ObjectIdentifier"
-  defp go_lookup("SingleAttribute"), do: "asn1.RawValue"
   defp go_lookup("DSTUAlgorithmIdentifier"), do: "asn1.RawValue"
   defp go_lookup("ASN1Any"), do: "asn1.RawValue"
   defp go_lookup("PKIX1Implicit_2009_GeneralNames"), do: "asn1.RawValue"
   defp go_lookup("LDAPAttribute"), do: "asn1.RawValue"
   defp go_lookup("InformationFrameworkMAPPINGBASEDMATCHING"), do: "asn1.RawValue"
   defp go_lookup("X2009AttributeType"), do: "asn1.ObjectIdentifier"
+  defp go_lookup("TeletexString"), do: "asn1.RawValue"
+  defp go_lookup("VisibleString"), do: "asn1.RawValue"
+  defp go_lookup("GeneralString"), do: "asn1.RawValue"
+  defp go_lookup("REAL"), do: "float64"
+  defp go_lookup("AuthenticationFramework_AlgorithmIdentifier"), do: "asn1.RawValue"
+  defp go_lookup("X62AlgorithmIdentifier"), do: "asn1.RawValue"
+  defp go_lookup("X2009AlgorithmIdentifier"), do: "asn1.RawValue"
+  defp go_lookup("X7AlgorithmIdentifier"), do: "asn1.RawValue"
+  defp go_lookup("PKIX1Explicit88Extensions"), do: "[]asn1.RawValue"
+  defp go_lookup("PKIX1Explicit88CertificateList"), do: "asn1.RawValue"
+  defp go_lookup("PKIX1Explicit88Certificate"), do: "asn1.RawValue"
+  defp go_lookup("AttributesCharacterAttributes"), do: "asn1.RawValue"
+  defp go_lookup("DescriptorDateAndTime"), do: "asn1.RawValue"
+  defp go_lookup("X7Attribute"), do: "asn1.RawValue"
+  defp go_lookup("UnitsTextUnit"), do: "asn1.RawValue"
+  defp go_lookup("DescriptorsLayoutStyleDescriptor"), do: "asn1.RawValue"
+  defp go_lookup("DescriptorsLinkClassDescriptor"), do: "asn1.RawValue"
+  defp go_lookup("DescriptorsLinkDescriptor"), do: "asn1.RawValue"
+  defp go_lookup("DescriptorsPresentationStyleDescriptor"), do: "asn1.RawValue"
+  defp go_lookup("SubprofilesSubprofileDescriptor"), do: "asn1.RawValue"
+  defp go_lookup("X2010Time"), do: "asn1.RawValue"
+  defp go_lookup("X2009AttributeCertificate"), do: "asn1.RawValue"
   # Actual ASN.1 type names (before module prefix is added)
   defp go_lookup("AlgorithmIdentifier"), do: "asn1.RawValue"
   defp go_lookup("Attribute"), do: "asn1.RawValue"
@@ -82,9 +142,18 @@ defmodule ASN1.GoEmitter do
     pkg = module_package(modname)
     Process.put(:current_pkg, pkg)
 
+    pkg_name = System.get_env("ASN1_OUTPUT")
+
+    if pkg_name do
+      register_module(modname, pkg, pkg_name)
+    end
+
     extra_imports =
       get_imports()
-      |> Enum.map(fn p -> "    \"tobirama/chat/#{p}\"" end)
+      |> Enum.map(fn
+        {p, base} -> "    \"tobirama/#{base}/#{p}\""
+        p -> "    \"tobirama/#{pkg_name}/#{p}\""
+      end)
       |> Enum.join("\n")
 
     """
@@ -96,10 +165,9 @@ defmodule ASN1.GoEmitter do
     #{extra_imports}
     )
 
-    // Reference imports to avoid unused errors
-    var _ = asn1.BitString{}
-    var _ = asn1.ObjectIdentifier{}
+    var _ = asn1.RawValue{}
     var _ = time.Time{}
+    var _ = asn1.ObjectIdentifier{}
 
     """
   end
@@ -126,6 +194,36 @@ defmodule ASN1.GoEmitter do
 
       "DSTU" ->
         "dstu"
+
+      "ColourAttributes" ->
+        "docprofile"
+
+      "Colour-Attributes" ->
+        "docprofile"
+
+      "LayoutDescriptors" ->
+        "docprofile"
+
+      "Layout-Descriptors" ->
+        "docprofile"
+
+      "DocumentProfileDescriptor" ->
+        "docprofile"
+
+      "Document-Profile-Descriptor" ->
+        "docprofile"
+
+      "StyleDescriptors" ->
+        "docprofile"
+
+      "Style-Descriptors" ->
+        "docprofile"
+
+      "LogicalDescriptors" ->
+        "docprofile"
+
+      "Logical-Descriptors" ->
+        "docprofile"
 
       _ ->
         modname
@@ -264,7 +362,7 @@ defmodule ASN1.GoEmitter do
             current_pkg = module_package(current_mod)
 
             if target_pkg != current_pkg do
-              add_import(target_pkg)
+              add_import(target_pkg, mod)
               target_pkg <> "." <> name(type, mod)
             else
               name(type, mod)
@@ -282,7 +380,7 @@ defmodule ASN1.GoEmitter do
                       p = if String.starts_with?(pkg, "chat/"), do: pkg, else: "chat/" <> pkg
                       # But we only want to add_import with the part relative to tobirama/chat/
                       # So if pkg is already mapped, we should be careful.
-                      add_import(pkg)
+                      add_import(pkg, mod)
                       pkg <> "." <> t
 
                     _ ->
@@ -305,7 +403,7 @@ defmodule ASN1.GoEmitter do
                           full_pkg_path
                         end
 
-                      add_import(import_path)
+                      add_import(import_path, mod)
                       pkg <> "." <> t
 
                     _ ->
@@ -352,12 +450,52 @@ defmodule ASN1.GoEmitter do
     end
   end
 
-  def fieldType(_name, _field, atom) when is_atom(atom) do
-    res = mapBuiltin(atom)
-    if is_binary(res), do: res, else: name(res, "")
+  defp resolve_type_name(type_name) do
+    # 1. Direct go_lookup (e.g. if type_name itself is mapped)
+    case go_lookup(type_name) do
+      nil ->
+        # 2. Lookup original ASN.1 name
+        orig = getEnv("meta_orig_" <> type_name, nil)
+
+        mapped = if orig, do: go_lookup(orig), else: nil
+
+        if mapped do
+          mapped
+        else
+          # 3. Resolve module and qualify
+          target_mod = getEnv("meta_mod_" <> type_name, nil)
+          current_mod = getEnv(:current_module, "")
+
+          if target_mod && target_mod != current_mod do
+            target_pkg = module_package(target_mod)
+            current_pkg = module_package(current_mod)
+
+            if target_pkg != current_pkg do
+              add_import(target_pkg, target_mod)
+              # Use the type name (which is the Go name)
+              target_pkg <> "." <> type_name
+            else
+              type_name
+            end
+          else
+            type_name
+          end
+        end
+
+      mapped ->
+        mapped
+    end
   end
 
-  def fieldType(_name, _field, other) when is_binary(other), do: other
+  def fieldType(_name, _field, atom) when is_atom(atom) do
+    res = mapBuiltin(atom)
+    if is_binary(res), do: resolve_type_name(res), else: name(res, "")
+  end
+
+  def fieldType(_name, _field, other) when is_binary(other) do
+    resolve_type_name(other)
+  end
+
   def fieldType(name, field, other), do: inspect({name, field, other})
 
   def mapBuiltin(:"OBJECT IDENTIFIER"), do: "asn1.ObjectIdentifier"
@@ -374,7 +512,13 @@ defmodule ASN1.GoEmitter do
   def mapBuiltin(:IA5String), do: "string"
   def mapBuiltin(:GeneralizedTime), do: "time.Time"
   def mapBuiltin(:UTCTime), do: "time.Time"
-  def mapBuiltin(:AlgorithmIdentifier), do: "FrameworkAlgorithmIdentifier"
+  def mapBuiltin(:ASN1Any), do: "asn1.RawValue"
+  def mapBuiltin(:AlgorithmIdentifier), do: "asn1.RawValue"
+  def mapBuiltin(:TeletexString), do: "asn1.RawValue"
+  def mapBuiltin(:VisibleString), do: "asn1.RawValue"
+  def mapBuiltin(:GeneralString), do: "asn1.RawValue"
+  def mapBuiltin(:REAL), do: "float64"
+  def mapBuiltin(:EXTERNAL), do: "asn1.RawValue"
   def mapBuiltin(other) when is_atom(other), do: go_lookup(bin(other)) || ASN1.lookup(bin(other))
   def mapBuiltin(other), do: inspect(other)
 
@@ -386,7 +530,7 @@ defmodule ASN1.GoEmitter do
     if tag == :set, do: setEnv("#{name}_is_set", true)
 
     # Check go_lookup for the element type
-    element_type = go_lookup(bin(type)) || type
+    element_type = resolve_type_name(bin(type))
 
     body = "type #{goName} []#{element_type}"
     header = emitHeader(modname)
@@ -573,7 +717,8 @@ defmodule ASN1.GoEmitter do
   def integerEnum(name, cases, modname, saveFlag), do: enumeration(name, cases, modname, saveFlag)
 
   def sequenceOf(_name, _field, type) do
-    element_type = go_lookup(bin(type)) || substituteType(type)
+    sub = substituteType(type)
+    element_type = if sub != type, do: sub, else: resolve_type_name(bin(type))
     "[]" <> element_type
   end
 
@@ -585,12 +730,14 @@ defmodule ASN1.GoEmitter do
     setEnv(name, goName)
 
     # First check go_lookup for the target type
-    resolved_target = go_lookup(bin(target)) || target
+    resolved_target = resolve_type_name(bin(target))
 
     # Sanitize resolved_target - map ASN.1 class names to valid Go types
     sanitized_target =
       cond do
         resolved_target == "TYPE-IDENTIFIER" -> "asn1.RawValue"
+        resolved_target == "AlgorithmIdentifier" -> "asn1.RawValue"
+        String.ends_with?(resolved_target, "AlgorithmIdentifier") -> "asn1.RawValue"
         resolved_target == "ABSTRACT-SYNTAX" -> "asn1.RawValue"
         resolved_target == "ATTRIBUTE" -> "asn1.RawValue"
         resolved_target == "MATCHING-RULE" -> "asn1.RawValue"
@@ -707,6 +854,17 @@ defmodule ASN1.GoEmitter do
     """
 
     save(saveFlag, modname, className, header <> body <> "\n")
+  end
+
+  def integerValue(name, {:Externalvaluereference, _, ext_mod, ext_val}, modname, saveFlag) do
+    clear_imports()
+    goName = name(name, modname)
+    valName = name(ext_val, ext_mod)
+
+    header = emitHeader(modname)
+    body = "const #{goName} = #{valName}"
+
+    save(saveFlag, modname, goName, header <> body <> "\n")
   end
 
   def integerValue(name, val, modname, saveFlag) do
