@@ -464,8 +464,19 @@ manual_boxing = [
     # "Identifiers_and_Expressions_Current_Instance_Function.second_parameter_expression"
 ]
 
-File.mkdir_p!("Sources/Suite/Basic")
-Application.put_env(:asn1scg, "output", "Sources/Suite/Basic/")
+lang = System.get_env("ASN1_LANG") || "swift"
+Application.put_env(:asn1scg, :lang, lang)
+
+default_output =
+  case lang do
+    "rust" -> "asn1_suite/src/generated"
+    _ -> "Sources/Suite/Basic"
+  end
+
+output_dir = System.get_env("ASN1_OUTPUT") || default_output
+File.mkdir_p!(output_dir)
+output_env = if String.ends_with?(output_dir, "/"), do: output_dir, else: output_dir <> "/"
+Application.put_env(:asn1scg, "output", output_env)
 
 base_dir = "priv/basic"
 

@@ -1,6 +1,7 @@
 Code.require_file("lib/ASN1/Emitter.ex")
 Code.require_file("lib/ASN1.ex")
 Code.require_file("lib/ASN1/SwiftEmitter.ex")
+Code.require_file("lib/ASN1/RustEmitter.ex")
 case System.argv() do
   ["compile"]          -> ASN1.compile
   ["compile","-v"]     -> ASN1.setEnv(:verbose, true) ; ASN1.compile
