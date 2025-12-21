@@ -1,0 +1,17 @@
+package docprofile
+
+import (
+    "encoding/asn1"
+    "time"
+
+)
+
+var _ = asn1.RawValue{}
+var _ = time.Time{}
+var _ = asn1.ObjectIdentifier{}
+
+type DescriptorsSeparation struct {
+    Leading int64 `asn1:"optional,tag:0"`
+    Trailing int64 `asn1:"optional,tag:1"`
+    Centre int64 `asn1:"optional,tag:2"`
+}

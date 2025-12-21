@@ -1,0 +1,16 @@
+package cryptographicmessagesyntax2009
+
+import (
+    "encoding/asn1"
+    "time"
+
+)
+
+var _ = asn1.RawValue{}
+var _ = time.Time{}
+var _ = asn1.ObjectIdentifier{}
+
+type X2009OriginatorPublicKey struct {
+    Algorithm asn1.RawValue
+    PublicKey asn1.BitString
+}

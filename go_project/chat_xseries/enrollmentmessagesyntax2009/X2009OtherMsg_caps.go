@@ -1,0 +1,17 @@
+package enrollmentmessagesyntax2009
+
+import (
+    "encoding/asn1"
+    "time"
+
+)
+
+var _ = asn1.RawValue{}
+var _ = time.Time{}
+var _ = asn1.ObjectIdentifier{}
+
+type X2009OtherMsg struct {
+    BodyPartID X2009BodyPartID
+    OtherMsgType asn1.ObjectIdentifier
+    OtherMsgValue asn1.RawValue
+}

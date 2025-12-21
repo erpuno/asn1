@@ -5,6 +5,7 @@ defmodule ASN1 do
       "go" -> ASN1.GoEmitter
       "rust" -> ASN1.RustEmitter
       "kotlin" -> ASN1.KotlinEmitter
+      "c99" -> ASN1.C99Emitter
       _ -> ASN1.SwiftEmitter
     end
   end
@@ -65,6 +66,7 @@ defmodule ASN1 do
     print("outputDir: ~ts~n", [outputDir()])
     print("coverage: ~tp~n", [coverage()])
     dump()
+    emitter().finalize()
     :ok
   end
 

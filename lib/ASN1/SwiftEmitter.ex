@@ -2,6 +2,9 @@ defmodule ASN1.SwiftEmitter do
   @behaviour ASN1.Emitter
   import ASN1, only: [bin: 1, normalizeName: 1, getEnv: 2, setEnv: 2, print: 2, save: 4, lookup: 1]
 
+  @impl true
+  def finalize, do: :ok
+
   # Check if fields contain ASN1Any (which is not Hashable)
   def containsNonHashableType(fields) when is_list(fields) do
       Enum.any?(fields, fn

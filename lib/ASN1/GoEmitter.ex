@@ -1,7 +1,7 @@
 defmodule ASN1.GoEmitter do
   @behaviour ASN1.Emitter
   import ASN1,
-    only: [bin: 1, normalizeName: 1, getEnv: 2, setEnv: 2, setEnvGlobal: 2, print: 2, save: 4]
+    only: [bin: 1, normalizeName: 1, getEnv: 2, setEnv: 2, setEnvGlobal: 2, print: 2, save: 4, outputDir: 0]
 
   @reserved_words ~w(break default func interface select case defer go map struct chan else goto package switch const fallthrough if range type continue for import return var)
 
@@ -20,12 +20,28 @@ defmodule ASN1.GoEmitter do
     File.write(registry_file(), :erlang.term_to_binary(reg))
   end
 
+  defp normalize_base_path(nil), do: nil
+
+  defp normalize_base_path(base) when is_binary(base) do
+    base
+    |> String.trim()
+    |> String.trim_trailing("/")
+    |> Path.split()
+    |> Enum.reject(&(&1 in ["", "."]))
+    |> List.last()
+  end
+
+  defp default_base do
+    normalize_base_path(System.get_env("ASN1_OUTPUT")) || "chat"
+  end
+
   defp register_module(mod, pkg, base) do
     reg = load_registry()
-    modules = Map.put(reg.modules, bin(mod), base)
+    norm_base = normalize_base_path(base)
+    modules = Map.put(reg.modules, bin(mod), norm_base)
     # Note: simple package mapping might be ambiguous if multiple bases define same package
     # but we use it as fallback.
-    packages = Map.put(reg.packages, pkg, base)
+    packages = Map.put(reg.packages, pkg, norm_base)
     save_registry(%{reg | modules: modules, packages: packages})
   end
 
@@ -67,7 +83,7 @@ defmodule ASN1.GoEmitter do
           end
 
         # Fallback to current output or default "chat" if not found
-        final_base = base || System.get_env("ASN1_OUTPUT") || "chat"
+        final_base = normalize_base_path(base) || default_base()
 
         imports = Process.get(:go_imports, MapSet.new())
         # Store {pkg, base} tuple
@@ -90,8 +106,8 @@ defmodule ASN1.GoEmitter do
 
   # Go-specific type lookups - map ASN.1 type names to valid Go types
   defp go_lookup("ASN1ObjectIdentifier"), do: "asn1.ObjectIdentifier"
+  defp go_lookup("ASN1Any"), do: "ASN1Any"
   defp go_lookup("DSTUAlgorithmIdentifier"), do: "asn1.RawValue"
-  defp go_lookup("ASN1Any"), do: "asn1.RawValue"
   defp go_lookup("PKIX1Implicit_2009_GeneralNames"), do: "asn1.RawValue"
   defp go_lookup("LDAPAttribute"), do: "asn1.RawValue"
   defp go_lookup("InformationFrameworkMAPPINGBASEDMATCHING"), do: "asn1.RawValue"
@@ -142,7 +158,7 @@ defmodule ASN1.GoEmitter do
     pkg = module_package(modname)
     Process.put(:current_pkg, pkg)
 
-    pkg_name = System.get_env("ASN1_OUTPUT")
+    pkg_name = normalize_base_path(System.get_env("ASN1_OUTPUT")) || pkg
 
     if pkg_name do
       register_module(modname, pkg, pkg_name)
@@ -488,11 +504,16 @@ defmodule ASN1.GoEmitter do
   end
 
   def fieldType(_name, _field, atom) when is_atom(atom) do
+    atom
+    |> Atom.to_string()
+    |> ensure_special_type(module_package(getEnv(:current_module, "")))
+
     res = mapBuiltin(atom)
     if is_binary(res), do: resolve_type_name(res), else: name(res, "")
   end
 
   def fieldType(_name, _field, other) when is_binary(other) do
+    ensure_special_type(other, module_package(getEnv(:current_module, "")))
     resolve_type_name(other)
   end
 
@@ -512,7 +533,7 @@ defmodule ASN1.GoEmitter do
   def mapBuiltin(:IA5String), do: "string"
   def mapBuiltin(:GeneralizedTime), do: "time.Time"
   def mapBuiltin(:UTCTime), do: "time.Time"
-  def mapBuiltin(:ASN1Any), do: "asn1.RawValue"
+  def mapBuiltin(:ASN1Any), do: "ASN1Any"
   def mapBuiltin(:AlgorithmIdentifier), do: "asn1.RawValue"
   def mapBuiltin(:TeletexString), do: "asn1.RawValue"
   def mapBuiltin(:VisibleString), do: "asn1.RawValue"
@@ -522,6 +543,85 @@ defmodule ASN1.GoEmitter do
   def mapBuiltin(other) when is_atom(other), do: go_lookup(bin(other)) || ASN1.lookup(bin(other))
   def mapBuiltin(other), do: inspect(other)
 
+  @special_types %{
+    "SingleAttribute" =>
+      {:struct,
+       [
+         {"Type", "asn1.ObjectIdentifier"},
+         {"Value", "ASN1Any"}
+       ]},
+    "ASN1Any" => {:alias, "asn1.RawValue"}
+  }
+
+  defp ensure_special_type(type_name, pkg) do
+    case Map.get(@special_types, type_name) do
+      nil ->
+        :ok
+
+      {:struct, fields} ->
+        emit_special_struct(type_name, fields, pkg)
+
+      {:alias, target} ->
+        emit_special_alias(type_name, target, pkg)
+    end
+  end
+
+  defp ensure_special_type(_type_name, _pkg), do: :ok
+
+  defp special_emit_guard(type_name, pkg) do
+    output_dir = current_output_dir()
+    key = {:go_special_struct, output_dir, pkg, type_name}
+
+    if Process.get(key) do
+      false
+    else
+      Process.put(key, true)
+      true
+    end
+  end
+
+  defp emit_special_struct(type_name, fields, pkg) do
+    if special_emit_guard(type_name, pkg) do
+      clear_imports()
+      modname = getEnv(:current_module, :"#{pkg}")
+
+      struct_body =
+        fields
+        |> Enum.map(fn {field, go_type} -> "    #{field} #{go_type}" end)
+        |> Enum.join("\n")
+
+      header = emitHeader(modname)
+
+      body = """
+      type #{type_name} struct {
+#{struct_body}
+      }
+      """
+
+      save(true, modname, type_name, header <> body <> "\n")
+    end
+  end
+
+  defp emit_special_alias(type_name, target, pkg) do
+    if special_emit_guard(type_name, pkg) do
+      clear_imports()
+      modname = getEnv(:current_module, :"#{pkg}")
+      header = emitHeader(modname)
+      body = "type #{type_name} = #{target}\n"
+      save(true, modname, type_name, header <> body <> "\n")
+    end
+  end
+
+  defp current_output_dir do
+    outputDir()
+    |> ensure_trailing_slash()
+    |> Path.expand()
+  end
+
+  defp ensure_trailing_slash(dir) do
+    if String.ends_with?(dir, "/"), do: dir, else: dir <> "/"
+  end
+
   def array(name, type, tag, _level) do
     clear_imports()
     modname = getEnv(:current_module, "")
@@ -529,8 +629,11 @@ defmodule ASN1.GoEmitter do
     setEnv(name, goName)
     if tag == :set, do: setEnv("#{name}_is_set", true)
 
+    type_name = bin(type)
+    ensure_special_type(type_name, module_package(modname))
+
     # Check go_lookup for the element type
-    element_type = resolve_type_name(bin(type))
+    element_type = resolve_type_name(type_name)
 
     body = "type #{goName} []#{element_type}"
     header = emitHeader(modname)

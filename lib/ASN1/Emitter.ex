@@ -14,4 +14,5 @@ defmodule ASN1.Emitter do
   @callback value(binary, any, any, binary, boolean) :: any
   @callback fileExtension() :: binary
   @callback builtinType(atom) :: binary
+  @callback finalize() :: any
 end

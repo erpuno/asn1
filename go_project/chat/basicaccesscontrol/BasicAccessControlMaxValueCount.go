@@ -1,0 +1,16 @@
+package basicaccesscontrol
+
+import (
+    "encoding/asn1"
+    "time"
+
+)
+
+var _ = asn1.RawValue{}
+var _ = time.Time{}
+var _ = asn1.ObjectIdentifier{}
+
+type BasicAccessControlMaxValueCount struct {
+    Type asn1.ObjectIdentifier
+    MaxCount int64
+}

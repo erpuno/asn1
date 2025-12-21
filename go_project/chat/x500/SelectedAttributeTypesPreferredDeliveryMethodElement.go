@@ -1,0 +1,27 @@
+package x500
+
+import (
+    "encoding/asn1"
+    "time"
+
+)
+
+var _ = asn1.RawValue{}
+var _ = time.Time{}
+var _ = asn1.ObjectIdentifier{}
+
+type SelectedAttributeTypesPreferredDeliveryMethodElement int
+
+const (
+    SelectedAttributeTypesPreferredDeliveryMethodElementAnyDeliveryMethod SelectedAttributeTypesPreferredDeliveryMethodElement = 0
+    SelectedAttributeTypesPreferredDeliveryMethodElementMhsDelivery SelectedAttributeTypesPreferredDeliveryMethodElement = 1
+    SelectedAttributeTypesPreferredDeliveryMethodElementPhysicalDelivery SelectedAttributeTypesPreferredDeliveryMethodElement = 2
+    SelectedAttributeTypesPreferredDeliveryMethodElementTelexDelivery SelectedAttributeTypesPreferredDeliveryMethodElement = 3
+    SelectedAttributeTypesPreferredDeliveryMethodElementTeletexDelivery SelectedAttributeTypesPreferredDeliveryMethodElement = 4
+    SelectedAttributeTypesPreferredDeliveryMethodElementG3FacsimileDelivery SelectedAttributeTypesPreferredDeliveryMethodElement = 5
+    SelectedAttributeTypesPreferredDeliveryMethodElementG4FacsimileDelivery SelectedAttributeTypesPreferredDeliveryMethodElement = 6
+    SelectedAttributeTypesPreferredDeliveryMethodElementIa5TerminalDelivery SelectedAttributeTypesPreferredDeliveryMethodElement = 7
+    SelectedAttributeTypesPreferredDeliveryMethodElementVideotexDelivery SelectedAttributeTypesPreferredDeliveryMethodElement = 8
+    SelectedAttributeTypesPreferredDeliveryMethodElementTelephoneDelivery SelectedAttributeTypesPreferredDeliveryMethodElement = 9
+)
+
