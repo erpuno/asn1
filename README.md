@@ -1,7 +1,7 @@
 SYNRC 💬 ASN.1
 ==============
 
-ASN.1 Swift Code Generation DER Compiler is
+SYNRC ASN.1 Swift Code Generation DER Compiler is
 minimal (normal), full, idiomatic, correct by construction compiler that
 supports full set of X-Series ITU definitions.
 
@@ -22,7 +22,7 @@ SYNRC ASN.1 Compiler supports `Sequence`, `Choice`, `Enumerated`, `Integer Enume
 `String`, `Integer`, `Any`, `Identifier`, `Set`, `Optional`, `Implicit`, `Explicit`,
 `Set of`, `Sequence of`, `Components of`.
 
-NOTE: The miltidimentianal arrays (tensors) are limited yet.
+NOTE: The miltidimentional arrays (tensors) are limited yet.
 
 Publications
 ------------
@@ -30,12 +30,9 @@ Publications
 * <a href="https://tonpa.guru/stream/2010/2010-10-18 LDAP.htm">2010-10-18 LDAP</a>
 * <a href="https://tonpa.guru/stream/2020/2020-02-03 Кваліфікований Електронний Підпис.htm">2020-02-03 Кваліфікований Електронний Підпис</a>
 * <a href="https://tonpa.guru/stream/2023/2023-06-22 Месенжер.htm">2023-06-22 CMS Месенжер (Пітч)</a>
-* <a href="https://chat.erp.uno">2023-06-30 ЧАТ X.509 (Домашня сторінка)</a>
 * <a href="https://tonpa.guru/stream/2023/2023-07-05 CMS SMIME.htm">2023-07-05 CMS S/MIME</a>
 * <a href="https://tonpa.guru/stream/2023/2023-07-16 CMS Compliance.htm">2023-07-16 CMS Compliance</a>
 * <a href="https://tonpa.guru/stream/2023/2023-07-20 LDAP Compliance.htm">2023-07-20 LDAP Compliance</a>
-* <a href="https://ldap.erp.uno">2023-07-25 LDAP 13.7.24 (Домашня сторінка)</a>
-* <a href="https://authority.erp.uno">2023-07-30 CA X.509 (Домашня сторінка)</a>
 * <a href="https://tonpa.guru/stream/2023/2023-07-21 CMP CMC EST.htm">2023-07-21 CMP/CMC/EST</a>
 * <a href="https://tonpa.guru/stream/2023/2023-07-27 MLS.htm">2023-07-21 MLS ROOM CHAT</a>
 * <a href="https://tonpa.guru/stream/2023/2023-08-05 CA CURVE.htm">2023-08-05 CA CURVE</a>
@@ -46,6 +43,14 @@ Publications
 * <a href="https://tonpa.guru/stream/2024/2024-11-17 EUDI.htm">2024-11-17 EUDI</a>
 * <a href="https://tonpa.guru/stream/2024/2024-11-20 CBOR COSE.htm">2024-11-20 CBOR COSE</a>
 * <a href="https://tonpa.guru/stream/2024/2024-11-21 MSO MDoc.htm">2024-11-21 MSO MDoc</a>
+
+Products
+--------
+
+* <a href="https://asn1.erp.uno">2023-09-02 ASN.1 X.509 (Домашня сторінка)</a>
+* <a href="https://chat.erp.uno">2023-06-30 CHAT X.509 (Домашня сторінка)</a>
+* <a href="https://ldap.erp.uno">2023-07-25 LDAP 13.7.24 (Домашня сторінка)</a>
+* <a href="https://authority.erp.uno">2023-07-30 CA X.509 (Домашня сторінка)</a>
 
 Authors
 -------
