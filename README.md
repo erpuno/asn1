@@ -18,21 +18,11 @@ Usage: ./asn1.ex help | compile [-v] [input [output]]
 Features
 --------
 
-* [x] Sequence
-* [x] Choice
-* [x] Enumerated
-* [x] Integer Enumerated
-* [x] String
-* [x] Integer
-* [x] Any
-* [x] Identifier
-* [x] Set
-* [x] Optional
-* [x] Implicit/Explicit
-* [x] Set of
-* [x] Sequence of
-* [x] Components of
-* [ ] Tensors
+SYNRC ASN.1 Compiler supports `Sequence`, `Choice`, `Enumerated`, `Integer Enumerated`,
+`String`, `Integer`, `Any`, `Identifier`, `Set`, `Optional`, `Implicit`, `Explicit`,
+`Set of`, `Sequence of`, `Components of`.
+
+NOTE: The miltidimentianal arrays (tensors) are limited yet.
 
 Publications
 ------------
