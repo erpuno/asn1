@@ -766,8 +766,15 @@ defmodule ASN1 do
         :filelib.ensure_dir(Path.join(d, "stub"))
         d <> "/"
       else
-        :filelib.ensure_dir(dir)
-        dir
+        if lang == "rust" do
+          crate = ASN1.RustEmitter.module_crate(modname)
+          d = Path.join([dir, "crates", crate, "src"])
+          :filelib.ensure_dir(Path.join(d, "stub"))
+          d <> "/"
+        else
+          :filelib.ensure_dir(dir)
+          dir
+        end
       end
 
     norm = normalizeName(bin(name))
@@ -795,10 +802,25 @@ defmodule ASN1 do
             norm
         end
       else
-        norm
+        if lang == "rust" do
+          ASN1.RustEmitter.fieldName(norm)
+        else
+          norm
+        end
       end
 
-    fileName = final_dir <> final_norm <> ext
+    final_dir_with_mod =
+      if lang == "rust" do
+        # Use module name as subdirectory
+        mod_snake = ASN1.RustEmitter.fieldName(normalizeName(bin(modname)))
+        path = Path.join(final_dir, mod_snake)
+        :filelib.ensure_dir(Path.join(path, "stub"))
+        path <> "/"
+      else
+        final_dir
+      end
+
+    fileName = final_dir_with_mod <> final_norm <> ext
     verbose = getEnv(:verbose, false)
 
     case :lists.member(norm, exceptions()) do
@@ -808,6 +830,27 @@ defmodule ASN1 do
 
       false ->
         :ok = :file.write_file(fileName, res)
+        # For Rust, we also need to register this type in the module's mod.rs
+        if lang == "rust" do
+          mod_file = Path.join(final_dir_with_mod, "mod.rs")
+          module_snake = ASN1.RustEmitter.fieldName(norm)
+          line = "pub mod #{module_snake};\npub use #{module_snake}::*;\n"
+
+          # Append if not present (simple check, or just append blindly if we assume cleaner run)
+          # Since we run x-series.ex multiple times in passes, we should check existence or overwrite behavior?
+          # Pass 3 generates code.
+          # Let's read and check to avoid duplicates.
+          if File.exists?(mod_file) do
+            existing = File.read!(mod_file)
+
+            unless String.contains?(existing, line) do
+              File.write!(mod_file, existing <> line)
+            end
+          else
+            File.write!(mod_file, line)
+          end
+        end
+
         setEnv(:verbose, true)
         print("compiled: ~ts~n", [fileName])
         setEnv(:verbose, verbose)
@@ -893,21 +936,44 @@ defmodule ASN1 do
 
     if mod != "" and is_binary(bx) do
       full = bin(normalizeName(mod)) <> "_" <> bx
-      :application.set_env(:asn1scg, full, y)
+      # Use atoms for keys
+      full_atom = String.to_atom(full)
+      :application.set_env(:asn1scg, full_atom, y)
       nxb = normalizeName(bx)
       nfull = bin(normalizeName(mod)) <> "_" <> nxb
 
       if nfull != full do
-        :application.set_env(:asn1scg, nfull, y)
+        nfull_atom = String.to_atom(nfull)
+        :application.set_env(:asn1scg, nfull_atom, y)
       end
     end
 
+    # Also set unscoped key as atom? Or keep binary as fallback?
+    # `lookup` fallback uses `bin(b)` key.
+    # `v = :application.get_env(:asn1scg, b, b)` where b is binary.
+    # So we MUST keep binary key setter for existing fallback logic, OR update lookup fallback.
+    # Updating setter to set BOTH string and atom keys for unscoped might be safer/robust.
+    # But warnings say binary keys deprecated.
+    # So we should switch to atoms everywhere.
+
+    # Unscoped
+    bx_atom =
+      try do
+        String.to_atom(bx)
+      rescue
+        _ -> String.to_atom("gen_" <> bx)
+      end
+
+    :application.set_env(:asn1scg, bx_atom, y)
+    # Also keep binary for backward compatibility if `lookup` relies on it
     :application.set_env(:asn1scg, bx, y)
 
     if is_binary(bx) do
       nxb = normalizeName(bx)
 
       if nxb != bx do
+        nxb_atom = String.to_atom(nxb)
+        :application.set_env(:asn1scg, nxb_atom, y)
         :application.set_env(:asn1scg, nxb, y)
       end
     end
@@ -915,12 +981,16 @@ defmodule ASN1 do
 
   def setEnvGlobal(x, y) do
     bx = bin(x)
+    bx_atom = String.to_atom(bx)
+    :application.set_env(:asn1scg, bx_atom, y)
     :application.set_env(:asn1scg, bx, y)
 
     if is_binary(bx) do
       nx = normalizeName(bx)
 
       if nx != bx do
+        nx_atom = String.to_atom(nx)
+        :application.set_env(:asn1scg, nx_atom, y)
         :application.set_env(:asn1scg, nx, y)
       end
     end

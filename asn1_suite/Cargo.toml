@@ -1,12 +1,145 @@
 [package]
 name = "asn1_suite"
 version = "0.1.0"
-edition = "2024"
-license = "MIT OR Apache-2.0"
-authors = ["ASN1 Generator"]
+edition = "2021"
+
+[workspace]
+resolver = "2"
+members = [
+        "crates/aeskeywrapwithpad02",
+        "crates/aeskeywrapwithpad88",
+        "crates/algorithminformation2009",
+        "crates/ansix942",
+        "crates/ansix962",
+        "crates/attributecertificateversion12009",
+        "crates/basicaccesscontrol",
+        "crates/charactercodingattributes",
+        "crates/characterpresentationattributes",
+        "crates/characterprofileattributes",
+        "crates/cmsaesccmandaesgcm2009",
+        "crates/cmsaesrsaesoaep2009",
+        "crates/cmseccalgs200902",
+        "crates/cmsecdhalgs2017",
+        "crates/colourattributes",
+        "crates/cryptographicmessagesyntax2009",
+        "crates/cryptographicmessagesyntax2010",
+        "crates/cryptographicmessagesyntaxalgorithms2009",
+        "crates/defaultvaluelists",
+        "crates/documentprofiledescriptor",
+        "crates/dordefinition",
+        "crates/enrollmentmessagesyntax2009",
+        "crates/extendedsecurityservices2009",
+        "crates/externalreferences",
+        "crates/geogrcodingattributes",
+        "crates/geogrpresentationattributes",
+        "crates/geogrprofileattributes",
+        "crates/identifiersandexpressions",
+        "crates/iso9541sn",
+        "crates/isostandard9541fontattributeset",
+        "crates/layoutdescriptors",
+        "crates/linkdescriptors",
+        "crates/locationexpressions",
+        "crates/logicaldescriptors",
+        "crates/multiplesignatures2010",
+        "crates/ocsp",
+        "crates/pkcs10",
+        "crates/pkcs12",
+        "crates/pkcs5",
+        "crates/pkcs7",
+        "crates/pkcs8",
+        "crates/pkcs9",
+        "crates/pkix1explicit2009",
+        "crates/pkix1explicit88",
+        "crates/pkix1implicit2009",
+        "crates/pkix1implicit88",
+        "crates/pkix1pssoaepalgorithms2009",
+        "crates/pkixalgs2009",
+        "crates/pkixattributecertificate2009",
+        "crates/pkixcmp2009",
+        "crates/pkixcommontypes2009",
+        "crates/pkixcrmf2009",
+        "crates/pkixx400address2009",
+        "crates/rastergrcodingattributes",
+        "crates/rastergrpresentationattributes",
+        "crates/rastergrprofileattributes",
+        "crates/securemimemessagev3dot12009",
+        "crates/smimesymmetrickeydistribution2009",
+        "crates/styledescriptors",
+        "crates/subprofiles",
+        "crates/temporalrelationships",
+        "crates/textunits",
+        "crates/upperbounds",
+        "crates/videotexcodingattributes",
+        "crates/x500"
+]
 
 [dependencies]
 rust-asn1 = { git = "https://github.com/iho/rust-asn1.git" }
+aeskeywrapwithpad02 = { path = "crates/aeskeywrapwithpad02" }
+aeskeywrapwithpad88 = { path = "crates/aeskeywrapwithpad88" }
+algorithminformation2009 = { path = "crates/algorithminformation2009" }
+ansix942 = { path = "crates/ansix942" }
+ansix962 = { path = "crates/ansix962" }
+attributecertificateversion12009 = { path = "crates/attributecertificateversion12009" }
+basicaccesscontrol = { path = "crates/basicaccesscontrol" }
+charactercodingattributes = { path = "crates/charactercodingattributes" }
+characterpresentationattributes = { path = "crates/characterpresentationattributes" }
+characterprofileattributes = { path = "crates/characterprofileattributes" }
+cmsaesccmandaesgcm2009 = { path = "crates/cmsaesccmandaesgcm2009" }
+cmsaesrsaesoaep2009 = { path = "crates/cmsaesrsaesoaep2009" }
+cmseccalgs200902 = { path = "crates/cmseccalgs200902" }
+cmsecdhalgs2017 = { path = "crates/cmsecdhalgs2017" }
+colourattributes = { path = "crates/colourattributes" }
+cryptographicmessagesyntax2009 = { path = "crates/cryptographicmessagesyntax2009" }
+cryptographicmessagesyntax2010 = { path = "crates/cryptographicmessagesyntax2010" }
+cryptographicmessagesyntaxalgorithms2009 = { path = "crates/cryptographicmessagesyntaxalgorithms2009" }
+defaultvaluelists = { path = "crates/defaultvaluelists" }
+documentprofiledescriptor = { path = "crates/documentprofiledescriptor" }
+dordefinition = { path = "crates/dordefinition" }
+enrollmentmessagesyntax2009 = { path = "crates/enrollmentmessagesyntax2009" }
+extendedsecurityservices2009 = { path = "crates/extendedsecurityservices2009" }
+externalreferences = { path = "crates/externalreferences" }
+geogrcodingattributes = { path = "crates/geogrcodingattributes" }
+geogrpresentationattributes = { path = "crates/geogrpresentationattributes" }
+geogrprofileattributes = { path = "crates/geogrprofileattributes" }
+identifiersandexpressions = { path = "crates/identifiersandexpressions" }
+iso9541sn = { path = "crates/iso9541sn" }
+isostandard9541fontattributeset = { path = "crates/isostandard9541fontattributeset" }
+layoutdescriptors = { path = "crates/layoutdescriptors" }
+linkdescriptors = { path = "crates/linkdescriptors" }
+locationexpressions = { path = "crates/locationexpressions" }
+logicaldescriptors = { path = "crates/logicaldescriptors" }
+multiplesignatures2010 = { path = "crates/multiplesignatures2010" }
+ocsp = { path = "crates/ocsp" }
+pkcs10 = { path = "crates/pkcs10" }
+pkcs12 = { path = "crates/pkcs12" }
+pkcs5 = { path = "crates/pkcs5" }
+pkcs7 = { path = "crates/pkcs7" }
+pkcs8 = { path = "crates/pkcs8" }
+pkcs9 = { path = "crates/pkcs9" }
+pkix1explicit2009 = { path = "crates/pkix1explicit2009" }
+pkix1explicit88 = { path = "crates/pkix1explicit88" }
+pkix1implicit2009 = { path = "crates/pkix1implicit2009" }
+pkix1implicit88 = { path = "crates/pkix1implicit88" }
+pkix1pssoaepalgorithms2009 = { path = "crates/pkix1pssoaepalgorithms2009" }
+pkixalgs2009 = { path = "crates/pkixalgs2009" }
+pkixattributecertificate2009 = { path = "crates/pkixattributecertificate2009" }
+pkixcmp2009 = { path = "crates/pkixcmp2009" }
+pkixcommontypes2009 = { path = "crates/pkixcommontypes2009" }
+pkixcrmf2009 = { path = "crates/pkixcrmf2009" }
+pkixx400address2009 = { path = "crates/pkixx400address2009" }
+rastergrcodingattributes = { path = "crates/rastergrcodingattributes" }
+rastergrpresentationattributes = { path = "crates/rastergrpresentationattributes" }
+rastergrprofileattributes = { path = "crates/rastergrprofileattributes" }
+securemimemessagev3dot12009 = { path = "crates/securemimemessagev3dot12009" }
+smimesymmetrickeydistribution2009 = { path = "crates/smimesymmetrickeydistribution2009" }
+styledescriptors = { path = "crates/styledescriptors" }
+subprofiles = { path = "crates/subprofiles" }
+temporalrelationships = { path = "crates/temporalrelationships" }
+textunits = { path = "crates/textunits" }
+upperbounds = { path = "crates/upperbounds" }
+videotexcodingattributes = { path = "crates/videotexcodingattributes" }
+x500 = { path = "crates/x500" }
 
 [dev-dependencies]
 reqwest = { version = "0.12", features = ["json"] }

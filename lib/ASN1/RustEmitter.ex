@@ -107,6 +107,79 @@ defmodule ASN1.RustEmitter do
     "ASN1Node"
   end
 
+  def module_crate(modname) do
+    case bin(modname) do
+      "AuthenticationFramework" ->
+        "x500"
+
+      "CertificateExtensions" ->
+        "x500"
+
+      "InformationFramework" ->
+        "x500"
+
+      "SelectedAttributeTypes" ->
+        "x500"
+
+      "DirectoryAbstractService" ->
+        "x500"
+
+      "UsefulDefinitions" ->
+        "x500"
+
+      "DSTU" ->
+        "dstu"
+
+      "ColourAttributes" ->
+        "docprofile"
+
+      "Colour-Attributes" ->
+        "docprofile"
+
+      "LayoutDescriptors" ->
+        "docprofile"
+
+      "Layout-Descriptors" ->
+        "docprofile"
+
+      "DocumentProfileDescriptor" ->
+        "docprofile"
+
+      "Document-Profile-Descriptor" ->
+        "docprofile"
+
+      "StyleDescriptors" ->
+        "docprofile"
+
+      "Style-Descriptors" ->
+        "docprofile"
+
+      "LogicalDescriptors" ->
+        "docprofile"
+
+      "Logical-Descriptors" ->
+        "docprofile"
+
+      "PKIX1Explicit-2009" ->
+        "pkix1explicit2009"
+
+      "PKIX1Implicit-2009" ->
+        "pkix1implicit2009"
+
+      "PKIX-CommonTypes-2009" ->
+        "pkixcommontypes2009"
+
+      "AlgorithmInformation-2009" ->
+        "algorithminformation2009"
+
+      _ ->
+        modname
+        |> normalizeName()
+        |> String.replace(~r/[^a-zA-Z0-9]/, "")
+        |> String.downcase()
+    end
+  end
+
   def fieldType(_struct_name, _field, {:"SEQUENCE OF", inner}) do
     "Vec<" <> (fieldType("", "", inner) |> substituteType()) <> ">"
   end
@@ -213,8 +286,8 @@ defmodule ASN1.RustEmitter do
     }
 
     impl DERSerializable for #{rust_name} {
-         fn serialize(&self, _serializer: &mut Serializer) -> Result<(), ASN1Error> {
-             Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnsupportedFieldLength, "Serialization not implemented".to_string(), file!().to_string(), line!()))
+         fn serialize(&self, serializer: &mut Serializer) -> Result<(), ASN1Error> {
+             rust_asn1::der::sequence_of_serialize(rust_asn1::asn1_types::ASN1Identifier::SEQUENCE, &self.0, serializer)
          }
     }
     """
@@ -269,15 +342,38 @@ defmodule ASN1.RustEmitter do
     rust_name = name(name, modname)
     setEnv(name, rust_name)
 
+    # Normalize cases to ensure they are all {name, value} tuples
+    normalized_cases =
+      cases
+      |> Enum.reduce({0, []}, fn
+        :EXTENSIONMARK, {idx, acc} ->
+          {idx, [:EXTENSIONMARK | acc]}
+
+        {:NamedNumber, n, v}, {_idx, acc} ->
+          {v + 1, [{n, v} | acc]}
+
+        {n, v}, {_idx, acc} ->
+          {v + 1, [{n, v} | acc]}
+
+        atom, {idx, acc} when is_atom(atom) ->
+          {idx + 1, [{atom, idx} | acc]}
+
+        other, {idx, acc} ->
+          IO.puts("Warning: Unknown enum case format: #{inspect(other)}")
+          {idx, acc}
+      end)
+      |> elem(1)
+      |> Enum.reverse()
+
     body =
       """
         #{@generated_header}#{rust_use_block()}
       #{@default_derives}
       pub enum #{rust_name} {
-      #{emit_enum_variants(cases)}
+      #{emit_enum_variants(normalized_cases)}
       }
 
-      #{emit_enum_der_impls(rust_name, cases)}
+      #{emit_enum_der_impls(rust_name, normalized_cases)}
       """
 
     save(saveFlag, modname, snake_case(rust_name), body)
@@ -492,6 +588,46 @@ defmodule ASN1.RustEmitter do
     """
   end
 
+  defp lookup_external(_struct_name, _field, {:Externaltypereference, _, mod, type}) do
+    # Resolve module crate
+    ref_crate = module_crate(mod)
+    # Resolve current module crate?
+    # We don't have current module info here easily unless we pass it.
+    # But usually full path is fine: `crate_name::module_name::Type`
+
+    mod_snake = mod |> bin() |> normalizeName() |> String.downcase() |> String.replace("-", "_")
+    type_name = type |> bin() |> name(mod)
+
+    # If same crate, we could use `crate::mod::Type` or just `mod::Type` if mapped?
+    # But let's use fully qualified name assuming crate name matches dependency name.
+
+    # Some overrides
+    key =
+      [
+        mod |> bin() |> normalizeName(),
+        type |> bin() |> normalizeName()
+      ]
+      |> Enum.join("_")
+
+    manual_map = %{
+      "PKIX1Implicit_2009_GeneralNames" => "pkix1implicit2009::pkix1implicit2009::GeneralNames",
+      "AuthenticationFramework_AlgorithmIdentifier" =>
+        "x500::authentication_framework::AlgorithmIdentifier"
+      # Add more if needed or rely on generic generation
+    }
+
+    case Map.get(manual_map, key) do
+      nil ->
+        # Generic generation: crate::module_snake::Type
+        # Note: module names in lib.rs are fieldName(modname)
+        mod_field_name = fieldName(bin(mod) |> normalizeName())
+        "#{ref_crate}::#{mod_field_name}::#{type_name}"
+
+      val ->
+        val
+    end
+  end
+
   # Region: utilities --------------------------------------------------------------
 
   defp snake_case(value) do
@@ -570,7 +706,13 @@ defmodule ASN1.RustEmitter do
     case builtin_map_lookup(name) do
       nil ->
         try do
-          lookup(normalizeName(name))
+          res = lookup(normalizeName(name))
+
+          if name == "UnauthAttributes" do
+            IO.puts("DEBUG lookup UnauthAttributes: #{inspect(res)}")
+          end
+
+          res
         rescue
           _ -> name
         end
@@ -683,8 +825,35 @@ defmodule ASN1.RustEmitter do
   def integerValue(name, value, modname, saveFlag) do
     rust_name = name(name, modname)
 
+    val_str =
+      case value do
+        {:Externalvaluereference, _, mod, val_name} ->
+          # Assuming the external module is imported or we can reference it fully qualified
+          # For simplicity, let's try to map it to the generated name
+          ref_mod_name = bin(mod) |> normalizeName()
+          ref_val_name = bin(val_name)
+
+          # If it's in the same "package" (x-series), the module name might need adjustment
+          # referencing crate::generated::SnakeCaseMod::UpperVal
+
+          mod_snake = snake_case(ref_mod_name)
+          val_upper = raw_pascal(ref_val_name) |> String.upcase()
+
+          # We might need to ensure the module is public/accessible.
+          # For now, let's generate a full path reference assuming crate structure.
+          # But we are in "generated/modname.rs" usually.
+          "crate::generated::#{mod_snake}::#{val_upper}"
+
+        v when is_integer(v) ->
+          "#{v}"
+
+        _ ->
+          # Fallback for other potential types, or error
+          inspect(value)
+      end
+
     const_body = """
-    #{@generated_header}pub const #{String.upcase(rust_name)}: i64 = #{value};
+    #{@generated_header}pub const #{String.upcase(rust_name)}: i64 = #{val_str};
     """
 
     save(saveFlag, modname, snake_case(rust_name), const_body)
@@ -795,8 +964,18 @@ defmodule ASN1.RustEmitter do
     impl DERParseable for #{rust_name} {
         fn from_der_node(node: ASN1Node) -> Result<Self, ASN1Error> {
             let integer = ASN1Integer::from_der_node(node)?;
-            // Assuming ASN1Integer fits in i64/u64 or we can cast
-            let val: i64 = integer.try_into().map_err(|_| ASN1Error::new(rust_asn1::errors::ErrorCode::InvalidASN1Object, "Enum value out of range".to_string(), file!().to_string(), line!()))?;
+            // Attempt to convert BigInt to i64
+            // ASN1Integer usually wraps BigInt in `value`.
+            // We need to import TryInto or use a conversion method.
+            // Using `TryInto` requires `use std::convert::TryInto;` in scope or prelude.
+            // If `ASN1Integer` doesn't impl `TryInto<i64>`, maybe `integer.value` does.
+            // Assuming `integer.value` is BigInt and `num_traits` or similar is available via `rust-asn1`.
+            // If not available, we can try formatting to string and parsing (slow but robust fallback?).
+            // Or assume `try_into` works on `value`.
+            // Error said: `required for ASN1Integer to implement TryInto`. So `integer.try_into()` failed.
+            // Let's try `integer.value.try_into()`.
+            let val_res: Result<i64, _> = integer.value.try_into();
+            let val = val_res.map_err(|_| ASN1Error::new(rust_asn1::errors::ErrorCode::InvalidASN1Object, "Enum value out of range".to_string(), file!().to_string(), line!()))?;
             match val {
     #{emit_enum_decoder_cases(rust_name, cases)}
                 _ => Err(ASN1Error::new(rust_asn1::errors::ErrorCode::InvalidASN1Object, format!("Unknown value for #{rust_name}: {}", val), file!().to_string(), line!()))
@@ -806,7 +985,7 @@ defmodule ASN1.RustEmitter do
 
     impl DERSerializable for #{rust_name} {
         fn serialize(&self, serializer: &mut Serializer) -> Result<(), ASN1Error> {
-            let val = match self {
+            let val: i32 = match self {
     #{emit_enum_encoder_cases(rust_name, cases)}
             };
             val.serialize(serializer)
@@ -1006,8 +1185,14 @@ defmodule ASN1.RustEmitter do
     }
 
     impl DERSerializable for #{rust_name} {
-        fn serialize(&self, _serializer: &mut Serializer) -> Result<(), ASN1Error> {
-            Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnsupportedFieldLength, "Serialization not implemented".to_string(), file!().to_string(), line!()))
+        fn serialize(&self, serializer: &mut Serializer) -> Result<(), ASN1Error> {
+             serializer.write_sequence(|serializer| {
+                 self.algorithm.serialize(serializer)?;
+                 if let Some(ref params) = self.parameters {
+                     params.serialize(serializer)?;
+                 }
+                 Ok(())
+            })
         }
     }
     """
