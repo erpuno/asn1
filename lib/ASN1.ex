@@ -593,9 +593,18 @@ defmodule ASN1 do
 
     case Map.get(ptypes, sname) do
       nil ->
-        if args != [],
-          do: :skip,
-          else: compileType(pos, name, type, getEnv(:current_module, ""), true)
+        cond do
+          # Handle Parameterized Classes (e.g. MAPPING-BASED-MATCHING)
+          # We treat them as regular classes to generate the base struct.
+          is_tuple(type) and elem(type, 0) == :objectclass ->
+            compileClass(pos, name, getEnv(:current_module, ""), type)
+
+          args != [] ->
+            :skip
+
+          true ->
+            compileType(pos, name, type, getEnv(:current_module, ""), true)
+        end
 
       definition ->
         modname = getEnv(:current_module, "")

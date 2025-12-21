@@ -5,6 +5,42 @@ defmodule ASN1.SwiftEmitter do
   @impl true
   def finalize, do: :ok
 
+  @special_types %{
+    "AlgorithmIdentifier" => "AuthenticationFramework_AlgorithmIdentifier",
+    "SubjectPublicKeyInfo" => "AuthenticationFramework_SubjectPublicKeyInfo",
+    "GeneralName" => "PKIX1Implicit88_GeneralName",
+    "GeneralNames" => "PKIX1Implicit88_GeneralNames",
+    "Name" => "InformationFramework_Name",
+    "RelativeDistinguishedName" => "InformationFramework_RelativeDistinguishedName",
+    "RDNSequence" => "InformationFramework_RDNSequence",
+    "Extension" => "AuthenticationFramework_Extension",
+    "Extensions" => "AuthenticationFramework_Extensions",
+    "Certificate" => "AuthenticationFramework_Certificate",
+    "CertificateList" => "AuthenticationFramework_CertificateList",
+    "AlgorithmInformation_2009_AlgorithmIdentifier" => "AuthenticationFramework_AlgorithmIdentifier",
+    "PKCS_7_AlgorithmIdentifier" => "AuthenticationFramework_AlgorithmIdentifier",
+    "ANSI_X9_62_AlgorithmIdentifier" => "AuthenticationFramework_AlgorithmIdentifier",
+    "PKCS_10_SubjectPublicKeyInfo" => "AuthenticationFramework_SubjectPublicKeyInfo",
+    "PKCS_9_Attribute" => "InformationFramework_Attribute",
+    "PKCS_9_AttributeType" => "InformationFramework_AttributeType",
+    "PKCS_9_AttributeTypeAndValue" => "InformationFramework_AttributeTypeAndValue"
+  }
+
+  defp ensure_special_type(type_name, modname) do
+    case Map.get(@special_types, bin(type_name)) do
+      nil -> :ok
+      target ->
+        swiftName = name(type_name, modname)
+        # If the name is already the target, no need for typealias unless we want to FORCE it
+        # Actually, let's just always call typealias if it's in @special_types
+        # and the name is different.
+        if swiftName != target do
+          typealias(type_name, target, modname, true)
+        end
+    end
+  end
+
+
   # Check if fields contain ASN1Any (which is not Hashable)
   def containsNonHashableType(fields) when is_list(fields) do
       Enum.any?(fields, fn
@@ -125,15 +161,15 @@ defmodule ASN1.SwiftEmitter do
     end
   end
   def fieldType(name,field,{:"Set Of", type}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set, "pro #{name}.#{fieldName(field)}")  end
-  def fieldType(_,_,{:contentType, {:Externaltypereference,_,_,type}}), do: "#{type}"
+  def fieldType(_,_,{:contentType, {:Externaltypereference,_,_,type}}), do: "#{substituteType(bin(type))}"
   def fieldType(_,_,{:"BIT STRING", _}), do: "ASN1BitString"
-  def fieldType(_,_,{:pt, {_,_,_,type}, _}) when is_atom(type), do: "#{substituteType(lookup(bin(type)))}"
+  def fieldType(_,_,{:pt, {_,_,_,type}, _}) when is_atom(type), do: "#{substituteType(bin(type))}"
   def fieldType(_,_,{:ANY_DEFINED_BY, type}) when is_atom(type), do: "ASN1Any"
-  def fieldType(_name,_field,{:Externaltypereference,_,_,type}) when type == :OrganizationalUnitNames, do: "#{substituteType(lookup(bin(type)))}"
-  def fieldType(_name,_field,{:Externaltypereference,_,_,type}), do: "#{substituteType(lookup(bin(type)))}"
+  def fieldType(_name,_field,{:Externaltypereference,_,_,type}) when type == :OrganizationalUnitNames, do: "#{substituteType(bin(type))}"
+  def fieldType(_name,_field,{:Externaltypereference,_,_,type}), do: "#{substituteType(bin(type))}"
   def fieldType(_,_,{:ObjectClassFieldType,_,_,[{:valuefieldreference, :id}],_}), do: "ASN1ObjectIdentifier"
   def fieldType(_,_,{:ObjectClassFieldType,_,_,_field,_}), do: "ASN1Any"
-  def fieldType(_,_,type) when is_atom(type), do: "#{substituteType(lookup(bin(type)))}"
+  def fieldType(_,_,type) when is_atom(type), do: "#{substituteType(bin(type))}"
   def fieldType(name,_,type) when is_tuple(type) do
     case type do
       {:pt, {:Externaltypereference, _, _, actual_type}, _} ->
@@ -151,7 +187,7 @@ defmodule ASN1.SwiftEmitter do
 
   def sequenceOf2(name,field,{:type,_,{:Externaltypereference,_,_,type},_,_,_}), do: "#{sequenceOf(name,field,type)}"
   def sequenceOf2(_,_,{:pt, {:Externaltypereference, _, _, type}, _}), do: substituteType("#{lookup(bin(type))}")
-  def sequenceOf2(name,field,{:type,_,{:"SET OF", {:type, _, {:"SET OF", {:type, _, inner_type, _, _, _}}, _, _, _}},_,_,_}) do
+    def sequenceOf2(name,field,{:type,_,{:"SET OF", {:type, _, {:"SET OF", {:type, _, inner_type, _, _, _}}, _, _, _}},_,_,_}) do
     # Handle nested SET OF SET OF by generating wrapper type
     element_name = bin(name) <> "_" <> bin(normalizeName(field)) <> "_Element"
     array(element_name, substituteType(lookup(bin(inner_type))), :set, "top")
@@ -193,7 +229,8 @@ defmodule ASN1.SwiftEmitter do
        name1 = bin(normalizeName(name))
        type1 = bin(type)
        mod = getEnv(:current_module, "")
-       fullName = if mod != "" and not String.starts_with?(name1, "["), do: bin(normalizeName(mod)) <> "_" <> name1, else: name1
+       m = bin(normalizeName(mod))
+       fullName = if mod != "" and not String.starts_with?(name1, "[") and not String.starts_with?(name1, m <> "_"), do: m <> "_" <> name1, else: name1
 
        setEnv(name1, fullName)
        setEnv({:array, fullName}, {tag, type1})
@@ -510,43 +547,54 @@ import Foundation
   def spec("set"), do: "SetOf"
   def spec(_), do: ""
 
-  def substituteType("IssuerSerial"), do: "AuthenticationFramework_IssuerSerial"
-  def substituteType("GeneralNames"), do: "PKIX1Implicit_2009_GeneralNames"
-  def substituteType("TeletexString"),     do: "ASN1TeletexString"
-  def substituteType("UniversalString"),   do: "ASN1UniversalString"
-  def substituteType("IA5String"),         do: "ASN1IA5String"
-  def substituteType("VisibleString"),     do: "ASN1UTF8String"
-  def substituteType("UTF8String"),        do: "ASN1UTF8String"
-  def substituteType("PrintableString"),   do: "ASN1PrintableString"
-  def substituteType("NumericString"),     do: "ASN1PrintableString"
-  def substituteType("BMPString"),         do: "ASN1BMPString"
-  def substituteType("VideotexString"),    do: "ASN1UTF8String"
-  def substituteType("GraphicString"),     do: "ASN1UTF8String"
-  def substituteType("INTEGER"),           do: "ArraySlice<UInt8>"
-  def substituteType("OCTET STRING"),      do: "ASN1OctetString"
-  def substituteType("BIT STRING"),        do: "ASN1BitString"
-  def substituteType("OBJECT IDENTIFIER"), do: "ASN1ObjectIdentifier"
-  def substituteType("BOOLEAN"),           do: "Bool"
-  def substituteType("pt"),                do: "ASN1Any"
-  def substituteType("ANY"),               do: "ASN1Any"
-  def substituteType("NULL"),              do: "ASN1Null"
-  def substituteType("EXTERNAL"),          do: "EXTERNAL"
-  def substituteType("External"),          do: "EXTERNAL"
-  def substituteType("GeneralString"),     do: "ASN1UTF8String"
-  def substituteType("REAL"),              do: "ASN1Any"
-  def substituteType("TYPE-IDENTIFIER"),   do: "ASN1Any"
-  def substituteType("ABSTRACT-SYNTAX"),   do: "ASN1Any"
-
   def substituteType(t) do
-    key = try do
-      String.to_existing_atom(t)
-    rescue
-      _ -> nil
-    end
+    modname = getEnv(:current_module, "")
+    stype = bin(t)
 
-    case key do
-      nil -> t
-      k -> :application.get_env(:asn1scg, k, t)
+    case Map.get(@special_types, stype) do
+      nil ->
+        case stype do
+          "IssuerSerial" -> "AuthenticationFramework_IssuerSerial"
+          "TeletexString" -> "ASN1TeletexString"
+          "UniversalString" -> "ASN1UniversalString"
+          "IA5String" -> "ASN1IA5String"
+          "VisibleString" -> "ASN1UTF8String"
+          "UTF8String" -> "ASN1UTF8String"
+          "PrintableString" -> "ASN1PrintableString"
+          "NumericString" -> "ASN1PrintableString"
+          "BMPString" -> "ASN1BMPString"
+          "VideotexString" -> "ASN1UTF8String"
+          "GraphicString" -> "ASN1UTF8String"
+          "INTEGER" -> "ArraySlice<UInt8>"
+          "OCTET STRING" -> "ASN1OctetString"
+          "BIT STRING" -> "ASN1BitString"
+          "OBJECT IDENTIFIER" -> "ASN1ObjectIdentifier"
+          "BOOLEAN" -> "Bool"
+          "pt" -> "ASN1Any"
+          "ANY" -> "ASN1Any"
+          "NULL" -> "ASN1Null"
+          "EXTERNAL" -> "EXTERNAL"
+          "External" -> "EXTERNAL"
+          "GeneralString" -> "ASN1UTF8String"
+          "REAL" -> "ASN1Any"
+          "TYPE-IDENTIFIER" -> "ASN1Any"
+          "ABSTRACT-SYNTAX" -> "ASN1Any"
+          _ ->
+            key = try do
+              String.to_existing_atom(stype)
+            rescue
+              _ -> nil
+            end
+
+            case key do
+              nil -> stype
+              k -> :application.get_env(:asn1scg, k, stype)
+            end
+        end
+
+      unified ->
+        ensure_special_type(stype, modname)
+        unified
     end
   end
 
@@ -922,7 +970,8 @@ public let #{swiftName}: Int = #{resolved_val}
 
   def emitSequenceDecoderBodyElementIntEnum(name, type) do
       n = fieldName(name)
-      "let #{n} = try #{type}(rawValue: Int(derEncoded: &nodes))"
+      "let #{n}Val = try Int(derEncoded: &nodes)\n" <>
+      pad(12) <> "let #{n} = #{type}(rawValue: #{n}Val)"
   end
 
   def emitChoiceDecoderBodyElement(w, _no, name, "ASN1Any", _spec) do

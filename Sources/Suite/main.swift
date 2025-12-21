@@ -243,7 +243,7 @@ func buildCSR(subject: String, countryCode: String = "UA", state: String = "Kyiv
         parameters: curveParams
     )
     
-    let spki = PKCS_10_SubjectPublicKeyInfo(
+    let spki = AuthenticationFramework_SubjectPublicKeyInfo(
         algorithm: algorithm,
         subjectPublicKey: ASN1BitString(bytes: ArraySlice(publicKeyBytes))
     )
@@ -287,7 +287,7 @@ public class Console {
 
   public static func showName(data: Array<UInt8>) throws {
      print("Debug: showName")
-     let name: DSTU_Name? = try DSTU_Name(derEncoded: data)
+     let name: InformationFramework_Name? = try InformationFramework_Name(derEncoded: data)
      var serializer = DER.Serializer()
      try name!.serialize(into: &serializer)
      print(": Name.DER \(data)")
@@ -337,7 +337,7 @@ public class Console {
      let url = URL(fileURLWithPath: file)
      if (!Console.exists(f: url.path)) { print(": CERT file not found.") } else {
          let data = try Data(contentsOf: url)
-         let cert = try DSTU_Certificate(derEncoded: Array(data)) // display TBSCertificate envelop from DSTU.asn1
+         let cert = try AuthenticationFramework_Certificate(derEncoded: Array(data)) // display TBSCertificate envelop from DSTU.asn1
          print(": Certificate ⟼ \(cert)\n")
      }
   }
@@ -346,7 +346,7 @@ public class Console {
      let url = URL(fileURLWithPath: file)
      if (!Console.exists(f: url.path)) { print(": X509 file not found.") } else {
          let data = try Data(contentsOf: url)
-         let cert = try DSTU_Certificate(derEncoded: Array(data))
+         let cert = try AuthenticationFramework_Certificate(derEncoded: Array(data))
          var serializer = DER.Serializer()
          try cert.serialize(into: &serializer)
          let outputUrl = URL(fileURLWithPath: output)
@@ -401,7 +401,7 @@ public class Console {
 
   public static func showCertificateData(data: Array<UInt8>) throws {
      print("Debug: showCertificateData")
-     let val: DSTU_Certificate? = try DSTU_Certificate(derEncoded: data)
+     let val: AuthenticationFramework_Certificate? = try AuthenticationFramework_Certificate(derEncoded: data)
      var serializer = DER.Serializer()
      try val!.serialize(into: &serializer)
      print(": Certificate.DER \(data)")
@@ -419,9 +419,9 @@ public class Console {
      let cnValueDer: [UInt8] = [0x13, 0x04, 0x54, 0x65, 0x73, 0x74] 
      let cnValue = try ASN1Any(derEncoded: cnValueDer)
      
-     let atav = DSTU_AttributeTypeAndValue(type: cnOID, value: cnValue)
-     let rdn = DSTU_RelativeDistinguishedName([atav])
-     let name = DSTU_Name.rdnSequence(DSTU_RDNSequence([rdn]))
+     let atav = InformationFramework_AttributeTypeAndValue(type: cnOID, value: .else(cnValue))
+     let rdn = InformationFramework_RelativeDistinguishedName([atav])
+     let name = InformationFramework_Name.rdnSequence(InformationFramework_RDNSequence([rdn]))
      
      // 2. Validity (Now to Now + 1 year)
      let now = Date()
@@ -431,39 +431,38 @@ public class Console {
      let nowComps = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: now)
      let laterComps = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: later)
      
-     let notBefore = try DSTU_Time.utcTime(UTCTime(year: nowComps.year!, month: nowComps.month!, day: nowComps.day!, hours: nowComps.hour!, minutes: nowComps.minute!, seconds: nowComps.second!))
-     let notAfter = try DSTU_Time.utcTime(UTCTime(year: laterComps.year!, month: laterComps.month!, day: laterComps.day!, hours: laterComps.hour!, minutes: laterComps.minute!, seconds: laterComps.second!))
+     let notBefore = try AuthenticationFramework_Time.utcTime(UTCTime(year: nowComps.year!, month: nowComps.month!, day: nowComps.day!, hours: nowComps.hour!, minutes: nowComps.minute!, seconds: nowComps.second!))
+     let notAfter = try AuthenticationFramework_Time.utcTime(UTCTime(year: laterComps.year!, month: laterComps.month!, day: laterComps.day!, hours: laterComps.hour!, minutes: laterComps.minute!, seconds: laterComps.second!))
      
-     let validity = DSTU_Validity(notBefore: notBefore, notAfter: notAfter)
+     let validity = AuthenticationFramework_Validity(notBefore: notBefore, notAfter: notAfter)
      
      // 3. Algorithm: 1.2.840.113549.1.1.1 (rsaEncryption)
      let algoOID = try ASN1ObjectIdentifier(dotRepresentation: "1.2.840.113549.1.1.1")
      // Parameters: NULL
      let nullParams = try ASN1Any(erasing: ASN1Null())
-     let algo = DSTU_AlgorithmIdentifier(algorithm: algoOID, parameters: nullParams)
+     let algo = AuthenticationFramework_AlgorithmIdentifier(algorithm: algoOID, parameters: nullParams)
      
      // 4. SubjectPublicKeyInfo
      let pubKeyBitString = ASN1BitString(bytes: [0x01, 0x02, 0x03, 0x04])
-     let spki = DSTU_SubjectPublicKeyInfo(algorithm: algo, subjectPublicKey: pubKeyBitString)
+     let spki = AuthenticationFramework_SubjectPublicKeyInfo(algorithm: algo, subjectPublicKey: pubKeyBitString)
      
      // 5. TBSCertificate
-     let serial: ArraySlice<UInt8> = [0x01]
-     let tbs = DSTU_TBSCertificate(
+     let tbs = AuthenticationFramework_Certificate_toBeSigned(
         version: .v3,
-        serialNumber: serial,
+        serialNumber: 1,
         signature: algo,
         issuer: name,
         validity: validity,
         subject: name,
         subjectPublicKeyInfo: spki,
-        issuerUniqueID: nil,
-        subjectUniqueID: nil,
+        issuerUniqueIdentifier: nil,
+        subjectUniqueIdentifier: nil,
         extensions: nil
      )
      
      // 6. Certificate
      let sigValue = ASN1BitString(bytes: [0xFF, 0xEE, 0xDD])
-     let cert = DSTU_Certificate(tbsCertificate: tbs, signatureAlgorithm: algo, signatureValue: sigValue)
+     let cert = AuthenticationFramework_Certificate(toBeSigned: tbs, algorithmIdentifier: algo, encrypted: sigValue)
      
      print(": Generated Certificate ⟼ \(cert)\n")
      
@@ -666,8 +665,8 @@ public class Console {
      // OID 2.16.840.1.101.3.4.2.1 = sha256
      let sha256OID = try ASN1ObjectIdentifier(dotRepresentation: "2.16.840.1.101.3.4.2.1")
      
-     let owfAlg = PKIX1Explicit88_AlgorithmIdentifier(algorithm: sha256OID, parameters: nil)
-     let macAlg = PKIX1Explicit88_AlgorithmIdentifier(algorithm: hmacSHA256OID, parameters: nil)
+     let owfAlg = AuthenticationFramework_AlgorithmIdentifier(algorithm: sha256OID, parameters: nil)
+     let macAlg = AuthenticationFramework_AlgorithmIdentifier(algorithm: hmacSHA256OID, parameters: nil)
      
      // Iteration count = 10000
      let iterationCount: ArraySlice<UInt8> = [0x27, 0x10]  // 10000 in big-endian
@@ -686,13 +685,13 @@ public class Console {
      
      // Create protection algorithm: 1.2.840.113533.7.66.13 (Password Based MAC)
      let pbmOID = try ASN1ObjectIdentifier(dotRepresentation: "1.2.840.113533.7.66.13")
-     let protectionAlg = PKIX1Explicit88_AlgorithmIdentifier(
+     let protectionAlg = AuthenticationFramework_AlgorithmIdentifier(
         algorithm: pbmOID,
         parameters: try ASN1Any(derEncoded: pbmDER)
      )
      
      // Build sender (empty directoryName) - now fixed to properly use context tag [4]
-     let emptyName = PKIX1Implicit88_GeneralName.directoryName(PKIX1Explicit88_Name.rdnSequence(PKIX1Explicit88_RDNSequence([])))
+     let emptyName = PKIX1Implicit88_GeneralName.directoryName(InformationFramework_Name.rdnSequence(InformationFramework_RDNSequence([])))
      
      // Build header
      let header = PKIXCMP_2009_PKIHeader(
@@ -829,8 +828,8 @@ public class Console {
      // Build PBM parameters
      let hmacSHA256OID = try ASN1ObjectIdentifier(dotRepresentation: "1.2.840.113549.2.9")
      let sha256OID = try ASN1ObjectIdentifier(dotRepresentation: "2.16.840.1.101.3.4.2.1")
-     let owfAlg = PKIX1Explicit88_AlgorithmIdentifier(algorithm: sha256OID, parameters: nil)
-     let macAlg = PKIX1Explicit88_AlgorithmIdentifier(algorithm: hmacSHA256OID, parameters: nil)
+     let owfAlg = AuthenticationFramework_AlgorithmIdentifier(algorithm: sha256OID, parameters: nil)
+     let macAlg = AuthenticationFramework_AlgorithmIdentifier(algorithm: hmacSHA256OID, parameters: nil)
      let iterationCount: ArraySlice<UInt8> = [0x27, 0x10]
      
      let pbmParams = PKIXCMP_2009_PBMParameter(
@@ -844,13 +843,13 @@ public class Console {
      try pbmParams.serialize(into: &pbmSerializer)
      
      let pbmOID = try ASN1ObjectIdentifier(dotRepresentation: "1.2.840.113533.7.66.13")
-     let protectionAlg = PKIX1Explicit88_AlgorithmIdentifier(
+     let protectionAlg = AuthenticationFramework_AlgorithmIdentifier(
         algorithm: pbmOID,
         parameters: try ASN1Any(derEncoded: pbmSerializer.serializedBytes)
      )
      
      // Build sender (empty directoryName) - now fixed to properly use context tag [4]
-     let emptyName = PKIX1Implicit88_GeneralName.directoryName(PKIX1Explicit88_Name.rdnSequence(PKIX1Explicit88_RDNSequence([])))
+     let emptyName = PKIX1Implicit88_GeneralName.directoryName(InformationFramework_Name.rdnSequence(InformationFramework_RDNSequence([])))
      let header = PKIXCMP_2009_PKIHeader(
         pvno: .cmp2000,
         sender: emptyName,
