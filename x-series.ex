@@ -10,7 +10,8 @@ defmodule XSeries.Config do
     output = System.get_env("ASN1_OUTPUT")
 
     if output do
-      Application.put_env(:asn1scg, "output", output)
+      normalized = if String.ends_with?(output, "/"), do: output, else: output <> "/"
+      Application.put_env(:asn1scg, "output", normalized)
     end
   end
 end

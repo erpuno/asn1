@@ -6,6 +6,7 @@ Code.require_file("lib/ASN1/Emitter.ex", ".")
 Code.require_file("lib/ASN1/GoEmitter.ex", ".")
 Code.require_file("lib/ASN1/SwiftEmitter.ex", ".")
 Code.require_file("lib/ASN1/RustEmitter.ex", ".")
+Code.require_file("lib/ASN1/C99Emitter.ex", ".")
 
 # ============================================================================
 # DependencyAnalyzer - Handles import parsing, topological sort, and cycle detection

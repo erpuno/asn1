@@ -4,6 +4,7 @@ Code.require_file("lib/ASN1/SwiftEmitter.ex")
 Code.require_file("lib/ASN1/GoEmitter.ex")
 IO.puts("Requiring RustEmitter...")
 Code.require_file("lib/ASN1/RustEmitter.ex")
+Code.require_file("lib/ASN1/C99Emitter.ex")
 
 case System.argv() do
   ["compile"] ->
