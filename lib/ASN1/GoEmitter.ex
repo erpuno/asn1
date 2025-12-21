@@ -7,17 +7,12 @@ defmodule ASN1.GoEmitter do
 
   def fileExtension, do: ".go"
 
-  defp registry_file, do: "priv/go_registry.etf"
-
   defp load_registry do
-    case File.read(registry_file()) do
-      {:ok, binary} -> :erlang.binary_to_term(binary)
-      _ -> %{modules: %{}, packages: %{}}
-    end
+    Process.get(:go_registry, %{modules: %{}, packages: %{}})
   end
 
   defp save_registry(reg) do
-    File.write(registry_file(), :erlang.term_to_binary(reg))
+    Process.put(:go_registry, reg)
   end
 
   defp normalize_base_path(nil), do: nil

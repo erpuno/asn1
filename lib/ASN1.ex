@@ -932,6 +932,11 @@ defmodule ASN1 do
   def importModuleName({:Externaltypereference, _, _, mod}), do: mod
   def importModuleName(mod), do: mod
 
+  def setEnv(x, y) when is_tuple(x) do
+    # For tuple keys like {:is_oid, name}, use directly without string conversion
+    :application.set_env(:asn1scg, x, y)
+  end
+
   def setEnv(x, y) do
     mod = getEnv(:current_module, "")
     bx = bin(x)
