@@ -23,7 +23,8 @@ defmodule ASN1.SwiftEmitter do
     "PKCS_10_SubjectPublicKeyInfo" => "AuthenticationFramework_SubjectPublicKeyInfo",
     "PKCS_9_Attribute" => "InformationFramework_Attribute",
     "PKCS_9_AttributeType" => "InformationFramework_AttributeType",
-    "PKCS_9_AttributeTypeAndValue" => "InformationFramework_AttributeTypeAndValue"
+    "PKCS_9_AttributeTypeAndValue" => "InformationFramework_AttributeTypeAndValue",
+    "CertificateSerialNumber" => "ArraySlice<UInt8>"
   }
 
   defp ensure_special_type(type_name, modname) do
@@ -141,7 +142,7 @@ defmodule ASN1.SwiftEmitter do
     # Check if type contains nested SET OF
     is_nested = case type do
       {:type, _, third, _, _, _} when is_tuple(third) ->
-        elem(third, 0) == :"SET OF" or elem(third, 0) == ~c"SET OF"
+        elem(third, 0) == :"SET OF" or elem(third, 0) == :"Set Of"
       _ -> false
     end
     if is_nested do
@@ -195,7 +196,28 @@ defmodule ASN1.SwiftEmitter do
     "[#{element_swift}]"
   end
   def sequenceOf2(name,field,{:type,_,{:"SET OF", type},_,_,_}) do
-    bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set, "arr #{name}.#{field}")
+    # Check if inner type is also a SET OF (nested SET OF SET OF)
+    is_nested = case type do
+      {:type, _, third, _, _, _} when is_tuple(third) ->
+        elem(third, 0) == :"SET OF" or elem(third, 0) == :"Set Of"
+      _ -> false
+    end
+    if is_nested do
+      # For nested SET OF, return wrapper struct name (which wraps inner SET OF)
+      element_name = bin(name) <> "_" <> bin(normalizeName(field)) <> "_Element"
+      {:type, _, {_, inner}, _, _, _} = type
+      inner_type = case inner do
+        {:type, _, t, _, _, _} -> t
+        _ -> inner
+      end
+      # Ensure wrapper struct is generated
+      array(element_name, substituteType(lookup(bin(inner_type))), :set, "top")
+      # Return the wrapper struct name for decoder
+      element_swift = name(element_name, getEnv(:current_module, ""))
+      element_swift
+    else
+      bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set, "arr #{name}.#{field}")
+    end
   end
   def sequenceOf2(name,field,{:type,_,{:"Set Of", type},_,_,_}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :set, "arr #{name}.#{field}")  end
   def sequenceOf2(name,field,{:type,_,{:"SEQUENCE OF", type},_,_,_}) do bin = "[#{sequenceOf(name,field,type)}]" ; array("#{bin}", partArray(bin), :sequence, "arr #{name}.#{field}") end
@@ -434,6 +456,11 @@ import Foundation
               case type do
                   {:"SEQUENCE OF", t} -> pad(12) <> emitSequenceDecoderBodyElementArray(optional, plicit(attrs), no, name, sequenceOf(swiftName, name, t), "sequence") <> "\n"
                   {:"Sequence Of", t} -> pad(12) <> emitSequenceDecoderBodyElementArray(optional, plicit(attrs), no, name, sequenceOf(swiftName, name, t), "sequence") <> "\n"
+                  {:"SET OF", {:type, _, {:"SET OF", _}, _, _, _} = inner_set} ->
+                    # Nested SET OF SET OF - use wrapper element type
+                    element_name = bin(swiftName) <> "_" <> bin(normalizeName(name)) <> "_Element"
+                    element_swift = name(element_name, getEnv(:current_module, ""))
+                    pad(12) <> emitSequenceDecoderBodyElementArray(optional, plicit(attrs), no, name, element_swift, "set") <> "\n"
                   {:"SET OF", t} -> pad(12) <> emitSequenceDecoderBodyElementArray(optional, plicit(attrs), no, name, sequenceOf(swiftName, name, t), "set") <> "\n"
                   {:"Set Of", t} -> pad(12) <> emitSequenceDecoderBodyElementArray(optional, plicit(attrs), no, name, sequenceOf(swiftName, name, t), "set") <> "\n"
                   {:"INTEGER", _} -> pad(12) <> emitSequenceDecoderBodyElementIntEnum(name, fieldType(swiftName, name, type)) <> "\n"
@@ -466,18 +493,27 @@ import Foundation
       end), "")
   end
 
+  # Types that need ArraySlice<UInt8> instead of Int for large integer support
+  @large_integer_types ["CertificateSerialNumber"]
+
   def typealias(name, target, modname, saveFlag) do
       swiftName = name(name, modname)
       setEnv(name, swiftName)
       if target == "ASN1ObjectIdentifier" do
           setEnv({:is_oid, swiftName}, true)
       end
+      # Check if this is a large integer type that needs ArraySlice<UInt8>
+      actual_target = if target == "Int" and Enum.any?(@large_integer_types, fn t -> String.ends_with?(bin(name), t) end) do
+          "ArraySlice<UInt8>"
+      else
+          target
+      end
       save(saveFlag, modname, swiftName, """
 #{emitImprint()}
 import SwiftASN1
 import Foundation
 
-@usableFromInline typealias #{swiftName} = #{normalizeName(target)}
+@usableFromInline typealias #{swiftName} = #{normalizeName(actual_target)}
 """)
   end
 
@@ -765,7 +801,7 @@ public let #{swiftName}: Int = #{resolved_val}
       "try coder.serialize(#{name})"
 
   def emitSequenceEncoderBodyElementIntEnum(no, name) when no == [], do:
-      "try #{fieldName(name)}.serialize(into: &coder, withIdentifier: identifier)"
+      "try #{fieldName(name)}.serialize(into: &coder, withIdentifier: .integer)"
   def emitSequenceEncoderBodyElementIntEnum(no, name), do:
       "try coder.serialize(#{fieldName(name)}.rawValue, explicitlyTaggedWithTagNumber: #{no}, tagClass: .contextSpecific)"
 
