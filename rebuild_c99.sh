@@ -16,7 +16,7 @@ ASN1_LANG=c99 ASN1_OUTPUT="$XSERIES_DIR" elixir x-series.ex
 
 printf ': done. C99 headers available under %s\n' "$ROOT_DIR"
 
+gcc -std=c99 -Wall -I c99-asn1/include -I c99_output/basic \
+  -L c99-asn1/build -o test_roundtrip main.c -lasn1
+DYLD_LIBRARY_PATH=c99-asn1/build ./test_roundtrip
 
-# gcc -std=c99 -Wall -I c99-asn1/include -I c99_output/basic \
-#     -L c99-asn1/build -o test_roundtrip main.c -lasn1
-# DYLD_LIBRARY_PATH=c99-asn1/build ./test_roundtrip
