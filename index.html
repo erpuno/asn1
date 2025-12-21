@@ -14,7 +14,8 @@
     <article>
         <section>
             <h3>SYNOPSIS</h3>
-            <div>ASN.1 Code Generation Compiler.</div><br/>
+            <div>ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Code Generation Compiler
+                 created by Namdak Tönpa.</div><br/>
         <figure>
         <code> $ ./x-series.ex</code>
         </figure>
@@ -25,12 +26,16 @@
                      <li>SWIFT</li>
                      <li>RUST</li>
                      <li>GO</li>
+                     <li>KOTLIN</li>
+                     <li>ELIXIR</li>
+                     <li>F#</li>
                  </ul></div>
         </section>
         <section>
             <h3>ENCODINGS</h3>
             <div><ul><li>BER</li>
                      <li>DER</li>
+                     <li>PER</li>
                  </ul></div>
             <br />
             <div>
@@ -39,7 +44,125 @@
             </div>
         </section>
     </article>
-</aside><main>
-</main><footer>
+</aside>
+<main>
+    <article>
+    <section>
+        <h3>ARTICLES</h3>
+
+        <p>The detailed worklog is presented as series of articles.</p>
+
+        <p>
+
+* <a href="https://tonpa.guru/stream/2010/2010-10-18 LDAP.htm">2010-10-18 LDAP</a><br>
+* <a href="https://tonpa.guru/stream/2020/2020-02-03 Кваліфікований Електронний Підпис.htm">2020-02-03 Кваліфікований Електронний Підпис</a><br>
+* <a href="https://tonpa.guru/stream/2023/2023-06-22 Месенжер.htm">2023-06-22 CMS Месенжер (Пітч)</a><br>
+* <a href="https://chat.erp.uno">2023-06-30 ЧАТ X.509 (Домашня сторінка)</a><br>
+* <a href="https://tonpa.guru/stream/2023/2023-07-05 CMS SMIME.htm">2023-07-05 CMS S/MIME</a><br>
+* <a href="https://tonpa.guru/stream/2023/2023-07-16 CMS Compliance.htm">2023-07-16 CMS Compliance</a>
+* <a href="https://tonpa.guru/stream/2023/2023-07-20 LDAP Compliance.htm">2023-07-20 LDAP Compliance</a><br>
+* <a href="https://ldap.erp.uno">2023-07-25 LDAP 13.7.24 (Домашня сторінка)</a><br>
+* <a href="https://authority.erp.uno">2023-07-30 CA X.509 (Домашня сторінка)</a><br>
+* <a href="https://tonpa.guru/stream/2023/2023-07-21 CMP CMC EST.htm">2023-07-21 CMP/CMC/EST</a><br>
+* <a href="https://tonpa.guru/stream/2023/2023-07-27 MLS.htm">2023-07-21 MLS ROOM CHAT</a><br>
+* <a href="https://tonpa.guru/stream/2023/2023-08-05 CA CURVE.htm">2023-08-05 CA CURVE</a><br>
+* <a href="https://tonpa.guru/stream/2023/2023-08-07 CHAT ASN.1.htm">2023-08-07 CHAT ASN.1</a><br>
+* <a href="https://tonpa.guru/stream/2023/2023-08-08 ASN.1 Компілятор.htm">2023-08-08 ASN.1 Компілятор</a><br>
+* <a href="https://tonpa.guru/stream/2023/2023-09-01 ASN1.EX X.680.htm">2023-09-01 ASN1.EX X.680</a><br>
+* <a href="https://tonpa.guru/stream/2024/2024-10-29 EST.htm">2024-10-29 EST сервер 7030</a><br>
+* <a href="https://tonpa.guru/stream/2024/2024-11-17 EUDI.htm">2024-11-17 EUDI</a><br>
+* <a href="https://tonpa.guru/stream/2024/2024-11-20 CBOR COSE.htm">2024-11-20 CBOR COSE</a><br>
+* <a href="https://tonpa.guru/stream/2024/2024-11-21 MSO MDoc.htm">2024-11-21 MSO MDoc</a><br>
+
+        </p>
+    </section>
+    <section>
+        <h3>X SERIES</h3>
+
+        <p>To regenerate <code>Sources/Suite/XSeries</code> folder use <code>./x-series.ex</code> script.</p>
+
+        <figure><code>
+AESKeyWrapWithPad-02.asn1
+AESKeyWrapWithPad-88.asn1
+ANSI-X9-42.asn1
+ANSI-X9-62.asn1
+AlgorithmInformation-2009.asn1
+AttributeCertificateVersion1-2009.asn1
+AuthenticationFramework.asn1
+BasicAccessControl.asn1
+CHAT.asn1
+CMS-AES-CCM-and-AES-GCM-2009.asn1
+CMSAesRsaesOaep-2009.asn1
+CMSECCAlgs-2009-02.asn1
+CMSECDHAlgs-2017.asn1
+CertificateExtensions.asn1
+Character-Coding-Attributes.asn1
+Character-Presentation-Attributes.asn1
+Character-Profile-Attributes.asn1
+Colour-Attributes.asn1
+CryptographicMessageSyntax-2009.asn1
+CryptographicMessageSyntax-2010.asn1
+CryptographicMessageSyntaxAlgorithms-2009.asn1
+DOR-definition.asn1
+Default-Value-Lists.asn1
+DirectoryAbstractService.asn1
+Document-Profile-Descriptor.asn1
+EnrollmentMessageSyntax-2009.asn1
+ExtendedSecurityServices-2009.asn1
+External-References.asn1
+Geo-Gr-Coding-Attributes.asn1
+Geo-Gr-Presentation-Attributes.asn1
+Geo-Gr-Profile-Attributes.asn1
+ISO-STANDARD-9541-FONT-ATTRIBUTE-SET.asn1
+ISO9541-SN.asn1
+Identifiers-and-Expressions.asn1
+InformationFramework.asn1
+KEP.asn1
+LDAP.asn1
+Layout-Descriptors.asn1
+Link-Descriptors.asn1
+Location-Expressions.asn1
+Logical-Descriptors.asn1
+MultipleSignatures-2010.asn1
+OCSP.asn1
+PKCS-10.asn1
+PKCS-12.asn1
+PKCS-5.asn1
+PKCS-7.asn1
+PKCS-8.asn1
+PKCS-9.asn1
+PKIX-CommonTypes-2009.asn1
+PKIX-X400Address-2009.asn1
+PKIX1-PSS-OAEP-Algorithms-2009.asn1
+PKIX1Explicit-2009.asn1
+PKIX1Explicit88.asn1
+PKIX1Implicit-2009.asn1
+PKIX1Implicit88.asn1
+PKIXAlgs-2009.asn1
+PKIXAttributeCertificate-2009.asn1
+PKIXCMP-2009.asn1
+PKIXCRMF-2009.asn1
+Raster-Gr-Coding-Attributes.asn1
+Raster-Gr-Presentation-Attributes.asn1
+Raster-Gr-Profile-Attributes.asn1
+SMIMESymmetricKeyDistribution-2009.asn1
+SecureMimeMessageV3dot1-2009.asn1
+SelectedAttributeTypes.asn1
+Style-Descriptors.asn1
+Subprofiles.asn1
+Temporal-Relationships.asn1
+Text-Units.asn1
+UpperBounds.asn1
+UsefulDefinitions.asn1
+Videotex-Coding-Attributes.asn1
+CHAT.asn1
+DSTU.asn1
+KEP.asn1
+LDAP.asn1
+        </code></figure>
+    </section>
+    </article>
+</main>
+<footer>
     Made with <span class="heart">❤</span> to N2O
 </footer></body></html>
