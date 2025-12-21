@@ -52,7 +52,7 @@ Products
 * <a href="https://ldap.erp.uno">2023-07-25 LDAP 13.7.24 (Домашня сторінка)</a>
 * <a href="https://authority.erp.uno">2023-07-30 CA X.509 (Домашня сторінка)</a>
 
-Authors
+Credits
 -------
 
 * Максим Сохацький
