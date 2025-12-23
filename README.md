@@ -47,10 +47,10 @@ Publications
 Products
 --------
 
-* <a href="https://asn1.erp.uno">2023-09-02 ASN.1 X.509 (Домашня сторінка)</a>
-* <a href="https://chat.erp.uno">2023-06-30 CHAT X.509 (Домашня сторінка)</a>
-* <a href="https://ldap.erp.uno">2023-07-25 LDAP 13.7.24 (Домашня сторінка)</a>
-* <a href="https://authority.erp.uno">2023-07-30 CA X.509 (Домашня сторінка)</a>
+* <a href="https://asn1.erp.uno">2023-09-02 ASN.1 X.509 </a>
+* <a href="https://chat.erp.uno">2023-06-30 CHAT X.509 </a>
+* <a href="https://ldap.erp.uno">2023-07-25 LDAP 13.7.24 </a>
+* <a href="https://authority.erp.uno">2023-07-30 CA X.509 </a>
 
 Credits
 -------
