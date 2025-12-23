@@ -1,9 +1,9 @@
 SYNRC 💬 ASN.1
 ==============
 
-SYNRC ASN.1 Swift Code Generation DER Compiler is
+SYNRC ASN.1 Code Generation DER Compiler is
 minimal (normal), full, idiomatic, correct by construction compiler that
-supports full set of X-Series ITU definitions.
+supports full set of X-Series ITU definitions and various compiler backends: Go, Rust, C99, Swift.
 
 You don't need Cap&Proto, Protobuf, Thrift, you need ASN.1!
 Anyway if you application is secure enough it should support X.509 and thus ASN.1.
