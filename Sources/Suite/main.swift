@@ -139,7 +139,7 @@ func pbkdf(password: Data, salt: Data, iterations: Int) -> Data {
     return Data()
 }
 
-#if false
+#if true
 import Security
 
 // MARK: - Pure Swift CSR Generation (No OpenSSL)
@@ -789,7 +789,7 @@ public class Console {
 
   /// Complete CMP flow with pure Swift CSR generation - NO OpenSSL needed
   /// Generates key pair, builds CSR, sends CMP p10cr request to CA
-  #if false
+  #if true
   public static func generateAndSendCMP(
      subject: String = "swift_robot",
      countryCode: String = "UA",
@@ -854,7 +854,7 @@ public class Console {
      let header = PKIXCMP_2009_PKIHeader(
         pvno: .cmp2000,
         sender: emptyName,
-        recipient: emptyName,
+        recipient:emptyName,
         messageTime: nil,
         protectionAlg: protectionAlg,
         senderKID: ASN1OctetString(contentBytes: ArraySlice(Array(reference.utf8))),
@@ -1038,7 +1038,7 @@ public class Console {
        try testCMPWorkflow(csrFile: "dima.csr")
 
        // PURE SWIFT CMP FLOW: Generate CSR and send to ca.synrc.com:8829
-       #if false
+       #if true
        print("\n: Running pure Swift CMP flow to ca.synrc.com:8829...")
        let semaphore = DispatchSemaphore(value: 0)
        Task {
