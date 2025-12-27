@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sh clean
+sh clean.sh
 sh rebuild_c99.sh
 
 printf '\n: running C99 Test Roundtrip\n'
