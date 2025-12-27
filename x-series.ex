@@ -1,6 +1,20 @@
 #!/usr/bin/env elixir
 
-Code.require_file("asn1.ex", ".")
+Code.require_file("Compiler/args.ex", ".")
+
+# Config helper to allow language/output overrides when rerunning the script with different emitters
+defmodule XSeries.Config do
+  def setup_lang_env do
+    lang = System.get_env("ASN1_LANG") || "swift"
+    Application.put_env(:asn1scg, :lang, lang)
+    output = System.get_env("ASN1_OUTPUT")
+
+    if output do
+      normalized = if String.ends_with?(output, "/"), do: output, else: output <> "/"
+      Application.put_env(:asn1scg, "output", normalized)
+    end
+  end
+end
 
 # ============================================================================
 # DependencyAnalyzer - Handles import parsing, topological sort, and cycle detection
@@ -19,10 +33,12 @@ defmodule DependencyAnalyzer do
   """
   def parse_imports(path) do
     tokens = :asn1ct_tok.file(path)
+
     case :asn1ct_parser2.parse(path, tokens) do
       {:ok, {:module, _pos, modname, _defid, _tagdefault, _exports, imports, _, _declarations}} ->
         imported_modules = extract_imported_modules(imports)
         {normalize_name(modname), imported_modules}
+
       {:error, reason} ->
         IO.puts("Warning: Failed to parse #{path}: #{inspect(reason)}")
         {Path.basename(path, ".asn1"), []}
@@ -33,18 +49,24 @@ defmodule DependencyAnalyzer do
     Enum.flat_map(imports_list, fn
       {:SymbolsFromModule, _, _symbols, module, _objid} ->
         [normalize_name(import_module_name(module))]
-      _ -> []
+
+      _ ->
+        []
     end)
     |> Enum.uniq()
   end
+
   defp extract_imported_modules(imports) when is_list(imports) do
     Enum.flat_map(imports, fn
       {:SymbolsFromModule, _, _symbols, module, _objid} ->
         [normalize_name(import_module_name(module))]
-      _ -> []
+
+      _ ->
+        []
     end)
     |> Enum.uniq()
   end
+
   defp extract_imported_modules(_), do: []
 
   defp import_module_name({:Externaltypereference, _, _, mod}), do: mod
@@ -58,6 +80,7 @@ defmodule DependencyAnalyzer do
   def parse_all_imports(files, base_dir) do
     Enum.reduce(files, %{}, fn filename, acc ->
       path = Path.join(base_dir, filename)
+
       if File.exists?(path) do
         {modname, imports} = parse_imports(path)
         Map.put(acc, modname, imports)
@@ -73,33 +96,40 @@ defmodule DependencyAnalyzer do
   """
   def topological_sort(deps, files, base_dir) do
     # Build module name -> filename mapping
-    mod_to_file = Enum.reduce(files, %{}, fn filename, acc ->
-      path = Path.join(base_dir, filename)
-      if File.exists?(path) do
-        {modname, _} = parse_imports(path)
-        Map.put(acc, modname, filename)
-      else
-        acc
-      end
-    end)
+    mod_to_file =
+      Enum.reduce(files, %{}, fn filename, acc ->
+        path = Path.join(base_dir, filename)
+
+        if File.exists?(path) do
+          {modname, _} = parse_imports(path)
+          Map.put(acc, modname, filename)
+        else
+          acc
+        end
+      end)
 
     # Build file -> file dependencies
-    file_deps = Enum.reduce(deps, %{}, fn {modname, imported_mods}, acc ->
-      filename = Map.get(mod_to_file, modname)
-      if filename do
-        dep_files = imported_mods
-          |> Enum.map(&Map.get(mod_to_file, &1))
-          |> Enum.filter(&(&1 != nil))
-        Map.put(acc, filename, dep_files)
-      else
-        acc
-      end
-    end)
+    file_deps =
+      Enum.reduce(deps, %{}, fn {modname, imported_mods}, acc ->
+        filename = Map.get(mod_to_file, modname)
+
+        if filename do
+          dep_files =
+            imported_mods
+            |> Enum.map(&Map.get(mod_to_file, &1))
+            |> Enum.filter(&(&1 != nil))
+
+          Map.put(acc, filename, dep_files)
+        else
+          acc
+        end
+      end)
 
     # Ensure all files are in the map
-    file_deps = Enum.reduce(files, file_deps, fn f, acc ->
-      Map.put_new(acc, f, [])
-    end)
+    file_deps =
+      Enum.reduce(files, file_deps, fn f, acc ->
+        Map.put_new(acc, f, [])
+      end)
 
     # Kahn's algorithm
     kahn_sort(file_deps, files)
@@ -107,19 +137,22 @@ defmodule DependencyAnalyzer do
 
   defp kahn_sort(graph, all_nodes) do
     # Calculate in-degrees
-    in_degree = Enum.reduce(all_nodes, %{}, fn node, acc ->
-      Map.put(acc, node, 0)
-    end)
-
-    in_degree = Enum.reduce(graph, in_degree, fn {_node, deps}, acc ->
-      Enum.reduce(deps, acc, fn dep, inner_acc ->
-        Map.update(inner_acc, dep, 1, &(&1 + 1))
+    in_degree =
+      Enum.reduce(all_nodes, %{}, fn node, acc ->
+        Map.put(acc, node, 0)
       end)
-    end)
+
+    in_degree =
+      Enum.reduce(graph, in_degree, fn {_node, deps}, acc ->
+        Enum.reduce(deps, acc, fn dep, inner_acc ->
+          Map.update(inner_acc, dep, 1, &(&1 + 1))
+        end)
+      end)
 
     # Find nodes with no incoming edges
-    queue = Enum.filter(all_nodes, fn node -> Map.get(in_degree, node, 0) == 0 end)
-    |> :queue.from_list()
+    queue =
+      Enum.filter(all_nodes, fn node -> Map.get(in_degree, node, 0) == 0 end)
+      |> :queue.from_list()
 
     do_kahn_sort(graph, in_degree, queue, [], MapSet.new(all_nodes))
   end
@@ -127,6 +160,7 @@ defmodule DependencyAnalyzer do
   defp do_kahn_sort(_graph, _in_degree, {[], []}, result, remaining) do
     # If there are remaining nodes, we have a cycle
     remaining_list = MapSet.to_list(remaining)
+
     if remaining_list != [] do
       IO.puts("Warning: Cycle detected in module dependencies: #{inspect(remaining_list)}")
       # Return what we have plus remaining in original order
@@ -140,6 +174,7 @@ defmodule DependencyAnalyzer do
     case :queue.out(queue) do
       {:empty, _} ->
         remaining_list = MapSet.to_list(remaining)
+
         if remaining_list != [] do
           IO.puts("Warning: Cycle detected in module dependencies: #{inspect(remaining_list)}")
           Enum.reverse(result) ++ remaining_list
@@ -153,15 +188,18 @@ defmodule DependencyAnalyzer do
         # For each node that depends on this one, reduce its in-degree
         # Note: we need reverse dependencies here
         deps = Map.get(graph, node, [])
-        {new_in_degree, nodes_to_add} = Enum.reduce(deps, {in_degree, []}, fn dep, {deg_acc, add_acc} ->
-          new_deg = Map.get(deg_acc, dep, 1) - 1
-          new_deg_acc = Map.put(deg_acc, dep, new_deg)
-          if new_deg == 0 do
-            {new_deg_acc, [dep | add_acc]}
-          else
-            {new_deg_acc, add_acc}
-          end
-        end)
+
+        {new_in_degree, nodes_to_add} =
+          Enum.reduce(deps, {in_degree, []}, fn dep, {deg_acc, add_acc} ->
+            new_deg = Map.get(deg_acc, dep, 1) - 1
+            new_deg_acc = Map.put(deg_acc, dep, new_deg)
+
+            if new_deg == 0 do
+              {new_deg_acc, [dep | add_acc]}
+            else
+              {new_deg_acc, add_acc}
+            end
+          end)
 
         final_queue = Enum.reduce(nodes_to_add, new_queue, fn n, q -> :queue.in(n, q) end)
 
@@ -176,15 +214,17 @@ defmodule DependencyAnalyzer do
   """
   def detect_type_cycles(base_dir, files) do
     # First pass: collect all type definitions
-    all_types = Enum.reduce(files, %{}, fn filename, acc ->
-      path = Path.join(base_dir, filename)
-      if File.exists?(path) do
-        types = collect_type_definitions(path)
-        Map.merge(acc, types)
-      else
-        acc
-      end
-    end)
+    all_types =
+      Enum.reduce(files, %{}, fn filename, acc ->
+        path = Path.join(base_dir, filename)
+
+        if File.exists?(path) do
+          types = collect_type_definitions(path)
+          Map.merge(acc, types)
+        else
+          acc
+        end
+      end)
 
     # Build type dependency graph
     type_graph = build_type_graph(all_types)
@@ -195,24 +235,30 @@ defmodule DependencyAnalyzer do
 
   defp collect_type_definitions(path) do
     tokens = :asn1ct_tok.file(path)
+
     case :asn1ct_parser2.parse(path, tokens) do
       {:ok, {:module, _pos, modname, _defid, _tagdefault, _exports, _imports, _, declarations}} ->
         normalized_mod = normalize_name(modname)
+
         Enum.reduce(declarations, %{}, fn decl, acc ->
           case decl do
             {:typedef, _, _pos, name, type} ->
               full_name = "#{normalized_mod}_#{normalize_name(name)}"
               Map.put(acc, full_name, {normalized_mod, name, type})
+
             {:ptypedef, _, _pos, name, _args, type} ->
               full_name = "#{normalized_mod}_#{normalize_name(name)}"
               Map.put(acc, full_name, {normalized_mod, name, type})
-            _ -> acc
+
+            _ ->
+              acc
           end
         end)
-      _ -> %{}
+
+      _ ->
+        %{}
     end
   end
-
 
   defp build_type_graph(all_types) do
     Enum.reduce(all_types, %{}, fn {type_name, {mod, _name, type_def}}, acc ->
@@ -226,43 +272,60 @@ defmodule DependencyAnalyzer do
     |> Enum.uniq()
   end
 
-  defp extract_type_refs_acc({:type, _, {:Externaltypereference, _, ref_mod, ref_type}, _, _, _}, current_mod, acc) do
-    mod = if ref_mod == current_mod or ref_mod == nil, do: current_mod, else: normalize_name(ref_mod)
+  defp extract_type_refs_acc(
+         {:type, _, {:Externaltypereference, _, ref_mod, ref_type}, _, _, _},
+         current_mod,
+         acc
+       ) do
+    mod =
+      if ref_mod == current_mod or ref_mod == nil, do: current_mod, else: normalize_name(ref_mod)
+
     full_ref = "#{mod}_#{normalize_name(ref_type)}"
     [full_ref | acc]
   end
+
   defp extract_type_refs_acc({:type, _, {:SEQUENCE, _, _, _, fields}, _, _, _}, mod, acc) do
     extract_from_fields(fields, mod, acc)
   end
+
   defp extract_type_refs_acc({:type, _, {:SET, _, _, _, fields}, _, _, _}, mod, acc) do
     extract_from_fields(fields, mod, acc)
   end
+
   defp extract_type_refs_acc({:type, _, {:CHOICE, cases}, _, _, _}, mod, acc) do
     extract_from_fields(cases, mod, acc)
   end
+
   defp extract_type_refs_acc({:type, _, {:"SEQUENCE OF", inner}, _, _, _}, mod, acc) do
     extract_type_refs_acc(inner, mod, acc)
   end
+
   defp extract_type_refs_acc({:type, _, {:"SET OF", inner}, _, _, _}, mod, acc) do
     extract_type_refs_acc(inner, mod, acc)
   end
+
   defp extract_type_refs_acc({:type, _, {:"Sequence Of", inner}, _, _, _}, mod, acc) do
     extract_type_refs_acc(inner, mod, acc)
   end
+
   defp extract_type_refs_acc({:type, _, {:"Set Of", inner}, _, _, _}, mod, acc) do
     extract_type_refs_acc(inner, mod, acc)
   end
+
   defp extract_type_refs_acc({:ComponentType, _, _name, type, _, _, _}, mod, acc) do
     extract_type_refs_acc(type, mod, acc)
   end
+
   defp extract_type_refs_acc(tuple, mod, acc) when is_tuple(tuple) do
     tuple
     |> Tuple.to_list()
     |> Enum.reduce(acc, fn elem, inner_acc -> extract_type_refs_acc(elem, mod, inner_acc) end)
   end
+
   defp extract_type_refs_acc(list, mod, acc) when is_list(list) do
     Enum.reduce(list, acc, fn elem, inner_acc -> extract_type_refs_acc(elem, mod, inner_acc) end)
   end
+
   defp extract_type_refs_acc(_, _, acc), do: acc
 
   defp extract_from_fields(fields, mod, acc) when is_list(fields) do
@@ -270,6 +333,7 @@ defmodule DependencyAnalyzer do
       extract_type_refs_acc(field, mod, inner_acc)
     end)
   end
+
   defp extract_from_fields(_, _, acc), do: acc
 
   defp find_cycles_dfs(graph, all_types) do
@@ -277,13 +341,14 @@ defmodule DependencyAnalyzer do
     nodes = Map.keys(graph)
     initial_color = Enum.reduce(nodes, %{}, fn n, acc -> Map.put(acc, n, :white) end)
 
-    {_, cycles} = Enum.reduce(nodes, {initial_color, []}, fn node, {colors, found_cycles} ->
-      if Map.get(colors, node) == :white do
-        dfs_visit(node, graph, all_types, colors, [], found_cycles)
-      else
-        {colors, found_cycles}
-      end
-    end)
+    {_, cycles} =
+      Enum.reduce(nodes, {initial_color, []}, fn node, {colors, found_cycles} ->
+        if Map.get(colors, node) == :white do
+          dfs_visit(node, graph, all_types, colors, [], found_cycles)
+        else
+          {colors, found_cycles}
+        end
+      end)
 
     # Convert cycles to boxing format
     cycles
@@ -295,18 +360,21 @@ defmodule DependencyAnalyzer do
     colors = Map.put(colors, node, :gray)
     neighbors = Map.get(graph, node, [])
 
-    {new_colors, new_cycles} = Enum.reduce(neighbors, {colors, found_cycles}, fn neighbor, {c_acc, cy_acc} ->
-      case Map.get(c_acc, neighbor, :white) do
-        :gray ->
-          # Found a cycle! Find the field that creates this reference
-          cycle_entries = find_cycle_fields(path ++ [node], neighbor, all_types)
-          {c_acc, cycle_entries ++ cy_acc}
-        :white ->
-          dfs_visit(neighbor, graph, all_types, c_acc, path ++ [node], cy_acc)
-        :black ->
-          {c_acc, cy_acc}
-      end
-    end)
+    {new_colors, new_cycles} =
+      Enum.reduce(neighbors, {colors, found_cycles}, fn neighbor, {c_acc, cy_acc} ->
+        case Map.get(c_acc, neighbor, :white) do
+          :gray ->
+            # Found a cycle! Find the field that creates this reference
+            cycle_entries = find_cycle_fields(path ++ [node], neighbor, all_types)
+            {c_acc, cycle_entries ++ cy_acc}
+
+          :white ->
+            dfs_visit(neighbor, graph, all_types, c_acc, path ++ [node], cy_acc)
+
+          :black ->
+            {c_acc, cy_acc}
+        end
+      end)
 
     {Map.put(new_colors, node, :black), new_cycles}
   end
@@ -317,31 +385,43 @@ defmodule DependencyAnalyzer do
       case Map.get(all_types, type_name) do
         {_mod, _name, type_def} ->
           find_fields_referencing(type_name, type_def, cycle_target)
-        nil -> []
+
+        nil ->
+          []
       end
     end)
   end
 
-  defp find_fields_referencing(parent_type, {:type, _, {:SEQUENCE, _, _, _, fields}, _, _, _}, target) do
+  defp find_fields_referencing(
+         parent_type,
+         {:type, _, {:SEQUENCE, _, _, _, fields}, _, _, _},
+         target
+       ) do
     find_in_fields(parent_type, fields, target)
   end
+
   defp find_fields_referencing(parent_type, {:type, _, {:SET, _, _, _, fields}, _, _, _}, target) do
     find_in_fields(parent_type, fields, target)
   end
+
   defp find_fields_referencing(_, _, _), do: []
 
   defp find_in_fields(parent_type, fields, target) when is_list(fields) do
     Enum.flat_map(fields, fn
       {:ComponentType, _, field_name, field_type, _, _, _} ->
         refs = extract_type_refs(field_type, "")
+
         if Enum.member?(refs, target) do
           ["#{parent_type}.#{normalize_name(field_name)}"]
         else
           []
         end
-      _ -> []
+
+      _ ->
+        []
     end)
   end
+
   defp find_in_fields(_, _, _), do: []
 
   defp normalize_name(name) when is_atom(name), do: to_string(name) |> String.replace("-", "_")
@@ -351,142 +431,223 @@ end
 
 # Set up environment variables for the compilation
 # Target ONLY the AuthenticationFramework file
-Application.put_env(:asn1scg, :SelectedAttributeTypes_DirectoryString, "PKIX1Explicit88_DirectoryString")
+Application.put_env(
+  :asn1scg,
+  :SelectedAttributeTypes_DirectoryString,
+  "PKIX1Explicit88_DirectoryString"
+)
+
 Application.put_env(:asn1scg, :InformationFramework_MAPPING_BASED_MATCHING, "ASN1Any")
 Application.put_env(:asn1scg, :Attribute, "InformationFramework_Attribute")
-Application.put_env(:asn1scg, :ANSI_X9_42_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
-Application.put_env(:asn1scg, :ANSI_X9_62_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
+
+Application.put_env(
+  :asn1scg,
+  :ANSI_X9_42_AlgorithmIdentifier,
+  "AuthenticationFramework_AlgorithmIdentifier"
+)
+
 Application.put_env(:asn1scg, :ANSI_X9_62_FieldID, "ASN1Any")
-Application.put_env(:asn1scg, :PKCS_7_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
-Application.put_env(:asn1scg, :PKCS_7_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
-Application.put_env(:asn1scg, :PKCS_5_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
-Application.put_env(:asn1scg, :ANSI_X9_42_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
-Application.put_env(:asn1scg, :ANSI_X9_62_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
-Application.put_env(:asn1scg, :AlgorithmInformation_2009_AlgorithmIdentifier, "AuthenticationFramework_AlgorithmIdentifier")
+
+Application.put_env(
+  :asn1scg,
+  :PKCS_7_AlgorithmIdentifier,
+  "AuthenticationFramework_AlgorithmIdentifier"
+)
+
+Application.put_env(
+  :asn1scg,
+  :PKCS_5_AlgorithmIdentifier,
+  "AuthenticationFramework_AlgorithmIdentifier"
+)
+
+Application.put_env(
+  :asn1scg,
+  :AlgorithmInformation_2009_AlgorithmIdentifier,
+  "AuthenticationFramework_AlgorithmIdentifier"
+)
+
 Application.put_env(:asn1scg, :PKIX1Explicit88_AttributeValue, "ASN1Any")
-Application.put_env(:asn1scg, :PKCS_9_AttributeValue, "ASN1Any") # Defensive
-Application.put_env(:asn1scg, :PKCS_7_AttributeValue, "ASN1Any") # Defensive
+# Defensive
+Application.put_env(:asn1scg, :PKCS_9_AttributeValue, "ASN1Any")
+# Defensive
+Application.put_env(:asn1scg, :PKCS_7_AttributeValue, "ASN1Any")
 Application.put_env(:asn1scg, :InformationFramework_Extension, "InformationFramework_Extension")
 Application.put_env(:asn1scg, :InformationFramework_Extensions, "InformationFramework_Extensions")
-Application.put_env(:asn1scg, :AuthenticationFramework_Extension, "AuthenticationFramework_Extension")
-Application.put_env(:asn1scg, :AuthenticationFramework_Extensions, "AuthenticationFramework_Extensions")
+
+Application.put_env(
+  :asn1scg,
+  :AuthenticationFramework_Extension,
+  "AuthenticationFramework_Extension"
+)
+
+Application.put_env(
+  :asn1scg,
+  :AuthenticationFramework_Extensions,
+  "AuthenticationFramework_Extensions"
+)
 
 # Fix type aliases to ensure consistent GeneralNames resolution
-Application.put_env(:asn1scg, :CertificateExtensions_GeneralNames, "PKIX1Implicit_2009_GeneralNames")
+Application.put_env(
+  :asn1scg,
+  :CertificateExtensions_GeneralNames,
+  "PKIX1Implicit_2009_GeneralNames"
+)
+
 Application.put_env(:asn1scg, :GeneralNames, "PKIX1Implicit_2009_GeneralNames")
-Application.put_env(:asn1scg, :Document_Profile_Descriptor_Document_Profile_Descriptor_Document_Characteristics_alternative_feature_sets_Element, "ASN1ObjectIdentifier")
+
+Application.put_env(
+  :asn1scg,
+  :Document_Profile_Descriptor_Document_Profile_Descriptor_Document_Characteristics_alternative_feature_sets_Element,
+  "ASN1ObjectIdentifier"
+)
 
 ptypes = %{
-  "SingleAttribute" => {:sequence, [
-    {:type, :oid, []},
-    {:value, :any, []}
-  ]},
-  "AttributeSet" => {:sequence, [
-    {:type, :oid, []},
-    {:values, {:set_of, :any}, []}
-  ]},
-  "Extension" => {:sequence, [
-    {:extnID, :oid, []},
-    {:critical, :boolean, [optional: true]},
-    {:extnValue, :octet_string, []}
-  ]},
-  "SecurityCategory" => {:sequence, [
-    {:type, :oid, [tag: {:context, 0, :implicit}]},
-    {:value, :any, [tag: {:context, 1, :explicit}]}
-  ]},
-  "SecurityCategory-rfc3281" => {:sequence, [
-    {:type, :oid, [tag: {:context, 0, :implicit}]},
-    {:value, :any, [tag: {:context, 1, :explicit}]}
-  ]},
-  "Attribute" => {:sequence, [
-    {:type, :oid, []},
-    {:values, {:set_of, :any}, []}
-  ]},
+  "SingleAttribute" =>
+    {:sequence,
+     [
+       {:type, :oid, []},
+       {:value, :any, []}
+     ]},
+  "AttributeSet" =>
+    {:sequence,
+     [
+       {:type, :oid, []},
+       {:values, {:set_of, :any}, []}
+     ]},
+  "Extension" =>
+    {:sequence,
+     [
+       {:extnID, :oid, []},
+       {:critical, :boolean, [optional: true]},
+       {:extnValue, :octet_string, []}
+     ]},
+  "SecurityCategory" =>
+    {:sequence,
+     [
+       {:type, :oid, [tag: {:context, 0, :implicit}]},
+       {:value, :any, [tag: {:context, 1, :explicit}]}
+     ]},
+  "SecurityCategory-rfc3281" =>
+    {:sequence,
+     [
+       {:type, :oid, [tag: {:context, 0, :implicit}]},
+       {:value, :any, [tag: {:context, 1, :explicit}]}
+     ]},
+  "Attribute" =>
+    {:sequence,
+     [
+       {:type, :oid, []},
+       {:values, {:set_of, :any}, []}
+     ]},
   "Attributes" => {:set_of, {:external, "Attribute"}},
   "Extensions" => {:sequence_of, {:external, "Extension"}},
-  "SubjectPublicKeyInfo" => {:sequence, [
-    {:algorithm, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
-    {:subjectPublicKey, :bit_string, []}
-  ]},
-  "DirectoryString" => {:choice, [
-    {:teletexString, :TeletexString},
-    {:printableString, :PrintableString},
-    {:bmpString, :BMPString},
-    {:universalString, :UniversalString},
-    {:uTF8String, :UTF8String}
-  ]},
-  "FieldID" => {:sequence, [
-    {:fieldType, :oid, []},
-    {:parameters, :any, []}
-  ]},
-  "PKCS9String" => {:choice, [
-      {:ia5String, :IA5String},
-      {:directoryString, {:external, "DirectoryString"}}
-  ]},
-  "SMIMECapability" => {:sequence, [
-      {:algorithm, :oid, []},
-      {:parameters, :any, [optional: true]} # Treating as optional to be safe
-  ]},
+  "SubjectPublicKeyInfo" =>
+    {:sequence,
+     [
+       {:algorithm, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
+       {:subjectPublicKey, :bit_string, []}
+     ]},
+  "DirectoryString" =>
+    {:choice,
+     [
+       {:teletexString, :TeletexString},
+       {:printableString, :PrintableString},
+       {:bmpString, :BMPString},
+       {:universalString, :UniversalString},
+       {:uTF8String, :UTF8String}
+     ]},
+  "FieldID" =>
+    {:sequence,
+     [
+       {:fieldType, :oid, []},
+       {:parameters, :any, []}
+     ]},
+  "PKCS9String" =>
+    {:choice,
+     [
+       {:ia5String, :IA5String},
+       {:directoryString, {:external, "DirectoryString"}}
+     ]},
+  "SMIMECapability" =>
+    {:sequence,
+     [
+       {:algorithm, :oid, []},
+       # Treating as optional to be safe
+       {:parameters, :any, [optional: true]}
+     ]},
   "SMIMECapabilities" => {:sequence_of, {:external, "SMIMECapability"}},
   "ENCRYPTED-HASH" => :bit_string,
   "ENCRYPTED" => :bit_string,
-  "HASH" => {:sequence, [
-      {:algorithmIdentifier, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
-      {:hashValue, :bit_string, []}
-  ]},
-  "SIGNATURE" => {:sequence, [
-      {:algorithmIdentifier, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
-      {:encrypted, :bit_string, []}
-  ]},
-  "SIGNED" => {:sequence, [
-      {:toBeSigned, :any, []},
-      {:algorithmIdentifier, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
-      {:encrypted, :bit_string, []}
- ]},
-  "Context" => {:sequence, [
-      {:contextType, :oid, []},
-      {:contextValues, {:set_of, :any}, []},
-      {:fallback, :boolean, [optional: true]}
-  ]},
-  "EncryptedContentInfo" => {:sequence, [
-      {:contentType, :oid, []},
-      {:contentEncryptionAlgorithm, {:external, "AlgorithmInformation_2009_AlgorithmIdentifier"}, []},
-      {:encryptedContent, :octet_string, [optional: true, tag: {:context, 0, :implicit}]}
-  ]}
+  "HASH" =>
+    {:sequence,
+     [
+       {:algorithmIdentifier, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
+       {:hashValue, :bit_string, []}
+     ]},
+  "SIGNATURE" =>
+    {:sequence,
+     [
+       {:algorithmIdentifier, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
+       {:encrypted, :bit_string, []}
+     ]},
+  "SIGNED" =>
+    {:sequence,
+     [
+       {:toBeSigned, :any, []},
+       {:algorithmIdentifier, {:external, "AuthenticationFramework_AlgorithmIdentifier"}, []},
+       {:encrypted, :bit_string, []}
+     ]},
+  "Context" =>
+    {:sequence,
+     [
+       {:contextType, :oid, []},
+       {:contextValues, {:set_of, :any}, []},
+       {:fallback, :boolean, [optional: true]}
+     ]},
+  "EncryptedContentInfo" =>
+    {:sequence,
+     [
+       {:contentType, :oid, []},
+       {:contentEncryptionAlgorithm, {:external, "AlgorithmInformation_2009_AlgorithmIdentifier"},
+        []},
+       {:encryptedContent, :octet_string, [optional: true, tag: {:context, 0, :implicit}]}
+     ]}
 }
+
 Application.put_env(:asn1scg, :ptypes, ptypes)
 
 # Manual boxing entries for known recursive types
 # These are kept as overrides/supplements to automatic detection
 manual_boxing = [
-    # "Layout_Descriptors_Layout_Class_Descriptor_Body.generator_for_subordinates",
-    # "Layout_Descriptors_Layout_Class_Descriptor_Body.content_generator",
-    # "Layout_Descriptors_Layout_Class_Descriptor_Body.bindings",
-    # "Layout_Descriptors_Layout_Object_Descriptor_Body.bindings",
-    # "Layout_Descriptors_Layout_Class_Descriptor.descriptor_body",
-    # "Layout_Descriptors_Layout_Object_Descriptor.descriptor_body",
+  # "Layout_Descriptors_Layout_Class_Descriptor_Body.generator_for_subordinates",
+  # "Layout_Descriptors_Layout_Class_Descriptor_Body.content_generator",
+  # "Layout_Descriptors_Layout_Class_Descriptor_Body.bindings",
+  # "Layout_Descriptors_Layout_Object_Descriptor_Body.bindings",
+  # "Layout_Descriptors_Layout_Class_Descriptor.descriptor_body",
+  # "Layout_Descriptors_Layout_Object_Descriptor.descriptor_body",
 
-    # # Reducing Layout Body Size
-    # "Layout_Descriptors_Layout_Class_Descriptor_Body.presentation_attributes",
-    # "Layout_Descriptors_Layout_Class_Descriptor_Body.default_value_lists",
-    # "Layout_Descriptors_Layout_Object_Descriptor_Body.presentation_attributes",
-    # "Layout_Descriptors_Layout_Object_Descriptor_Body.default_value_lists",
+  # # Reducing Layout Body Size
+  # "Layout_Descriptors_Layout_Class_Descriptor_Body.presentation_attributes",
+  # "Layout_Descriptors_Layout_Class_Descriptor_Body.default_value_lists",
+  # "Layout_Descriptors_Layout_Object_Descriptor_Body.presentation_attributes",
+  # "Layout_Descriptors_Layout_Object_Descriptor_Body.default_value_lists",
 
-    # # Identifiers-and-Expressions Recursion
-    # "Identifiers_and_Expressions_Construction_Factor.construction_type",
-    # "Identifiers_and_Expressions_Object_Id_Expression.preceding_object_function",
-    # "Identifiers_and_Expressions_Object_Id_Expression.superior_object_function",
-    # "Identifiers_and_Expressions_Numeric_Expression.increment_application",
-    # "Identifiers_and_Expressions_Numeric_Expression.decrement_application",
-    # "Identifiers_and_Expressions_Numeric_Expression_ordinal_application.expression",
-    # "Identifiers_and_Expressions_Binding_Selection_Function.preceding_function",
-    # "Identifiers_and_Expressions_Binding_Selection_Function.superior_function",
-    # "Identifiers_and_Expressions_Current_Instance_Function.second_parameter_expression"
+  # # Identifiers-and-Expressions Recursion
+  # "Identifiers_and_Expressions_Construction_Factor.construction_type",
+  # "Identifiers_and_Expressions_Object_Id_Expression.preceding_object_function",
+  # "Identifiers_and_Expressions_Object_Id_Expression.superior_object_function",
+  # "Identifiers_and_Expressions_Numeric_Expression.increment_application",
+  # "Identifiers_and_Expressions_Numeric_Expression.decrement_application",
+  # "Identifiers_and_Expressions_Numeric_Expression_ordinal_application.expression",
+  # "Identifiers_and_Expressions_Binding_Selection_Function.preceding_function",
+  # "Identifiers_and_Expressions_Binding_Selection_Function.superior_function",
+  # "Identifiers_and_Expressions_Current_Instance_Function.second_parameter_expression"
 ]
 
-File.mkdir_p!("Sources/Suite/XSeries")
-Application.put_env(:asn1scg, "output", "Sources/Suite/XSeries/")
-base_dir = "priv/x-series"
+File.mkdir_p!("Languages/AppleSwift/Generated")
+base_output = System.get_env("ASN1_OUTPUT") || "Languages/AppleSwift/Generated/"
+Application.put_env(:asn1scg, "output", base_output)
+base_dir = "Specifications/x-series"
 
 # Get list of files
 raw_files =
@@ -513,6 +674,7 @@ IO.puts("Found #{map_size(deps)} modules with dependencies")
 IO.puts("Topologically sorting by dependencies...")
 files = DependencyAnalyzer.topological_sort(deps, raw_files, base_dir)
 IO.puts("Sorted order: #{length(files)} files")
+Enum.each(files, fn f -> IO.puts("Sorted: #{f}") end)
 
 # Detect type cycles for Box wrapping
 IO.puts("Detecting type cycles for Box wrapper...")
@@ -521,10 +683,14 @@ IO.puts("Detected #{length(detected_cycles)} cyclic type references")
 
 # Merge manual and detected boxing entries
 all_boxing = (manual_boxing ++ detected_cycles) |> Enum.uniq()
-IO.puts("Total boxing entries: #{length(all_boxing)} (#{length(manual_boxing)} manual + #{length(detected_cycles)} detected)")
+
+IO.puts(
+  "Total boxing entries: #{length(all_boxing)} (#{length(manual_boxing)} manual + #{length(detected_cycles)} detected)"
+)
 
 # Show newly detected cycles not in manual list
 new_detections = detected_cycles -- manual_boxing
+
 if new_detections != [] do
   IO.puts("\nNewly detected cycles (not in manual list):")
   Enum.each(new_detections, fn entry -> IO.puts("  - #{entry}") end)
@@ -537,9 +703,12 @@ IO.puts("\n=== Compilation ===")
 # Pass 1: Collect types (save=false)
 IO.puts("Pass 1: Collecting types...")
 Application.put_env(:asn1scg, "save", false)
+
 Enum.each(files, fn filename ->
   path = Path.join(base_dir, filename)
+
   if File.exists?(path) do
+    XSeries.Config.setup_lang_env()
     ASN1.compile(false, path)
   else
     IO.puts("Error: File #{path} not found.")
@@ -550,17 +719,197 @@ end)
 # Pass 2: Resolve references (save=false)
 IO.puts("Pass 2: Resolving references...")
 Application.put_env(:asn1scg, "save", false)
+
 Enum.each(files, fn filename ->
   path = Path.join(base_dir, filename)
+  XSeries.Config.setup_lang_env()
   ASN1.compile(false, path)
 end)
 
 # Pass 3: Generate code (save=true)
 IO.puts("Pass 3: Generating code...")
 Application.put_env(:asn1scg, "save", true)
+
 Enum.each(files, fn filename ->
   path = Path.join(base_dir, filename)
+  XSeries.Config.setup_lang_env()
   ASN1.compile(true, path)
 end)
 
 IO.puts("\n=== Complete ===")
+
+defmodule XSeries.Config do
+  def setup_lang_env do
+    lang = System.get_env("ASN1_LANG") || "swift"
+    Application.put_env(:asn1scg, :lang, lang)
+    output = System.get_env("ASN1_OUTPUT")
+
+    if output do
+      Application.put_env(:asn1scg, "output", output)
+    end
+  end
+end
+
+# ============================================================================
+# WorkspaceGenerator - Generates Cargo workspace files for Rust
+# ============================================================================
+defmodule WorkspaceGenerator do
+  def generate_workspace(files, base_dir, output_dir, deps) do
+    # Map modules to crates
+    mod_to_crate =
+      Enum.reduce(files, %{}, fn filename, acc ->
+        path = Path.join(base_dir, filename)
+        {modname, _} = DependencyAnalyzer.parse_imports(path)
+        crate = ASN1.RustEmitter.module_crate(modname)
+        Map.put(acc, modname, crate)
+      end)
+
+    # Identify unique crates
+    crates = mod_to_crate |> Map.values() |> Enum.uniq() |> Enum.sort()
+
+    # Assumes output_dir is "asn1_suite" or similar root
+    crates_dir = Path.join(output_dir, "crates")
+
+    IO.puts("\n=== Generating Cargo Workspace ===")
+    IO.puts("Crates found: #{Enum.join(crates, ", ")}")
+
+    generate_root_cargo_toml(output_dir, crates)
+
+    Enum.each(crates, fn crate ->
+      generate_crate_cargo_toml(crate, mod_to_crate, deps, crates_dir)
+      generate_crate_lib_rs(crate, mod_to_crate, crates_dir)
+    end)
+  end
+
+  defp generate_root_cargo_toml(output_dir, crates) do
+    dep_lines =
+      crates
+      |> Enum.map(fn c -> "#{c} = { path = \"crates/#{c}\" }" end)
+      |> Enum.join("\n")
+
+    workspace_members =
+      crates
+      |> Enum.map(&"\"crates/#{&1}\"")
+      |> Enum.join(",\n        ")
+
+    content = """
+    [package]
+    name = "asn1_suite"
+    version = "0.1.0"
+    edition = "2021"
+
+    [workspace]
+    resolver = "2"
+    members = [
+            #{workspace_members}
+    ]
+
+    [dependencies]
+    rust-asn1 = { git = "https://github.com/iho/rust-asn1.git" }
+    #{dep_lines}
+
+    [dev-dependencies]
+    reqwest = { version = "0.12", features = ["json"] }
+    tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+    """
+
+    path = Path.join(output_dir, "Cargo.toml")
+    IO.puts("Writing root Cargo.toml to #{path}")
+    File.write!(path, content)
+
+    # Also update lib.rs of asn1_suite
+    lib_path = Path.join([output_dir, "src", "lib.rs"])
+
+    if File.exists?(lib_path) do
+      lib_content =
+        crates
+        |> Enum.map(&"pub use #{&1};")
+        |> Enum.join("\n")
+
+      full_lib = """
+      //! Generated ASN.1 suite bindings
+      #{lib_content}
+
+      pub mod probe;
+      """
+
+      File.write!(lib_path, full_lib)
+    end
+  end
+
+  defp generate_crate_cargo_toml(crate, mod_to_crate, deps, crates_dir) do
+    # Calculate dependencies
+    crate_modules =
+      mod_to_crate
+      |> Enum.filter(fn {_, c} -> c == crate end)
+      |> Enum.map(fn {m, _} -> m end)
+
+    crate_deps =
+      crate_modules
+      |> Enum.flat_map(fn mod -> Map.get(deps, mod, []) end)
+      |> Enum.map(fn dep_mod -> Map.get(mod_to_crate, dep_mod) end)
+      |> Enum.filter(fn dep_crate -> dep_crate != nil and dep_crate != crate end)
+      |> Enum.uniq()
+      |> Enum.sort()
+
+    dep_section =
+      crate_deps
+      |> Enum.map(fn d -> "#{d} = { path = \"../#{d}\" }" end)
+      |> Enum.join("\n")
+
+    content = """
+    [package]
+    name = "#{crate}"
+    version = "0.1.0"
+    edition = "2024"
+
+    [dependencies]
+    rust-asn1 = { git = "https://github.com/iho/rust-asn1.git" }
+    #{dep_section}
+    """
+
+    path = Path.join([crates_dir, crate, "Cargo.toml"])
+    :filelib.ensure_dir(path)
+    File.write!(path, content)
+  end
+
+  defp generate_crate_lib_rs(crate, mod_to_crate, crates_dir) do
+    crate_modules =
+      mod_to_crate
+      |> Enum.filter(fn {_, c} -> c == crate end)
+      |> Enum.map(fn {m, _} -> m end)
+      |> Enum.sort()
+
+    content =
+      crate_modules
+      |> Enum.map(fn mod ->
+        snake = mod |> ASN1.normalizeName() |> ASN1.RustEmitter.fieldName()
+        "pub mod #{snake};"
+      end)
+      |> Enum.join("\n")
+
+    # Need to add 'use crate::*' imports probably for cross-mod references if they use crate::...
+    # But usually RustEmitter generates `use crate::generated::...`.
+    # I need to fix RustEmitter to generate valid cross-crate imports.
+    # Currently `RustEmitter.rust_use_block` says:
+    # `use crate::generated::*;`
+    # If we are in `x500` crate, `crate::generated` doesn't exist.
+    # We should change `rust_use_block` to appropriate imports.
+    # `use rust_asn1::*;` is basic.
+    # If referencing types from other crates, they are now `other_crate::Type`.
+    # `RustEmitter` helper `lookup_external` or `fieldType` should resolve to `other_crate::Module::Type`.
+
+    full_content = """
+    #{content}
+    """
+
+    path = Path.join([crates_dir, crate, "src", "lib.rs"])
+    :filelib.ensure_dir(path)
+    File.write!(path, full_content)
+  end
+end
+
+if System.get_env("ASN1_LANG") == "rust" do
+  output = System.get_env("ASN1_OUTPUT") || "Languages/AppleSwift/"
+  WorkspaceGenerator.generate_workspace(files, base_dir, output, deps)
+end

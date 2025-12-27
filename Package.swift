@@ -6,8 +6,11 @@ import class Foundation.ProcessInfo
 let package = Package(
     name: "chat-x509",
     platforms: [ .macOS(.v12), .iOS(.v13) ],
-    products: [ .executable(name: "chat-x509", targets: ["Suite"]), ],
-    targets: [ .executableTarget(name: "Suite", dependencies: [ .product(name: "SwiftASN1", package: "swift-asn1"), ]), ]
+    products:  [ .executable(name: "chat-x509", targets: ["AppleSwift"]), ],
+    targets:   [ .executableTarget(
+                  name: "AppleSwift",
+                  dependencies: [ .product(name: "SwiftASN1", package: "swift-asn1"), ],
+                  path: "Languages/AppleSwift"), ]
 )
 
 if ProcessInfo.processInfo.environment["SWIFTCI_USE_LOCAL_DEPS"] == nil {
