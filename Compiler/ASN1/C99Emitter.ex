@@ -540,7 +540,13 @@ defmodule ASN1.C99Emitter do
   def typealias(name, target, modname, saveFlag) do
     c_name = name(name, modname)
     setEnv(name, c_name)
-    target_name = substituteType(target)
+    target_name =
+      if String.ends_with?(c_name, "CERTIFICATESERIALNUMBER") do
+        "uint64_t"
+      else
+        substituteType(target)
+      end
+
     start_header(c_name)
     track_if_type(target_name)
 
@@ -554,6 +560,7 @@ defmodule ASN1.C99Emitter do
           "ASN1C_OctetString" -> "ASN1C_OctetString"
           "ASN1C_Node" -> "ASN1C_Node"
           "int64_t" -> :int64
+          "uint64_t" -> :uint64
           "uint8_t" -> :null
           "bool" -> :bool
           _ -> nil
@@ -570,6 +577,21 @@ defmodule ASN1.C99Emitter do
                 (void)result;
                 int64_t val;
                 asn1_error_t err = asn1_parse_int64(node, &val);
+                if (!asn1_is_ok(err)) return err;
+                *self = (#{c_name})val;
+                return asn1_ok();
+            }
+            """
+          :uint64 ->
+             """
+
+            static inline asn1_error_t #{c_name}_encode(const #{c_name} *self, asn1_serializer_t *s) {
+                return asn1_serialize_uint64(s, (uint64_t)*self);
+            }
+            static inline asn1_error_t #{c_name}_decode(#{c_name} *self, const asn1_node_t *node, const asn1_parse_result_t *result) {
+                (void)result;
+                uint64_t val;
+                asn1_error_t err = asn1_parse_uint64(node, &val);
                 if (!asn1_is_ok(err)) return err;
                 *self = (#{c_name})val;
                 return asn1_ok();
