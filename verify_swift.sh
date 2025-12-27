@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-sh clean
+sh clean.sh
 sh rebuild_swift.sh
 
 echo "--- 1. Using existing DSTU X.509 types (from Sources/Suite/ASN1SCG) ---"
