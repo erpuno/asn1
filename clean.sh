@@ -1,6 +1,6 @@
 #!/bin/sh
 
-rm -rf ./build
+rm -rf ./.build
 rm -rf ./Languages/C99/Generated
 rm -rf ./Languages/C99/c99_client
 rm -rf ./Languages/C99/Parser/build
