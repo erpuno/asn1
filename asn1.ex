@@ -1,3 +1,5 @@
+#!/usr/bin/env elixir
+
 Code.require_file("Compiler/ASN1/Emitter.ex")
 Code.require_file("Compiler/ASN1.ex")
 Code.require_file("Compiler/ASN1/SwiftEmitter.ex")
@@ -35,7 +37,7 @@ case System.argv() do
     ASN1.compile()
 
   _ ->
-    :io.format("Copyright © 1994—2024 Namdak Tönpa.~n")
-    :io.format("ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 30.10.7.~n")
+    :io.format("Copyright (c) 1994-2026 Namdak Tonpa.~n")
+    :io.format("ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 31.1.1.~n")
     :io.format("Usage: ./asn1.ex help | compile [-v] [input [output]]~n")
 end
