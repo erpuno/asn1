@@ -204,9 +204,6 @@ defmodule ASN1.RustEmitter do
     Map.get(@builtin_type_map, type, "ASN1Node")
   end
 
-  defp builtin_map_lookup(type) do
-    Map.get(@builtin_type_map, type)
-  end
 
   defp vector_element(vec_type) when is_binary(vec_type) do
     vec_type
@@ -234,9 +231,15 @@ defmodule ASN1.RustEmitter do
 
     # Ensure internal types have crate:: prefix in single-crate mode
     final_base =
-      if is_single_crate?() and not String.contains?(base_type, "::") and
+      if not String.contains?(base_type, "::") and
            not is_primitive_or_std_type?(base_type) do
-        "crate::" <> base_type
+        if String.starts_with?(base_type, "Box<") do
+          # Extract inner type, prefix it, and re-wrap
+          inner = String.slice(base_type, 4..-2//1)
+          "Box<crate::#{inner}>"
+        else
+          "crate::" <> base_type
+        end
       else
         base_type
       end
@@ -368,7 +371,7 @@ defmodule ASN1.RustEmitter do
     end
   end
 
-  def fieldType(_struct_name, _field, {:ObjectClassFieldType, _, _, fields, _}) do
+  def fieldType(struct_name, field, {:ObjectClassFieldType, _, _, fields, _}) do
     IO.puts("DEBUG ObjectClassFieldType fields=#{inspect(fields)}")
 
     cond do
@@ -378,13 +381,85 @@ defmodule ASN1.RustEmitter do
     end
   end
 
-  @impl true
-  def module_crate(modname) do
-    if System.get_env("ASN1_SINGLE_CRATE") do
-      "asn1_suite"
-    else
-      module_crate_internal(modname)
+  def fieldType(_struct_name, _field, {:"SEQUENCE OF", inner}) do
+    "Vec<" <> (fieldType("", "", inner) |> substituteType()) <> ">"
+  end
+
+  def fieldType(_struct_name, _field, {:"SET OF", inner}) do
+    "Vec<" <> (fieldType("", "", inner) |> substituteType()) <> ">"
+  end
+
+  def fieldType(struct_name, field, {:"Sequence Of", inner}) do
+    fieldType(struct_name, field, {:"SEQUENCE OF", inner})
+  end
+
+  def fieldType(struct_name, field, {:"Set Of", inner}) do
+    fieldType(struct_name, field, {:"SET OF", inner})
+  end
+
+  def fieldType(struct_name, field, {:Externaltypereference, _, _, _} = ref) do
+    lookup_external(struct_name, field, ref)
+  end
+
+  def fieldType(_struct_name, _field, atom) when is_atom(atom) do
+    atom
+    |> Atom.to_string()
+    |> lookup_builtin_or_external()
+  end
+
+  def fieldType(struct_name, field, other) when is_tuple(other) do
+    case other do
+      {:CHOICE, _} ->
+        name("#{field}_choice", struct_name)
+
+      {:SEQUENCE, _, _, _, _} ->
+        name("#{field}_sequence", struct_name)
+
+      {:SET, _, _, _, _} ->
+        name("#{field}_set", struct_name)
+
+      {:ENUMERATED, _} ->
+        name("#{field}_enum", struct_name)
+
+      {:ANY_DEFINED_BY, _} ->
+        "ASN1Node"
+
+      {:INTEGER, _} ->
+        "ASN1Integer"
+
+      {:"BIT STRING", _} ->
+        "ASN1BitString"
+
+      {:"INSTANCE OF", _, _} ->
+        "ASN1Node"
+
+      {:SelectionType, _field_name, {:type, _, type_ref, _, _, _}} ->
+        fieldType(struct_name, field, type_ref)
+
+      {:SelectionType, _field_name, type_spec} ->
+        fieldType(struct_name, field, type_spec)
+
+      name when is_binary(name) ->
+        res = builtin_map_lookup(name) || name
+
+        if name in ["Sequence", "Choice", "UTF8String"] do
+          IO.puts("Debug fieldType: name=#{inspect(name)} res=#{inspect(res)}")
+        end
+
+        res
+
+      _ ->
+        inspect(other)
     end
+  end
+
+  def fieldType(_struct_name, _field, other) when is_binary(other) do
+    substituteType(other)
+  end
+
+  @impl true
+  def module_crate(_modname) do
+    "asn1_suite"
   end
 
   def module_crate_internal(modname) do
@@ -469,81 +544,6 @@ defmodule ASN1.RustEmitter do
     |> MapSet.to_list()
   end
 
-  def fieldType(_struct_name, _field, {:"SEQUENCE OF", inner}) do
-    "Vec<" <> (fieldType("", "", inner) |> substituteType()) <> ">"
-  end
-
-  def fieldType(_struct_name, _field, {:"SET OF", inner}) do
-    "Vec<" <> (fieldType("", "", inner) |> substituteType()) <> ">"
-  end
-
-  def fieldType(struct_name, field, {:"Sequence Of", inner}) do
-    fieldType(struct_name, field, {:"SEQUENCE OF", inner})
-  end
-
-  def fieldType(struct_name, field, {:"Set Of", inner}) do
-    fieldType(struct_name, field, {:"SET OF", inner})
-  end
-
-  def fieldType(struct_name, field, {:Externaltypereference, _, _, _} = ref) do
-    lookup_external(struct_name, field, ref)
-  end
-
-  def fieldType(_struct_name, _field, atom) when is_atom(atom) do
-    atom
-    |> Atom.to_string()
-    |> lookup_builtin_or_external()
-  end
-
-  def fieldType(struct_name, field, other) when is_tuple(other) do
-    case other do
-      {:CHOICE, _} ->
-        name("#{field}_choice", struct_name)
-
-      {:SEQUENCE, _, _, _, _} ->
-        name("#{field}_sequence", struct_name)
-
-      {:SET, _, _, _, _} ->
-        name("#{field}_set", struct_name)
-
-      {:ENUMERATED, _} ->
-        name("#{field}_enum", struct_name)
-
-      {:ANY_DEFINED_BY, _} ->
-        "ASN1Node"
-
-      {:INTEGER, _} ->
-        "ASN1Integer"
-
-      {:"BIT STRING", _} ->
-        "ASN1BitString"
-
-      {:"INSTANCE OF", _, _} ->
-        "ASN1Node"
-
-      {:SelectionType, _field_name, {:type, _, type_ref, _, _, _}} ->
-        fieldType(struct_name, field, type_ref)
-
-      {:SelectionType, _field_name, type_spec} ->
-        fieldType(struct_name, field, type_spec)
-
-      name when is_binary(name) ->
-        res = builtin_map_lookup(name) || name
-
-        if name in ["Sequence", "Choice", "UTF8String"] do
-          IO.puts("Debug fieldType: name=#{inspect(name)} res=#{inspect(res)}")
-        end
-
-        res
-
-      _ ->
-        inspect(other)
-    end
-  end
-
-  def fieldType(_struct_name, _field, other) when is_binary(other) do
-    substituteType(other)
-  end
 
   @impl true
   def array(name, type, tag_type, _level) do
@@ -723,7 +723,6 @@ defmodule ASN1.RustEmitter do
     else
       # Only log if it's NOT a binary (to avoid noise)
       if not is_binary(type) do
-        IO.inspect(type, label: "DEBUG substituteType fallback")
       end
     end
 
@@ -767,13 +766,12 @@ defmodule ASN1.RustEmitter do
         res = builtin_map_lookup(type_name) || builtin_map_lookup(type_name_str)
 
         if type_name_str == "PKIX1Explicit2009AlgorithmIdentifier" do
-          IO.puts("DEBUG: PKIX1Explicit2009AlgorithmIdentifier lookup res=#{inspect(res)}")
         end
 
         case res do
           val when not is_nil(val) ->
             # Track cross-crate dependency if the replacement contains a crate prefix (multi-crate only)
-            if not is_single_crate?() and String.contains?(val, "::") do
+            if String.contains?(val, "::") do
               crate_name = String.split(val, "::") |> List.first()
               if crate_name != "crate", do: track_crate_dependency(crate_name)
             end
@@ -809,28 +807,7 @@ defmodule ASN1.RustEmitter do
                   current_module = getEnv(:current_module, "")
                   current_crate = module_crate(current_module)
 
-                  prefixed =
-                    if not is_single_crate?() and not String.contains?(type_name_str, "::") do
-                      Enum.find_value(@modules, fn mod_canon ->
-                        if String.starts_with?(type_name_str, mod_canon) do
-                          crate = module_crate(mod_canon)
-                          mod_field = fieldName(mod_canon)
-
-                          if crate == current_crate do
-                            if mod_canon == current_module do
-                              type_name_str
-                            else
-                              "crate::#{mod_field}::#{type_name_str}"
-                            end
-                          else
-                            track_crate_dependency(crate)
-                            "#{crate}::#{mod_field}::#{type_name_str}"
-                          end
-                        end
-                      end)
-                    else
-                      nil
-                    end
+                  prefixed = type_name_str
 
                   case fetch_env_override(type_name) do
                     nil ->
@@ -859,7 +836,7 @@ defmodule ASN1.RustEmitter do
         if is_binary(r) do
           # Aggressively strip any path and use crate:: in single-crate mode
           r =
-            if is_single_crate?() and String.contains?(r, "::") do
+            if String.contains?(r, "::") do
               "crate::" <> (r |> String.split("::") |> List.last())
             else
               r
@@ -929,8 +906,10 @@ defmodule ASN1.RustEmitter do
         type_name
       end
 
-    # Check if the type is explicitly mapped to ASN1Node in any module
-    # We check both the raw name and modType patterns (without underscores, matching basic.ex)
+    # Explicitly known ASN1Node aliases (ANY types)
+    # We must be careful not to match generated structs (like SelectedAttributeTypesASN1Node)
+    clean_name == "InformationFrameworkAttributeType" ||
+    clean_name == "AttributeValue" ||
     (Application.get_env(:asn1scg, String.to_atom(clean_name)) == "ASN1Node" ||
        Enum.any?(
          [
@@ -947,6 +926,8 @@ defmodule ASN1.RustEmitter do
   end
 
   defp is_raw_node?(type) do
+    if String.contains?(type, "LocationExpressionsASN1Node") do
+    end
     # Only return true for the base type itself, not collections
     clean =
       if String.contains?(type, "::") do
@@ -958,18 +939,19 @@ defmodule ASN1.RustEmitter do
     type == "ASN1Node" || type == "Box<ASN1Node>" || clean == "ASN1Node" ||
       (is_binary(type) &&
          (not String.contains?(type, "Vec<") and
-            (String.contains?(type, "ASN1Node") or
-               String.ends_with?(type, "APTitle") or
+             (String.ends_with?(type, "APTitle") or
                String.ends_with?(type, "AEQualifier") or
                is_asn1_node_type?(type))))
   end
 
-  defp is_single_crate?() do
-    System.get_env("ASN1_SINGLE_CRATE") == "true" or
-      :application.get_env(:asn1scg, :single_crate, false) == true
-  end
 
-  def tagClass(_tag), do: ""
+  def tagClass([{:tag, class, _, _, _}]), do: class
+  def tagClass(x) when is_integer(x), do: x
+  def tagClass([{:tag, :CONTEXT, _, _, _}]), do: "TagClass::ContextSpecific"
+  def tagClass([{:tag, :APPLICATION, _, _, _}]), do: "TagClass::Application"
+  def tagClass([{:tag, :PRIVATE, _, _, _}]), do: "TagClass::Private"
+  def tagClass([{:tag, :UNIVERSAL, _, _, _}]), do: "TagClass::Universal"
+  def tagClass(_tag), do: nil
 
   @impl true
   def typealias(name, target, modname, saveFlag) do
@@ -1094,7 +1076,6 @@ defmodule ASN1.RustEmitter do
     |> Enum.join("\n")
   end
 
-  defp add_optional(type, :OPTIONAL), do: "Option<#{type}>"
   defp add_optional(type, _), do: type
 
   defp pad_field_name(name) do
@@ -1172,7 +1153,7 @@ defmodule ASN1.RustEmitter do
   defp builtin_map_lookup(key) when is_atom(key) do
     val = Map.get(@builtin_type_map, key)
 
-    if val && is_single_crate?() && String.contains?(val, "::") do
+    if val && String.contains?(val, "::") do
       "crate::" <> (val |> String.split("::") |> List.last())
     else
       val
@@ -1186,7 +1167,7 @@ defmodule ASN1.RustEmitter do
         :error -> Map.get(@builtin_type_map, key)
       end
 
-    if val && is_single_crate?() && String.contains?(val, "::") do
+    if val && String.contains?(val, "::") do
       "crate::" <> (val |> String.split("::") |> List.last())
     else
       val
@@ -1237,7 +1218,7 @@ defmodule ASN1.RustEmitter do
     case builtin_map_lookup(type_name) do
       val when not is_nil(val) ->
         # Track cross-crate dependency (multi-crate only)
-        if not is_single_crate?() and String.contains?(val, "::") do
+        if String.contains?(val, "::") do
           crate_name = String.split(val, "::") |> List.first()
           if crate_name != "crate", do: track_crate_dependency(crate_name)
         end
@@ -1263,22 +1244,7 @@ defmodule ASN1.RustEmitter do
           current_crate = module_crate(current_module)
           module_field = fieldName(mod_name)
 
-          if is_single_crate?() do
-            # Single-crate flat mode: just use the type name directly
-            # The file is in the same crate so we can just reference it
-            type_name
-          else
-            prefix =
-              if external_crate == current_crate do
-                "crate"
-              else
-                # Track the cross-crate dependency
-                track_crate_dependency(external_crate)
-                external_crate
-              end
-
-            "#{prefix}::#{module_field}::#{type_name}"
-          end
+          type_name
         end
     end
   end
@@ -1288,26 +1254,6 @@ defmodule ASN1.RustEmitter do
     other |> bin() |> normalizeName()
   end
 
-  defp ensure_generated_mod_entry(rust_name) do
-    dir = outputDir()
-    mod_dir = Path.expand(dir)
-    File.mkdir_p!(mod_dir)
-    mod_file = Path.join(mod_dir, "mod.rs")
-    module_name = rust_name |> Macro.underscore() |> String.replace("/", "_")
-    line = "pub mod #{module_name};\npub use self::#{module_name}::*;\n"
-
-    cond do
-      File.exists?(mod_file) ->
-        existing = File.read!(mod_file)
-
-        unless String.contains?(existing, line) do
-          File.write!(mod_file, existing <> line)
-        end
-
-      true ->
-        File.write!(mod_file, line)
-    end
-  end
 
   defp maybe_box(type, struct_name, field_name) do
     if is_boxed(struct_name, field_name) || type == struct_name do
@@ -1326,13 +1272,6 @@ defmodule ASN1.RustEmitter do
     if key == "CHATMessage.Body", do: true, else: Enum.member?(boxing, key)
   end
 
-  defp is_variant_boxed(enum_name, variant_name) do
-    boxing = :application.get_env(:asn1scg, :boxing, [])
-
-    # variant_name is already pascal-cased here because it's passed from emit_choice_variants/emit_enum_variants
-    key = "#{enum_name}.#{variant_name}"
-    Enum.member?(boxing, key)
-  end
 
   defp emit_der_impls(rust_name, fields) do
     """
@@ -1501,7 +1440,7 @@ defmodule ASN1.RustEmitter do
             end
 
           val_str =
-            if is_single_crate?() and String.contains?(val_str, "::") do
+            if String.contains?(val_str, "::") do
               "crate::" <> (val_str |> String.split("::") |> List.last())
             else
               val_str
@@ -1587,11 +1526,45 @@ defmodule ASN1.RustEmitter do
           type_name = field_type_for(rust_name, field_name, type, [])
           type_fish = String.replace(type_name, "<", "::<")
 
-          # Determine tagging method from type_tags but always use idx for tag number
+          # Determine expected tag from type_tags or fallback to universal
+          {expected_tag_no, expected_tag_class} = case type_tags do
+            [{:tag, class, number, _method, _}] ->
+              cls_str = case class do
+                :universal -> "TagClass::Universal"
+                :UNIVERSAL -> "TagClass::Universal"
+                :application -> "TagClass::Application"
+                :APPLICATION -> "TagClass::Application"
+                :context -> "TagClass::ContextSpecific"
+                :CONTEXT -> "TagClass::ContextSpecific"
+                :private -> "TagClass::Private"
+                :PRIVATE -> "TagClass::Private"
+              end
+              {number, cls_str}
+
+            _ ->
+              # No explicit tag, use universal tag of the type
+              ut = universal_tag(type)
+              if ut do
+                {ut, "TagClass::Universal"}
+              else
+                # If we can't determine tag, and no explicit tag is given, we default to ContextSpecific(idx) to avoid compilation error?
+                # No, that caused the bug.
+                # If ut is nil (e.g. ANY), we generally can't generate a specific match arm for it (it would overlap or be 'any').
+                # But for CHOICE, we need distinguishing tags.
+                # Maybe we use idx as fallback ONLY if ut is nil.
+                IO.puts("Warning: Could not determine tag for CHOICE variant #{field_name} in #{rust_name}, falling back to ContextSpecific(#{idx})")
+                {idx, "TagClass::ContextSpecific"}
+              end
+          end
+
+          # Determine tagging method for peeling logic (only if explicit tag was present?)
+          # If we used universal tag, we usually don't need peeling unless IMPLICIT was set?
+          # Actually, if type_tags is empty, tag_method is usually irrelevant (parse directly).
           tag_method = case type_tags do
             [{:tag, _class, _number, method, _}] -> method
-            _ -> {:IMPLICIT, nil}  # Default to IMPLICIT
+            _ -> :IMPLICIT # Or :none
           end
+
           tag_method = case tag_method do
             {:IMPLICIT, _} -> :IMPLICIT
             {:EXPLICIT, _} -> :EXPLICIT
@@ -1600,10 +1573,7 @@ defmodule ASN1.RustEmitter do
             other -> other
           end
 
-          # Always use idx as the tag number for CHOICE alternatives to avoid duplicates
-          tag_no = idx
-
-          # Determine innermost universal tag for tag swapping
+          # Determine innermost universal tag for tag swapping (if IMPLICIT)
           universal_tag_no = universal_tag(type)
 
           # Generate the parsing call based on tagging method
@@ -1630,6 +1600,7 @@ defmodule ASN1.RustEmitter do
 
             tag_method in [:EXPLICIT, {:default, :EXPLICIT}] ->
               # EXPLICIT: Peel outer tag to get inner node
+              # Note: If we had an explicit tag, expected_tag_no matches it.
               """
               {
                   if let rust_asn1::asn1::Content::Constructed(collection) = node.content {
@@ -1652,21 +1623,32 @@ defmodule ASN1.RustEmitter do
               }
               """
 
-            universal_tag_no != nil ->
+            universal_tag_no != nil and tag_method == :IMPLICIT ->
               # IMPLICIT: Swap tag identifier before parsing
-              """
-              {
-                  let mut node = node;
-                  node.identifier = ASN1Identifier::new(#{universal_tag_no}, TagClass::Universal);
-                  #{type_fish}::from_der_node(node)?
-              }
-              """
+              # Only if we actually HAVE an explicit tag definition that is IMPLICIT.
+              # If type_tags is empty, we don't swap, we just match and parse.
+              # My previous logic (lines 1598+) checked `universal_tag_no != nil`.
+              # But if we found the tag via universal_tag (i.e. type_tags empty), then expected_tag_no == universal_tag_no.
+              # Swapping is redundant.
+              # Swapping is only needed if expected_tag_no != universal_tag_no.
+
+              if expected_tag_no != universal_tag_no do
+                  """
+                  {
+                      let mut node = node;
+                      node.identifier = ASN1Identifier::new(#{universal_tag_no}, TagClass::Universal);
+                      #{type_fish}::from_der_node(node)?
+                  }
+                  """
+               else
+                   "#{type_fish}::from_der_node(node)?"
+               end
 
             true ->
               "#{type_fish}::from_der_node(node)?"
           end
 
-          ["            (#{tag_no}, TagClass::ContextSpecific) => Ok(Self::#{variant}(#{call})),"]
+          ["            (#{expected_tag_no}, #{expected_tag_class}) => Ok(Self::#{variant}(#{call})),"]
 
         _ ->
           []
@@ -1693,31 +1675,6 @@ defmodule ASN1.RustEmitter do
   end
 
 
-  defp emit_choice_encoder_cases(rust_name, cases) do
-    cases
-    |> Enum.map(fn
-      {:ComponentType, _, field_name, {:type, _, type, _, _, _}, _optional, _, _} ->
-        variant = field_name |> raw_pascal() |> escape_reserved_variant()
-        type_name = field_type_for(rust_name, field_name, type, [])
-
-        if String.starts_with?(type_name, "Vec<") do
-          """
-            #{rust_name}::#{variant}(val) => {
-                for item in val {
-                    item.serialize(serializer)?;
-                }
-                Ok(())
-            }
-          """
-        else
-          "            #{rust_name}::#{variant}(val) => val.serialize(serializer),"
-        end
-
-      _ ->
-        ""
-    end)
-    |> Enum.join("\n")
-  end
 
   defp emit_enum_der_impls(rust_name, cases) do
     """
@@ -1831,22 +1788,6 @@ defmodule ASN1.RustEmitter do
     |> Enum.join("\n")
   end
 
-  defp emit_enum_encoder_cases(rust_name, cases) do
-    cases
-    |> Enum.map(fn
-      :EXTENSIONMARK ->
-        ""
-
-      {:NamedNumber, name, val} ->
-        variant = name |> raw_pascal() |> escape_reserved_variant()
-        "            #{rust_name}::#{variant} => #{val},"
-
-      {name, val} ->
-        variant = name |> raw_pascal() |> escape_reserved_variant()
-        "            #{rust_name}::#{variant} => #{val},"
-    end)
-    |> Enum.join("\n")
-  end
 
   defp emit_sequence_decoder_body(rust_name, fields) do
     decoders =
@@ -1860,6 +1801,23 @@ defmodule ASN1.RustEmitter do
 
           type_fish = String.replace(field_type, "<", "::<")
 
+          # Extract tag info (hoisted)
+          {expected_tag_no, expected_tag_class, tag_method} = case attrs do
+            [{:tag, class, number, method, _}] ->
+              cls = case class do
+                :CONTEXT -> "TagClass::ContextSpecific"
+                :APPLICATION -> "TagClass::Application"
+                :PRIVATE -> "TagClass::Private"
+                :UNIVERSAL -> "TagClass::Universal"
+                :CONTEXT_SPECIFIC -> "TagClass::ContextSpecific"
+                _ -> "TagClass::ContextSpecific"
+              end
+              {number, cls, method}
+            _ ->
+              # No explicit tag, fallback to type check based on content
+              {nil, nil, nil}
+          end
+
           case optional do
             :OPTIONAL ->
               inner_type = field_type_for(rust_name, field_name, type, [])
@@ -1867,26 +1825,11 @@ defmodule ASN1.RustEmitter do
               # We need to use inner_type for the actual parsing call
               inner_type_fish = String.replace(inner_type, "<", "::<")
 
-              # Extract tag info for optional field matching
-              {expected_tag_no, expected_tag_class, tag_method} = case attrs do
-                [{:tag, class, number, method, _}] ->
-                  cls = case class do
-                    :CONTEXT -> "TagClass::ContextSpecific"
-                    :APPLICATION -> "TagClass::Application"
-                    :PRIVATE -> "TagClass::Private"
-                    :UNIVERSAL -> "TagClass::Universal"
-                    _ -> "TagClass::ContextSpecific"
-                  end
-                  {number, cls, method}
-                _ ->
-                  # No explicit tag, fallback to type check based on content
-                  {nil, nil, nil}
-              end
-
               if expected_tag_no != nil do
                 # Has explicit tag: check tag before consuming
                 if tag_method in [:EXPLICIT, {:default, :EXPLICIT}] do
                   # EXPLICIT: Peel the outer tag
+
                   if String.starts_with?(inner_type, "Vec") do
                     elem_type = vector_element(inner_type)
                     elem_type_fish = String.replace(elem_type, "<", "::<")
@@ -1932,7 +1875,7 @@ defmodule ASN1.RustEmitter do
                                           if let rust_asn1::asn1::Content::Constructed(collection) = node.content {
                                               let mut iter = collection.into_iter();
                                               let inner_node = iter.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::InvalidASN1Object, "Empty Explicit Tag [#{expected_tag_no}]".to_string(), file!().to_string(), line!()))?;
-                                              Some(inner_node)
+                                              Some(#{if String.contains?(field_type, "Box<"), do: "Box::new(inner_node)", else: "inner_node"})
                                           } else { return Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnexpectedFieldType, "Expected Constructed for Explicit field".to_string(), file!().to_string(), line!())); }
                                       } else { None }
                                   } else { None };
@@ -1990,10 +1933,16 @@ defmodule ASN1.RustEmitter do
                   else
                     # Single value - check if raw node
                     if is_raw_node?(inner_type) do
+                      val_expr = if String.starts_with?(inner_type, "Box<") or String.contains?(field_type, "Box<") do
+                        "Box::new(nodes.next().unwrap())"
+                      else
+                        "nodes.next().unwrap()"
+                      end
+
                       """
                                   let #{rust_field}: #{field_type} = if let Some(node) = nodes.peek() {
                                       if node.identifier.tag_number == #{expected_tag_no} && node.identifier.tag_class == #{expected_tag_class} {
-                                          Some(nodes.next().unwrap())
+                                          Some(#{val_expr})
                                       } else { None }
                                   } else { None };
                       """
@@ -2018,7 +1967,12 @@ defmodule ASN1.RustEmitter do
               else
                 # No explicit tag - use existing type-based fallback logic
                 if is_raw_node?(inner_type) or String.ends_with?(inner_type, "AttributeValue") do
-                  "            let #{rust_field}: #{field_type} = nodes.next();"
+                  val_stmt = if String.contains?(field_type, "Box<") do
+                    "nodes.next().map(Box::new)"
+                  else
+                    "nodes.next()"
+                  end
+                  "            let #{rust_field}: #{field_type} = #{val_stmt};"
                 else
                   if String.starts_with?(inner_type, "Vec") do
                     elem_type = vector_element(inner_type)
@@ -2046,46 +2000,159 @@ defmodule ASN1.RustEmitter do
 
             _ ->
               type_fish = String.replace(field_type, "<", "::<")
+              inner_type = field_type
+              inner_type_fish = type_fish
 
-              if String.starts_with?(field_type, "Vec") do
-                elem_type = vector_element(field_type)
+              if expected_tag_no != nil and tag_method in [:EXPLICIT, {:default, :EXPLICIT}] do
+                 # Handle EXPLICIT tag for mandatory/default field (Robust version)
 
-                if is_raw_node?(elem_type) do
-                  "            let #{rust_field} = { let node = nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?; if let rust_asn1::asn1::Content::Constructed(collection) = node.content { collection.into_iter().collect::<Vec<#{elem_type}>>() } else { return Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnexpectedFieldType, \"Expected constructed\".to_string(), file!().to_string(), line!())); } };"
-                else
-                  call = "#{elem_type}::from_der_node(child)"
+                 # Logic mirrors OPTIONAL branch but returns Result<T> instead of Option<T>
 
-                  "            let #{rust_field}: Vec<#{elem_type}> = { let node = nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?; if let rust_asn1::asn1::Content::Constructed(collection) = node.content { collection.clone().into_iter().map(|child| #{call}).collect::<Result<_, _>>()? } else { return Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnexpectedFieldType, \"Expected constructed\".to_string(), file!().to_string(), line!())); } };"
-                end
+                 if String.starts_with?(inner_type, "Vec") do
+                    elem_type = vector_element(inner_type)
+                    elem_type_fish = String.replace(elem_type, "<", "::<")
+
+                    if is_raw_node?(elem_type) do
+                      # Vec<RawNode>
+                      """
+                                  let #{rust_field}: #{field_type} = {
+                                      let node = nodes.peek().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, "Premature end of data".to_string(), file!().to_string(), line!()))?;
+                                      if node.identifier.tag_number == #{expected_tag_no} && node.identifier.tag_class == #{expected_tag_class} {
+                                          let node = nodes.next().unwrap();
+                                          if let rust_asn1::asn1::Content::Constructed(collection) = node.content {
+                                              let mut iter = collection.into_iter();
+                                              let inner_seq = iter.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::InvalidASN1Object, "Empty Explicit Tag [#{expected_tag_no}]".to_string(), file!().to_string(), line!()))?;
+                                              if let rust_asn1::asn1::Content::Constructed(seq_collection) = inner_seq.content {
+                                                  Ok(seq_collection.into_iter().collect())
+                                              } else { Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnexpectedFieldType, "Expected Sequence inner content".to_string(), file!().to_string(), line!())) }
+                                          } else { Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnexpectedFieldType, "Expected Constructed Tag [#{expected_tag_no}]".to_string(), file!().to_string(), line!())) }
+                                      } else {
+                                          Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnexpectedFieldType, format!("Expected Explicit Tag [#{expected_tag_no}] for #{field_name}, got {}", node.identifier), file!().to_string(), line!()))
+                                      }
+                                  }?;
+                      """
+                    else
+                      # Vec<T>
+                      """
+                                  let #{rust_field}: #{field_type} = {
+                                      let node = nodes.peek().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, "Premature end of data".to_string(), file!().to_string(), line!()))?;
+                                      if node.identifier.tag_number == #{expected_tag_no} && node.identifier.tag_class == #{expected_tag_class} {
+                                          let node = nodes.next().unwrap();
+                                          if let rust_asn1::asn1::Content::Constructed(collection) = node.content {
+                                              let mut iter = collection.into_iter();
+                                              let inner_seq = iter.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::InvalidASN1Object, "Empty Explicit Tag [#{expected_tag_no}]".to_string(), file!().to_string(), line!()))?;
+                                              if let rust_asn1::asn1::Content::Constructed(seq_collection) = inner_seq.content {
+                                                  seq_collection.into_iter().map(|child| #{elem_type_fish}::from_der_node(child)).collect::<Result<_, _>>()
+                                              } else { Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnexpectedFieldType, "Expected Sequence inner content".to_string(), file!().to_string(), line!())) }
+                                          } else { Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnexpectedFieldType, "Expected Constructed Tag [#{expected_tag_no}]".to_string(), file!().to_string(), line!())) }
+                                      } else {
+                                          Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnexpectedFieldType, format!("Expected Explicit Tag [#{expected_tag_no}] for #{field_name}, got {}", node.identifier), file!().to_string(), line!()))
+                                      }
+                                  }?;
+                      """
+                    end
+                 else
+                    # Non-Vec
+                    if is_raw_node?(inner_type) do
+                      # Raw inner type
+                      val_expr = if String.contains?(field_type, "Box<"), do: "Box::new(inner_node)", else: "inner_node"
+
+                      """
+                                  let #{rust_field}: #{field_type} = {
+                                      let node = nodes.peek().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, "Premature end of data".to_string(), file!().to_string(), line!()))?;
+                                      if node.identifier.tag_number == #{expected_tag_no} && node.identifier.tag_class == #{expected_tag_class} {
+                                          let node = nodes.next().unwrap();
+                                          if let rust_asn1::asn1::Content::Constructed(collection) = node.content {
+                                              let mut iter = collection.into_iter();
+                                              let inner_node = iter.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::InvalidASN1Object, "Empty Explicit Tag [#{expected_tag_no}]".to_string(), file!().to_string(), line!()))?;
+                                              Ok(#{val_expr})
+                                          } else { Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnexpectedFieldType, "Expected Constructed for Explicit field".to_string(), file!().to_string(), line!())) }
+                                      } else {
+                                          Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnexpectedFieldType, format!("Expected Explicit Tag [#{expected_tag_no}] for #{field_name}, got {}", node.identifier), file!().to_string(), line!()))
+                                      }
+                                  }?;
+                      """
+                    else
+                      # Normal type (possibly Box<T>)
+                      # If Box<T>, inner_type is Box<T>. We should unbox if possible?
+                      # Wait, field_type_for returns Box<T>.
+                      # My simplified logic: #{inner_type_fish}::from_der_node(inner_node)
+                      # If T is Box<U>, T::from_der_node exists?
+                      # Yes, if `U: DERParseable`. `Box<U>` implements `DERParseable`.
+                      # So `Box<U>::from_der_node` works fine IF `U` is not raw.
+                      # But if `U` is raw (RawNode), `Box<RawNode>` does NOT implement `from_der_node`.
+                      # I need to check if inner type is Box<RawNode>.
+                      # Using `is_raw_node?`.
+
+                      call_expr = if String.starts_with?(inner_type, "Box<") do
+                          inner_inner = strip_generic(inner_type, "Box<")
+                          if is_raw_node?(inner_inner) do
+                             "Ok(Box::new(inner_node))"
+                          else
+                             "#{inner_type_fish}::from_der_node(inner_node)"
+                          end
+                      else
+                          "#{inner_type_fish}::from_der_node(inner_node)"
+                      end
+
+                      """
+                                  let #{rust_field}: #{field_type} = {
+                                      let node = nodes.peek().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, "Premature end of data".to_string(), file!().to_string(), line!()))?;
+                                      if node.identifier.tag_number == #{expected_tag_no} && node.identifier.tag_class == #{expected_tag_class} {
+                                          let node = nodes.next().unwrap();
+                                          if let rust_asn1::asn1::Content::Constructed(collection) = node.content {
+                                              let mut iter = collection.into_iter();
+                                              let inner_node = iter.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::InvalidASN1Object, "Empty Explicit Tag [#{expected_tag_no}]".to_string(), file!().to_string(), line!()))?;
+                                              #{call_expr}
+                                          } else { Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnexpectedFieldType, "Expected Constructed for Explicit field".to_string(), file!().to_string(), line!())) }
+                                      } else {
+                                          Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnexpectedFieldType, format!("Expected Explicit Tag [#{expected_tag_no}] for #{field_name}, got {}", node.identifier), file!().to_string(), line!()))
+                                      }
+                                  }?;
+                      """
+                    end
+                 end
               else
-                if is_raw_node?(field_type) or String.ends_with?(field_type, "AttributeValue") do
-                  "            let #{rust_field} = nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?;"
-                else
-                  if String.starts_with?(field_type, "Box<") do
-                    inner = strip_generic(field_type, "Box<")
+                  # Fallback to existing logic for non-tagged or implicit
+                  if String.starts_with?(field_type, "Vec") do
+                    elem_type = vector_element(field_type)
 
-                    call =
-                      if is_raw_node?(inner) do
-                        "Ok(nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?)"
-                      else
-                        "#{inner}::from_der_node(nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?)"
-                      end
+                    if is_raw_node?(elem_type) do
+                      "            let #{rust_field} = { let node = nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?; if let rust_asn1::asn1::Content::Constructed(collection) = node.content { collection.into_iter().collect::<Vec<#{elem_type}>>() } else { return Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnexpectedFieldType, \"Expected constructed\".to_string(), file!().to_string(), line!())); } };"
+                    else
+                      call = "#{elem_type}::from_der_node(child)"
 
-                    "            let #{rust_field} = Box::new(#{call}?);"
+                      "            let #{rust_field}: Vec<#{elem_type}> = { let node = nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?; if let rust_asn1::asn1::Content::Constructed(collection) = node.content { collection.clone().into_iter().map(|child| #{call}).collect::<Result<_, _>>()? } else { return Err(ASN1Error::new(rust_asn1::errors::ErrorCode::UnexpectedFieldType, \"Expected constructed\".to_string(), file!().to_string(), line!())); } };"
+                    end
                   else
-                    call =
-                      if is_raw_node?(type_fish) do
-                        "nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?"
-                      else
-                        "#{type_fish}::from_der_node(nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?)?"
-                      end
+                    if is_raw_node?(field_type) or String.ends_with?(field_type, "AttributeValue") do
+                      "            let #{rust_field} = nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?;"
+                    else
+                      if String.starts_with?(field_type, "Box<") do
+                        inner = strip_generic(field_type, "Box<")
 
-                    "            let #{rust_field} = #{call};"
+                        call =
+                          if is_raw_node?(inner) do
+                            "Ok(nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?)"
+                          else
+                            "#{inner}::from_der_node(nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?)"
+                          end
+
+                        "            let #{rust_field} = Box::new(#{call}?);"
+                      else
+                        call =
+                          if is_raw_node?(type_fish) do
+                            "nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?"
+                          else
+                            "#{type_fish}::from_der_node(nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?)?"
+                          end
+
+                        "            let #{rust_field} = #{call};"
+                      end
+                    end
                   end
-                end
               end
           end
-
         _ ->
           ""
       end)
@@ -2111,25 +2178,6 @@ defmodule ASN1.RustEmitter do
     """
   end
 
-  defp emit_sequence_encoder_body(rust_name, fields) do
-    fields
-    |> Enum.map(fn
-      {:ComponentType, _, field_name, {:type, _attrs, _type, _, _, _}, optional, _, _} ->
-        rust_field = pad_field_name(field_name)
-
-        case optional do
-          :OPTIONAL ->
-            "            if let Some(val) = &self.#{rust_field} { val.serialize(serializer)?; }"
-
-          _ ->
-            "            self.#{rust_field}.serialize(serializer)?;"
-        end
-
-      _ ->
-        ""
-    end)
-    |> Enum.join("\n")
-  end
 
   # Helpers adapted from SwiftEmitter
 
@@ -2171,21 +2219,10 @@ defmodule ASN1.RustEmitter do
   end
 
   @impl true
-  def tagClass([]), do: nil
-  def tagClass(x) when is_integer(x), do: x
-  def tagClass([{:tag, :CONTEXT, _, _, _}]), do: "TagClass::ContextSpecific"
-  def tagClass([{:tag, :APPLICATION, _, _, _}]), do: "TagClass::Application"
-  def tagClass([{:tag, :PRIVATE, _, _, _}]), do: "TagClass::Private"
-  def tagClass([{:tag, :UNIVERSAL, _, _, _}]), do: "TagClass::Universal"
-  def tagClass([{:tag, class, _, _, _}]), do: class
-
-  defp tagNo_or_default(attrs) do
-    case tagNo(attrs) do
-      nil -> []
-      val -> val
-    end
+  def finalize() do
+    SingleCrateGenerator.generate_single_crate(@modules, outputDir())
+    :ok
   end
-
   def algorithmIdentifierClass(className, modname, saveFlag) do
     rust_name = name(className, modname)
 

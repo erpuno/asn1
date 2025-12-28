@@ -2,7 +2,7 @@
 // Tests parsing X.509 certificates from DER-encoded bytes
 
 use rust_asn1::der::{self, DERParseable};
-use x500::authentication_framework::AuthenticationFrameworkCertificate;
+use asn1_suite::authenticationframeworkcertificate::AuthenticationFrameworkCertificate;
 
 /// Test parsing a minimal X.509 certificate structure
 /// This uses the same DER bytes from Swift's main.swift:showCertificateData test

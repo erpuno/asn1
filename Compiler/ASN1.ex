@@ -787,7 +787,7 @@ defmodule ASN1 do
       else
         if lang == "rust" do
           crate = ASN1.RustEmitter.module_crate(modname)
-          d = Path.join([dir, "crates", crate, "src"])
+          d = Path.join([dir,  "src"])
           :filelib.ensure_dir(Path.join(d, "stub"))
           d <> "/"
         else
@@ -829,16 +829,7 @@ defmodule ASN1 do
         end
       end
 
-    final_dir_with_mod =
-      if lang == "rust" do
-        # Use module name as subdirectory
-        mod_snake = ASN1.RustEmitter.fieldName(normalizeName(bin(modname)))
-        path = Path.join(final_dir, mod_snake)
-        :filelib.ensure_dir(Path.join(path, "stub"))
-        path <> "/"
-      else
-        final_dir
-      end
+    final_dir_with_mod = final_dir
 
     fileName = final_dir_with_mod <> final_norm <> ext
     verbose = getEnv(:verbose, false)
@@ -851,26 +842,6 @@ defmodule ASN1 do
       false ->
         :ok = :file.write_file(fileName, res)
         # For Rust, we also need to register this type in the module's mod.rs
-        if lang == "rust" do
-          mod_file = Path.join(final_dir_with_mod, "mod.rs")
-          module_snake = ASN1.RustEmitter.fieldName(norm)
-          line = "pub mod #{module_snake};\npub use #{module_snake}::*;\n"
-
-          # Append if not present (simple check, or just append blindly if we assume cleaner run)
-          # Since we run x-series.ex multiple times in passes, we should check existence or overwrite behavior?
-          # Pass 3 generates code.
-          # Let's read and check to avoid duplicates.
-          if File.exists?(mod_file) do
-            existing = File.read!(mod_file)
-
-            unless String.contains?(existing, line) do
-              File.write!(mod_file, existing <> line)
-            end
-          else
-            File.write!(mod_file, line)
-          end
-        end
-
         setEnv(:verbose, true)
         print("compiled: ~ts~n", [fileName])
         setEnv(:verbose, verbose)
