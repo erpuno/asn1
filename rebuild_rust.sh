@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 export ASN1_OUTPUT="Languages/Rust"
-# rustup component add rustc-codegen-cranelift
-# Run for basic modules
 echo "Cleaning generated code..."
 rm -rf Languages/Rust/Suite/crates/*
 rm -rf Languages/Rust/src/*
@@ -18,3 +16,4 @@ ASN1_LANG=rust elixir x-series.ex
 # elixir generate_mod_rs.ex
 
 echo "Rust code generation complete."
+
