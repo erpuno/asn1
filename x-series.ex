@@ -392,11 +392,11 @@ defmodule DependencyAnalyzer do
     end)
   end
 
-  defp find_fields_referencing(
-         parent_type,
-         {:type, _, {:SEQUENCE, _, _, _, fields}, _, _, _},
-         target
-       ) do
+  defp find_fields_referencing(parent_type, {:type, _, {:CHOICE, cases}, _, _, _}, target) do
+    find_in_fields(parent_type, cases, target)
+  end
+
+  defp find_fields_referencing(parent_type, {:type, _, {:SEQUENCE, _, _, _, fields}, _, _, _}, target) do
     find_in_fields(parent_type, fields, target)
   end
 
