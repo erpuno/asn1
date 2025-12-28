@@ -1,6 +1,6 @@
 #!/usr/bin/env elixir
 
-Code.require_file("Compiler/args.ex", ".")
+Code.require_file("asn1.ex", ".")
 
 # Config helper to allow language/output overrides when rerunning the script with different emitters
 defmodule XSeries.Config do

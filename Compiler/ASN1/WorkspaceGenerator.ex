@@ -23,8 +23,8 @@ defmodule WorkspaceGenerator do
     generate_root_cargo_toml(output_dir, crates)
 
     Enum.each(crates, fn crate ->
-      generate_crate_cargo_toml(crate, mod_to_crate, deps, crates_dir)
-      generate_crate_lib_rs(crate, mod_to_crate, crates_dir)
+      generate_crate_cargo_toml(crate, mod_to_crate, deps, crates_dir, crates)
+      generate_crate_lib_rs(crate, mod_to_crate, crates_dir, crates)
     end)
   end
 
@@ -76,25 +76,33 @@ defmodule WorkspaceGenerator do
       full_lib = """
       //! Generated ASN.1 suite bindings
       #{lib_content}
-
-      pub mod probe;
       """
 
       File.write!(lib_path, full_lib)
     end
   end
 
-  defp generate_crate_cargo_toml(crate, mod_to_crate, deps, crates_dir) do
+  defp generate_crate_cargo_toml(crate, mod_to_crate, deps, crates_dir, existing_crates) do
     crate_modules =
       mod_to_crate
       |> Enum.filter(fn {_, c} -> c == crate end)
       |> Enum.map(fn {m, _} -> m end)
 
-    crate_deps =
+    # ASN.1 IMPORTS-based dependencies
+    asn1_deps =
       crate_modules
       |> Enum.flat_map(fn mod -> Map.get(deps, mod, []) end)
       |> Enum.map(fn dep_mod -> Map.get(mod_to_crate, dep_mod) end)
-      |> Enum.filter(fn dep_crate -> dep_crate != nil and dep_crate != crate end)
+
+    # Cross-crate dependencies tracked during code generation
+    tracked_deps = ASN1.RustEmitter.get_crate_dependencies(crate)
+
+    # Merge both sources and filter - only include crates that exist in the workspace
+    crate_deps =
+      (asn1_deps ++ tracked_deps)
+      |> Enum.filter(fn dep_crate ->
+        dep_crate != nil and dep_crate != crate and dep_crate in existing_crates
+      end)
       |> Enum.uniq()
       |> Enum.sort()
 
@@ -119,23 +127,45 @@ defmodule WorkspaceGenerator do
     File.write!(path, content)
   end
 
-  defp generate_crate_lib_rs(crate, mod_to_crate, crates_dir) do
+  defp generate_crate_lib_rs(crate, mod_to_crate, crates_dir, existing_crates) do
     crate_modules =
       mod_to_crate
       |> Enum.filter(fn {_, c} -> c == crate end)
       |> Enum.map(fn {m, _} -> m end)
       |> Enum.sort()
 
-    content =
+    # Module declarations
+    module_content =
       crate_modules
       |> Enum.map(fn mod ->
         snake = mod |> ASN1.normalizeName() |> ASN1.RustEmitter.fieldName()
-        "pub mod #{snake};"
+        "pub mod #{snake};\npub use self::#{snake}::*;"
       end)
       |> Enum.join("\n")
 
+    # Cross-crate re-exports for dependency types - only for crates that exist
+    tracked_deps =
+      ASN1.RustEmitter.get_crate_dependencies(crate)
+      |> Enum.filter(fn dep -> dep in existing_crates end)
+
+    reexport_content =
+      if tracked_deps != [] do
+        reexports =
+          tracked_deps
+          |> Enum.sort()
+          |> Enum.map(fn dep_crate ->
+            # Re-export all public items from each dependency crate
+            "pub use ::#{dep_crate}::*;"
+          end)
+          |> Enum.join("\n")
+
+        "\n// Re-export cross-crate dependencies\n#{reexports}"
+      else
+        ""
+      end
+
     full_content = """
-    #{content}
+    #{module_content}#{reexport_content}
     """
 
     src_dir = Path.join([crates_dir, crate, "src"])
