@@ -54,15 +54,15 @@ dependencies {
       case type do
         :INTEGER -> "ASN1Integer"
         :BOOLEAN -> "ASN1Boolean"
-        :"BIT STRING" -> "ASN1BitString"
+        :"BIT STRING" -> "DERBitString"
         :"OCTET STRING" -> "ASN1OctetString"
         :NULL -> "ASN1Null"
         :OBJECT_IDENTIFIER -> "ASN1ObjectIdentifier"
         :GeneralizedTime -> "ASN1Object" # Fallback
         :UTCTime -> "ASN1Object" # Fallback
-        :IA5String -> "ASN1Object" # Fallback
-        :PrintableString -> "ASN1Object"
-        :UTF8String -> "ASN1Object"
+        :IA5String -> "DerPrintableString" # Use PrintableString or GeneralString fallback. BC has DERPrintableString.
+        :PrintableString -> "DERPrintableString"
+        :UTF8String -> "DERUTF8String"
         :TeletexString -> "ASN1Object"
         :T61String -> "ASN1Object"
         :VideotexString -> "ASN1Object"
@@ -71,7 +71,7 @@ dependencies {
         :GeneralString -> "ASN1Object"
         :UniversalString -> "ASN1Object"
         :BMPString -> "ASN1Object"
-        :NumericString -> "ASN1Object"
+        :NumericString -> "DERNumericString"
         :ObjectDescriptor -> "ASN1Object"
         :External -> "ASN1Object"
         :REAL -> "ASN1Object"
@@ -80,26 +80,29 @@ dependencies {
       end
   end
 
-  @impl true
+
   def typealias(name, target, modname, saveFlag) do
       javaName = name(name, modname)
-      # Wrapper approach
+      # Wrapper approach for BC
       content = """
 package com.generated.asn1;
 
 #{emitImports()}
 
-public class #{javaName} extends ASN1Object<Object> {
-    private final ASN1Object decorated;
+public class #{javaName} extends ASN1Object {
+    private final ASN1Primitive decorated;
 
-    public #{javaName}(ASN1Object decorated) {
-        super(decorated.getTag());
-        this.decorated = decorated;
+    public #{javaName}(ASN1Encodable decorated) {
+        this.decorated = decorated.toASN1Primitive();
     }
 
     @Override
-    public Object getValue() {
-        return decorated.getValue();
+    public ASN1Primitive toASN1Primitive() {
+        return decorated;
+    }
+
+    public ASN1Primitive getValue() {
+        return decorated;
     }
 }
 """
@@ -134,7 +137,7 @@ public class #{javaName} extends ASN1Object<Object> {
       name(type, mod)
   end
   def fieldType(_name, _field, _) do
-    "ASN1Object"
+    "ASN1Encodable"
   end
 
   @impl true
@@ -151,12 +154,20 @@ package com.generated.asn1;
 
 #{imports}
 
-import java.util.List;
-import java.util.ArrayList;
+public class #{javaName} extends ASN1Object {
+    private final ASN1Sequence sequence;
 
-public class #{javaName} extends ASN1Sequence {
-    public #{javaName}(List<ASN1Object> objects) {
-        super(objects);
+    public #{javaName}(ASN1EncodableVector vector) {
+        this.sequence = new DERSequence(vector);
+    }
+
+    public #{javaName}(ASN1Sequence sequence) {
+        this.sequence = sequence;
+    }
+
+    @Override
+    public ASN1Primitive toASN1Primitive() {
+        return sequence;
     }
 }
 """
@@ -208,8 +219,8 @@ public class #{javaName} extends ASN1Sequence {
     field_accessors = parsed_fields
     |> Enum.map(fn f ->
         """
-        public ASN1Object get#{capitalize(f.java_name)}() {
-            return this.size() > #{f.idx} ? this.get(#{f.idx}) : null;
+        public ASN1Encodable get#{capitalize(f.java_name)}() {
+            return sequence.size() > #{f.idx} ? sequence.getObjectAt(#{f.idx}) : null;
         }
         """
     end)
@@ -218,14 +229,14 @@ public class #{javaName} extends ASN1Sequence {
     # Generate Builder class
     builder_fields = parsed_fields
     |> Enum.map(fn f ->
-        "    private ASN1Object #{f.java_name};"
+        "    private ASN1Encodable #{f.java_name};"
     end)
     |> Enum.join("\n")
 
     builder_setters = parsed_fields
     |> Enum.map(fn f ->
         """
-            public Builder #{f.java_name}(ASN1Object value) {
+            public Builder #{f.java_name}(ASN1Encodable value) {
                 this.#{f.java_name} = value;
                 return this;
             }
@@ -237,9 +248,9 @@ public class #{javaName} extends ASN1Sequence {
     build_items = parsed_fields
     |> Enum.map(fn f ->
         if f.optional do
-          "        if (#{f.java_name} != null) list.add(#{f.java_name});"
+          "        if (#{f.java_name} != null) vec.add(#{f.java_name}); else vec.add(org.bouncycastle.asn1.DERNull.INSTANCE);"
         else
-          "        list.add(#{f.java_name});"
+          "        vec.add(#{f.java_name});"
         end
     end)
     |> Enum.join("\n")
@@ -248,26 +259,35 @@ public class #{javaName} extends ASN1Sequence {
 package com.generated.asn1;
 
 #{imports}
-import java.util.List;
-import java.util.ArrayList;
 
-public class #{javaName} extends ASN1Sequence {
-    public #{javaName}(List<ASN1Object> objects) {
-        super(objects);
+public class #{javaName} extends ASN1Object {
+    private final ASN1Sequence sequence;
+
+    public #{javaName}(ASN1Sequence sequence) {
+        this.sequence = sequence;
+    }
+
+    public #{javaName}(ASN1EncodableVector vector) {
+        this.sequence = new DERSequence(vector);
+    }
+
+    @Override
+    public ASN1Primitive toASN1Primitive() {
+        return sequence;
     }
 
 #{field_accessors}
 
-    // Builder for ergonomic construction
+    // Builder
     public static class Builder {
 #{builder_fields}
 
 #{builder_setters}
 
         public #{javaName} build() {
-            List<ASN1Object> list = new ArrayList<>();
+            ASN1EncodableVector vec = new ASN1EncodableVector();
 #{build_items}
-            return new #{javaName}(list);
+            return new #{javaName}(vec);
         }
     }
 
@@ -296,6 +316,7 @@ public class #{javaName} extends ASN1Sequence {
   end
 
   @impl true
+  @impl true
   def choice(name, _cases, modname, saveFlag) do
       javaName = name(name, modname)
       content = """
@@ -303,17 +324,20 @@ package com.generated.asn1;
 
 #{emitImports()}
 
-public class #{javaName} extends ASN1Object<Object> {
-    private final ASN1Object decorated;
+public class #{javaName} extends ASN1Object {
+    private final ASN1Primitive decorated;
 
-    public #{javaName}(ASN1Object decorated) {
-        super(decorated.getTag());
-        this.decorated = decorated;
+    public #{javaName}(ASN1Encodable decorated) {
+        this.decorated = decorated.toASN1Primitive();
     }
 
     @Override
-    public Object getValue() {
-        return decorated.getValue();
+    public ASN1Primitive toASN1Primitive() {
+        return decorated;
+    }
+
+    public ASN1Primitive getValue() {
+        return decorated;
     }
 }
 """
@@ -382,11 +406,9 @@ public enum #{javaName} {
 
   defp emitImports do
       """
-import com.hierynomus.asn1.types.*;
-import com.hierynomus.asn1.types.constructed.*;
-import com.hierynomus.asn1.types.primitive.*;
-import com.hierynomus.asn1.types.string.*;
+import org.bouncycastle.asn1.*;
 import java.util.List;
+
 """
   end
 
@@ -427,14 +449,14 @@ import java.util.List;
                 if suffix_str == "" do
                     "#{base_val}.VALUE"
                 else
-                    "new ASN1ObjectIdentifier(#{base_val}.VALUE.getValue() + \".#{suffix_str}\")"
+                    "new ASN1ObjectIdentifier(#{base_val}.VALUE.toString() + \".#{suffix_str}\")"
                 end
          end
 
          """
 package com.generated.asn1;
 
-import com.hierynomus.asn1.types.primitive.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
 public class #{javaName} {
     public static final ASN1ObjectIdentifier VALUE = #{value_expr};
@@ -446,7 +468,7 @@ public class #{javaName} {
         """
 package com.generated.asn1;
 
-import com.hierynomus.asn1.types.primitive.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
 public class #{javaName} {
     public static final ASN1ObjectIdentifier VALUE = new ASN1ObjectIdentifier("#{oid_str}");
@@ -496,7 +518,7 @@ public class #{javaName} {
          """
 package com.generated.asn1;
 
-import com.hierynomus.asn1.types.primitive.ASN1Integer;
+import org.bouncycastle.asn1.ASN1Integer;
 
 public class #{javaName} {
     public static final ASN1Integer VALUE = new ASN1Integer(#{val}L);
@@ -520,7 +542,7 @@ public class #{javaName} {
              """
 package com.generated.asn1;
 
-import com.hierynomus.asn1.types.primitive.ASN1Integer;
+import org.bouncycastle.asn1.ASN1Integer;
 
 public class #{javaName} {
     public static final ASN1Integer VALUE = #{parent_class}.VALUE;
