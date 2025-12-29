@@ -19,3 +19,9 @@ rm -f ./verified.txt
 rm -f ./Package.resolved
 rm -rf Languages/TypeScript/generated/
 rm -rf Languages/TypeScript/dist/
+
+# Remove all generated Java files except Main.java
+[ -d "./Languages/Java/src/java/main" ] && find ./Languages/Java/src/java/main -maxdepth 1 -type f ! -name 'Main.java' -exec rm -f {} +
+rm -rf Languages/Rust/src/*
+rm -rf Languages/Rust/target/
+rm -rf Languages/Rust/Cargo.lock

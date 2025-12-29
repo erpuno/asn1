@@ -8,7 +8,8 @@ Code.require_file("Compiler/ASN1/SwiftEmitter.ex", ".")
 Code.require_file("Compiler/ASN1/RustEmitter.ex", ".")
 Code.require_file("Compiler/ASN1/C99Emitter.ex", ".")
 Code.require_file("Compiler/ASN1/TSEmitter.ex", ".")
-Code.require_file("Compiler/ASN1/WorkspaceGenerator.ex", ".")
+Code.require_file("Compiler/ASN1/JavaEmitter.ex", ".")
+Code.require_file("Compiler/ASN1/SingleCrateGenerator.ex", ".")
 
 # ============================================================================
 # DependencyAnalyzer - Handles import parsing, topological sort, and cycle detection
@@ -237,11 +238,11 @@ defmodule DependencyAnalyzer do
         Enum.reduce(declarations, %{}, fn decl, acc ->
           case decl do
             {:typedef, _, _pos, name, type} ->
-              full_name = "#{normalized_mod}_#{normalize_name(name)}"
+              full_name = full_type_name(modname, name)
               Map.put(acc, full_name, {normalized_mod, name, type})
 
             {:ptypedef, _, _pos, name, _args, type} ->
-              full_name = "#{normalized_mod}_#{normalize_name(name)}"
+              full_name = full_type_name(modname, name)
               Map.put(acc, full_name, {normalized_mod, name, type})
 
             _ ->
@@ -274,7 +275,7 @@ defmodule DependencyAnalyzer do
     mod =
       if ref_mod == current_mod or ref_mod == nil, do: current_mod, else: normalize_name(ref_mod)
 
-    full_ref = "#{mod}_#{normalize_name(ref_type)}"
+    full_ref = full_type_name(mod, ref_type)
     [full_ref | acc]
   end
 
@@ -386,11 +387,11 @@ defmodule DependencyAnalyzer do
     end)
   end
 
-  defp find_fields_referencing(
-         parent_type,
-         {:type, _, {:SEQUENCE, _, _, _, fields}, _, _, _},
-         target
-       ) do
+  defp find_fields_referencing(parent_type, {:type, _, {:CHOICE, cases}, _, _, _}, target) do
+    find_in_fields(parent_type, cases, target)
+  end
+
+  defp find_fields_referencing(parent_type, {:type, _, {:SEQUENCE, _, _, _, fields}, _, _, _}, target) do
     find_in_fields(parent_type, fields, target)
   end
 
@@ -406,7 +407,7 @@ defmodule DependencyAnalyzer do
         refs = extract_type_refs(field_type, "")
 
         if Enum.member?(refs, target) do
-          ["#{parent_type}.#{normalize_name(field_name)}"]
+          ["#{parent_type}.#{raw_pascal(field_name)}"]
         else
           []
         end
@@ -421,6 +422,26 @@ defmodule DependencyAnalyzer do
   defp normalize_name(name) when is_atom(name), do: to_string(name) |> String.replace("-", "_")
   defp normalize_name(name) when is_binary(name), do: String.replace(name, "-", "_")
   defp normalize_name(name), do: to_string(name) |> String.replace("-", "_")
+
+  defp full_type_name(mod, name) do
+    if System.get_env("ASN1_LANG") == "rust" do
+      pascal_mod = raw_pascal(mod)
+      pascal_type = raw_pascal(name)
+      if String.starts_with?(pascal_type, pascal_mod), do: pascal_type, else: pascal_mod <> pascal_type
+    else
+      normalized_mod = normalize_name(mod)
+      "#{normalized_mod}_#{normalize_name(name)}"
+    end
+  end
+
+  defp raw_pascal(value) do
+    value
+    |> to_string()
+    |> String.replace("-", "_")
+    |> String.split(["_", "-", " ", "::", "/"], trim: true)
+    |> Enum.map(&String.capitalize/1)
+    |> Enum.join("")
+  end
 end
 
 # Application.put_env(:asn1scg, :AuthenticationFramework_AlgorithmIdentigfier, "DSTU_AlgorithmIdentifier")
@@ -610,25 +631,6 @@ IO.puts("Found #{map_size(deps)} modules with dependencies")
 IO.puts("Topologically sorting by dependencies...")
 files = DependencyAnalyzer.topological_sort(deps, raw_files, base_dir)
 IO.puts("Sorted order: #{length(files)} files")
-
-if lang == "rust" do
-  modules =
-    files
-    |> Enum.map(fn filename ->
-      path = Path.join(base_dir, filename)
-
-      if File.exists?(path) do
-        {modname, _} = DependencyAnalyzer.parse_imports(path)
-        modname
-      end
-    end)
-    |> Enum.reject(&is_nil/1)
-    |> Enum.uniq()
-
-  workspace_root = Path.expand("asn1_suite")
-  File.mkdir_p!(Path.join(workspace_root, "crates"))
-  WorkspaceGenerator.generate_workspace(modules, workspace_root, deps)
-end
 
 # Detect type cycles for Box wrapping
 IO.puts("Detecting type cycles for Box wrapper...")
