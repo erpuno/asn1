@@ -104,6 +104,16 @@ public class #{javaName} extends ASN1Object {
     public ASN1Primitive getValue() {
         return decorated;
     }
+
+    public static #{javaName} parse(byte[] data) throws java.io.IOException {
+        try (org.bouncycastle.asn1.ASN1InputStream ais = new org.bouncycastle.asn1.ASN1InputStream(data)) {
+            return new #{javaName}(ais.readObject());
+        }
+    }
+
+    public byte[] serialize() throws java.io.IOException {
+        return this.toASN1Primitive().getEncoded("DER");
+    }
 }
 """
     save(saveFlag, modname, javaName, content)
@@ -168,6 +178,16 @@ public class #{javaName} extends ASN1Object {
     @Override
     public ASN1Primitive toASN1Primitive() {
         return sequence;
+    }
+
+    public static #{javaName} parse(byte[] data) throws java.io.IOException {
+        try (org.bouncycastle.asn1.ASN1InputStream ais = new org.bouncycastle.asn1.ASN1InputStream(data)) {
+            return new #{javaName}(org.bouncycastle.asn1.ASN1Sequence.getInstance(ais.readObject()));
+        }
+    }
+
+    public byte[] serialize() throws java.io.IOException {
+        return this.toASN1Primitive().getEncoded("DER");
     }
 }
 """
@@ -276,6 +296,16 @@ public class #{javaName} extends ASN1Object {
         return sequence;
     }
 
+    public static #{javaName} parse(byte[] data) throws java.io.IOException {
+        try (org.bouncycastle.asn1.ASN1InputStream ais = new org.bouncycastle.asn1.ASN1InputStream(data)) {
+            return new #{javaName}(org.bouncycastle.asn1.ASN1Sequence.getInstance(ais.readObject()));
+        }
+    }
+
+    public byte[] serialize() throws java.io.IOException {
+        return this.toASN1Primitive().getEncoded("DER");
+    }
+
 #{field_accessors}
 
     // Builder
@@ -338,6 +368,16 @@ public class #{javaName} extends ASN1Object {
 
     public ASN1Primitive getValue() {
         return decorated;
+    }
+
+    public static #{javaName} parse(byte[] data) throws java.io.IOException {
+        try (org.bouncycastle.asn1.ASN1InputStream ais = new org.bouncycastle.asn1.ASN1InputStream(data)) {
+            return new #{javaName}(ais.readObject());
+        }
+    }
+
+    public byte[] serialize() throws java.io.IOException {
+        return this.toASN1Primitive().getEncoded("DER");
     }
 }
 """
