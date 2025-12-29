@@ -18,4 +18,5 @@ rm -f ./original.txt
 rm -f ./verified.txt
 rm -f ./Package.resolved
 
-
+# Remove all generated Java files except Main.java
+[ -d "./Languages/Java/src/java/main" ] && find ./Languages/Java/src/java/main -maxdepth 1 -type f ! -name 'Main.java' -exec rm -f {} +
