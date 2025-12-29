@@ -83,7 +83,8 @@ fn main() {
                 asn1_suite::PKIX1Explicit2009Name::RdnSequence(rdns) => rdns.len(),
             });
             if let Some(ref exts) = cert.to_be_signed.extensions {
-                println!("  Extensions: {} total", exts.len());
+                // Extensions is likely a tuple struct wrapping a Vec
+                println!("  Extensions: {} total", exts.0.len());
             }
         }
         Err(e) => {
@@ -181,7 +182,8 @@ fn base64_decode(input: &str) -> Result<Vec<u8>, String> {
 
 fn print_certificate_node(node: &ASN1Node, depth: usize) {
     let indent = "  ".repeat(depth);
-    let tag_name = get_tag_name(node.identifier.tag_number, &node.identifier.tag_class);
+    // Use the standard Display implementation for ASN1Identifier
+    let tag_name = format!("{}", node.identifier);
     
     match &node.content {
         Content::Constructed(children) => {
@@ -207,11 +209,25 @@ fn print_certificate_node(node: &ASN1Node, depth: usize) {
             }
         }
         Content::Primitive(data) => {
-            let preview = format_primitive_value(node.identifier.tag_number, data);
+            // Simplified primitive value printing
+            let preview = if data.len() < 30 && (
+                node.identifier.tag_number == 12 || // UTF8String
+                node.identifier.tag_number == 19 || // PrintableString
+                node.identifier.tag_number == 22 || // IA5String
+                node.identifier.tag_number == 23 || // UTCTime
+                node.identifier.tag_number == 24    // GeneralizedTime
+            ) {
+                 format!("\"{}\"", String::from_utf8_lossy(data))
+            } else if node.identifier.tag_number == 6 {
+                 format!("OID ({} bytes)", data.len())
+            } else {
+                 format!("{} bytes", data.len())
+            };
             println!("{}{}: {}", indent, tag_name, preview);
         }
     }
 }
+
 
 fn print_tbs_details(node: &ASN1Node, depth: usize) {
     let indent = "  ".repeat(depth);
@@ -342,52 +358,6 @@ fn format_time(node: &ASN1Node) -> String {
         String::from_utf8_lossy(bytes).to_string()
     } else {
         "(unknown)".to_string()
-    }
-}
-
-fn get_tag_name(tag_number: u64, tag_class: &TagClass) -> String {
-    match tag_class {
-        TagClass::Universal => match tag_number {
-            1 => "BOOLEAN".to_string(),
-            2 => "INTEGER".to_string(),
-            3 => "BIT STRING".to_string(),
-            4 => "OCTET STRING".to_string(),
-            5 => "NULL".to_string(),
-            6 => "OBJECT IDENTIFIER".to_string(),
-            12 => "UTF8String".to_string(),
-            16 => "SEQUENCE".to_string(),
-            17 => "SET".to_string(),
-            19 => "PrintableString".to_string(),
-            22 => "IA5String".to_string(),
-            23 => "UTCTime".to_string(),
-            24 => "GeneralizedTime".to_string(),
-            _ => format!("Universal({})", tag_number),
-        },
-        TagClass::ContextSpecific => format!("[{}]", tag_number),
-        TagClass::Application => format!("Application({})", tag_number),
-        TagClass::Private => format!("Private({})", tag_number),
-    }
-}
-
-fn format_primitive_value(tag_number: u64, data: &bytes::Bytes) -> String {
-    match tag_number {
-        6 => format!("OID ({} bytes)", data.len()),
-        19 | 12 | 22 => {
-            // PrintableString, UTF8String, IA5String
-            let s = String::from_utf8_lossy(data);
-            if s.len() > 30 {
-                format!("\"{}...\" ({} chars)", &s[..30], s.len())
-            } else {
-                format!("\"{}\"", s)
-            }
-        }
-        23 | 24 => {
-            // UTCTime, GeneralizedTime
-            String::from_utf8_lossy(data).to_string()
-        }
-        2 => format!("{} bytes", data.len()),
-        3 => format!("{} bytes", data.len()),
-        _ => format!("{} bytes", data.len()),
     }
 }
 
