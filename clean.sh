@@ -17,5 +17,6 @@ rm -f ./generated.crt
 rm -f ./original.txt
 rm -f ./verified.txt
 rm -f ./Package.resolved
-
-
+rm -rf Languages/Rust/src/*
+rm -rf Languages/Rust/target/
+rm -rf Languages/Rust/Cargo.lock
