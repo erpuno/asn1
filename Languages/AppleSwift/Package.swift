@@ -10,7 +10,7 @@ let package = Package(
     targets:   [ .executableTarget(
                   name: "AppleSwift",
                   dependencies: [ .product(name: "SwiftASN1", package: "swift-asn1"), ],
-                  path: "Languages/AppleSwift"), ]
+                  path: "."), ]
 )
 
 if ProcessInfo.processInfo.environment["SWIFTCI_USE_LOCAL_DEPS"] == nil {

@@ -17,5 +17,15 @@ rm -f ./generated.crt
 rm -f ./original.txt
 rm -f ./verified.txt
 rm -f ./Package.resolved
+rm -rf ./Languages/AppleSwift/.build/
+rm -rf ./Languages/AppleSwift/Package.resolved
+rm -rf ./Languages/AppleSwift/verified.der
+rm -rf ./Languages/AppleSwift/generated.crt
+rm -rf ./Languages/AppleSwift/generated_verified.der
+rm -rf ./Languages/AppleSwift/generated_orig.txt
+rm -rf ./Languages/AppleSwift/generated_cycle.txt
+rm -rf ./Languages/AppleSwift/verified.txt
+rm -rf ./Languages/AppleSwift/original.txt
+
 
 

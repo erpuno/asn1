@@ -1315,8 +1315,8 @@ public class Console {
        try showPentanomial(data: [48, 9, 2, 1, 1, 2, 1, 2, 2, 1, 3])
        try showCertificateData(data: [48, 129, 129, 48, 107, 160, 3, 2, 1, 2, 2, 3, 1, 226, 64, 48, 10, 6, 8, 42, 134, 72, 206, 61, 4, 3, 2, 48, 13, 49, 11, 48, 9, 6, 3, 85, 4, 3, 19, 2, 67, 65, 48, 30, 23, 13, 50, 51, 48, 49, 48, 49, 49, 50, 48, 48, 48, 48, 90, 23, 13, 51, 48, 48, 49, 48, 49, 49, 50, 48, 48, 48, 48, 90, 48, 15, 49, 13, 48, 11, 6, 3, 85, 4, 3, 19, 4, 85, 115, 101, 114, 48, 19, 48, 9, 6, 7, 42, 134, 72, 206, 61, 2, 1, 3, 6, 0, 4, 0, 0, 0, 0, 48, 10, 6, 8, 42, 134, 72, 206, 61, 4, 3, 2, 3, 6, 0, 1, 2, 3, 4, 5])
        // TODO: Fix Extension type generation - currently has AlgorithmIdentifier fields instead of Extension fields
-       try showCertificate(file: "ca.crt")
-       try verifyX509(file: "ca.crt", output: "verified.der")
+       try showCertificate(file: "../../ca.crt")
+       try verifyX509(file: "../../ca.crt", output: "verified.der")
        try generateX509()
        try verifyX509(file: "generated.crt", output: "generated_verified.der")
        // try showContentInfo(file: "data.bin")  // Also uses Extension types
