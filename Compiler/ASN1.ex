@@ -6,6 +6,7 @@ defmodule ASN1 do
       "rust" -> ASN1.RustEmitter
       "kotlin" -> ASN1.KotlinEmitter
       "c99" -> ASN1.C99Emitter
+      "java" -> ASN1.JavaEmitter
       _ -> ASN1.SwiftEmitter
     end
   end
@@ -203,7 +204,7 @@ defmodule ASN1 do
     end
   end
 
-  def compileClass(_pos, name, modname, type) do
+  def compileClass(_pos, name, modname, _type) do
     # Normalize the class name (convert UPPERCASE to TitleCase for IOCs)
     normalizedName = normalizeClassName(name)
     className = emitter().name(normalizedName, modname)
@@ -450,6 +451,10 @@ defmodule ASN1 do
           typealias(name, builtinType(:ANY), modname, save)
 
         {:type, _, :"OBJECT IDENTIFIER", _set, _constraints, :no} ->
+          setEnv({:is_oid, name}, true)
+          # Also set for the generated name
+          swiftName = name(name, modname)
+          setEnv({:is_oid, swiftName}, true)
           typealias(name, builtinType(:"OBJECT IDENTIFIER"), modname, save)
 
         {:type, _, :External, _set, [], :no} ->
@@ -564,6 +569,28 @@ defmodule ASN1 do
   def compileValue(
         _pos,
         name,
+        {:type, _, type_atom, _, _, _} = type,
+        val,
+        mod
+      ) when is_atom(type_atom) do
+    # Handle local type references (e.g. ID)
+    sname = to_string(type_atom)
+    # Check if sname is "OBJECT IDENTIFIER" (unlikely as it's usually separate clause)
+    # Or resolved alias
+    resolved = lookup(sname)
+
+    if type_atom == :"OBJECT IDENTIFIER" or resolved == builtinType(:ASN1ObjectIdentifier) or
+         resolved == "OBJECT IDENTIFIER" or getEnv({:is_oid, sname}, false) or
+         getEnv({:is_oid, resolved}, false) do
+      emitter().value(name, type, val, mod, true)
+    else
+      []
+    end
+  end
+
+  def compileValue(
+        _pos,
+        name,
         {:type, _, {:Externaltypereference, _, _, ref}, _, _, _} = type,
         val,
         mod
@@ -581,12 +608,8 @@ defmodule ASN1 do
 
   def compileValue(_pos, _name, _type, _val, _mod), do: []
 
-  def compileClass(_pos, name, _mod, type),
-    do:
-      (
-        print("Unhandled class definition ~p : ~p~n", [name, type])
-        []
-      )
+    # Removed duplicate compileClass
+
 
   def compilePType(pos, name, args, type) do
     sname = to_string(name)
