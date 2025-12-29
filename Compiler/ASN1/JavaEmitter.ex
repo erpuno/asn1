@@ -10,6 +10,7 @@ defmodule ASN1.JavaEmitter do
     # settings.gradle
     settings = """
 rootProject.name = 'generated-asn1'
+includeBuild '/Users/ihor/asn1/asn-one'
 """
     File.write!(Path.join(dir, "settings.gradle"), settings)
 
@@ -143,20 +144,7 @@ public class #{javaName} extends ASN1Object<Object> {
     setEnv(name, javaName)
     saveFlag = getEnv(:save, false)
 
-    # For top level array, we can subclass ASN1Sequence (since SEQUENCE OF is encoded as SEQUENCE usually in BER/DER or has same structure list-wise)
-    # But strictly, SEQUENCE OF might effectively be just a List.
-    # We will generate a Wrapper or just a class extending ArrayList? No, must extends ASN1Object.
-
-    # Easier: public class Name extends ASN1Sequence
-    # But constructors need to check types.
-
     imports = emitImports()
-
-    # We need the element type java name.
-    # element_type here is passed as string from Emitter? No, it's passed as result of fieldType?
-    # Wait, in TSEmitter: `def array(name, element_type, ...)`
-    # element_type arg comes from `emitArray` in Emitter.ex which calls `fieldType`.
-    # So `element_type` is the Java string "ASN1Integer" or "OtherClass".
 
     content = """
 package com.generated.asn1;
@@ -406,15 +394,147 @@ import java.util.List;
   def value(name, _type, val, modname, saveFlag) do
      # Constants
      javaName = name(name, modname)
-     save(saveFlag, modname, javaName, "public class #{javaName} { /* val=#{inspect(val)} */ }")
+
+     content = cond do
+       is_nested_oid(val) ->
+         {ref_mod, ref_name, suffix_str} =
+           case val do
+             [{{:seqtag, _, m, n}, s}] -> {m, n, format_oid([s])}
+             [{:Externalvaluereference, _, m, n} | tail] -> {m, n, format_oid(tail)}
+             {:Externalvaluereference, _, m, n} -> {m, n, ""}
+           end
+
+         # Resolve Java name for mod and ref using global lookup to handle imports
+         resolved = lookup(to_string(ref_name))
+
+         {resolution_type, base_val} = case to_string(ref_name) do
+             root when root in ["iso", "isu"] -> {:literal, "1"}
+             root when root in ["itu-t", "ccitt"] -> {:literal, "0"}
+             root when root in ["joint-iso-itu-t", "joint-iso-ccitt"] -> {:literal, "2"}
+             _ ->
+                 p = if resolved != to_string(ref_name), do: resolved, else: name(ref_name, ref_mod)
+                 {:ref, p}
+         end
+
+         value_expr = case resolution_type do
+            :literal ->
+                if suffix_str == "" do
+                    "new ASN1ObjectIdentifier(\"#{base_val}\")"
+                else
+                    "new ASN1ObjectIdentifier(\"#{base_val}.#{suffix_str}\")"
+                end
+            :ref ->
+                if suffix_str == "" do
+                    "#{base_val}.VALUE"
+                else
+                    "new ASN1ObjectIdentifier(#{base_val}.VALUE.getValue() + \".#{suffix_str}\")"
+                end
+         end
+
+         """
+package com.generated.asn1;
+
+import com.hierynomus.asn1.types.primitive.ASN1ObjectIdentifier;
+
+public class #{javaName} {
+    public static final ASN1ObjectIdentifier VALUE = #{value_expr};
+}
+"""
+
+       isOID(val) ->
+        oid_str = format_oid(val)
+        """
+package com.generated.asn1;
+
+import com.hierynomus.asn1.types.primitive.ASN1ObjectIdentifier;
+
+public class #{javaName} {
+    public static final ASN1ObjectIdentifier VALUE = new ASN1ObjectIdentifier("#{oid_str}");
+}
+"""
+       true ->
+        "public class #{javaName} { /* val=#{inspect(val)} */ }"
+     end
+
+     save(saveFlag, modname, javaName, content)
      javaName
   end
+
+  defp is_nested_oid([{{:seqtag, _, _, _}, suffix}]) when is_integer(suffix), do: true
+  defp is_nested_oid([{:Externalvaluereference, _, _, _} | _]), do: true
+  defp is_nested_oid({:Externalvaluereference, _, _, _}), do: true
+  defp is_nested_oid(_), do: false
+
+  defp isOID(list) when is_list(list) do
+      Enum.all?(list, fn
+          {:NamedNumber, _, _} -> true
+          x when is_integer(x) -> true
+          _ -> false
+      end)
+  end
+  defp isOID(_), do: false
+
+
+  defp format_oid(list) do
+      list
+      |> Enum.map(fn
+          {:NamedNumber, _, val} -> "#{val}"
+          val -> "#{val}"
+      end)
+      |> Enum.join(".")
+  end
+
 
   @impl true
   def algorithmIdentifierClass(name, modname, saveFlag), do: sequence(name, [], modname, saveFlag) # Mock
 
   @impl true
-  def integerValue(name, val, modname, saveFlag), do: value(name, :INTEGER, val, modname, saveFlag)
+  def integerValue(name, val, modname, saveFlag) do
+    javaName = name(name, modname)
+    content = cond do
+       is_integer(val) ->
+         """
+package com.generated.asn1;
+
+import com.hierynomus.asn1.types.primitive.ASN1Integer;
+
+public class #{javaName} {
+    public static final ASN1Integer VALUE = new ASN1Integer(#{val}L);
+}
+"""
+       # Handle references (single tuple or list)
+       is_list(val) or is_tuple(val) ->
+         # Resolve reference
+         {ref_mod, ref_name} = case val do
+             [{:Externalvaluereference, _, m, n} | _] -> {m, n}
+             {:Externalvaluereference, _, m, n} -> {m, n}
+             _ -> {nil, nil}
+         end
+
+         if ref_name == nil do
+             "public class #{javaName} { /* val=#{inspect(val)} */ }"
+         else
+             resolved = lookup(to_string(ref_name))
+             parent_class = if resolved != to_string(ref_name), do: resolved, else: name(ref_name, ref_mod)
+
+             """
+package com.generated.asn1;
+
+import com.hierynomus.asn1.types.primitive.ASN1Integer;
+
+public class #{javaName} {
+    public static final ASN1Integer VALUE = #{parent_class}.VALUE;
+}
+"""
+         end
+
+       true ->
+         "public class #{javaName} { /* val=#{inspect(val)} */ }"
+    end
+
+    save(saveFlag, modname, javaName, content)
+    javaName
+  end
 
   # Helpers. Imported at top.
 
