@@ -19,7 +19,29 @@ import { ASN1BitString } from "./der.ts/src/types/bit_string";
 import { ASN1PrintableString, ASN1IA5String, ASN1UTF8String } from "./der.ts/src/types/strings";
 import { ASN1Null } from "./der.ts/src/types/null";
 import { ASN1Identifier, TagClass } from "./der.ts/src/types/identifier";
-import { ContentType } from "./der.ts/src/collection";
+import { ContentType, ASN1Node } from "./der.ts/src/collection";
+
+/**
+ * Helper to allow serializing an existing ASN1Node tree back to DER.
+ */
+class NodeSerializable {
+    constructor(private node: ASN1Node) { }
+
+    serialize(s: Serializer): void {
+        if (this.node.content.type === ContentType.Primitive) {
+            const data = this.node.content.value;
+            s.appendPrimitiveNode(this.node.identifier, (buf) => {
+                for (const b of data) buf.push(b);
+            });
+        } else {
+            s.appendConstructedNode(this.node.identifier, (nested) => {
+                for (const child of this.node.content.value as any) {
+                    new NodeSerializable(child).serialize(nested);
+                }
+            });
+        }
+    }
+}
 
 // --- Manual DER Encoder Shim (Using der.ts) ---
 
@@ -132,6 +154,71 @@ function toBase64(arr: Uint8Array): string {
     // Using a way that handles large arrays and works in modern environments
     const binary = Array.from(arr, b => String.fromCharCode(b)).join('');
     return btoa(binary);
+}
+
+function printASN1Tree(node: ASN1Node, depth: number = 0): void {
+    const indent = "  ".repeat(depth);
+    const tag = node.identifier.tagNumber;
+    const cls = TagClass[node.identifier.tagClass];
+    const len = node.encodedBytes.length;
+
+    if (node.content.type === ContentType.Primitive) {
+        let valStr = "";
+        if (tag === 2n) { // INTEGER
+            valStr = BigInt("0x" + toHex(node.content.value)).toString();
+        } else if (tag === 6n) { // OID
+            valStr = "(OID bytes)";
+        } else if (tag === 12n || tag === 19n || tag === 22n) { // UTF8/Printable/IA5
+            valStr = `'${new TextDecoder().decode(node.content.value)}'`;
+        } else {
+            valStr = `hex:${toHex(node.content.value.slice(0, 16))}...`;
+        }
+        console.log(`${indent}${cls}[${tag}] Primitive Len=${len} Val=${valStr}`);
+    } else {
+        console.log(`${indent}${cls}[${tag}] Constructed Len=${len}`);
+        for (const child of node.content.value) {
+            printASN1Tree(child, depth + 1);
+        }
+    }
+}
+
+async function runCertificateRoundtrip(certDer: Uint8Array) {
+    console.log("\n--- Starting Certificate Roundtrip Test ---");
+
+    // 1. Parse
+    const root = derParse(certDer);
+    console.log("ASN.1 Structure of Extracted Certificate:");
+    printASN1Tree(root);
+
+    // 2. Re-serialize
+    const serializer = new Serializer();
+    new NodeSerializable(root).serialize(serializer);
+    const reSerialized = serializer.serializedBytes();
+
+    console.log(`Original: ${certDer.length} bytes`);
+    console.log(`Re-serialized: ${reSerialized.length} bytes`);
+
+    // 3. Save to files
+    // @ts-ignore
+    if (typeof Bun !== 'undefined') {
+        // @ts-ignore
+        await Bun.write("robot_go_roundtrip.der", reSerialized);
+        console.log("Saved re-serialized to robot_go_roundtrip.der");
+    }
+
+    // 4. Compare
+    if (certDer.length !== reSerialized.length) {
+        console.error("FAIL: Length mismatch!");
+        return;
+    }
+
+    for (let i = 0; i < certDer.length; i++) {
+        if (certDer[i] !== reSerialized[i]) {
+            console.error(`FAIL: Byte mismatch at offset ${i}!`);
+            return;
+        }
+    }
+    console.log("SUCCESS: Roundtrip Identity Check passed! (Bit-for-bit identical)");
 }
 
 // --- Manual DER Decoder (Using der.ts) ---
@@ -518,7 +605,7 @@ async function main() {
                         if (certBytes) {
                             console.log("Certificate extracted!");
 
-                            // Save to PEM
+                            // Save to PEM/DER
                             const b64 = toBase64(certBytes);
                             const pem = `-----BEGIN CERTIFICATE-----\n${b64.match(/.{1,64}/g)?.join('\n')}\n-----END CERTIFICATE-----\n`;
 
@@ -528,10 +615,13 @@ async function main() {
                             if (typeof Bun !== 'undefined') {
                                 // @ts-ignore
                                 await Bun.write("robot_go.crt", pem);
-                                console.log("Saved to robot_go.crt");
+                                // @ts-ignore
+                                await Bun.write("robot_go.der", certBytes);
+                                console.log("Saved to robot_go.crt and robot_go.der");
                             }
 
-                            console.log("Parsing successful! Closing connection.");
+                            console.log("Parsing successful! Starting roundtrip test...");
+                            await runCertificateRoundtrip(certBytes);
                             reader.cancel(); // Stop reading
                             break;
                         }
