@@ -6,6 +6,8 @@ Code.require_file("Compiler/ASN1/SwiftEmitter.ex")
 Code.require_file("Compiler/ASN1/GoEmitter.ex")
 Code.require_file("Compiler/ASN1/RustEmitter.ex")
 Code.require_file("Compiler/ASN1/C99Emitter.ex")
+Code.require_file("Compiler/ASN1/TSEmitter.ex")
+
 
 case System.argv() do
   ["compile"] ->
