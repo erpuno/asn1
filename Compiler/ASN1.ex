@@ -6,6 +6,7 @@ defmodule ASN1 do
       "rust" -> ASN1.RustEmitter
       "kotlin" -> ASN1.KotlinEmitter
       "c99" -> ASN1.C99Emitter
+      "typescript" -> ASN1.TSEmitter
       "java" -> ASN1.JavaEmitter
       _ -> ASN1.SwiftEmitter
     end
