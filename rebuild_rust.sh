@@ -2,7 +2,6 @@
 set -e
 export ASN1_OUTPUT="Languages/Rust"
 echo "Cleaning generated code..."
-rm -rf Languages/Rust/Suite/crates/*
 rm -rf Languages/Rust/src/*
 
 echo "Generating Rust code for Basic modules..."
