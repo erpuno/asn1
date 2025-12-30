@@ -1,9 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "Cleaning"
-# sh clean.sh
-echo "Rebuilding"
+sh clean.sh
 sh rebuild_java.sh
 
 echo "Running"
