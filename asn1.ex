@@ -40,6 +40,6 @@ case System.argv() do
 
   _ ->
     :io.format("Copyright (c) 1994-2026 Namdak Tonpa.~n")
-    :io.format("ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 31.1.1.~n")
+    :io.format("ISO 8824 ITU/IETF X.680-690 ERP/1 ASN.1 DER Compiler, version 32.1.1.~n")
     :io.format("Usage: ./asn1.ex help | compile [-v] [input [output]]~n")
 end
