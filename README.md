@@ -140,6 +140,20 @@ SUITE-EXPLICIT.asn1
 SUITE-IMPLICIT.asn1
 ```
 
+Integration Testing
+-------------------
+
+To test Certificate Enrollment process you can run our
+Erlang/Elixir <a href="https://github.com/synrc/ca">CA
+certificate authoriry server</a> and test against its CMP service:
+
+```
+$ git clone git@github.com/synrc/ca
+$ cd ca
+$ mix deps.get
+$ iex -S mix
+```
+
 Authors
 -------
 
