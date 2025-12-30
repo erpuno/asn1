@@ -6,8 +6,8 @@ sh rebuild_swift.sh
 
 echo "--- 1. Using existing DSTU X.509 types (from Sources/Suite/ASN1SCG) ---"
 echo "  Note: DSTU.asn1 provides Certificate, Name, AlgorithmIdentifier, etc."
-echo "--- 1. Using existing DSTU X.509 types (from Sources/Suite/ASN1SCG) ---"
-echo "  Note: DSTU.asn1 provides Certificate, Name, AlgorithmIdentifier, etc."
+
+cd Languages/AppleSwift
 
 echo "--- 2. Building and Running Swift Suite ---"
 swift run -Xswiftc -suppress-warnings -Xswiftc -Onone -j 12
@@ -28,7 +28,7 @@ echo "  [OK] OpenSSL x509 check passed."
 
 echo "Comparability Check:"
 # Both files are DER encoded
-openssl asn1parse -in ca.crt -inform DER > original.txt
+openssl asn1parse -in ../../ca.crt -inform DER > original.txt
 openssl asn1parse -in verified.der -inform DER > verified.txt
 
 if diff -q original.txt verified.txt > /dev/null; then
