@@ -547,113 +547,112 @@ async function main() {
     console.log("Full Msg Hex:", toHex(msgDer));
 
 
-    // --- SEND TO CA ---
-    console.log("\nSending PKIMessage to CA at http://localhost:8829/...");
+// --- SEND TO CA ---
+console.log("\nSending PKIMessage to CA at http://localhost:8829/...");
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // Increased timeout to 5s
+// Create abort controller upfront
+const controller = new AbortController();
+const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+let certProcessed = false; // Flag to prevent double processing
+
+try {
+    const response = await fetch("http://localhost:8829/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/pkixcmp",
+            "Connection": "close"
+        },
+        body: msgDer,
+        signal: controller.signal  // Important: pass the signal
+    });
+    clearTimeout(timeoutId);
+
+    console.log(`Response Status: ${response.status} ${response.statusText}`);
+
+    if (!response.body) {
+        throw new Error("No response body");
+    }
+
+    const reader = response.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let totalLength = 0;
 
     try {
-        const response = await fetch("http://localhost:8829/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/pkixcmp",
-                "Connection": "close"
-            },
-            body: msgDer,
-            signal: controller.signal
-        });
-        clearTimeout(timeoutId);
+        while (true) {
+            const { done, value } = await reader.read();
 
-        console.log(`Response Status: ${response.status} ${response.statusText}`);
-
-        // Log Headers
-        response.headers.forEach((val, key) => {
-            console.log(`Header [${key}]: ${val}`);
-        });
-
-        // Read Response Body Stream
-        console.log("Reading response body stream...");
-        const reader = response.body?.getReader();
-        const chunks: Uint8Array[] = [];
-        let totalLength = 0;
-
-        if (reader) {
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) {
-                    console.log("Stream complete.");
-                    break;
-                }
-                if (value) {
-                    console.log(`Received chunk: ${value.length} bytes`);
-                    chunks.push(value);
-                    totalLength += value.length;
-
-                    // Attempt Parsing on accumulated data
-                    const currentData = new Uint8Array(totalLength);
-                    let off = 0;
-                    for (const c of chunks) {
-                        currentData.set(c, off);
-                        off += c.length;
-                    }
-
-                    try {
-                        console.log(`Attempting to parse ${currentData.length} bytes...`);
-                        const certBytes = DERDecoder.parsePKIMessage(currentData);
-
-                        if (certBytes) {
-                            console.log("Certificate extracted!");
-
-                            // Save to PEM/DER
-                            const b64 = toBase64(certBytes);
-                            const pem = `-----BEGIN CERTIFICATE-----\n${b64.match(/.{1,64}/g)?.join('\n')}\n-----END CERTIFICATE-----\n`;
-
-                            console.log("\n" + pem);
-
-                            // @ts-ignore
-                            if (typeof Bun !== 'undefined') {
-                                // @ts-ignore
-                                await Bun.write("robot_go.crt", pem);
-                                // @ts-ignore
-                                await Bun.write("robot_go.der", certBytes);
-                                console.log("Saved to robot_go.crt and robot_go.der");
-                            }
-
-                            console.log("Parsing successful! Starting roundtrip test...");
-                            await runCertificateRoundtrip(certBytes);
-                            reader.cancel(); // Stop reading
-                            break;
-                        }
-                    } catch (e) {
-                        // Incomplete data, keep reading
-                        console.log("Parsing incomplete or failed:", e);
-                    }
-                }
+            if (done) {
+                console.log("Stream ended naturally.");
+                break;
             }
-        }
 
-        const responseArray = new Uint8Array(totalLength);
-        let offset = 0;
-        for (const chunk of chunks) {
-            responseArray.set(chunk, offset);
-            offset += chunk.length;
-        }
+            if (value) {
+                chunks.push(value);
+                totalLength += value.length;
 
-        console.log(`Total Received: ${responseArray.length} bytes.`);
+                const currentData = new Uint8Array(totalLength);
+                let offset = 0;
+                for (const chunk of chunks) {
+                    currentData.set(chunk, offset);
+                    offset += chunk.length;
+                }
 
-        if (responseArray.length > 0) {
-            // console.log("Response Body Hex:", Buffer.from(responseArray).toString('hex'));
-            try {
-                DERDecoder.parsePKIMessage(responseArray);
-            } catch (err) {
-                console.error("Failed to parse response:", err);
-                console.log("Raw Hex:", toHex(responseArray));
+                try {
+                    const certBytes = DERDecoder.parsePKIMessage(currentData);
+
+                    if (certBytes && !certProcessed) {
+                        certProcessed = true;
+
+                        console.log("Certificate extracted!");
+
+                        const b64 = toBase64(certBytes);
+                        const pem = `-----BEGIN CERTIFICATE-----\n${b64.match(/.{1,64}/g)?.join('\n')}\n-----END CERTIFICATE-----\n`;
+                        console.log("\n" + pem);
+
+                        if (typeof Bun !== 'undefined') {
+                            try {
+                                await Promise.all([
+                                    Bun.write("robot_go.crt", pem),
+                                    Bun.write("robot_go.der", certBytes)
+                                ]);
+                                console.log("Saved to robot_go.crt and robot_go.der");
+                            } catch (e) {
+                                console.warn("File save failed:", e);
+                            }
+                        }
+
+                        try {
+                            console.log("Starting roundtrip test...");
+                            await runCertificateRoundtrip(certBytes);
+                        } catch (e) {
+                            console.error("Roundtrip failed:", e);
+                        }
+
+                        // NOW: Properly stop everything
+                        console.log("Certificate processed. Aborting further reading.");
+                        controller.abort();  // This will make pending read() reject immediately
+                        break;
+                    }
+                } catch (e) {
+                    // Incomplete parse — keep reading
+                    console.log("Waiting for more data...");
+                }
             }
         }
     } catch (err) {
-        console.error("Request failed:", err);
+        if (err.name === 'AbortError') {
+            console.log("Stream reading aborted as expected after cert extraction.");
+        } else {
+            console.error("Stream error:", err);
+        }
+    } finally {
+        reader.releaseLock();
     }
+
+} catch (err) {
+    console.error("Request failed:", err);
+}
 }
 
 main().catch(console.error);
