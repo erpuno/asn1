@@ -6,6 +6,8 @@ defmodule ASN1 do
       "rust" -> ASN1.RustEmitter
       "kotlin" -> ASN1.KotlinEmitter
       "c99" -> ASN1.C99Emitter
+      "typescript" -> ASN1.TSEmitter
+      "java" -> ASN1.JavaEmitter
       _ -> ASN1.SwiftEmitter
     end
   end
@@ -203,7 +205,7 @@ defmodule ASN1 do
     end
   end
 
-  def compileClass(_pos, name, modname, type) do
+  def compileClass(_pos, name, modname, _type) do
     # Normalize the class name (convert UPPERCASE to TitleCase for IOCs)
     normalizedName = normalizeClassName(name)
     className = emitter().name(normalizedName, modname)
@@ -450,6 +452,10 @@ defmodule ASN1 do
           typealias(name, builtinType(:ANY), modname, save)
 
         {:type, _, :"OBJECT IDENTIFIER", _set, _constraints, :no} ->
+          setEnv({:is_oid, name}, true)
+          # Also set for the generated name
+          swiftName = name(name, modname)
+          setEnv({:is_oid, swiftName}, true)
           typealias(name, builtinType(:"OBJECT IDENTIFIER"), modname, save)
 
         {:type, _, :External, _set, [], :no} ->
@@ -564,6 +570,28 @@ defmodule ASN1 do
   def compileValue(
         _pos,
         name,
+        {:type, _, type_atom, _, _, _} = type,
+        val,
+        mod
+      ) when is_atom(type_atom) do
+    # Handle local type references (e.g. ID)
+    sname = to_string(type_atom)
+    # Check if sname is "OBJECT IDENTIFIER" (unlikely as it's usually separate clause)
+    # Or resolved alias
+    resolved = lookup(sname)
+
+    if type_atom == :"OBJECT IDENTIFIER" or resolved == builtinType(:ASN1ObjectIdentifier) or
+         resolved == "OBJECT IDENTIFIER" or getEnv({:is_oid, sname}, false) or
+         getEnv({:is_oid, resolved}, false) do
+      emitter().value(name, type, val, mod, true)
+    else
+      []
+    end
+  end
+
+  def compileValue(
+        _pos,
+        name,
         {:type, _, {:Externaltypereference, _, _, ref}, _, _, _} = type,
         val,
         mod
@@ -581,12 +609,8 @@ defmodule ASN1 do
 
   def compileValue(_pos, _name, _type, _val, _mod), do: []
 
-  def compileClass(_pos, name, _mod, type),
-    do:
-      (
-        print("Unhandled class definition ~p : ~p~n", [name, type])
-        []
-      )
+    # Removed duplicate compileClass
+
 
   def compilePType(pos, name, args, type) do
     sname = to_string(name)
@@ -787,7 +811,7 @@ defmodule ASN1 do
       else
         if lang == "rust" do
           crate = ASN1.RustEmitter.module_crate(modname)
-          d = Path.join([dir, "crates", crate, "src"])
+          d = Path.join([dir,  "src"])
           :filelib.ensure_dir(Path.join(d, "stub"))
           d <> "/"
         else
@@ -829,16 +853,7 @@ defmodule ASN1 do
         end
       end
 
-    final_dir_with_mod =
-      if lang == "rust" do
-        # Use module name as subdirectory
-        mod_snake = ASN1.RustEmitter.fieldName(normalizeName(bin(modname)))
-        path = Path.join(final_dir, mod_snake)
-        :filelib.ensure_dir(Path.join(path, "stub"))
-        path <> "/"
-      else
-        final_dir
-      end
+    final_dir_with_mod = final_dir
 
     fileName = final_dir_with_mod <> final_norm <> ext
     verbose = getEnv(:verbose, false)
@@ -851,26 +866,6 @@ defmodule ASN1 do
       false ->
         :ok = :file.write_file(fileName, res)
         # For Rust, we also need to register this type in the module's mod.rs
-        if lang == "rust" do
-          mod_file = Path.join(final_dir_with_mod, "mod.rs")
-          module_snake = ASN1.RustEmitter.fieldName(norm)
-          line = "pub mod #{module_snake};\npub use #{module_snake}::*;\n"
-
-          # Append if not present (simple check, or just append blindly if we assume cleaner run)
-          # Since we run x-series.ex multiple times in passes, we should check existence or overwrite behavior?
-          # Pass 3 generates code.
-          # Let's read and check to avoid duplicates.
-          if File.exists?(mod_file) do
-            existing = File.read!(mod_file)
-
-            unless String.contains?(existing, line) do
-              File.write!(mod_file, existing <> line)
-            end
-          else
-            File.write!(mod_file, line)
-          end
-        end
-
         setEnv(:verbose, true)
         print("compiled: ~ts~n", [fileName])
         setEnv(:verbose, verbose)

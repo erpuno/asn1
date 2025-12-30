@@ -7,6 +7,10 @@ defmodule ASN1.GoEmitter do
 
   def fileExtension, do: ".go"
 
+  def finalize do
+
+  end
+
   defp load_registry do
     Process.get(:go_registry, %{modules: %{}, packages: %{}})
   end

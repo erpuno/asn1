@@ -1,7 +1,7 @@
-use kep::kep::KEPMessageImprint;
+use asn1_suite::kepmessageimprint::KEPMessageImprint;
 use rust_asn1::asn1_types::{ASN1ObjectIdentifier, ASN1OctetString};
 use rust_asn1::der::{DERSerializable, Serializer};
-use x500::authentication_framework::AuthenticationFrameworkAlgorithmIdentifier;
+use asn1_suite::authenticationframeworkalgorithmidentifier::AuthenticationFrameworkAlgorithmIdentifier;
 
 #[test]
 fn test_roundtrip_kep_message_imprint() {
@@ -21,8 +21,8 @@ fn test_roundtrip_kep_message_imprint() {
     };
 
     // Serialize - just check if it compiles for now
-    let mut _serializer = Serializer::new();
-    // msg.serialize(&mut _serializer).ok(); // It might return Err because not implemented
+    let mut serializer = Serializer::new();
+    msg.serialize(&mut serializer).ok(); // It might return Err because not implemented
 
     println!("Roundtrip compile check passed!");
 }
