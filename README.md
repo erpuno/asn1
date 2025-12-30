@@ -16,8 +16,6 @@ Supported Languages
 Articles
 --------
 
-ARTICLES
-
 The detailed worklog is presented as series of articles.
 
 * <a href="https://tonpa.guru/stream/2010/2010-10-18 LDAP.htm">2010-10-18 LDAP</a>
