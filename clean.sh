@@ -22,6 +22,7 @@ rm -rf ./Languages/TypeScript/dist/
 rm -rf ./Languages/Java/.gradle/
 rm -rf ./Languages/Java/build/
 rm -rf ./Languages/TypeScript/der.ts/
+rm -rf ./Languages/der-java/
 rm -rf ./Languages/Rust/src/*
 rm -rf ./Languages/Rust/target/
 rm -rf ./Languages/Rust/Cargo.lock
