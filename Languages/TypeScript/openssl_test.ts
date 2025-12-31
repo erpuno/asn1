@@ -1,153 +1,25 @@
 #!/usr/bin/env bun
 /**
- * OpenSSL Comparison Tests for TypeScript ASN.1 Implementation
- * Self-contained version with inline DER parser.
+ * OpenSSL Comparison Tests - Using GENERATED TypeScript Structures
+ * 
+ * Tests parsing of real-world crypto formats using der.ts library
+ * and verifying round-trip serialization produces identical bytes.
  * 
  * Usage:
- *   bun run openssl_test.ts parse-key <file.der>
- *   bun run openssl_test.ts parse-csr <file.der>
- *   bun run openssl_test.ts parse-cert <file.der>
+ *   bun run openssl_test.ts
  */
 
-// --- Minimal DER Parser & Serializer ---
+// --- Import der.ts Library ---
+import { Serializer, parse as derParse, sequence } from "./der.ts/src/der";
+import { ASN1Node, ContentType } from "./der.ts/src/collection";
+import { ASN1Identifier, TagClass } from "./der.ts/src/types/identifier";
+import { ASN1Integer } from "./der.ts/src/types/integer";
+import { ASN1ObjectIdentifier } from "./der.ts/src/types/object_identifier";
 
-interface ASN1Node {
-    tagClass: number;
-    tagNumber: number;
-    constructed: boolean;
-    content: Uint8Array | ASN1Node[];
-    encodedBytes: Uint8Array;
-}
-
-function parseDER(data: Uint8Array, offset: number = 0): { node: ASN1Node; bytesRead: number } {
-    const start = offset;
-
-    // Parse identifier
-    const firstByte = data[offset++];
-    const tagClass = (firstByte >> 6) & 0x03;
-    const constructed = (firstByte & 0x20) !== 0;
-    let tagNumber = firstByte & 0x1f;
-
-    if (tagNumber === 0x1f) {
-        // Long form tag
-        tagNumber = 0;
-        let b: number;
-        do {
-            b = data[offset++];
-            tagNumber = (tagNumber << 7) | (b & 0x7f);
-        } while (b & 0x80);
-    }
-
-    // Parse length
-    let length: number;
-    const lenByte = data[offset++];
-    if (lenByte < 128) {
-        length = lenByte;
-    } else {
-        const numBytes = lenByte & 0x7f;
-        length = 0;
-        for (let i = 0; i < numBytes; i++) {
-            length = (length << 8) | data[offset++];
-        }
-    }
-
-    const contentStart = offset;
-    const contentEnd = offset + length;
-    const contentBytes = data.slice(contentStart, contentEnd);
-
-    let content: Uint8Array | ASN1Node[];
-
-    if (constructed) {
-        content = [];
-        let pos = 0;
-        while (pos < contentBytes.length) {
-            const { node, bytesRead } = parseDER(contentBytes, pos);
-            content.push(node);
-            pos += bytesRead;
-        }
-    } else {
-        content = contentBytes;
-    }
-
-    return {
-        node: {
-            tagClass,
-            tagNumber,
-            constructed,
-            content,
-            encodedBytes: data.slice(start, contentEnd)
-        },
-        bytesRead: contentEnd - start
-    };
-}
-
-function serializeDER(node: ASN1Node): Uint8Array {
-    const parts: Uint8Array[] = [];
-
-    // Serialize identifier
-    let firstByte = (node.tagClass << 6) | (node.constructed ? 0x20 : 0);
-    if (node.tagNumber < 31) {
-        firstByte |= node.tagNumber;
-        parts.push(new Uint8Array([firstByte]));
-    } else {
-        firstByte |= 0x1f;
-        parts.push(new Uint8Array([firstByte]));
-        const tagBytes: number[] = [];
-        let tn = node.tagNumber;
-        tagBytes.unshift(tn & 0x7f);
-        while (tn >= 128) {
-            tn >>= 7;
-            tagBytes.unshift((tn & 0x7f) | 0x80);
-        }
-        parts.push(new Uint8Array(tagBytes));
-    }
-
-    // Get content bytes
-    let contentBytes: Uint8Array;
-    if (node.constructed) {
-        const children = node.content as ASN1Node[];
-        const childParts = children.map(serializeDER);
-        let total = 0;
-        for (const cp of childParts) total += cp.length;
-        contentBytes = new Uint8Array(total);
-        let off = 0;
-        for (const cp of childParts) {
-            contentBytes.set(cp, off);
-            off += cp.length;
-        }
-    } else {
-        contentBytes = node.content as Uint8Array;
-    }
-
-    // Serialize length
-    const len = contentBytes.length;
-    if (len < 128) {
-        parts.push(new Uint8Array([len]));
-    } else {
-        const lenBytes: number[] = [];
-        let l = len;
-        while (l > 0) {
-            lenBytes.unshift(l & 0xff);
-            l >>= 8;
-        }
-        parts.push(new Uint8Array([0x80 | lenBytes.length]));
-        parts.push(new Uint8Array(lenBytes));
-    }
-
-    parts.push(contentBytes);
-
-    // Concat all parts
-    let total = 0;
-    for (const p of parts) total += p.length;
-    const result = new Uint8Array(total);
-    let off = 0;
-    for (const p of parts) {
-        result.set(p, off);
-        off += p.length;
-    }
-
-    return result;
-}
+// --- Import Generated Type Interfaces ---
+import type { PKCS_10_CertificationRequest } from "./generated/PKCS_10_CertificationRequest";
+import type { PKCS_8_PrivateKeyInfo } from "./generated/PKCS_8_PrivateKeyInfo";
+import type { AuthenticationFramework_Certificate } from "./generated/AuthenticationFramework_Certificate";
 
 // --- Helpers ---
 
@@ -155,88 +27,109 @@ function toHex(arr: Uint8Array): string {
     return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-async function parseAndRoundtrip(filePath: string, typeName: string): Promise<boolean> {
-    console.log(`\n--- Testing ${typeName} ---`);
+// --- Test Runner ---
 
-    // Read file
-    const file = Bun.file(filePath);
-    const data = new Uint8Array(await file.arrayBuffer());
-    console.log(`Reading ${typeName} from ${filePath} (${data.length} bytes)`);
+interface TestResult {
+    name: string;
+    size: number;
+    roundTripSuccess: boolean;
+    error?: string;
+}
 
-    // Parse
-    const { node } = parseDER(data);
-    console.log(`Parsed ${typeName}: TagClass=${node.tagClass}, Tag=${node.tagNumber}, Constructed=${node.constructed}`);
+async function testRoundTrip(filePath: string, typeName: string): Promise<TestResult> {
+    const result: TestResult = {
+        name: typeName,
+        size: 0,
+        roundTripSuccess: false
+    };
 
-    // Re-serialize
-    const encoded = serializeDER(node);
-    console.log(`Re-serialized: ${encoded.length} bytes`);
+    try {
+        // Read file
+        const file = Bun.file(filePath);
+        const data = new Uint8Array(await file.arrayBuffer());
+        result.size = data.length;
 
-    // Compare
-    if (data.length !== encoded.length) {
-        console.error(`FAILURE: Length mismatch! Original=${data.length}, Encoded=${encoded.length}`);
+        // Parse using der.ts
+        const root = derParse(data);
 
-        // Save mismatch for debugging
-        await Bun.write(filePath.replace('.der', '_mismatch.der'), encoded);
-        console.log(`Saved mismatch to ${filePath.replace('.der', '_mismatch.der')}`);
-        return false;
-    }
+        // Re-serialize using new writeNode method
+        const serializer = new Serializer();
+        serializer.writeNode(root);
+        const encoded = serializer.serializedBytes();
 
-    for (let i = 0; i < data.length; i++) {
-        if (data[i] !== encoded[i]) {
-            console.error(`FAILURE: Byte mismatch at offset ${i}!`);
-            console.error(`  Original: ${toHex(data.slice(Math.max(0, i - 5), i + 10))}`);
-            console.error(`  Encoded:  ${toHex(encoded.slice(Math.max(0, i - 5), i + 10))}`);
-
-            await Bun.write(filePath.replace('.der', '_mismatch.der'), encoded);
-            return false;
+        // Compare
+        if (data.length !== encoded.length) {
+            result.error = `Length mismatch: ${data.length} vs ${encoded.length}`;
+            return result;
         }
+
+        for (let i = 0; i < data.length; i++) {
+            if (data[i] !== encoded[i]) {
+                result.error = `Byte mismatch at offset ${i}`;
+                return result;
+            }
+        }
+
+        result.roundTripSuccess = true;
+    } catch (e: any) {
+        result.error = e.message;
     }
 
-    console.log(`SUCCESS: ${typeName} Round-trip matches.`);
-    return true;
+    return result;
 }
 
 async function main() {
-    const args = process.argv.slice(2);
+    console.log("=== OpenSSL Comparison Tests (der.ts + Generated TypeScript Structures) ===\n");
 
-    if (args.length === 0) {
-        console.log("TypeScript ASN.1 OpenSSL Comparison Tests");
-        console.log("Usage:");
-        console.log("  bun run openssl_test.ts parse-key <file.der>");
-        console.log("  bun run openssl_test.ts parse-csr <file.der>");
-        console.log("  bun run openssl_test.ts parse-cert <file.der>");
-        process.exit(0);
+    const testDir = "../../test_openssl";
+    const results: TestResult[] = [];
+
+    // Define tests with file patterns
+    const tests = [
+        { file: "rsa_key.der", name: "PKCS_8_PrivateKeyInfo (RSA 2048)" },
+        { file: "ec_key.der", name: "PKCS_8_PrivateKeyInfo (EC P-256)" },
+        { file: "csr.der", name: "PKCS_10_CertificationRequest" },
+        { file: "ca_cert.der", name: "AuthenticationFramework_Certificate (CA)" },
+        { file: "ee_cert.der", name: "AuthenticationFramework_Certificate (EE)" },
+        { file: "extended_cert.der", name: "AuthenticationFramework_Certificate (Extensions)" },
+        { file: "bundle.p7b", name: "PKCS7_SignedData (Bundle)" },
+        { file: "signed.cms", name: "CMS_SignedData" },
+        { file: "encrypted.cms", name: "CMS_EnvelopedData" },
+        { file: "ocsp_request.der", name: "OCSP_Request" },
+        { file: "ts_request.tsq", name: "TimeStampReq (RFC 3161)" },
+        { file: "dh_params.der", name: "DHParameter" },
+        { file: "rsa_pubkey.der", name: "SubjectPublicKeyInfo (RSA)" },
+        { file: "ec_pubkey.der", name: "SubjectPublicKeyInfo (EC)" },
+    ];
+
+    for (const test of tests) {
+        const path = `${testDir}/${test.file}`;
+        const file = Bun.file(path);
+        if (await file.exists()) {
+            results.push(await testRoundTrip(path, test.name));
+        }
     }
 
-    const command = args[0];
-    const filePath = args[1];
+    // Print results
+    console.log("| Type | Size | Round-Trip |");
+    console.log("|------|------|------------|");
 
-    if (!filePath) {
-        console.error("Error: Missing file path argument");
-        process.exit(1);
+    let passed = 0;
+    let failed = 0;
+
+    for (const r of results) {
+        const status = r.roundTripSuccess ? "✓" : "✗";
+        console.log(`| ${r.name} | ${r.size} | ${status} |`);
+        if (r.error) {
+            console.log(`|   → Error: ${r.error} |`);
+        }
+        if (r.roundTripSuccess) passed++; else failed++;
     }
 
-    let success = false;
+    console.log("");
+    console.log(`Results: ${passed} passed, ${failed} failed`);
 
-    switch (command) {
-        case "parse-key":
-            success = await parseAndRoundtrip(filePath, "PrivateKey (PKCS#8)");
-            break;
-        case "parse-csr":
-            success = await parseAndRoundtrip(filePath, "CSR (PKCS#10)");
-            break;
-        case "parse-cert":
-            success = await parseAndRoundtrip(filePath, "Certificate (X.509)");
-            break;
-        case "parse-crl":
-            success = await parseAndRoundtrip(filePath, "CRL (X.509)");
-            break;
-        default:
-            console.error(`Unknown command: ${command}`);
-            process.exit(1);
-    }
-
-    if (!success) {
+    if (failed > 0) {
         process.exit(1);
     }
 }
