@@ -1,4 +1,4 @@
-name: OpenSSL Tests
+name: TypeScript OpenSSL Tests
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  test:
-    name: Run Integration Tests
+  test-typescript:
+    name: TypeScript Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -20,21 +20,10 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y openssl
 
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.22'
-
     - name: Set up Bun
       uses: oven-sh/setup-bun@v1
       with:
         bun-version: latest
-
-    - name: Set up Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
 
     - name: Set up Elixir
       uses: erlef/setup-beam@v1
@@ -43,22 +32,10 @@ jobs:
         otp-version: '26'
 
     - name: Make scripts executable
-      run: chmod +x rebuild_*.sh run_*_openssl_tests.sh
-
-    - name: Rebuild Go
-      run: ./rebuild_go.sh
+      run: chmod +x rebuild_ts.sh run_ts_openssl_tests.sh
 
     - name: Rebuild TypeScript
       run: ./rebuild_ts.sh
 
-    - name: Rebuild Java
-      run: ./rebuild_java.sh
-
     - name: Run TypeScript OpenSSL Tests
       run: ./run_ts_openssl_tests.sh
-
-    - name: Run Java OpenSSL Tests
-      run: ./run_java_openssl_tests.sh
-
-    - name: Run Go OpenSSL Tests
-      run: ./run_go_openssl_tests.sh

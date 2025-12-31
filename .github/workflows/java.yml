@@ -1,0 +1,42 @@
+name: Java OpenSSL Tests
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test-java:
+    name: Java Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install OpenSSL
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openssl
+
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1
+      with:
+        elixir-version: '1.17'
+        otp-version: '26'
+
+    - name: Make scripts executable
+      run: chmod +x rebuild_java.sh run_java_openssl_tests.sh
+
+    - name: Rebuild Java
+      run: ./rebuild_java.sh
+
+    - name: Run Java OpenSSL Tests
+      run: ./run_java_openssl_tests.sh
