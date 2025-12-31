@@ -1,0 +1,48 @@
+name: C99 OpenSSL Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install OpenSSL
+      run: |
+        brew install openssl
+        echo "/opt/homebrew/opt/openssl@3/bin" >> $GITHUB_PATH
+        echo "/usr/local/opt/openssl@3/bin" >> $GITHUB_PATH
+
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1
+      with:
+        elixir-version: '1.18'
+        otp-version: '28'
+
+    - name: Set executable permissions
+      run: |
+        chmod +x rebuild_c99.sh
+        chmod +x run_c99_openssl_tests.sh
+
+    - name: Run C99 OpenSSL Tests
+      run: ./run_c99_openssl_tests.sh
+    
+    - name: Start CA server
+      run: |
+        git clone https://github.com/synrc/ca.git 
+        cd ca
+        mix deps.get > /dev/null 2>&1
+        mix compile > /dev/null 2>&1
+        mix run --no-halt &
+        CA_PID=$! &&
+        sleep 5s &&
+        cd ../Languages/C99 &&
+        ./c99_client &&
+        kill $CA_PID
+      

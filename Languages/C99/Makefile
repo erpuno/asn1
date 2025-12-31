@@ -3,11 +3,14 @@
 
 CC = clang
 CFLAGS = -Wall -Wextra -Wpedantic -std=c99 -O2
-INCLUDES = -IParser/include
+INCLUDES = -IParser/include -IGenerated
 LDFLAGS = -LParser/build -lasn1
 
-# Test executable
+# Test executables
 test_suite: test_suite.c
+	$(CC) $(CFLAGS) $(INCLUDES) -o $@ $< $(LDFLAGS)
+
+openssl_test: openssl_test.c
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ $< $(LDFLAGS)
 
 # Run tests
@@ -16,6 +19,6 @@ test: test_suite
 
 # Clean
 clean:
-	rm -f test_suite
+	rm -f test_suite openssl_test
 
-.PHONY: test clean
+.PHONY: test clean test_suite openssl_test

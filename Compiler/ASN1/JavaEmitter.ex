@@ -16,7 +16,7 @@ defmodule ASN1.JavaEmitter do
     # settings.gradle
     settings = """
 rootProject.name = 'generated-asn1'
-includeBuild '../der-java'
+includeBuild 'der.java'
 """
     File.write!(Path.join(project_root, "settings.gradle"), settings)
 
@@ -34,6 +34,16 @@ application {
     mainClass = 'com.generated.asn1.Main'
 }
 
+tasks.register('runOpenSSLTest', JavaExec) {
+    group = 'verification'
+    description = 'Runs the OpenSSL compatibility tests'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.generated.asn1.OpenSSLTest'
+    if (project.hasProperty('args')) {
+        args project.args.split('\\\\s+')
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -46,8 +56,9 @@ dependencies {
 
     # Generate ASN1Utilities helper
     utilities = """
-package com.iho.asn1;
+package com.generated.asn1;
 
+import com.iho.asn1.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +72,6 @@ public class ASN1Utilities {
              writer.writePrimitive(node.identifier, ((ASN1Node.Primitive) node.content).data);
         } else {
              writer.writeConstructed(node.identifier, nested -> {
-                 // Constructed implements Iterable<ASN1Node>
                  for (ASN1Node child : (ASN1Node.Constructed) node.content) {
                      serializeNode(nested, child);
                  }
@@ -78,6 +88,10 @@ public class ASN1Utilities {
              result.add(decoder.decode(child));
         }
         return result;
+    }
+
+    public static boolean isMatch(ASN1Node node, TagClass tagClass, long tagNumber) {
+        return node.identifier.tagClass == tagClass && node.identifier.tagNumber == tagNumber;
     }
 }
 """
@@ -355,8 +369,8 @@ public class #{javaName} implements DERSerializable {
       |> Enum.with_index()
       |> Enum.map(fn {field, _idx} ->
           case field do
-            {:ComponentType, _, fname, type, optional, tags, _} ->
-              is_optional = optional in [:OPTIONAL, 'OPTIONAL']
+            {:ComponentType, _, fname, type, optional, _tags, _} ->
+              is_optional = (optional in [:OPTIONAL, 'OPTIONAL']) or (case optional do {:DEFAULT, _} -> true; _ -> false end)
               java_type_name = to_java_type(type, modname)
               base_decoder = decoder_for(java_type_name, "child")
 
@@ -365,23 +379,66 @@ public class #{javaName} implements DERSerializable {
                   _ -> false
               end
 
-              # Handle explicit tagging
-              decoder_call = if match?([{:tag, :context, _, :explicit} | _], tags) do
-                 # Extract inner
-                 inner_expr = "((ASN1Node)((ASN1Node.Constructed)child.content).iterator().next())"
-                 decoder_for(java_type_name, inner_expr)
-              else
-                 base_decoder
+              # Extract tags from type definition if available
+              type_tags = case type do
+                  {:type, attrs, _inner, _params, _comments, _location} ->
+                      # Filter for tags
+                      Enum.filter(attrs, fn
+                          {:tag, _class, _num, _mode, _} -> true
+                          _ -> false
+                      end)
+                  _ -> []
               end
 
-              %{
-                name: fieldName(fname),
-                type: java_type_name,
-                optional: is_optional,
-                decoder: decoder_call,
-                is_set_of: is_set_of,
-                tags: tags
-              }
+              # Helper to check for explicit context tagging
+              get_explicit_tag = fn tags ->
+                  Enum.find_value(tags, fn
+                      {:tag, :CONTEXT, num, mode, _} ->
+                          effective_mode = case mode do
+                              {:default, m} -> m
+                              m -> m
+                          end
+                          if effective_mode == :EXPLICIT, do: num, else: nil
+                      {:tag, :context, num, :explicit, _} -> num # Legacy/lowercase fallback
+                      _ -> nil
+                  end)
+              end
+
+               explicit_tag_num = get_explicit_tag.(type_tags)
+
+               # Determine expected tag for matching
+               # Prefer explicit tag if present, otherwise fallback to universal tag of the type
+               effective_tag = if explicit_tag_num do
+                   "{class: TagClass.ContextSpecific, number: #{explicit_tag_num}L}"
+               else
+                   # Attempt to find universal tag if possible
+                   t = universal_tag(type)
+                   if t do
+                       "{class: TagClass.Universal, number: #{t}L}"
+                   else
+                       "null" # Fallback to position-based if unknown
+                   end
+               end
+
+               # Handle explicit tagging
+               decoder_call = if explicit_tag_num do
+                  # Extract inner
+                  inner_expr = "((ASN1Node)((ASN1Node.Constructed)child.content).iterator().next())"
+                  decoder_for(java_type_name, inner_expr)
+               else
+                  base_decoder
+               end
+
+               %{
+                 name: fieldName(fname),
+                 type: java_type_name,
+                 optional: is_optional,
+                 decoder: decoder_call,
+                 is_set_of: is_set_of,
+                 tags: type_tags,
+                 explicit_tag_num: explicit_tag_num,
+                 effective_tag: effective_tag
+               }
             {:"COMPONENTS OF", _type} -> nil
             _ -> nil
           end
@@ -403,40 +460,54 @@ public class #{javaName} implements DERSerializable {
       end) |> Enum.join("\n")
 
       # Generate Parsing Logic
-      parsing_logic =
-      """
-        List<ASN1Node> children = new ArrayList<>();
-        if (node.content instanceof ASN1Node.Constructed) {
-            for (ASN1Node child : (ASN1Node.Constructed) node.content) {
-                children.add(child);
-            }
-        }
-        int idx = 0;
-      """ <>
-      (parsed_fields |> Enum.map(fn f ->
-          if f.optional do
-             """
-        if (idx < children.size()) {
-             // Optional logic
+       parsing_logic =
+       """
+         List<ASN1Node> children = new ArrayList<>();
+         if (node.content instanceof ASN1Node.Constructed) {
+             for (ASN1Node child : (ASN1Node.Constructed) node.content) {
+                 children.add(child);
+             }
+         }
+         int idx = 0;
+       """ <>
+       (parsed_fields |> Enum.map(fn f ->
+           if f.optional do
+             match_expr = if f.effective_tag == "null" do
+                "true"
+             else
+                # We need to parse the effective_tag string to get class and number
+                {class, num} = if String.contains?(f.effective_tag, "ContextSpecific") do
+                    {"TagClass.ContextSpecific", String.replace(f.effective_tag, ~r/.*number: (\d+)L.*/, "\\1")}
+                else
+                    {"TagClass.Universal", String.replace(f.effective_tag, ~r/.*number: (\d+)L.*/, "\\1")}
+                end
+                "ASN1Utilities.isMatch(child, #{class}, #{num}L)"
+             end
+
+              """
+         if (idx < children.size()) {
+              ASN1Node child = children.get(idx);
+              if (#{match_expr}) {
+                  this.#{f.name} = #{f.decoder};
+                  idx++;
+              } else {
+                  this.#{f.name} = null;
+              }
+         } else {
+              this.#{f.name} = null;
+         }
+              """
+           else
+              """
+         if (idx >= children.size()) throw new ASN1Exception(ErrorCode.UnexpectedFieldType, "Missing required field #{f.name}");
+         {
              ASN1Node child = children.get(idx);
-             // Heuristic: assume match for now
              this.#{f.name} = #{f.decoder};
              idx++;
-        } else {
-             this.#{f.name} = null;
-        }
-             """
-          else
-             """
-        if (idx >= children.size()) throw new ASN1Exception(ErrorCode.UnexpectedFieldType, "Missing required field #{f.name}");
-        {
-            ASN1Node child = children.get(idx);
-            this.#{f.name} = #{f.decoder};
-            idx++;
-        }
-             """
-          end
-      end) |> Enum.join("\n"))
+         }
+              """
+           end
+       end) |> Enum.join("\n"))
 
       # Serialization Logic
       serialization_logic = parsed_fields |> Enum.map(fn f ->
@@ -444,7 +515,7 @@ public class #{javaName} implements DERSerializable {
            base_write = cond do
                f.type == "ASN1Node" -> "ASN1Utilities.serializeNode(nested, #{f.name});"
                String.starts_with?(f.type, "List<") ->
-                   t = String.slice(f.type, 5..-2)
+                   t = String.slice(f.type, 5..-2//1)
                    method = if f.is_set_of, do: "writeSet", else: "writeSequence"
                    """
                    nested.#{method}(seqWriter -> {
@@ -457,43 +528,16 @@ public class #{javaName} implements DERSerializable {
            end
 
            # Apply tagging if present
-           tagged_write = case f.tags do
-               [{:tag, :context, num, :implicit} | _] ->
-                   # Implicit tagging: Override the tag.
-                   # For Lists (SEQUENCE/SET OF), this means replacing writeSequence/Set with writeConstructed([num])
-                   # For objects, we rely on them implementing separate implicit write? No, DERSerializable writes everything.
-                   # We need to capture the content and write it with new tag?
-                   # Easiest way for Lists: Use writeConstructed directly.
-                   if String.starts_with?(f.type, "List<") do
-                       t = String.slice(f.type, 5..-2)
-                       """
-                       nested.writeConstructed(new ASN1Identifier(#{num}, TagClass.ContextSpecific), seqWriter -> {
-                           for (#{t} item : #{f.name}) {
-                               #{if t == "ASN1Node", do: "ASN1Utilities.serializeNode(seqWriter, item);", else: "item.serialize(seqWriter);"}
-                           }
-                       });
-                       """
-                   else
-                       # For simple types, we can't easily re-tag without buffering.
-                       # But wait, DERWriter writePrimitive takes identifier.
-                       # If object provides 'serializeContent', we could use it.
-                       # As a fallback for simple types wrapped in standard classes:
-                       # We might need to write a helper or assume standard types.
-                       # For now, let's focus on List types (attributes in PrivateKeyInfo) which are the blocker.
-                       # Warning: Implicit tagging on objects is hard without API change.
-                       # But for PrivateKeyInfo 'attributes' is SET OF, so it hits the List branch above.
-                       base_write # Fallback for non-list implicit (potentially buggy if not handled)
-                   end
-
-               [{:tag, :context, num, :explicit} | _] ->
+           tagged_write = if f.explicit_tag_num do
                    # Explicit tagging: Wrap in ContextSpecific Constructed
                    """
-                   nested.writeConstructed(new ASN1Identifier(#{num}, TagClass.ContextSpecific), explicitWriter -> {
-                       #{base_write.replace("nested", "explicitWriter")}
+                   nested.writeConstructed(new ASN1Identifier(#{f.explicit_tag_num}L, TagClass.ContextSpecific), explicitWriter -> {
+                       #{String.replace(base_write, "nested", "explicitWriter")}
                    });
                    """
-
-               _ -> base_write
+           else
+                  # Implicit tagging not fully handled for all types yet, assuming Explicit for now as identified blocker
+                  base_write
            end
 
            if f.optional do
@@ -1086,8 +1130,39 @@ public class #{javaName} {
     end
   end
 
+  defp universal_tag(type_ast) do
+    case type_ast do
+      :INTEGER -> 2
+      {:INTEGER, _} -> 2
+      :BOOLEAN -> 1
+      :"BIT STRING" -> 3
+      {:"BIT STRING", _} -> 3
+      :"OCTET STRING" -> 4
+      {:"OCTET STRING", _} -> 4
+      :NULL -> 5
+      :"OBJECT IDENTIFIER" -> 6
+      :UTF8String -> 12
+      :PrintableString -> 19
+      :TeletexString -> 20
+      :IA5String -> 22
+      :UTCTime -> 23
+      :GeneralizedTime -> 24
+      :VisibleString -> 26
+      {:VisibleString, _} -> 26
+      :NumericString -> 18
+      {:NumericString, _} -> 18
+      :UniversalString -> 28
+      :BMPString -> 30
+      {:SEQUENCE, _, _, _, _} -> 16
+      {:SET, _, _, _, _} -> 17
+      {:"SEQUENCE OF", _} -> 16
+      {:"SET OF", _} -> 17
+      {:Externaltypereference, _, _, _} -> 16 # Assume external refs are constructed (SEQUENCE) usually
+      _ -> nil
+    end
+  end
+
   defp capitalize(str) do
-      {head, tail} = String.split_at(str, 1)
-      String.upcase(head) <> tail
+    String.capitalize(str)
   end
 end

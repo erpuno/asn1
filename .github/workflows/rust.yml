@@ -1,0 +1,64 @@
+name: Rust OpenSSL Tests
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test-rust:
+    env:
+      ImageOS: ubuntu24
+    name: Rust Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install OpenSSL
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openssl
+
+    - name: Set up Rust
+      uses: actions-rust-lang/setup-rust-toolchain@v1
+      with:
+        cache: true
+        cache-on-failure: true
+        cache-bin: true
+        cache-provider: github
+        cache-all-crates: false
+        cache-workspace-crates: false
+        matcher: true
+        rustflags: -A warnings
+        override: true
+
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1
+      with:
+        elixir-version: '1.18'
+        otp-version: '28'
+
+    - name: Make scripts executable
+      run: chmod +x rebuild_rust.sh run_rust_openssl_tests.sh
+
+    - name: Rebuild Rust
+      run: ./rebuild_rust.sh
+
+    - name: Run Rust OpenSSL Tests
+      run: ./run_rust_openssl_tests.sh
+
+    - name: Start CA server
+      run: |
+        git clone https://github.com/synrc/ca.git 
+        cd ca
+        mix deps.get > /dev/null 2>&1
+        mix compile > /dev/null 2>&1
+        mix run --no-halt &
+        CA_PID=$! &&
+        sleep 5s &&
+        cd .. && cd ./Languages/Rust &&
+        cargo run --example ca_client &&
+        kill $CA_PID

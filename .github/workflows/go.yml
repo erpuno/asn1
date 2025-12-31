@@ -1,0 +1,56 @@
+name: Go OpenSSL Tests
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test-go:
+    env:
+      ImageOS: ubuntu24
+    name: Go Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install OpenSSL
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openssl
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1
+      with:
+        elixir-version: '1.18'
+        otp-version: '28'
+
+    - name: Make scripts executable
+      run: chmod +x rebuild_go.sh run_go_openssl_tests.sh
+
+    - name: Rebuild Go
+      run: ./rebuild_go.sh
+
+    - name: Run Go OpenSSL Tests
+      run: ./run_go_openssl_tests.sh
+
+    - name: Start CA server
+      run: |
+        git clone https://github.com/synrc/ca.git 
+        cd ca
+        mix deps.get > /dev/null 2>&1
+        mix compile > /dev/null 2>&1
+        mix run --no-halt &
+        CA_PID=$! &&
+        sleep 5s &&
+        cd ../Languages/Go &&
+        go run main.go &&
+        kill $CA_PID

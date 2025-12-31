@@ -80,7 +80,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ASN1Integer::from(0),
         subject_name,
         spki,
-        PKCS10Attributes(vec![]),
+        PKCS10Attributes(vec![]).0,
     );
 
     // Serialize CSR Info for signing (Generated)

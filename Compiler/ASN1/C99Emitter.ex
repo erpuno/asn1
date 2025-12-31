@@ -1,7 +1,8 @@
 defmodule ASN1.C99Emitter do
   @behaviour ASN1.Emitter
 
-  import ASN1, only: [bin: 1, normalizeName: 1, getEnv: 2, setEnv: 2, save: 4, lookup: 1, outputDir: 0]
+  import ASN1,
+    only: [bin: 1, normalizeName: 1, getEnv: 2, setEnv: 2, save: 4, lookup: 1, outputDir: 0]
 
   @common_block """
   #ifndef ASN1C_COMMON_TYPES
@@ -21,18 +22,33 @@ defmodule ASN1.C99Emitter do
 
   typedef struct {
       size_t byte_count;
-      uint8_t bytes[256];
+      uint8_t bytes[2048];
       uint8_t unused_bits;
   } ASN1C_BitString;
 
   typedef struct {
       size_t length;
-      uint8_t bytes[256];
+      uint8_t bytes[2048];
   } ASN1C_OctetString;
 
   typedef struct {
       size_t length;
-      uint8_t bytes[512];
+      uint8_t bytes[2048];
+  } ASN1C_Integer;
+
+  typedef struct {
+      size_t length;
+      uint8_t bytes[2048];
+  } ASN1C_GeneralizedTime;
+
+  typedef struct {
+      size_t length;
+      uint8_t bytes[2048];
+  } ASN1C_UTCTime;
+
+  typedef struct {
+      size_t length;
+      uint8_t bytes[2048];
   } ASN1C_Node;
 
   /* ASN.1 Tag class constants for implicit tagging */
@@ -91,16 +107,83 @@ defmodule ASN1.C99Emitter do
       self->length = len;
       return asn1_ok();
   }
+  static inline asn1_error_t ASN1C_Integer_encode(const ASN1C_Integer *self, asn1_serializer_t *s) {
+      return asn1_serialize_integer_bytes(s, self->bytes, self->length);
+  }
+  static inline asn1_error_t ASN1C_Integer_decode(ASN1C_Integer *self, const asn1_node_t *node, const asn1_parse_result_t *result) {
+      (void)result;
+      const uint8_t *data; size_t len; bool negative;
+      asn1_error_t err = asn1_parse_integer_bytes(node, &data, &len, &negative);
+      if (!asn1_is_ok(err)) return err;
+      if (len > sizeof(self->bytes)) len = sizeof(self->bytes);
+      memcpy(self->bytes, data, len);
+      self->length = len;
+      return asn1_ok();
+  }
+  static inline asn1_error_t ASN1C_GeneralizedTime_encode(const ASN1C_GeneralizedTime *self, asn1_serializer_t *s) {
+      return asn1_serialize_primitive(s, ASN1_TAG(ASN1_TAG_CLASS_UNIVERSAL, 24), self->bytes, self->length);
+  }
+  static inline asn1_error_t ASN1C_GeneralizedTime_decode(ASN1C_GeneralizedTime *self, const asn1_node_t *node, const asn1_parse_result_t *result) {
+      (void)result;
+      /* Directly access data bytes - tag validation is done at the CHOICE level */
+      size_t len = node->data_length;
+      if (len > sizeof(self->bytes)) len = sizeof(self->bytes);
+      memcpy(self->bytes, node->data_bytes, len);
+      self->length = len;
+      return asn1_ok();
+  }
+  static inline asn1_error_t ASN1C_UTCTime_encode(const ASN1C_UTCTime *self, asn1_serializer_t *s) {
+      return asn1_serialize_primitive(s, ASN1_TAG(ASN1_TAG_CLASS_UNIVERSAL, 23), self->bytes, self->length);
+  }
+  static inline asn1_error_t ASN1C_UTCTime_decode(ASN1C_UTCTime *self, const asn1_node_t *node, const asn1_parse_result_t *result) {
+      (void)result;
+      /* Directly access data bytes - tag validation is done at the CHOICE level */
+      size_t len = node->data_length;
+      if (len > sizeof(self->bytes)) len = sizeof(self->bytes);
+      memcpy(self->bytes, node->data_bytes, len);
+      self->length = len;
+      return asn1_ok();
+  }
   static inline asn1_error_t ASN1C_Node_encode(const ASN1C_Node *self, asn1_serializer_t *s) {
       return asn1_serialize_raw(s, self->bytes, self->length);
   }
   static inline asn1_error_t ASN1C_Node_decode(ASN1C_Node *self, const asn1_node_t *node, const asn1_parse_result_t *result) {
       (void)result;
-      if (node->encoded_length > sizeof(self->bytes)) return asn1_error(ASN1_ERROR_INVALID_OBJECT, \"too large\", 0);
+      if (node->encoded_length > sizeof(self->bytes)) return asn1_error(ASN1_ERROR_INVALID_OBJECT, "too large", 0);
       memcpy(self->bytes, node->encoded_bytes, node->encoded_length);
       self->length = node->encoded_length;
       return asn1_ok();
   }
+
+  #include <stdio.h>
+
+  /* Macro to define string types with specific primitive tags */
+  #define ASN1C_STRING_IMPL(Type, Tag) \
+  typedef struct { size_t length; uint8_t bytes[2048]; } Type; \
+  static inline asn1_error_t Type##_encode(const Type *self, asn1_serializer_t *s) { \
+      return asn1_serialize_primitive(s, ASN1_TAG(ASN1_TAG_CLASS_UNIVERSAL, Tag), self->bytes, self->length); \
+  } \
+  static inline asn1_error_t Type##_decode(Type *self, const asn1_node_t *node, const asn1_parse_result_t *result) { \
+      (void)result; \
+      if (node->identifier.tag_class != ASN1_TAG_CLASS_UNIVERSAL || node->identifier.tag_number != Tag) { \
+          fprintf(stderr, "DEBUG: %s type mismatch. Expected Tag %d, got Class %d Tag %d\\n", #Type, Tag, node->identifier.tag_class, node->identifier.tag_number); \
+          return asn1_error(ASN1_ERROR_UNEXPECTED_FIELD_TYPE, #Type " tag mismatch", node->identifier.tag_number); \
+      } \
+      size_t len = node->data_length; \
+      if (len > sizeof(self->bytes)) len = sizeof(self->bytes); \
+      memcpy(self->bytes, node->data_bytes, len); \
+      self->length = len; \
+      return asn1_ok(); \
+  }
+
+  ASN1C_STRING_IMPL(ASN1C_PrintableString, 19)
+  ASN1C_STRING_IMPL(ASN1C_UTF8String, 12)
+  ASN1C_STRING_IMPL(ASN1C_IA5String, 22)
+  ASN1C_STRING_IMPL(ASN1C_TeletexString, 20)
+  ASN1C_STRING_IMPL(ASN1C_VisibleString, 26)
+  ASN1C_STRING_IMPL(ASN1C_BMPString, 30)
+  ASN1C_STRING_IMPL(ASN1C_UniversalString, 28)
+  ASN1C_STRING_IMPL(ASN1C_NumericString, 18)
 
   #endif /* ASN1C_COMMON_TYPES */
   """
@@ -116,34 +199,34 @@ defmodule ASN1.C99Emitter do
     "ENUMERATED" => "int64_t",
     :NULL => "uint8_t",
     "NULL" => "uint8_t",
-    :UTF8String => "ASN1C_OctetString",
-    "UTF8String" => "ASN1C_OctetString",
-    :PrintableString => "ASN1C_OctetString",
-    "PrintableString" => "ASN1C_OctetString",
-    :IA5String => "ASN1C_OctetString",
-    "IA5String" => "ASN1C_OctetString",
-    :GeneralizedTime => "ASN1C_OctetString",
-    "GeneralizedTime" => "ASN1C_OctetString",
-    :UTCTime => "ASN1C_OctetString",
-    "UTCTime" => "ASN1C_OctetString",
+    :UTF8String => "ASN1C_UTF8String",
+    "UTF8String" => "ASN1C_UTF8String",
+    :PrintableString => "ASN1C_PrintableString",
+    "PrintableString" => "ASN1C_PrintableString",
+    :IA5String => "ASN1C_IA5String",
+    "IA5String" => "ASN1C_IA5String",
+    :GeneralizedTime => "ASN1C_GeneralizedTime",
+    "GeneralizedTime" => "ASN1C_GeneralizedTime",
+    :UTCTime => "ASN1C_UTCTime",
+    "UTCTime" => "ASN1C_UTCTime",
     :ANY => "ASN1C_Node",
     "ANY" => "ASN1C_Node",
-    :TeletexString => "ASN1C_OctetString",
-    "TeletexString" => "ASN1C_OctetString",
-    :BMPString => "ASN1C_OctetString",
-    "BMPString" => "ASN1C_OctetString",
-    :UniversalString => "ASN1C_OctetString",
-    "UniversalString" => "ASN1C_OctetString",
+    :TeletexString => "ASN1C_TeletexString",
+    "TeletexString" => "ASN1C_TeletexString",
+    :BMPString => "ASN1C_BMPString",
+    "BMPString" => "ASN1C_BMPString",
+    :UniversalString => "ASN1C_UniversalString",
+    "UniversalString" => "ASN1C_UniversalString",
     :NumericString => "ASN1C_OctetString",
     "NumericString" => "ASN1C_OctetString",
-    :VisibleString => "ASN1C_OctetString",
-    "VisibleString" => "ASN1C_OctetString",
-    :"UTF8String" => "ASN1C_OctetString",
-    :"PrintableString" => "ASN1C_OctetString",
-    :"IA5String" => "ASN1C_OctetString",
-    :"INTEGER" => "int64_t",
-    :"ENUMERATED" => "int64_t",
-    :"BOOLEAN" => "bool",
+    :VisibleString => "ASN1C_VisibleString",
+    "VisibleString" => "ASN1C_VisibleString",
+    :UTF8String => "ASN1C_UTF8String",
+    :PrintableString => "ASN1C_PrintableString",
+    :IA5String => "ASN1C_IA5String",
+    :INTEGER => "int64_t",
+    :ENUMERATED => "int64_t",
+    :BOOLEAN => "bool",
     :VisibleString => "ASN1C_OctetString",
     :GeneralString => "ASN1C_OctetString",
     :T61String => "ASN1C_OctetString",
@@ -153,18 +236,14 @@ defmodule ASN1.C99Emitter do
   }
 
   @primitive_types MapSet.new([
-    "int64_t",
-    "uint64_t",
-    "uint32_t",
-    "uint16_t",
-    "uint8_t",
-    "size_t",
-    "bool",
-    "ASN1C_OID",
-    "ASN1C_BitString",
-    "ASN1C_OctetString",
-    "ASN1C_Node"
-  ])
+                     "int64_t",
+                     "uint64_t",
+                     "uint32_t",
+                     "uint16_t",
+                     "uint8_t",
+                     "size_t",
+                     "bool"
+                   ])
 
   @impl true
   def fileExtension, do: ".h"
@@ -275,12 +354,42 @@ defmodule ASN1.C99Emitter do
 
   defp builtin_type?(type_name) when is_binary(type_name) do
     lower = String.downcase(type_name)
+
     String.starts_with?(type_name, "char[") or
       MapSet.member?(@primitive_types, type_name) or
       MapSet.member?(@primitive_types, lower) or
       String.starts_with?(type_name, "ASN1C_") or
-      lower in ["int64_t", "uint64_t", "int32_t", "uint32_t", "int16_t", "uint16_t",
-                "int8_t", "uint8_t", "size_t", "bool", "void", "any", "octet string", "bit string", "integer", "enumerated", "boolean", "null", "object identifier", "generalizedtime", "utctime", "utf8string", "printablestring", "ia5string", "teletexstring", "visiblestring", "numericstring", "universalstring", "bmpstring"]
+      lower in [
+        "int64_t",
+        "uint64_t",
+        "int32_t",
+        "uint32_t",
+        "int16_t",
+        "uint16_t",
+        "int8_t",
+        "uint8_t",
+        "size_t",
+        "bool",
+        "void",
+        "any",
+        "octet string",
+        "bit string",
+        "integer",
+        "enumerated",
+        "boolean",
+        "null",
+        "object identifier",
+        "generalizedtime",
+        "utctime",
+        "utf8string",
+        "printablestring",
+        "ia5string",
+        "teletexstring",
+        "visiblestring",
+        "numericstring",
+        "universalstring",
+        "bmpstring"
+      ]
   end
 
   defp builtin_type?(_), do: true
@@ -296,46 +405,54 @@ defmodule ASN1.C99Emitter do
   end
 
   @impl true
-  def fieldType(struct_name, field, {:type, _, inner, _, _, _}), do: fieldType(struct_name, field, inner)
+  def fieldType(struct_name, field, {:type, _, inner, _, _, _}),
+    do: fieldType(struct_name, field, inner)
 
-  def fieldType(struct_name, field, {:tag, _, _, _, inner}), do: fieldType(struct_name, field, inner)
+  def fieldType(struct_name, field, {:tag, _, _, _, inner}),
+    do: fieldType(struct_name, field, inner)
 
   @impl true
   def fieldType(_struct_name, _field, {:ObjectClassFieldType, _, _, _, _}), do: "ASN1C_Node"
 
   @impl true
-  def fieldType(struct_name, field, {:"SEQUENCE OF", inner}), do: sequenceOf(struct_name, field, inner)
+  def fieldType(struct_name, field, {:"SEQUENCE OF", inner}),
+    do: sequenceOf(struct_name, field, inner)
 
-  def fieldType(struct_name, field, {:"Sequence Of", inner}), do: sequenceOf(struct_name, field, inner)
+  def fieldType(struct_name, field, {:"Sequence Of", inner}),
+    do: sequenceOf(struct_name, field, inner)
+
   def fieldType(struct_name, field, {:"SET OF", inner}), do: sequenceOf(struct_name, field, inner)
   def fieldType(struct_name, field, {:"Set Of", inner}), do: sequenceOf(struct_name, field, inner)
 
   @impl true
-  def fieldType(_struct_name, _field, {:"CHOICE", _cases}), do: "ASN1C_Node"
+  def fieldType(_struct_name, _field, {:CHOICE, _cases}), do: "ASN1C_Node"
 
-  def fieldType(_struct_name, _field, {:"SEQUENCE", _, _, _, _}), do: "ASN1C_Node"
-  def fieldType(_struct_name, _field, {:"SET", _, _, _, _}), do: "ASN1C_Node"
-  def fieldType(_struct_name, _field, {:"ENUMERATED", _}), do: "int64_t"
-  def fieldType(_struct_name, _field, {:"INTEGER", _}), do: "int64_t"
+  def fieldType(_struct_name, _field, {:SEQUENCE, _, _, _, _}), do: "ASN1C_Node"
+  def fieldType(_struct_name, _field, {:SET, _, _, _, _}), do: "ASN1C_Node"
+  def fieldType(_struct_name, _field, {:ENUMERATED, _}), do: "int64_t"
+  def fieldType(_struct_name, _field, {:INTEGER, _}), do: "int64_t"
   def fieldType(_struct_name, _field, {:"BIT STRING", _}), do: "ASN1C_BitString"
   def fieldType(_struct_name, _field, {:"OCTET STRING", _}), do: "ASN1C_OctetString"
 
   # Known cycle-breaking types - these create recursive include chains
   @cyclic_types MapSet.new([
-    "PKIXCMP_2009_NESTEDMESSAGECONTENT",
-    "PKIXCMP_2009_PKIMESSAGES",
-    "PKIXCMP_2009_PKIMESSAGE"
-  ])
+                  "PKIXCMP_2009_NESTEDMESSAGECONTENT",
+                  "PKIXCMP_2009_PKIMESSAGES",
+                  "PKIXCMP_2009_PKIMESSAGE"
+                ])
 
   @impl true
   def fieldType(_struct_name, _field, {:Externaltypereference, _, mod, ref}) do
     c_name = qualified_name(ref, mod)
     stack = Process.get(:c99_header_stack, [])
+
     cond do
       c_name in stack ->
         "ASN1C_Node"
+
       MapSet.member?(@cyclic_types, c_name) ->
         "ASN1C_Node"
+
       true ->
         track_if_type(c_name)
         c_name
@@ -355,6 +472,7 @@ defmodule ASN1.C99Emitter do
   @impl true
   def array(name, type, tag, _level \\ "") do
     mod = current_module()
+
     c_name =
       if mod == "" do
         sanitize_type_name(name)
@@ -374,10 +492,11 @@ defmodule ASN1.C99Emitter do
       end
 
     # Determine the tag for the constructed type
-    asn1_id = case tag do
-      :set -> "ASN1_ID_SET"
-      _ -> "ASN1_ID_SEQUENCE"
-    end
+    asn1_id =
+      case tag do
+        :set -> "ASN1_ID_SET"
+        _ -> "ASN1_ID_SEQUENCE"
+      end
 
     typedef = """
     typedef struct {
@@ -442,17 +561,21 @@ defmodule ASN1.C99Emitter do
 
     selector =
       variants
-      |> Enum.map(fn {variant, _field, _type, _tag, _type_ast} -> "    #{selector_name(c_name, variant)}," end)
+      |> Enum.map(fn {variant, _field, _type, _tag, _type_ast} ->
+        "    #{selector_name(c_name, variant)},"
+      end)
       |> Enum.join("\n")
 
     union_body =
       variants
       |> Enum.map(fn {variant, field, type, _tag, _type_ast} ->
         # Handle C array types like "char[32]" -> "char field[32]"
-        field_decl = case Regex.run(~r/^(\w+)\[(\d+)\]$/, type) do
-          [_, base_type, size] -> "#{base_type} #{field}[#{size}]"
-          _ -> "#{type} #{field}"
-        end
+        field_decl =
+          case Regex.run(~r/^(\w+)\[(\d+)\]$/, type) do
+            [_, base_type, size] -> "#{base_type} #{field}[#{size}]"
+            _ -> "#{type} #{field}"
+          end
+
         "        #{field_decl}; /* #{variant} */"
       end)
       |> Enum.join("\n")
@@ -540,9 +663,10 @@ defmodule ASN1.C99Emitter do
   def typealias(name, target, modname, saveFlag) do
     c_name = name(name, modname)
     setEnv(name, c_name)
+
     target_name =
       if String.ends_with?(c_name, "CERTIFICATESERIALNUMBER") do
-        "uint64_t"
+        "ASN1C_Integer"
       else
         substituteType(target)
       end
@@ -554,17 +678,29 @@ defmodule ASN1.C99Emitter do
     encode_decode =
       if builtin_type?(target_name) do
         # Map common C types to their ASN1C_ encoder/decoder names
-        encoder_target = case target_name do
-          "ASN1C_OID" -> "ASN1C_OID"
-          "ASN1C_BitString" -> "ASN1C_BitString"
-          "ASN1C_OctetString" -> "ASN1C_OctetString"
-          "ASN1C_Node" -> "ASN1C_Node"
-          "int64_t" -> :int64
-          "uint64_t" -> :uint64
-          "uint8_t" -> :null
-          "bool" -> :bool
-          _ -> nil
-        end
+        encoder_target =
+          case target_name do
+            "ASN1C_OID" -> "ASN1C_OID"
+            "ASN1C_BitString" -> "ASN1C_BitString"
+            "ASN1C_OctetString" -> "ASN1C_OctetString"
+            "ASN1C_Integer" -> "ASN1C_Integer"
+            "ASN1C_Node" -> "ASN1C_Node"
+            "ASN1C_GeneralizedTime" -> "ASN1C_GeneralizedTime"
+            "ASN1C_UTCTime" -> "ASN1C_UTCTime"
+            "ASN1C_PrintableString" -> "ASN1C_PrintableString"
+            "ASN1C_UTF8String" -> "ASN1C_UTF8String"
+            "ASN1C_IA5String" -> "ASN1C_IA5String"
+            "ASN1C_TeletexString" -> "ASN1C_TeletexString"
+            "ASN1C_VisibleString" -> "ASN1C_VisibleString"
+            "ASN1C_BMPString" -> "ASN1C_BMPString"
+            "ASN1C_UniversalString" -> "ASN1C_UniversalString"
+            "ASN1C_NumericString" -> "ASN1C_NumericString"
+            "int64_t" -> :int64
+            "uint64_t" -> :uint64
+            "uint8_t" -> :null
+            "bool" -> :bool
+            _ -> nil
+          end
 
         case encoder_target do
           :int64 ->
@@ -582,8 +718,9 @@ defmodule ASN1.C99Emitter do
                 return asn1_ok();
             }
             """
+
           :uint64 ->
-             """
+            """
 
             static inline asn1_error_t #{c_name}_encode(const #{c_name} *self, asn1_serializer_t *s) {
                 return asn1_serialize_uint64(s, (uint64_t)*self);
@@ -597,6 +734,7 @@ defmodule ASN1.C99Emitter do
                 return asn1_ok();
             }
             """
+
           :bool ->
             """
 
@@ -608,6 +746,7 @@ defmodule ASN1.C99Emitter do
                 return asn1_parse_boolean(node, self, ASN1_ENCODING_DER);
             }
             """
+
           :null ->
             """
 
@@ -620,7 +759,10 @@ defmodule ASN1.C99Emitter do
                 return asn1_ok();
             }
             """
-          nil -> ""
+
+          nil ->
+            ""
+
           helper_name ->
             """
 
@@ -696,10 +838,12 @@ defmodule ASN1.C99Emitter do
   end
 
   @impl true
-  def builtinType(type) when is_atom(type), do: Map.get(@builtin_map, type, default_type_name(type))
+  def builtinType(type) when is_atom(type),
+    do: Map.get(@builtin_map, type, default_type_name(type))
 
   @impl true
-  def builtinType(type) when is_binary(type), do: Map.get(@builtin_map, type, default_type_name(type))
+  def builtinType(type) when is_binary(type),
+    do: Map.get(@builtin_map, type, default_type_name(type))
 
   @impl true
   def sequenceOf(name, field, type) do
@@ -833,41 +977,44 @@ defmodule ASN1.C99Emitter do
         selector = selector_name(c_name, variant_name)
 
         # Generate encoder call with optional implicit/explicit tag
-        encoder_call = case tag do
-          {:IMPLICIT, tag_number} ->
-            # IMPLICIT tag: use tagged encoder for primitives, wrap for complex types
-            primitive_encoder_for_choice_with_tag(type, "self->data.#{field}", tag_number)
+        encoder_call =
+          case tag do
+            {:IMPLICIT, tag_number} ->
+              # IMPLICIT tag: use tagged encoder for primitives, wrap for complex types
+              primitive_encoder_for_choice_with_tag(type, "self->data.#{field}", tag_number)
 
-          {:EXPLICIT, tag_number} ->
-            # EXPLICIT tag: wrap content in constructed context tag
-            inner_encoder = if type == "ASN1C_Node" do
-              "err = ASN1C_Node_encode(&self->data.#{field}, s); if (!asn1_is_ok(err)) return err;"
-            else
-              if MapSet.member?(@primitive_types, type) or String.starts_with?(type, "char[") do
-                primitive_encoder(type_ast, "self->data.#{field}")
-              else
-                "err = #{type}_encode(&self->data.#{field}, s); if (!asn1_is_ok(err)) return err;"
-              end
-            end
-            """
-{
-                size_t tag_marker;
-                err = asn1_serialize_constructed_begin(s, ASN1_TAG(ASN1_TAG_CLASS_CONTEXT, #{tag_number}), &tag_marker);
-                if (!asn1_is_ok(err)) return err;
-                #{inner_encoder}
-                err = asn1_serialize_constructed_end(s, tag_marker);
-                if (!asn1_is_ok(err)) return err;
-            }
-"""
+            {:EXPLICIT, tag_number} ->
+              # EXPLICIT tag: wrap content in constructed context tag
+              inner_encoder =
+                if type == "ASN1C_Node" do
+                  "err = ASN1C_Node_encode(&self->data.#{field}, s); if (!asn1_is_ok(err)) return err;"
+                else
+                  if MapSet.member?(@primitive_types, type) or String.starts_with?(type, "char[") do
+                    primitive_encoder(type_ast, "self->data.#{field}")
+                  else
+                    "err = #{type}_encode(&self->data.#{field}, s); if (!asn1_is_ok(err)) return err;"
+                  end
+                end
 
-          {:UNIVERSAL, _tag_number} ->
-            # UNIVERSAL tag - use regular encoder
-            primitive_encoder_for_choice(type, "self->data.#{field}")
+              """
+              {
+                              size_t tag_marker;
+                              err = asn1_serialize_constructed_begin(s, ASN1_TAG(ASN1_TAG_CLASS_CONTEXT, #{tag_number}), &tag_marker);
+                              if (!asn1_is_ok(err)) return err;
+                              #{inner_encoder}
+                              err = asn1_serialize_constructed_end(s, tag_marker);
+                              if (!asn1_is_ok(err)) return err;
+                          }
+              """
 
-          nil ->
-            # No tag - use regular encoder
-            primitive_encoder_for_choice(type, "self->data.#{field}")
-        end
+            {:UNIVERSAL, _tag_number} ->
+              # UNIVERSAL tag - use regular encoder
+              primitive_encoder(type_ast, "self->data.#{field}")
+
+            nil ->
+              # No tag - use regular encoder
+              primitive_encoder(type_ast, "self->data.#{field}")
+          end
 
         "        case #{selector}: #{encoder_call} break;"
       end)
@@ -896,23 +1043,31 @@ defmodule ASN1.C99Emitter do
       {:"OCTET STRING", _} -> 4
       :NULL -> 5
       :"OBJECT IDENTIFIER" -> 6
-      :UTF8String -> 12
+      {:UTF8String, _} -> 12
       :PrintableString -> 19
+      {:PrintableString, _} -> 19
       :TeletexString -> 20
+      {:TeletexString, _} -> 20
       :IA5String -> 22
+      {:IA5String, _} -> 22
       :UTCTime -> 23
+      {:UTCTime, _} -> 23
       :GeneralizedTime -> 24
+      {:GeneralizedTime, _} -> 24
       :VisibleString -> 26
       {:VisibleString, _} -> 26
       :NumericString -> 18
       {:NumericString, _} -> 18
       :UniversalString -> 28
+      {:UniversalString, _} -> 28
       :BMPString -> 30
+      {:BMPString, _} -> 30
       {:SEQUENCE, _, _, _, _} -> 16
       {:SET, _, _, _, _} -> 17
       {:"SEQUENCE OF", _} -> 16
       {:"SET OF", _} -> 17
-      {:Externaltypereference, _, _, _} -> 16 # Assume external refs are constructed (SEQUENCE) usually
+      # Assume external refs are constructed (SEQUENCE) usually
+      {:Externaltypereference, _, _, _} -> 16
       _ -> 0
     end
   end
@@ -922,49 +1077,56 @@ defmodule ASN1.C99Emitter do
       variants
       |> Enum.map(fn {variant_name, field, type, tag, type_ast} ->
         selector = selector_name(c_name, variant_name)
-        {class, number} = case tag do
-          {:IMPLICIT, n} -> {"ASN1_TAG_CLASS_CONTEXT", n}
-          {:EXPLICIT, n} -> {"ASN1_TAG_CLASS_CONTEXT", n}
-          {:UNIVERSAL, n} -> {"ASN1_TAG_CLASS_UNIVERSAL", n}
-          _ -> {nil, nil}
-        end
+
+        {class, number} =
+          case tag do
+            {:IMPLICIT, n} -> {"ASN1_TAG_CLASS_CONTEXT", n}
+            {:EXPLICIT, n} -> {"ASN1_TAG_CLASS_CONTEXT", n}
+            {:UNIVERSAL, n} -> {"ASN1_TAG_CLASS_UNIVERSAL", n}
+            _ -> {nil, nil}
+          end
 
         if class do
-          content_decode = if type == "ASN1C_Node" do
-            "{ err = ASN1C_Node_decode(&self->data.#{field}, child, result); if (!asn1_is_ok(err)) return err; }"
-          else
-            primitive_decoder(type_ast, "self->data.#{field}")
-          end
+          content_decode =
+            if type == "ASN1C_Node" do
+              "{ err = ASN1C_Node_decode(&self->data.#{field}, child, result); if (!asn1_is_ok(err)) return err; }"
+            else
+              primitive_decoder(type_ast, "self->data.#{field}")
+            end
 
-          inner_decode = case tag do
-            {:EXPLICIT, _} ->
-              "{\n" <>
-              "                    asn1_node_iterator_t iter = asn1_children(result, node_idx);\n" <>
-              "                    const asn1_node_t *child = asn1_next_child(&iter);\n" <>
-              "                    if (child == NULL) return asn1_error(ASN1_ERROR_TRUNCATED_FIELD, \"missing explicit content\", 0);\n" <>
-              "                    #{content_decode}\n" <>
-              "                }"
-            {:IMPLICIT, _} ->
-              u_tag = universal_tag(type_ast)
-              "{\n" <>
-              "                    asn1_node_t fake_node = *node;\n" <>
-              "                    fake_node.identifier.tag_class = ASN1_TAG_CLASS_UNIVERSAL;\n" <>
-              "                    fake_node.identifier.tag_number = #{u_tag};\n" <>
-              "                    const asn1_node_t *child = &fake_node;\n" <>
-              "                    #{content_decode}\n" <>
-              "                }"
-            _ ->
-              "{\n" <>
-              "                    const asn1_node_t *child = node;\n" <>
-              "                    #{content_decode}\n" <>
-              "                }"
-          end
+          inner_decode =
+            case tag do
+              {:EXPLICIT, _} ->
+                "{\n" <>
+                  "                    asn1_node_iterator_t iter = asn1_children(result, node_idx);\n" <>
+                  "                    const asn1_node_t *child = asn1_next_child(&iter);\n" <>
+                  "                    if (child == NULL) return asn1_error(ASN1_ERROR_TRUNCATED_FIELD, \"missing explicit content\", 0);\n" <>
+                  "                    #{content_decode}\n" <>
+                  "                }"
+
+              {:IMPLICIT, _} ->
+                u_tag = universal_tag(type_ast)
+
+                "{\n" <>
+                  "                    asn1_node_t fake_node = *node;\n" <>
+                  "                    fake_node.identifier.tag_class = ASN1_TAG_CLASS_UNIVERSAL;\n" <>
+                  "                    fake_node.identifier.tag_number = #{u_tag};\n" <>
+                  "                    const asn1_node_t *child = &fake_node;\n" <>
+                  "                    #{content_decode}\n" <>
+                  "                }"
+
+              _ ->
+                "{\n" <>
+                  "                    const asn1_node_t *child = node;\n" <>
+                  "                    #{content_decode}\n" <>
+                  "                }"
+            end
 
           "        if (node->identifier.tag_class == #{class} && node->identifier.tag_number == #{number}) {\n" <>
-          "            self->selector = #{selector};\n" <>
-          "            #{inner_decode}\n" <>
-          "            return asn1_ok();\n" <>
-          "        }"
+            "            self->selector = #{selector};\n" <>
+            "            #{inner_decode}\n" <>
+            "            return asn1_ok();\n" <>
+            "        }"
         else
           ""
         end
@@ -976,7 +1138,7 @@ defmodule ASN1.C99Emitter do
         asn1_error_t err; (void)err;
         size_t node_idx = asn1_node_index(result, node);
         (void)node_idx;
-#{cases}
+    #{cases}
         return asn1_error(ASN1_ERROR_INVALID_OBJECT, "unknown choice tag", 0);
     }
     """
@@ -986,16 +1148,32 @@ defmodule ASN1.C99Emitter do
     case Regex.run(~r/^(\w+)\[(\d+)\]$/, type) do
       [_, _, _] ->
         "err = asn1_serialize_string(s, ASN1_ID_UTF8_STRING, #{var}, strlen(#{var})); if (!asn1_is_ok(err)) return err;"
+
       _ ->
         case type do
-          "ASN1C_OID" -> "err = ASN1C_OID_encode(&#{var}, s); if (!asn1_is_ok(err)) return err;"
-          "ASN1C_BitString" -> "err = ASN1C_BitString_encode(&#{var}, s); if (!asn1_is_ok(err)) return err;"
-          "ASN1C_OctetString" -> "err = ASN1C_OctetString_encode(&#{var}, s); if (!asn1_is_ok(err)) return err;"
-          "ASN1C_Node" -> "err = ASN1C_Node_encode(&#{var}, s); if (!asn1_is_ok(err)) return err;"
-          "int64_t" -> "err = asn1_serialize_int64(s, #{var}); if (!asn1_is_ok(err)) return err;"
-          "uint8_t" -> "err = asn1_serialize_null(s); if (!asn1_is_ok(err)) return err; (void)#{var};"
-          "bool" -> "err = asn1_serialize_boolean(s, #{var}); if (!asn1_is_ok(err)) return err;"
-          other -> "err = #{other}_encode(&#{var}, s); if (!asn1_is_ok(err)) return err;"
+          "ASN1C_OID" ->
+            "err = ASN1C_OID_encode(&#{var}, s); if (!asn1_is_ok(err)) return err;"
+
+          "ASN1C_BitString" ->
+            "err = ASN1C_BitString_encode(&#{var}, s); if (!asn1_is_ok(err)) return err;"
+
+          "ASN1C_OctetString" ->
+            "err = ASN1C_OctetString_encode(&#{var}, s); if (!asn1_is_ok(err)) return err;"
+
+          "ASN1C_Node" ->
+            "err = ASN1C_Node_encode(&#{var}, s); if (!asn1_is_ok(err)) return err;"
+
+          "int64_t" ->
+            "err = asn1_serialize_int64(s, #{var}); if (!asn1_is_ok(err)) return err;"
+
+          "uint8_t" ->
+            "err = asn1_serialize_null(s); if (!asn1_is_ok(err)) return err; (void)#{var};"
+
+          "bool" ->
+            "err = asn1_serialize_boolean(s, #{var}); if (!asn1_is_ok(err)) return err;"
+
+          other ->
+            "err = #{other}_encode(&#{var}, s); if (!asn1_is_ok(err)) return err;"
         end
     end
   end
@@ -1009,50 +1187,123 @@ defmodule ASN1.C99Emitter do
       "ASN1C_OctetString" ->
         # For OCTET STRING with implicit tag, serialize as tagged primitive
         "err = asn1_serialize_string(s, #{context_tag}, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      # String types - use primitive encoding with context tag
+      "ASN1C_IA5String" ->
+        "err = asn1_serialize_primitive(s, #{context_tag}, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      "ASN1C_PrintableString" ->
+        "err = asn1_serialize_primitive(s, #{context_tag}, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      "ASN1C_UTF8String" ->
+        "err = asn1_serialize_primitive(s, #{context_tag}, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      "ASN1C_VisibleString" ->
+        "err = asn1_serialize_primitive(s, #{context_tag}, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      "ASN1C_TeletexString" ->
+        "err = asn1_serialize_primitive(s, #{context_tag}, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      "ASN1C_BMPString" ->
+        "err = asn1_serialize_primitive(s, #{context_tag}, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      "ASN1C_UniversalString" ->
+        "err = asn1_serialize_primitive(s, #{context_tag}, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      "ASN1C_NumericString" ->
+        "err = asn1_serialize_primitive(s, #{context_tag}, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      # OID with implicit tag - encode as primitive
+      "ASN1C_OID" ->
+        # For OID we need to use the OID serializer but with a custom tag
+        # This is tricky - we'll wrap it for now, but mark it for future fix
+        """
+        {
+                    size_t tag_marker;
+                    err = asn1_serialize_constructed_begin(s, ASN1_TAG(ASN1_TAG_CLASS_CONTEXT, #{tag_number}), &tag_marker);
+                    if (!asn1_is_ok(err)) return err;
+                    err = ASN1C_OID_encode(&#{var}, s);
+                    if (!asn1_is_ok(err)) return err;
+                    err = asn1_serialize_constructed_end(s, tag_marker);
+                    if (!asn1_is_ok(err)) return err;
+                }
+        """
+
       "int64_t" ->
         # For INTEGER with implicit tag
         "err = asn1_serialize_integer_tagged(s, #{context_tag}, #{var}); if (!asn1_is_ok(err)) return err;"
+
       "uint8_t" ->
         # For NULL with implicit tag - serialize NULL with context tag
         "err = asn1_serialize_null(s); if (!asn1_is_ok(err)) return err; (void)#{var};"
+
       other ->
         # For complex types with implicit tag, wrap in constructed context tag
-        # This is technically wrong (should be truly implicit) but gets us closer
+        # This is correct for SEQUENCE/SET types but technically we should check
+        # if the underlying type is primitive or constructed
         """
-{
-            size_t tag_marker;
-            err = asn1_serialize_constructed_begin(s, ASN1_TAG(ASN1_TAG_CLASS_CONTEXT, #{tag_number}), &tag_marker);
-            if (!asn1_is_ok(err)) return err;
-            err = #{other}_encode(&#{var}, s);
-            if (!asn1_is_ok(err)) return err;
-            err = asn1_serialize_constructed_end(s, tag_marker);
-            if (!asn1_is_ok(err)) return err;
-        }
-"""
+        {
+                    size_t tag_marker;
+                    err = asn1_serialize_constructed_begin(s, ASN1_TAG(ASN1_TAG_CLASS_CONTEXT, #{tag_number}), &tag_marker);
+                    if (!asn1_is_ok(err)) return err;
+                    err = #{other}_encode(&#{var}, s);
+                    if (!asn1_is_ok(err)) return err;
+                    err = asn1_serialize_constructed_end(s, tag_marker);
+                    if (!asn1_is_ok(err)) return err;
+                }
+        """
     end
   end
 
   defp emit_array_encode_decode(c_name, element_type, asn1_id) do
     # Determine the encoder call for element type
-    element_encoder = case element_type do
-      "ASN1C_OID" -> "err = ASN1C_OID_encode(&self->elements[i], s); if (!asn1_is_ok(err)) return err;"
-      "ASN1C_BitString" -> "err = ASN1C_BitString_encode(&self->elements[i], s); if (!asn1_is_ok(err)) return err;"
-      "ASN1C_OctetString" -> "err = ASN1C_OctetString_encode(&self->elements[i], s); if (!asn1_is_ok(err)) return err;"
-      "ASN1C_Node" -> "err = ASN1C_Node_encode(&self->elements[i], s); if (!asn1_is_ok(err)) return err;"
-      "int64_t" -> "err = asn1_serialize_int64(s, self->elements[i]); if (!asn1_is_ok(err)) return err;"
-      "bool" -> "err = asn1_serialize_boolean(s, self->elements[i]); if (!asn1_is_ok(err)) return err;"
-      other -> "err = #{other}_encode(&self->elements[i], s); if (!asn1_is_ok(err)) return err;"
-    end
+    element_encoder =
+      case element_type do
+        "ASN1C_OID" ->
+          "err = ASN1C_OID_encode(&self->elements[i], s); if (!asn1_is_ok(err)) return err;"
 
-    element_decoder = case element_type do
-      "ASN1C_OID" -> "{err = ASN1C_OID_decode(&self->elements[self->length], child, result); if (!asn1_is_ok(err)) return err;}"
-      "ASN1C_BitString" -> "{err = ASN1C_BitString_decode(&self->elements[self->length], child, result); if (!asn1_is_ok(err)) return err;}"
-      "ASN1C_OctetString" -> "{err = ASN1C_OctetString_decode(&self->elements[self->length], child, result); if (!asn1_is_ok(err)) return err;}"
-      "ASN1C_Node" -> "{err = ASN1C_Node_decode(&self->elements[self->length], child, result); if (!asn1_is_ok(err)) return err;}"
-      "int64_t" -> "{int64_t val; err = asn1_parse_int64(child, &val); if (!asn1_is_ok(err)) return err; self->elements[self->length] = val;}"
-      "bool" -> "{bool val; err = asn1_parse_boolean(child, &val, ASN1_ENCODING_DER); if (!asn1_is_ok(err)) return err; self->elements[self->length] = val;}"
-      other -> "{err = #{other}_decode(&self->elements[self->length], child, result); if (!asn1_is_ok(err)) return err;}"
-    end
+        "ASN1C_BitString" ->
+          "err = ASN1C_BitString_encode(&self->elements[i], s); if (!asn1_is_ok(err)) return err;"
+
+        "ASN1C_OctetString" ->
+          "err = ASN1C_OctetString_encode(&self->elements[i], s); if (!asn1_is_ok(err)) return err;"
+
+        "ASN1C_Node" ->
+          "err = ASN1C_Node_encode(&self->elements[i], s); if (!asn1_is_ok(err)) return err;"
+
+        "int64_t" ->
+          "err = asn1_serialize_int64(s, self->elements[i]); if (!asn1_is_ok(err)) return err;"
+
+        "bool" ->
+          "err = asn1_serialize_boolean(s, self->elements[i]); if (!asn1_is_ok(err)) return err;"
+
+        other ->
+          "err = #{other}_encode(&self->elements[i], s); if (!asn1_is_ok(err)) return err;"
+      end
+
+    element_decoder =
+      case element_type do
+        "ASN1C_OID" ->
+          "{err = ASN1C_OID_decode(&self->elements[self->length], child, result); if (!asn1_is_ok(err)) return err;}"
+
+        "ASN1C_BitString" ->
+          "{err = ASN1C_BitString_decode(&self->elements[self->length], child, result); if (!asn1_is_ok(err)) return err;}"
+
+        "ASN1C_OctetString" ->
+          "{err = ASN1C_OctetString_decode(&self->elements[self->length], child, result); if (!asn1_is_ok(err)) return err;}"
+
+        "ASN1C_Node" ->
+          "{err = ASN1C_Node_decode(&self->elements[self->length], child, result); if (!asn1_is_ok(err)) return err;}"
+
+        "int64_t" ->
+          "{int64_t val; err = asn1_parse_int64(child, &val); if (!asn1_is_ok(err)) return err; self->elements[self->length] = val;}"
+
+        "bool" ->
+          "{bool val; err = asn1_parse_boolean(child, &val, ASN1_ENCODING_DER); if (!asn1_is_ok(err)) return err; self->elements[self->length] = val;}"
+
+        other ->
+          "{err = #{other}_decode(&self->elements[self->length], child, result); if (!asn1_is_ok(err)) return err;}"
+      end
 
     """
     static inline asn1_error_t #{c_name}_encode(const #{c_name} *self, asn1_serializer_t *s) {
@@ -1088,81 +1339,90 @@ defmodule ASN1.C99Emitter do
     is_optional = optional?(optional)
 
     # Extract type AST and tags from type_info (same pattern as choice_variant)
-    {type_ast, tags_list} = case type_info do
-      {:type, tags, t, _, _, _} -> {t, tags}
-      _ -> {type_info, []}
-    end
+    {type_ast, tags_list} =
+      case type_info do
+        {:type, tags, t, _, _, _} -> {t, tags}
+        _ -> {type_info, []}
+      end
 
     c_type = fieldType(struct_name, field_name, type_ast)
 
     # Extract tag information
-    tag_info = case tags_list do
-      [{:tag, :CONTEXT, number, {:default, :EXPLICIT}, _} | _] -> {:EXPLICIT, number}
-      [{:tag, :CONTEXT, number, :EXPLICIT, _} | _] -> {:EXPLICIT, number}
-      [{:tag, :CONTEXT, number, {:default, :IMPLICIT}, _} | _] -> {:IMPLICIT, number}
-      [{:tag, :CONTEXT, number, :IMPLICIT, _} | _] -> {:IMPLICIT, number}
-      _ -> nil
-    end
+    tag_info =
+      case tags_list do
+        [{:tag, :CONTEXT, number, {:default, :EXPLICIT}, _} | _] -> {:EXPLICIT, number}
+        [{:tag, :CONTEXT, number, :EXPLICIT, _} | _] -> {:EXPLICIT, number}
+        [{:tag, :CONTEXT, number, {:default, :IMPLICIT}, _} | _] -> {:IMPLICIT, number}
+        [{:tag, :CONTEXT, number, :IMPLICIT, _} | _] -> {:IMPLICIT, number}
+        _ -> nil
+      end
 
     # Generate encoder call based on type and tag
-    encoder_call = case tag_info do
-      {:EXPLICIT, tag_num} ->
-        # EXPLICIT tag: wrap with constructed context tag
-        inner_encoder = if MapSet.member?(@primitive_types, c_type) or String.starts_with?(c_type, "char[") do
-          primitive_encoder(type_ast, "self->#{field}")
-        else
-          "err = #{c_type}_encode(&self->#{field}, s); if (!asn1_is_ok(err)) return err;"
-        end
-        """
-        {
-            size_t tag_marker;
-            err = asn1_serialize_constructed_begin(s, ASN1_TAG(ASN1_TAG_CLASS_CONTEXT, #{tag_num}), &tag_marker);
-            if (!asn1_is_ok(err)) return err;
-            #{inner_encoder}
-            err = asn1_serialize_constructed_end(s, tag_marker);
-            if (!asn1_is_ok(err)) return err;
-        }
-        """
+    encoder_call =
+      case tag_info do
+        {:EXPLICIT, tag_num} ->
+          # EXPLICIT tag: wrap with constructed context tag
+          inner_encoder =
+            if MapSet.member?(@primitive_types, c_type) or String.starts_with?(c_type, "char[") do
+              primitive_encoder(type_ast, "self->#{field}")
+            else
+              "err = #{c_type}_encode(&self->#{field}, s); if (!asn1_is_ok(err)) return err;"
+            end
 
-      {:IMPLICIT, tag_num} ->
-        # IMPLICIT tag: serialize directly with context tag
-        if c_type == "ASN1C_Node" do
-           "err = ASN1C_Node_encode(&self->#{field}, s); if (!asn1_is_ok(err)) return err;"
-        else
-          if MapSet.member?(@primitive_types, c_type) or String.starts_with?(c_type, "char[") do
-            primitive_encoder_with_tag(type_ast, "self->#{field}", tag_num)
-          else
-            # For complex types with implicit tags, overwrite the tag after encoding
-            """
-            {
-                size_t start = s->length;
-                err = #{c_type}_encode(&self->#{field}, s);
-                if (asn1_is_ok(err)) {
-                    /* Replace universal tag with implicit context tag, preserving constructed bit */
-                    s->buffer[start] = (s->buffer[start] & 0x20) | 0x80 | #{tag_num};
-                } else return err;
-            }
-            """
-          end
-        end
+          """
+          {
+              size_t tag_marker;
+              err = asn1_serialize_constructed_begin(s, ASN1_TAG(ASN1_TAG_CLASS_CONTEXT, #{tag_num}), &tag_marker);
+              if (!asn1_is_ok(err)) return err;
+              #{inner_encoder}
+              err = asn1_serialize_constructed_end(s, tag_marker);
+              if (!asn1_is_ok(err)) return err;
+          }
+          """
 
-      nil ->
-        # No tag - regular encoding
-        if c_type == "ASN1C_Node" do
-          "err = ASN1C_Node_encode(&self->#{field}, s); if (!asn1_is_ok(err)) return err;"
-        else
-          if MapSet.member?(@primitive_types, c_type) or String.starts_with?(c_type, "char[") do
-            primitive_encoder(type_ast, "self->#{field}")
+        {:IMPLICIT, tag_num} ->
+          # IMPLICIT tag: serialize directly with context tag
+          if c_type == "ASN1C_Node" do
+            "err = ASN1C_Node_encode(&self->#{field}, s); if (!asn1_is_ok(err)) return err;"
           else
-            "err = #{c_type}_encode(&self->#{field}, s); if (!asn1_is_ok(err)) return err;"
+            if MapSet.member?(@primitive_types, c_type) or String.starts_with?(c_type, "char[") do
+              primitive_encoder_with_tag(type_ast, "self->#{field}", tag_num)
+            else
+              # For complex types with implicit tags, overwrite the tag after encoding
+              """
+              {
+                  size_t start = s->length;
+                  err = #{c_type}_encode(&self->#{field}, s);
+                  if (asn1_is_ok(err)) {
+                      /* Replace universal tag with implicit context tag, preserving constructed bit */
+                      s->buffer[start] = (s->buffer[start] & 0x20) | 0x80 | #{tag_num};
+                  } else return err;
+              }
+              """
+            end
           end
-        end
-    end
+
+        nil ->
+          # No tag - regular encoding
+          if c_type == "ASN1C_Node" do
+            "err = ASN1C_Node_encode(&self->#{field}, s); if (!asn1_is_ok(err)) return err;"
+          else
+            if MapSet.member?(@primitive_types, c_type) or String.starts_with?(c_type, "char[") do
+              primitive_encoder(type_ast, "self->#{field}")
+            else
+              "err = #{c_type}_encode(&self->#{field}, s); if (!asn1_is_ok(err)) return err;"
+            end
+          end
+      end
 
     if is_optional do
-      "    if (self->has_" <> field <> ") {\n" <>
-      "        " <> encoder_call <> "\n" <>
-      "    }"
+      "    if (self->has_" <>
+        field <>
+        ") {\n" <>
+        "        " <>
+        encoder_call <>
+        "\n" <>
+        "    }"
     else
       "    " <> encoder_call
     end
@@ -1170,107 +1430,123 @@ defmodule ASN1.C99Emitter do
 
   # emit_sequence_decoder moved to loc 783
 
-
-  defp emit_field_decoder(struct_name, {:ComponentType, _, field_name, type_info, optional, _, _}, _idx) do
+  defp emit_field_decoder(
+         struct_name,
+         {:ComponentType, _, field_name, type_info, optional, _, _},
+         _idx
+       ) do
     field = fieldName(field_name)
     is_optional = optional?(optional)
 
     # Extract type AST and tags from type_info
-    {type_ast, tags_list} = case type_info do
-      {:type, tags, t, _, _, _} -> {t, tags}
-      _ -> {type_info, []}
-    end
+    {type_ast, tags_list} =
+      case type_info do
+        {:type, tags, t, _, _, _} -> {t, tags}
+        _ -> {type_info, []}
+      end
 
     c_type = fieldType(struct_name, field_name, type_ast)
 
     # Extract tag information
-    tag_info = case tags_list do
-      [{:tag, :CONTEXT, number, {:default, :EXPLICIT}, _} | _] -> {:EXPLICIT, number}
-      [{:tag, :CONTEXT, number, :EXPLICIT, _} | _] -> {:EXPLICIT, number}
-      [{:tag, :CONTEXT, number, {:default, :IMPLICIT}, _} | _] -> {:IMPLICIT, number}
-      [{:tag, :CONTEXT, number, :IMPLICIT, _} | _] -> {:IMPLICIT, number}
-      _ -> nil
-    end
+    tag_info =
+      case tags_list do
+        [{:tag, :CONTEXT, number, {:default, :EXPLICIT}, _} | _] -> {:EXPLICIT, number}
+        [{:tag, :CONTEXT, number, :EXPLICIT, _} | _] -> {:EXPLICIT, number}
+        [{:tag, :CONTEXT, number, {:default, :IMPLICIT}, _} | _] -> {:IMPLICIT, number}
+        [{:tag, :CONTEXT, number, :IMPLICIT, _} | _] -> {:IMPLICIT, number}
+        _ -> nil
+      end
 
     # Condition to check if 'child' matches this field
-    {match_cond, decoder_block} = case tag_info do
-      {:EXPLICIT, tag_num} ->
-        cond = "child->identifier.tag_class == ASN1_TAG_CLASS_CONTEXT && child->identifier.tag_number == #{tag_num}"
+    {match_cond, decoder_block} =
+      case tag_info do
+        {:EXPLICIT, tag_num} ->
+          cond =
+            "child->identifier.tag_class == ASN1_TAG_CLASS_CONTEXT && child->identifier.tag_number == #{tag_num}"
 
-        # For explicit, we unwrap the child
-        content_call = if c_type == "ASN1C_Node" do
-           "err = ASN1C_Node_decode(&self->#{field}, sub_child, result); if (!asn1_is_ok(err)) return err;"
-        else
-            if MapSet.member?(@primitive_types, c_type) or String.starts_with?(c_type, "char[") do
+          # For explicit, we unwrap the child
+          content_call =
+            if c_type == "ASN1C_Node" do
+              "err = ASN1C_Node_decode(&self->#{field}, sub_child, result); if (!asn1_is_ok(err)) return err;"
+            else
+              if MapSet.member?(@primitive_types, c_type) or String.starts_with?(c_type, "char[") do
                 primitive_decoder(type_ast, "self->#{field}", "sub_child")
-            else
+              else
                 "err = #{c_type}_decode(&self->#{field}, sub_child, result); if (!asn1_is_ok(err)) return err;"
+              end
             end
-        end
 
-        block = """
-            size_t child_idx = asn1_node_index(result, child);
-            asn1_node_iterator_t sub_iter = asn1_children(result, child_idx);
-            const asn1_node_t *sub_child = asn1_next_child(&sub_iter);
-            if (sub_child == NULL) return asn1_error(ASN1_ERROR_TRUNCATED_FIELD, "missing explicit content", 0);
-            #{content_call}
-        """
-        {cond, block}
+          block = """
+              size_t child_idx = asn1_node_index(result, child);
+              asn1_node_iterator_t sub_iter = asn1_children(result, child_idx);
+              const asn1_node_t *sub_child = asn1_next_child(&sub_iter);
+              if (sub_child == NULL) return asn1_error(ASN1_ERROR_TRUNCATED_FIELD, "missing explicit content", 0);
+              #{content_call}
+          """
 
-      {:IMPLICIT, tag_num} ->
-        u_tag = universal_tag(type_ast)
-        cond = "child->identifier.tag_class == ASN1_TAG_CLASS_CONTEXT && child->identifier.tag_number == #{tag_num}"
+          {cond, block}
 
-        # For implicit, we fake the node
-        content_call = if c_type == "ASN1C_Node" do
-           "err = ASN1C_Node_decode(&self->#{field}, &fake_node, result); if (!asn1_is_ok(err)) return err;"
-        else
-            if MapSet.member?(@primitive_types, c_type) or String.starts_with?(c_type, "char[") do
+        {:IMPLICIT, tag_num} ->
+          u_tag = universal_tag(type_ast)
+
+          cond =
+            "child->identifier.tag_class == ASN1_TAG_CLASS_CONTEXT && child->identifier.tag_number == #{tag_num}"
+
+          # For implicit, we fake the node
+          content_call =
+            if c_type == "ASN1C_Node" do
+              "err = ASN1C_Node_decode(&self->#{field}, &fake_node, result); if (!asn1_is_ok(err)) return err;"
+            else
+              if MapSet.member?(@primitive_types, c_type) or String.starts_with?(c_type, "char[") do
                 primitive_decoder(type_ast, "self->#{field}", "&fake_node")
-            else
+              else
                 "err = #{c_type}_decode(&self->#{field}, &fake_node, result); if (!asn1_is_ok(err)) return err;"
+              end
             end
-        end
 
-        block = """
-            asn1_node_t fake_node = *child;
-            fake_node.identifier.tag_class = ASN1_TAG_CLASS_UNIVERSAL;
-            fake_node.identifier.tag_number = #{u_tag};
-            #{content_call}
-        """
-        {cond, block}
+          block = """
+              asn1_node_t fake_node = *child;
+              fake_node.identifier.tag_class = ASN1_TAG_CLASS_UNIVERSAL;
+              fake_node.identifier.tag_number = #{u_tag};
+              #{content_call}
+          """
 
-      nil ->
-        u_tag = universal_tag(type_ast)
+          {cond, block}
 
-        # Only use strict tag checking for known primitive types or explicit structures.
-        # Avoid strict checking for Externaltypereference because we can't resolve them to their base type here,
-        # and they might be aliased primitives (e.g. INTEGER) instead of SEQUENCE (16).
-        is_resolvable = case type_ast do
-          {:Externaltypereference, _, _, _} -> false
-          :ANY -> false
-          {:CHOICE, _} -> false
-          _ -> u_tag > 0
-        end
+        nil ->
+          u_tag = universal_tag(type_ast)
 
-        cond = if is_resolvable do
-           "child->identifier.tag_class == ASN1_TAG_CLASS_UNIVERSAL && child->identifier.tag_number == #{u_tag}"
-        else
-           "1"
-        end
+          # Only use strict tag checking for known primitive types or explicit structures.
+          # Avoid strict checking for Externaltypereference because we can't resolve them to their base type here,
+          # and they might be aliased primitives (e.g. INTEGER) instead of SEQUENCE (16).
+          is_resolvable =
+            case type_ast do
+              {:Externaltypereference, _, _, _} -> false
+              :ANY -> false
+              {:CHOICE, _} -> false
+              _ -> u_tag > 0
+            end
 
-        content_call = if c_type == "ASN1C_Node" do
-           "err = ASN1C_Node_decode(&self->#{field}, child, result); if (!asn1_is_ok(err)) return err;"
-        else
-            if MapSet.member?(@primitive_types, c_type) or String.starts_with?(c_type, "char[") do
-                primitive_decoder(type_ast, "self->#{field}")
+          cond =
+            if is_resolvable do
+              "child->identifier.tag_class == ASN1_TAG_CLASS_UNIVERSAL && child->identifier.tag_number == #{u_tag}"
             else
-                "err = #{c_type}_decode(&self->#{field}, child, result); if (!asn1_is_ok(err)) return err;"
+              "1"
             end
-        end
 
-        {cond, content_call}
-    end
+          content_call =
+            if c_type == "ASN1C_Node" do
+              "err = ASN1C_Node_decode(&self->#{field}, child, result); if (!asn1_is_ok(err)) return err;"
+            else
+              if MapSet.member?(@primitive_types, c_type) or String.starts_with?(c_type, "char[") do
+                primitive_decoder(type_ast, "self->#{field}")
+              else
+                "err = #{c_type}_decode(&self->#{field}, child, result); if (!asn1_is_ok(err)) return err;"
+              end
+            end
+
+          {cond, content_call}
+      end
 
     if is_optional do
       """
@@ -1303,48 +1579,110 @@ defmodule ASN1.C99Emitter do
 
   defp primitive_encoder(type_ast, var) do
     case type_ast do
-      :INTEGER -> "err = asn1_serialize_int64(s, #{var}); if (!asn1_is_ok(err)) return err;"
-      :BOOLEAN -> "err = asn1_serialize_boolean(s, #{var}); if (!asn1_is_ok(err)) return err;"
-      :NULL -> "err = asn1_serialize_null(s); if (!asn1_is_ok(err)) return err;"
+      :INTEGER ->
+        "err = asn1_serialize_int64(s, #{var}); if (!asn1_is_ok(err)) return err;"
+
+      :BOOLEAN ->
+        "err = asn1_serialize_boolean(s, #{var}); if (!asn1_is_ok(err)) return err;"
+
+      :NULL ->
+        "err = asn1_serialize_null(s); if (!asn1_is_ok(err)) return err;"
+
       :"OBJECT IDENTIFIER" ->
         "{ asn1_oid_t oid = {.count = #{var}.count}; for(size_t i=0; i<#{var}.count; i++) oid.components[i] = #{var}.components[i]; err = asn1_serialize_oid(s, &oid); if (!asn1_is_ok(err)) return err; }"
+
       :"OCTET STRING" ->
         "err = asn1_serialize_octet_string(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
       :"BIT STRING" ->
         "{ asn1_bit_string_t bs = {.bytes = #{var}.bytes, .byte_count = #{var}.byte_count, .unused_bits = #{var}.unused_bits}; err = asn1_serialize_bit_string(s, &bs); if (!asn1_is_ok(err)) return err; }"
+
       {:"BIT STRING", _} ->
         "{ asn1_bit_string_t bs = {.bytes = #{var}.bytes, .byte_count = #{var}.byte_count, .unused_bits = #{var}.unused_bits}; err = asn1_serialize_bit_string(s, &bs); if (!asn1_is_ok(err)) return err; }"
+
       {:"OCTET STRING", _} ->
         "err = asn1_serialize_octet_string(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      {:ENUMERATED, _} -> "err = asn1_serialize_int64(s, (int64_t)#{var}); if (!asn1_is_ok(err)) return err;"
-      {:INTEGER, _} -> "err = asn1_serialize_int64(s, #{var}); if (!asn1_is_ok(err)) return err;"
-      :UTF8String -> "err = asn1_serialize_string(s, ASN1_ID_UTF8_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      :PrintableString -> "err = asn1_serialize_string(s, ASN1_ID_PRINTABLE_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      :IA5String -> "err = asn1_serialize_string(s, ASN1_ID_IA5_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      :GeneralizedTime -> "err = asn1_serialize_string(s, ASN1_ID_GENERALIZED_TIME, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      :UTCTime -> "err = asn1_serialize_string(s, ASN1_ID_UTC_TIME, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      {:ENUMERATED, _} ->
+        "err = asn1_serialize_int64(s, (int64_t)#{var}); if (!asn1_is_ok(err)) return err;"
+
+      {:INTEGER, _} ->
+        "err = asn1_serialize_int64(s, #{var}); if (!asn1_is_ok(err)) return err;"
+
+      :UTF8String ->
+        "err = asn1_serialize_string(s, ASN1_ID_UTF8_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      :PrintableString ->
+        "err = asn1_serialize_string(s, ASN1_ID_PRINTABLE_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      :IA5String ->
+        "err = asn1_serialize_string(s, ASN1_ID_IA5_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      :GeneralizedTime ->
+        "err = asn1_serialize_string(s, ASN1_ID_GENERALIZED_TIME, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      :UTCTime ->
+        "err = asn1_serialize_string(s, ASN1_ID_UTC_TIME, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
       # String subtypes
-      {:PrintableString, _} -> "err = asn1_serialize_string(s, ASN1_ID_PRINTABLE_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      {:UTF8String, _} -> "err = asn1_serialize_string(s, ASN1_ID_UTF8_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      {:IA5String, _} -> "err = asn1_serialize_string(s, ASN1_ID_IA5_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      {:VisibleString, _} -> "err = asn1_serialize_string(s, ASN1_ID_VISIBLE_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      {:NumericString, _} -> "err = asn1_serialize_string(s, ASN1_ID_NUMERIC_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      :TeletexString -> "err = asn1_serialize_string(s, ASN1_ID_TELETEX_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      :VisibleString -> "err = asn1_serialize_string(s, ASN1_ID_VISIBLE_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      :NumericString -> "err = asn1_serialize_string(s, ASN1_ID_NUMERIC_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      :UniversalString -> "err = asn1_serialize_string(s, ASN1_ID_UNIVERSAL_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      :BMPString -> "err = asn1_serialize_string(s, ASN1_ID_BMP_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      :ANY -> "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      {:ANY_DEFINED_BY, _} -> "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+      {:PrintableString, _} ->
+        "err = asn1_serialize_string(s, ASN1_ID_PRINTABLE_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      {:UTF8String, _} ->
+        "err = asn1_serialize_string(s, ASN1_ID_UTF8_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      {:IA5String, _} ->
+        "err = asn1_serialize_string(s, ASN1_ID_IA5_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      {:VisibleString, _} ->
+        "err = asn1_serialize_string(s, ASN1_ID_VISIBLE_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      {:NumericString, _} ->
+        "err = asn1_serialize_string(s, ASN1_ID_NUMERIC_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      :TeletexString ->
+        "err = asn1_serialize_string(s, ASN1_ID_TELETEX_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      :VisibleString ->
+        "err = asn1_serialize_string(s, ASN1_ID_VISIBLE_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      :NumericString ->
+        "err = asn1_serialize_string(s, ASN1_ID_NUMERIC_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      :UniversalString ->
+        "err = asn1_serialize_string(s, ASN1_ID_UNIVERSAL_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      :BMPString ->
+        "err = asn1_serialize_string(s, ASN1_ID_BMP_STRING, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      :ANY ->
+        "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      {:ANY_DEFINED_BY, _} ->
+        "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
       {:Externaltypereference, _, mod, ref_type} ->
         c_ref_name = qualified_name(ref_type, mod)
         "err = #{c_ref_name}_encode(&#{var}, s); if (!asn1_is_ok(err)) return err;"
-      {:ObjectClassFieldType, _, _, _, _} -> "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      {:ObjectClassFieldType, _, _, _} -> "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      {:CHOICE, _} -> "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      {:SEQUENCE, _, _, _, _} -> "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      {:SET, _, _, _, _} -> "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      {:pt, _, _} -> "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      {:ObjectClassFieldType, _, _, _, _} ->
+        "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      {:ObjectClassFieldType, _, _, _} ->
+        "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      {:CHOICE, _} ->
+        "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      {:SEQUENCE, _, _, _, _} ->
+        "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      {:SET, _, _, _, _} ->
+        "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      {:pt, _, _} ->
+        "err = asn1_serialize_raw(s, #{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
       _ ->
         IO.puts("Warning: Falling through in primitive_encoder for #{inspect(type_ast)}")
         "/* TODO: encode #{inspect(type_ast)} */ (void)#{var};"
@@ -1356,13 +1694,27 @@ defmodule ASN1.C99Emitter do
     context_tag = "ASN1_TAG(ASN1_TAG_CLASS_CONTEXT, #{tag_num})"
 
     case type_ast do
-      :"OCTET STRING" -> "err = asn1_serialize_string(s, #{context_tag}, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      {:"OCTET STRING", _} -> "err = asn1_serialize_string(s, #{context_tag}, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      :UTF8String -> "err = asn1_serialize_string(s, #{context_tag}, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      :PrintableString -> "err = asn1_serialize_string(s, #{context_tag}, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      :IA5String -> "err = asn1_serialize_string(s, #{context_tag}, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      :GeneralizedTime -> "err = asn1_serialize_string(s, #{context_tag}, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
-      :UTCTime -> "err = asn1_serialize_string(s, #{context_tag}, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+      :"OCTET STRING" ->
+        "err = asn1_serialize_string(s, #{context_tag}, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      {:"OCTET STRING", _} ->
+        "err = asn1_serialize_string(s, #{context_tag}, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      :UTF8String ->
+        "err = asn1_serialize_string(s, #{context_tag}, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      :PrintableString ->
+        "err = asn1_serialize_string(s, #{context_tag}, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      :IA5String ->
+        "err = asn1_serialize_string(s, #{context_tag}, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      :GeneralizedTime ->
+        "err = asn1_serialize_string(s, #{context_tag}, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
+      :UTCTime ->
+        "err = asn1_serialize_string(s, #{context_tag}, (const char*)#{var}.bytes, #{var}.length); if (!asn1_is_ok(err)) return err;"
+
       _ ->
         # Fall back to regular encoder if we don't have specific handling
         # Note: INTEGER with implicit tag needs special handling but asn1_serialize_integer_tagged doesn't exist
@@ -1372,40 +1724,132 @@ defmodule ASN1.C99Emitter do
 
   defp primitive_decoder(type_ast, var, node_var \\ "child") do
     case type_ast do
-      :INTEGER -> "{ int64_t val; err = asn1_parse_int64(#{node_var}, &val); if (!asn1_is_ok(err)) return err; #{var} = val; }"
-      :BOOLEAN -> "{ bool val; err = asn1_parse_boolean(#{node_var}, &val, ASN1_ENCODING_DER); if (!asn1_is_ok(err)) return err; #{var} = val; }"
-      :NULL -> "err = asn1_parse_null(#{node_var}); if (!asn1_is_ok(err)) return err;"
+      :INTEGER ->
+        "{ int64_t val; err = asn1_parse_int64(#{node_var}, &val); if (!asn1_is_ok(err)) return err; #{var} = val; }"
+
+      :BOOLEAN ->
+        "{ bool val; err = asn1_parse_boolean(#{node_var}, &val, ASN1_ENCODING_DER); if (!asn1_is_ok(err)) return err; #{var} = val; }"
+
+      :NULL ->
+        "err = asn1_parse_null(#{node_var}); if (!asn1_is_ok(err)) return err;"
+
       :"OBJECT IDENTIFIER" ->
         "{ asn1_oid_t oid; err = asn1_parse_oid(#{node_var}, &oid); if (!asn1_is_ok(err)) return err; #{var}.count = oid.count; for(size_t i=0; i<oid.count; i++) #{var}.components[i] = oid.components[i]; }"
+
       :"OCTET STRING" ->
         "{ const uint8_t *data; size_t len; err = asn1_parse_octet_string(#{node_var}, &data, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, data, len); #{var}.length = len; }"
+
+      :PrintableString ->
+        "err = ASN1C_PrintableString_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      :IA5String ->
+        "err = ASN1C_IA5String_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      :UTF8String ->
+        "err = ASN1C_UTF8String_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      :T61String ->
+        "err = ASN1C_TeletexString_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      :TeletexString ->
+        "err = ASN1C_TeletexString_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:TeletexString, _} ->
+        "err = ASN1C_TeletexString_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      :BMPString ->
+        "err = ASN1C_BMPString_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:BMPString, _} ->
+        "err = ASN1C_BMPString_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      :UniversalString ->
+        "err = ASN1C_UniversalString_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:UniversalString, _} ->
+        "err = ASN1C_UniversalString_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      :VisibleString ->
+        "err = ASN1C_VisibleString_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      :NumericString ->
+        "err = ASN1C_NumericString_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      :UTCTime ->
+        "err = ASN1C_UTCTime_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      :GeneralizedTime ->
+        "err = ASN1C_GeneralizedTime_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
       :"BIT STRING" ->
         "{ asn1_bit_string_t bs; err = asn1_parse_bit_string(#{node_var}, &bs); if (!asn1_is_ok(err)) return err; if(bs.byte_count > sizeof(#{var}.bytes)) bs.byte_count = sizeof(#{var}.bytes); memcpy(#{var}.bytes, bs.bytes, bs.byte_count); #{var}.byte_count = bs.byte_count; #{var}.unused_bits = bs.unused_bits; }"
+
       {:"BIT STRING", _} ->
         "{ asn1_bit_string_t bs; err = asn1_parse_bit_string(#{node_var}, &bs); if (!asn1_is_ok(err)) return err; if(bs.byte_count > sizeof(#{var}.bytes)) bs.byte_count = sizeof(#{var}.bytes); memcpy(#{var}.bytes, bs.bytes, bs.byte_count); #{var}.byte_count = bs.byte_count; #{var}.unused_bits = bs.unused_bits; }"
+
       {:"OCTET STRING", _} ->
         "{ const uint8_t *data; size_t len; err = asn1_parse_octet_string(#{node_var}, &data, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, data, len); #{var}.length = len; }"
-      {:ENUMERATED, _} -> "{ int64_t val; err = asn1_parse_int64(#{node_var}, &val); if (!asn1_is_ok(err)) return err; #{var} = (int64_t)val; }"
-      {:INTEGER, _} -> "{ int64_t val; err = asn1_parse_int64(#{node_var}, &val); if (!asn1_is_ok(err)) return err; #{var} = val; }"
-      :ANY -> "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
-      {:ANY_DEFINED_BY, _} -> "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:PrintableString, _} ->
+        "err = ASN1C_PrintableString_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:IA5String, _} ->
+        "err = ASN1C_IA5String_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:UTF8String, _} ->
+        "err = ASN1C_UTF8String_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:VisibleString, _} ->
+        "err = ASN1C_VisibleString_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:NumericString, _} ->
+        "err = ASN1C_NumericString_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:ENUMERATED, _} ->
+        "{ int64_t val; err = asn1_parse_int64(#{node_var}, &val); if (!asn1_is_ok(err)) return err; #{var} = (int64_t)val; }"
+
+      {:INTEGER, _} ->
+        "{ int64_t val; err = asn1_parse_int64(#{node_var}, &val); if (!asn1_is_ok(err)) return err; #{var} = val; }"
+
+      :ANY ->
+        "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:ANY_DEFINED_BY, _} ->
+        "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
       {:Externaltypereference, _, mod, ref_type} ->
         c_ref_name = qualified_name(ref_type, mod)
+
         "err = #{c_ref_name}_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
-      {:ObjectClassFieldType, _, _, _, _} -> "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
-      {:ObjectClassFieldType, _, _, _} -> "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
-      {:CHOICE, _} -> "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
-      {:SEQUENCE, _, _, _, _} -> "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
-      {:SET, _, _, _, _} -> "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
-      {:pt, _, _} -> "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:ObjectClassFieldType, _, _, _, _} ->
+        "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:ObjectClassFieldType, _, _, _} ->
+        "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:CHOICE, _} ->
+        "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:SEQUENCE, _, _, _, _} ->
+        "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:SET, _, _, _, _} ->
+        "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
+      {:pt, _, _} ->
+        "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"
+
       _ ->
         IO.puts("Warning: Falling through in primitive_decoder for #{inspect(type_ast)}")
         "/* TODO: decode #{inspect(type_ast)} */ (void)#{var};"
     end
   end
 
-
-  defp emit_sequence_field(struct_name, {:ComponentType, _, field_name, {:type, _, type_ast, _, _, _}, optional, _, _}) do
+  defp emit_sequence_field(
+         struct_name,
+         {:ComponentType, _, field_name, {:type, _, type_ast, _, _, _}, optional, _, _}
+       ) do
     field = fieldName(field_name)
     c_type = fieldType(struct_name, field_name, type_ast)
 
@@ -1417,10 +1861,11 @@ defmodule ASN1.C99Emitter do
       end
 
     # Handle C array types like "char[256]" -> "char field[256]"
-    field_decl = case Regex.run(~r/^(\w+)\[(\d+)\]$/, c_type) do
-      [_, base_type, size] -> "#{base_type} #{field}[#{size}]"
-      _ -> "#{c_type} #{field}"
-    end
+    field_decl =
+      case Regex.run(~r/^(\w+)\[(\d+)\]$/, c_type) do
+        [_, base_type, size] -> "#{base_type} #{field}[#{size}]"
+        _ -> "#{c_type} #{field}"
+      end
 
     presence <> "    #{field_decl};"
   end
@@ -1430,19 +1875,30 @@ defmodule ASN1.C99Emitter do
   defp optional?(opt) when opt == :OPTIONAL, do: true
 
   defp optional?(opt) when is_list(opt) do
-    Enum.any?(opt, &(&1 == :OPTIONAL))
+    Enum.any?(opt, fn
+      :OPTIONAL -> true
+      {:DEFAULT, _} -> true
+      _ -> false
+    end)
   end
+
+  # Handle DEFAULT as a single value (not in a list)
+  defp optional?({:DEFAULT, _}), do: true
 
   defp optional?(_), do: false
 
-  defp choice_variant(struct_name, component = {:ComponentType, _, field_name, type_info, _optional, _, _}) do
+  defp choice_variant(
+         struct_name,
+         component = {:ComponentType, _, field_name, type_info, _optional, _, _}
+       ) do
     field = fieldName(field_name)
 
     # Extract the actual type AST and tags from type_info
-    {type_ast, tags_list} = case type_info do
-      {:type, tags, t, _, _, _} -> {t, tags}
-      _ -> {type_info, []}
-    end
+    {type_ast, tags_list} =
+      case type_info do
+        {:type, tags, t, _, _, _} -> {t, tags}
+        _ -> {type_info, []}
+      end
 
     IO.puts("--- choice_variant for #{struct_name} field #{field_name} ---")
     IO.puts("    type_ast: #{inspect(type_ast)}")
@@ -1450,47 +1906,53 @@ defmodule ASN1.C99Emitter do
     type = fieldType(struct_name, field_name, type_ast)
 
     # Extract tag from the tags list
-    tag = case tags_list do
-      [{:tag, :CONTEXT, number, {:default, :IMPLICIT}, _} | _] ->
-        {:IMPLICIT, number}
-      [{:tag, :CONTEXT, number, :IMPLICIT, _} | _] ->
-        {:IMPLICIT, number}
-      [{:tag, :CONTEXT, number, {:default, :EXPLICIT}, _} | _] ->
-        {:EXPLICIT, number}
-      [{:tag, :CONTEXT, number, :EXPLICIT, _} | _] ->
-        {:EXPLICIT, number}
-      _ ->
-        # No context tag, use universal tag based on type_ast
-        case type_ast do
-          :BOOLEAN -> {:UNIVERSAL, 1}
-          :INTEGER -> {:UNIVERSAL, 2}
-          {:INTEGER, _} -> {:UNIVERSAL, 2}
-          :"BIT STRING" -> {:UNIVERSAL, 3}
-          {:"BIT STRING", _} -> {:UNIVERSAL, 3}
-          :"OCTET STRING" -> {:UNIVERSAL, 4}
-          {:"OCTET STRING", _} -> {:UNIVERSAL, 4}
-          :NULL -> {:UNIVERSAL, 5}
-          :"OBJECT IDENTIFIER" -> {:UNIVERSAL, 6}
-          :UTF8String -> {:UNIVERSAL, 12}
-          :PrintableString -> {:UNIVERSAL, 19}
-          :TeletexString -> {:UNIVERSAL, 20}
-          :IA5String -> {:UNIVERSAL, 22}
-          :UTCTime -> {:UNIVERSAL, 23}
-          :GeneralizedTime -> {:UNIVERSAL, 24}
-          :VisibleString -> {:UNIVERSAL, 26}
-          {:VisibleString, _} -> {:UNIVERSAL, 26}
-          :NumericString -> {:UNIVERSAL, 18}
-          {:NumericString, _} -> {:UNIVERSAL, 18}
-          {:UniversalString, _} -> {:UNIVERSAL, 28}
-          :BMPString -> {:UNIVERSAL, 30}
-          {:SEQUENCE, _, _, _, _} -> {:UNIVERSAL, 16}
-          {:SET, _, _, _, _} -> {:UNIVERSAL, 17}
-          {:"SEQUENCE OF", _} -> {:UNIVERSAL, 16}
-          {:"SET OF", _} -> {:UNIVERSAL, 17}
-          {:Externaltypereference, _, _, _} -> {:UNIVERSAL, 16}
-          _ -> nil
-        end
-    end
+    tag =
+      case tags_list do
+        [{:tag, :CONTEXT, number, {:default, :IMPLICIT}, _} | _] ->
+          {:IMPLICIT, number}
+
+        [{:tag, :CONTEXT, number, :IMPLICIT, _} | _] ->
+          {:IMPLICIT, number}
+
+        [{:tag, :CONTEXT, number, {:default, :EXPLICIT}, _} | _] ->
+          {:EXPLICIT, number}
+
+        [{:tag, :CONTEXT, number, :EXPLICIT, _} | _] ->
+          {:EXPLICIT, number}
+
+        _ ->
+          # No context tag, use universal tag based on type_ast
+          case type_ast do
+            :BOOLEAN -> {:UNIVERSAL, 1}
+            :INTEGER -> {:UNIVERSAL, 2}
+            {:INTEGER, _} -> {:UNIVERSAL, 2}
+            :"BIT STRING" -> {:UNIVERSAL, 3}
+            {:"BIT STRING", _} -> {:UNIVERSAL, 3}
+            :"OCTET STRING" -> {:UNIVERSAL, 4}
+            {:"OCTET STRING", _} -> {:UNIVERSAL, 4}
+            :NULL -> {:UNIVERSAL, 5}
+            :"OBJECT IDENTIFIER" -> {:UNIVERSAL, 6}
+            :UTF8String -> {:UNIVERSAL, 12}
+            :PrintableString -> {:UNIVERSAL, 19}
+            :TeletexString -> {:UNIVERSAL, 20}
+            :IA5String -> {:UNIVERSAL, 22}
+            :UTCTime -> {:UNIVERSAL, 23}
+            :GeneralizedTime -> {:UNIVERSAL, 24}
+            :VisibleString -> {:UNIVERSAL, 26}
+            {:VisibleString, _} -> {:UNIVERSAL, 26}
+            :NumericString -> {:UNIVERSAL, 18}
+            {:NumericString, _} -> {:UNIVERSAL, 18}
+            :UniversalString -> {:UNIVERSAL, 28}
+            {:UniversalString, _} -> {:UNIVERSAL, 28}
+            :BMPString -> {:UNIVERSAL, 30}
+            {:SEQUENCE, _, _, _, _} -> {:UNIVERSAL, 16}
+            {:SET, _, _, _, _} -> {:UNIVERSAL, 17}
+            {:"SEQUENCE OF", _} -> {:UNIVERSAL, 16}
+            {:"SET OF", _} -> {:UNIVERSAL, 17}
+            {:Externaltypereference, _, _, _} -> {:UNIVERSAL, 16}
+            _ -> nil
+          end
+      end
 
     {field_name, field, type, tag, type_ast}
   end
@@ -1538,6 +2000,7 @@ defmodule ASN1.C99Emitter do
   defp flatten_oid({:NamedNumber, _, inner}), do: flatten_oid(inner)
   defp flatten_oid({:seqtag, _, _, _}), do: []
   defp flatten_oid({:Externalvaluereference, _, _, name}), do: flatten_oid(name)
+
   defp flatten_oid(atom) when is_atom(atom) do
     value = Atom.to_string(atom)
 
@@ -1607,14 +2070,27 @@ defmodule ASN1.C99Emitter do
     str = bin(value) |> normalizeName()
     lower = String.downcase(str)
     # Don't uppercase if it's already a valid C primitive type
-    if lower in ["int64_t", "uint64_t", "int32_t", "uint32_t", "int16_t", "uint16_t",
-                 "int8_t", "uint8_t", "size_t", "bool", "void"] do
+    if lower in [
+         "int64_t",
+         "uint64_t",
+         "int32_t",
+         "uint32_t",
+         "int16_t",
+         "uint16_t",
+         "int8_t",
+         "uint8_t",
+         "size_t",
+         "bool",
+         "void"
+       ] do
       lower
-    else if String.starts_with?(str, "ASN1C_") do
-      str
     else
-      String.upcase(str)
-    end end
+      if String.starts_with?(str, "ASN1C_") do
+        str
+      else
+        String.upcase(str)
+      end
+    end
   end
 
   defp sanitize_type_name(value, fallback \\ nil) do
@@ -1684,36 +2160,37 @@ defmodule ASN1.C99Emitter do
     mod_str = bin(mod)
 
     # Canonicalize module redirects
-    mod_str = case mod_str do
-      "PKIX1Explicit-2009" -> "PKIX1Explicit88"
-      "PKIX1Implicit-2009" -> "PKIX1Implicit88"
-      "AttributeCertificateVersion1-2009" -> "AttributeCertificateVersion1"
-      "AttributeCertificateVersion1" -> "AttributeCertificateVersion1"
-      "AlgorithmInformation-2009" -> "PKIX1Explicit88"
-      "AlgorithmInformation" -> "PKIX1Explicit88"
-      "AuthenticationFramework" -> "PKIX1Explicit88"
-      "InformationFramework" -> "PKIX1Explicit88"
-      other -> other
-    end
+    mod_str =
+      case mod_str do
+        "PKIX1Explicit-2009" -> "PKIX1Explicit88"
+        "PKIX1Implicit-2009" -> "PKIX1Implicit88"
+        "AttributeCertificateVersion1-2009" -> "AttributeCertificateVersion1"
+        "AttributeCertificateVersion1" -> "AttributeCertificateVersion1"
+        "AlgorithmInformation-2009" -> "PKIX1Explicit88"
+        "AlgorithmInformation" -> "PKIX1Explicit88"
+        "AuthenticationFramework" -> "PKIX1Explicit88"
+        "InformationFramework" -> "PKIX1Explicit88"
+        other -> other
+      end
 
     mod_part = normalizeName(mod_str)
     normalized_name = name_str |> bin() |> normalizeName() |> String.upcase()
 
     # Pre-canonicalized prefixes
     translated_name =
-       normalized_name
-       |> String.replace("ALGORITHMINFORMATION_2009_", "PKIX1EXPLICIT88_")
-       |> String.replace("PKIX1EXPLICIT_2009_", "PKIX1EXPLICIT88_")
-       |> String.replace("PKIX1IMPLICIT_2009_", "PKIX1IMPLICIT88_")
-       |> String.replace("ATTRIBUTECERTIFICATEVERSION1_2009_", "ATTRIBUTECERTIFICATEVERSION1_")
+      normalized_name
+      |> String.replace("ALGORITHMINFORMATION_2009_", "PKIX1EXPLICIT88_")
+      |> String.replace("PKIX1EXPLICIT_2009_", "PKIX1EXPLICIT88_")
+      |> String.replace("PKIX1IMPLICIT_2009_", "PKIX1IMPLICIT88_")
+      |> String.replace("ATTRIBUTECERTIFICATEVERSION1_2009_", "ATTRIBUTECERTIFICATEVERSION1_")
 
     # Fix for AlgorithmIdentifier specifically - always map to PKIX1EXPLICIT88
     # unless it's a specialized variant (which usually has more underscores)
     translated_name =
       if translated_name == "ALGORITHMIDENTIFIER" or
-         translated_name == "AUTHENTICATIONFRAMEWORK_ALGORITHMIDENTIFIER" or
-         translated_name == "ALGORITHMINFORMATION_ALGORITHMIDENTIFIER" or
-         translated_name == "ATTRIBUTECERTIFICATEVERSION1_ALGORITHMIDENTIFIER" do
+           translated_name == "AUTHENTICATIONFRAMEWORK_ALGORITHMIDENTIFIER" or
+           translated_name == "ALGORITHMINFORMATION_ALGORITHMIDENTIFIER" or
+           translated_name == "ATTRIBUTECERTIFICATEVERSION1_ALGORITHMIDENTIFIER" do
         "PKIX1EXPLICIT88_ALGORITHMIDENTIFIER"
       else
         translated_name
@@ -1734,10 +2211,10 @@ defmodule ASN1.C99Emitter do
     ]
 
     if Enum.any?(prefixes, &String.starts_with?(translated_name, &1)) do
-       sanitize_type_name(translated_name)
+      sanitize_type_name(translated_name)
     else
-       # Not qualified, so prepend mod_part
-       sanitize_type_name("#{mod_part}_#{name_str}")
+      # Not qualified, so prepend mod_part
+      sanitize_type_name("#{mod_part}_#{name_str}")
     end
   end
 end

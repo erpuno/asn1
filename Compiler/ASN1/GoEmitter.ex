@@ -151,6 +151,29 @@ defmodule ASN1.GoEmitter do
   defp go_lookup("CertificateList"), do: "asn1.RawValue"
   defp go_lookup("Time"), do: "time.Time"
   defp go_lookup("IssuerSerial"), do: "asn1.RawValue"
+  # AlgorithmInformation-2009 cross-module types
+  defp go_lookup("AlgorithmInformation_2009_AlgorithmIdentifier"), do: "asn1.RawValue"
+  defp go_lookup("AlgorithmInformation2009AlgorithmIdentifier"), do: "asn1.RawValue"
+  defp go_lookup("AlgorithmInformation_2009_SIGNATURE_ALGORITHM"), do: "asn1.RawValue"
+  defp go_lookup("AlgorithmInformation_2009_DIGEST_ALGORITHM"), do: "asn1.RawValue"
+  defp go_lookup("AlgorithmInformation_2009_KEY_DERIVATION"), do: "asn1.RawValue"
+  defp go_lookup("AlgorithmInformation_2009_KEY_WRAP"), do: "asn1.RawValue"
+  defp go_lookup("AlgorithmInformation_2009_KEY_TRANSPORT"), do: "asn1.RawValue"
+  defp go_lookup("AlgorithmInformation_2009_KEY_AGREE"), do: "asn1.RawValue"
+  defp go_lookup("AlgorithmInformation_2009_CONTENT_ENCRYPTION"), do: "asn1.RawValue"
+  defp go_lookup("AlgorithmInformation_2009_MAC_ALGORITHM"), do: "asn1.RawValue"
+  # Large integer types that need *big.Int
+  defp go_lookup("CertificateSerialNumber"), do: "*big.Int"
+  defp go_lookup("AuthenticationFrameworkCertificateSerialNumber"), do: "*big.Int"
+  defp go_lookup("X2009CertificateSerialNumber"), do: "*big.Int"
+  defp go_lookup("X10Version"), do: "int"
+  # Version types that need to preserve exact bytes for round-trip
+  defp go_lookup("AuthenticationFrameworkVersion"), do: "asn1.RawValue"
+  # Extension types - generated struct is incorrect, use RawValue to preserve bytes
+  defp go_lookup("AuthenticationFrameworkExtension"), do: "asn1.RawValue"
+  defp go_lookup("AuthenticationFrameworkExtensions"), do: "[]asn1.RawValue"
+  defp go_lookup("Extension"), do: "asn1.RawValue"
+  defp go_lookup("Extensions"), do: "[]asn1.RawValue"
   defp go_lookup(_), do: nil
 
   def emitHeader(modname) do
@@ -176,6 +199,7 @@ defmodule ASN1.GoEmitter do
 
     import (
         "encoding/asn1"
+        "math/big"
         "time"
     #{extra_imports}
     )
@@ -183,6 +207,7 @@ defmodule ASN1.GoEmitter do
     var _ = asn1.RawValue{}
     var _ = time.Time{}
     var _ = asn1.ObjectIdentifier{}
+    var _ = (*big.Int)(nil)
 
     """
   end
@@ -684,8 +709,12 @@ defmodule ASN1.GoEmitter do
     # Handle GeneralizedTime
     tags = if inner == :GeneralizedTime, do: ["generalized" | tags], else: tags
 
-    # Handle optional
-    tags = if optional == :OPTIONAL, do: ["optional" | tags], else: tags
+    # Handle optional and DEFAULT (DEFAULT fields should be treated as optional)
+    tags = case optional do
+      :OPTIONAL -> ["optional" | tags]
+      {:DEFAULT, _} -> ["optional" | tags]
+      _ -> tags
+    end
 
     # Handle SET
     tags =
@@ -720,13 +749,23 @@ defmodule ASN1.GoEmitter do
           acc =
             case mode do
               :EXPLICIT -> ["explicit" | acc]
-              :IMPLICIT -> acc # Go handles implicit by default? Or do we need to strip it? Go is implicit by default for struct tags.
+              :IMPLICIT -> acc # Go handles implicit by default for struct tags
               _ ->
-                 # If module default is EXPLICIT, we must add explicit.
-                 if getEnv(:current_module_tag_default, :EXPLICIT) == :EXPLICIT do
-                    ["explicit" | acc]
-                 else
+                 # Check current module - some modules use IMPLICIT TAGS by default
+                 current_mod = getEnv(:current_module, "")
+                 module_tag_default = getEnv(:current_module_tag_default, nil)
+
+                 # Modules that use IMPLICIT TAGS
+                 implicit_modules = ["PKCS-10", "PKCS-8", "CryptographicMessageSyntax-2009",
+                                     "CryptographicMessageSyntax-2010", "PKCS-7"]
+
+                 is_implicit = module_tag_default == :IMPLICIT or
+                               Enum.any?(implicit_modules, &(String.contains?(bin(current_mod), &1)))
+
+                 if is_implicit do
                     acc
+                 else
+                    ["explicit" | acc]
                  end
             end
           acc
@@ -884,7 +923,12 @@ defmodule ASN1.GoEmitter do
     oid_str = Enum.join(components, ", ")
 
     header = emitHeader(modname)
-    body = "var #{goName} = asn1.ObjectIdentifier{#{oid_str}}"
+    # Check if we have a valid OID (at least 2 numeric components)
+    body = if length(components) >= 2 and Enum.all?(components, fn c -> match?({_, ""}, Integer.parse(c)) end) do
+      "var #{goName} = asn1.ObjectIdentifier{#{oid_str}}"
+    else
+      "var #{goName} = asn1.RawValue{} /* unsupported value */"
+    end
 
     save(saveFlag, modname, goName, header <> body <> "\n")
   end
@@ -894,7 +938,12 @@ defmodule ASN1.GoEmitter do
     goName = name(name, modname)
 
     header = emitHeader(modname)
-    body = "const #{goName} = #{inspect(val)}"
+    # Always generate valid Go - use RawValue for unsupported values
+    body = cond do
+      is_integer(val) -> "const #{goName} = #{val}"
+      is_binary(val) -> "const #{goName} = \"#{val}\""
+      true -> "var #{goName} = asn1.RawValue{} /* unsupported value */"
+    end
 
     save(saveFlag, modname, goName, header <> body <> "\n")
   end

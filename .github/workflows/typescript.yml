@@ -1,0 +1,57 @@
+name: TypeScript OpenSSL Tests
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test-typescript:
+    env:
+      ImageOS: ubuntu24
+    name: TypeScript Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install OpenSSL
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openssl
+
+    - name: Set up Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: latest
+
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1
+      with:
+        elixir-version: '1.18'
+        otp-version: '28'
+
+    - name: Make scripts executable
+      run: chmod +x rebuild_ts.sh run_ts_openssl_tests.sh
+
+    - name: Rebuild TypeScript
+      run: ./rebuild_ts.sh
+
+    - name: Run TypeScript OpenSSL Tests
+      run: ./run_ts_openssl_tests.sh
+
+    - name: Start CA server
+      run: |
+        git clone https://github.com/synrc/ca.git 
+        cd ca
+        mix deps.get > /dev/null 2>&1
+        mix compile > /dev/null 2>&1
+        mix run --no-halt &
+        CA_PID=$! &&
+        sleep 5s &&
+        cd .. && cd ./Languages/TypeScript &&
+        bun run main.ts &&
+        kill $CA_PID
+        

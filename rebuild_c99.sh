@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -eu
 
 ROOT_DIR="Languages/C99/Generated"
 

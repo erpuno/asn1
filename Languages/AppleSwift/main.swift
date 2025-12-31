@@ -410,6 +410,77 @@ func buildCSR(subject: String, countryCode: String = "UA", state: String = "Kyiv
 }
 // #endif
 
+
+// MARK: - OpenSSL Comparison Tests
+
+/// Run OpenSSL comparison tests similar to Go/Java/Rust test suites
+func runOpenSSLTests(testDir: String) -> Int32 {
+    print("=== OpenSSL Comparison Tests (Swift GENERATED Structures) ===")
+    print("")
+    print("| Type | Size | Parse | Round-Trip |")
+    print("|------|------|-------|------------|")
+    
+    var passed = 0
+    var failed = 0
+    
+    func testFile<T: DERSerializable & DERParseable>(
+        _ path: String, 
+        _ name: String, 
+        _ type: T.Type
+    ) {
+        let url = URL(fileURLWithPath: path)
+        guard FileManager.default.fileExists(atPath: path) else {
+            print("| \(name) | - | ✗ | ✗ |")
+            print("|   → Error: File not found |")
+            failed += 1
+            return
+        }
+        
+        do {
+            let data = try Data(contentsOf: url)
+            let size = data.count
+            
+            // Parse
+            let parsed = try T(derEncoded: Array(data))
+            
+            // Round-trip
+            var serializer = DER.Serializer()
+            try parsed.serialize(into: &serializer)
+            let reencoded = serializer.serializedBytes
+            
+            if Array(data) == reencoded {
+                print("| \(name) | \(size) | ✓ | ✓ |")
+                passed += 1
+            } else {
+                print("| \(name) | \(size) | ✓ | ✗ |")
+                print("|   → Error: byte mismatch: len \(size) vs \(reencoded.count) |")
+                failed += 1
+            }
+        } catch {
+            print("| \(name) | - | ✗ | ✗ |")
+            print("|   → Error: \(error) |")
+            failed += 1
+        }
+    }
+    
+    // PKCS#8 Private Keys
+    testFile("\(testDir)/rsa_key.der", "PKCS#8 RSA Key", PKCS_8_PrivateKeyInfo.self)
+    testFile("\(testDir)/ec_key.der", "PKCS#8 EC Key", PKCS_8_PrivateKeyInfo.self)
+    
+    // PKCS#10 CSR
+    testFile("\(testDir)/csr.der", "PKCS#10 CSR", PKCS_10_CertificationRequest.self)
+    
+    // X.509 Certificates  
+    testFile("\(testDir)/ca_cert.der", "X.509 CA Cert", AuthenticationFramework_Certificate.self)
+    testFile("\(testDir)/ee_cert.der", "X.509 EE Cert", AuthenticationFramework_Certificate.self)
+    testFile("\(testDir)/extended_cert.der", "X.509 Extended Cert", AuthenticationFramework_Certificate.self)
+    
+    print("")
+    print("Results: \(passed) passed, \(failed) failed")
+    
+    return failed == 0 ? 0 : 1
+}
+
 public class Console {
 
   public static func exists(f: String) -> Bool { return FileManager.default.fileExists(atPath: f) }
@@ -1308,6 +1379,10 @@ public class Console {
      let argv = CommandLine.arguments
      if argv.count >= 2, argv[1] == "cms" {
         return CMSCLI.main(arguments: Array(argv.dropFirst(2)))
+     }
+     if argv.count >= 2, argv[1] == "--openssl-tests" {
+        let testDir = argv.count >= 3 ? argv[2] : "test_openssl"
+        return runOpenSSLTests(testDir: testDir)
      }
      do {
        try verifyOID()

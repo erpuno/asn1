@@ -40,5 +40,5 @@ rm -f ./Languages/AppleSwift/original.txt
 rm -f ./Languages/AppleSwift/verified.txt
 rm -f ./Languages/AppleSwift/Package.resolved
 
-# Remove all generated Java files except Main.java
-[ -d "./Languages/Java/src/main/java/com/generated/asn1" ] && find ./Languages/Java/src/main/java/com/generated/asn1/ -maxdepth 1 -type f ! -name 'Main.java' -exec rm -f {} +
+# Remove all generated Java files except Main.java and OpenSSLTest.java
+[ -d "./Languages/Java/src/main/java/com/generated/asn1" ] && find ./Languages/Java/src/main/java/com/generated/asn1/ -maxdepth 1 -type f ! -name 'Main.java' ! -name 'OpenSSLTest.java' -exec rm -f {} +

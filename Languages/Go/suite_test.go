@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/asn1"
+	"math/big"
 	"testing"
 	"time"
 
@@ -14,7 +15,7 @@ func TestCertificateMarshal(t *testing.T) {
 	cert := pkix1explicit88.PKIX1Explicit88Certificate{
 		TbsCertificate: pkix1explicit88.PKIX1Explicit88TBSCertificate{
 			Version:      pkix1explicit88.PKIX1Explicit88VersionV3,
-			SerialNumber: pkix1explicit88.PKIX1Explicit88CertificateSerialNumber(1),
+			SerialNumber: big.NewInt(1),
 			Signature:    asn1.RawValue{Tag: asn1.TagSequence, IsCompound: true},
 			Issuer:       pkix1explicit88.PKIX1Explicit88Name{Tag: asn1.TagSequence, IsCompound: true},
 			Validity: pkix1explicit88.PKIX1Explicit88Validity{

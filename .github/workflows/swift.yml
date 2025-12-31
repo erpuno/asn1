@@ -1,0 +1,49 @@
+name: Swift OpenSSL Tests
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test-swift:
+    env:
+      ImageOS: ubuntu24
+    name: Swift Tests
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install OpenSSL
+      run: brew install openssl
+
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1
+      with:
+        elixir-version: '1.18'
+        otp-version: '28'
+
+    - name: Make scripts executable
+      run: chmod +x rebuild_swift.sh run_swift_openssl_tests.sh
+
+    - name: Rebuild Swift
+      run: ./rebuild_swift.sh
+
+    - name: Run Swift OpenSSL Tests
+      run: ./run_swift_openssl_tests.sh
+
+    - name: Start CA server
+      run: |
+        git clone https://github.com/synrc/ca.git 
+        cd ca
+        mix deps.get > /dev/null 2>&1
+        mix compile > /dev/null 2>&1
+        mix run --no-halt &
+        CA_PID=$! &&
+        sleep 5s &&
+        cd ../Languages/AppleSwift &&
+        swift run -Xswiftc -suppress-warnings &&
+        kill $CA_PID

@@ -15,6 +15,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"math/big"
 	"net"
 	"net/url"
 	"strconv"
@@ -444,7 +445,7 @@ func testXSeries() {
 	// Test BasicAccessControlACIItem
 	aci := basicaccesscontrol.BasicAccessControlACIItem{
 		IdentificationTag:   asn1.RawValue{Tag: 4, Bytes: []byte("tag")},
-		Precedence:          10,
+		Precedence:          basicaccesscontrol.BasicAccessControlPrecedence(10),
 		AuthenticationLevel: basicaccesscontrol.BasicAccessControlAuthenticationLevel{Tag: 16, IsCompound: true}, // simplified
 		ItemOrUserFirst:     asn1.RawValue{Tag: 16, IsCompound: true},                                            // Sequence
 	}
@@ -457,8 +458,8 @@ func testXSeries() {
 	// Test AuthenticationFrameworkCertificate (partial)
 	cert := x500.AuthenticationFrameworkCertificate{
 		ToBeSigned: x500.AuthenticationFrameworkCertificateToBeSigned{
-			Version:      2,                                                        // v3
-			SerialNumber: x500.AuthenticationFrameworkCertificateSerialNumber(255), // Dummy
+			Version:      2,               // v3
+			SerialNumber: big.NewInt(255), // Dummy
 			Signature:    asn1.RawValue{Tag: 16, IsCompound: true},
 			// Issuer/Subject would need complex setup, using zero values for now (might panic on marshal if not careful, but struct creation is verified)
 		},
@@ -515,6 +516,7 @@ func testCHATContact() {
 		Names:    [][]byte{[]byte("John")},
 		PhoneId:  []byte("+380123456789"),
 		Surnames: [][]byte{[]byte("Doe")},
+		LastMsg:  chat.CHATMessage{No: 1},
 		Update:   1703100000,
 		Created:  1703000000,
 	}

@@ -134,6 +134,26 @@ typedef struct {
 #define ASN1_ID_GENERALIZED_TIME                                               \
   ((asn1_identifier_t){ASN1_TAG_GENERALIZED_TIME, ASN1_TAG_CLASS_UNIVERSAL})
 
+/** NumericString identifier */
+#define ASN1_ID_NUMERIC_STRING                                                 \
+  ((asn1_identifier_t){ASN1_TAG_NUMERIC_STRING, ASN1_TAG_CLASS_UNIVERSAL})
+
+/** TeletexString identifier */
+#define ASN1_ID_TELETEX_STRING                                                 \
+  ((asn1_identifier_t){ASN1_TAG_TELETEX_STRING, ASN1_TAG_CLASS_UNIVERSAL})
+
+/** VisibleString identifier */
+#define ASN1_ID_VISIBLE_STRING                                                 \
+  ((asn1_identifier_t){ASN1_TAG_VISIBLE_STRING, ASN1_TAG_CLASS_UNIVERSAL})
+
+/** UniversalString identifier */
+#define ASN1_ID_UNIVERSAL_STRING                                               \
+  ((asn1_identifier_t){ASN1_TAG_UNIVERSAL_STRING, ASN1_TAG_CLASS_UNIVERSAL})
+
+/** BMPString identifier */
+#define ASN1_ID_BMP_STRING                                                     \
+  ((asn1_identifier_t){ASN1_TAG_BMP_STRING, ASN1_TAG_CLASS_UNIVERSAL})
+
 /* ============================================================================
  * Identifier Functions
  * ============================================================================

@@ -10,6 +10,16 @@ application {
     mainClass = 'com.generated.asn1.Main'
 }
 
+tasks.register('runOpenSSLTest', JavaExec) {
+    group = 'verification'
+    description = 'Runs the OpenSSL compatibility tests'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.generated.asn1.OpenSSLTest'
+    if (project.hasProperty('args')) {
+        args project.args.split('\\s+')
+    }
+}
+
 repositories {
     mavenCentral()
 }
