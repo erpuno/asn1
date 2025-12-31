@@ -64,7 +64,9 @@ static int test_roundtrip(const char *filename, const char *typename,
     const asn1_node_t *root = asn1_root_node(&result);
     err = decode(obj, root, &result);
     if (!asn1_is_ok(err)) {
-        printf("FAILED decode: %s\n", asn1_error_code_name(err.code));
+        printf("FAILED decode: %s (message: %s)\n", 
+               asn1_error_code_name(err.code), 
+               err.message ? err.message : "none");
         free(obj);
         free(original_data);
         return 1;
