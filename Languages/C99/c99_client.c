@@ -310,21 +310,7 @@ int main(void) {
   //       02 02 27 10 (Iter 10000)
   //       02 01 02 (MAC HMAC-SHA256)
   // Total len: 2 + 11 + 2 + 18 + 3 + 4 + 3 = 43 bytes (0x2B)
-  uint8_t pbm_alg_der[] = {0x30, 0x3C, // Sequence, longer?
-                                       // OID 1.2.840.113533.7.66.13
-                           0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF6, 0x7D, 0x07,
-                           0x42, 0x0D,
-                           // Params Sequence
-                           0x30, 0x2F,
-                           // Salt
-                           0x04, 0x10, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
-                           0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-                           // OWF (2)
-                           0x02, 0x01, 0x02,
-                           // Iter (10000 = 0x2710)
-                           0x02, 0x02, 0x27, 0x10,
-                           // MAC (2)
-                           0x02, 0x01, 0x02};
+
   // The inner param seq length is 18+3+4+3 = 28 (0x1C)?
   // 2+16=18. 02 01 02 = 3. 02 02 27 10 = 4. 02 01 02 = 3.
   // 18+3+4+3 = 28.
@@ -470,7 +456,7 @@ int main(void) {
     printf("ERROR: No such host (localhost)\n");
     return 1;
   }
-  memcpy(&serv_addr.sin_addr.s_addr, server->h_addr, server->h_length);
+  memcpy(&serv_addr.sin_addr.s_addr, server->h_addr_list[0], server->h_length);
 
   printf("Connecting to localhost:8829...\n");
   if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
