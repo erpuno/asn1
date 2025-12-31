@@ -689,4 +689,8 @@ Enum.each(files, fn filename ->
   ASN1.compile(true, path)
 end)
 
+
+IO.puts("Running finalized steps...")
+ASN1.emitter().finalize()
+
 IO.puts("\n=== Complete ===")
