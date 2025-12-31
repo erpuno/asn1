@@ -30,6 +30,7 @@ Languages/C99/test_roundtrip
 Languages/C99/openssl_test
 Languages/C99/Generated/
 Languages/C99/Parser/build/
+Languages/C99/test_suite
 
 *.txt
 *.log

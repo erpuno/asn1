@@ -21,4 +21,4 @@ test: test_suite
 clean:
 	rm -f test_suite openssl_test
 
-.PHONY: test clean
+.PHONY: test clean test_suite openssl_test
