@@ -18,7 +18,6 @@ if [ ! -f "$TEST_DIR/rsa_key.der" ]; then
 distinguished_name = req_dn
 [req_dn]
 EOF
-    export OPENSSL_CONF=$TEST_DIR/min.cnf
 
     # RSA Key
     openssl genrsa -out $TEST_DIR/rsa_key.pem 2048
@@ -29,14 +28,14 @@ EOF
     openssl pkcs8 -topk8 -inform PEM -outform DER -in $TEST_DIR/ec_key.pem -out $TEST_DIR/ec_key.der -nocrypt
     
     # CSR
-    openssl req -new -key $TEST_DIR/rsa_key.pem -out $TEST_DIR/csr.der -outform DER -subj "/CN=Test/O=Org"
+    openssl req -new -key $TEST_DIR/rsa_key.pem -out $TEST_DIR/csr.der -outform DER -subj "/CN=Test/O=Org" -config $TEST_DIR/min.cnf
     
     # CA Certificate
-    openssl req -x509 -key $TEST_DIR/rsa_key.pem -out $TEST_DIR/ca_cert.der -outform DER -days 365 -subj "/CN=CA" -set_serial 1234567890
-    openssl x509 -in $TEST_DIR/ca_cert.der -inform DER -out $TEST_DIR/ca_cert.pem
+    openssl req -x509 -key $TEST_DIR/rsa_key.pem -out $TEST_DIR/ca_cert.der -outform DER -days 365 -subj "/CN=CA" -set_serial 1234567890 -config $TEST_DIR/min.cnf
+    openssl x509 -inform DER -in $TEST_DIR/ca_cert.der -out $TEST_DIR/ca_cert.pem
 
     # EE Certificate
-    openssl x509 -req -in $TEST_DIR/csr.der -inform DER -CA $TEST_DIR/ca_cert.pem -CAkey $TEST_DIR/rsa_key.pem \
+    openssl x509 -req -inform DER -in $TEST_DIR/csr.der -CA $TEST_DIR/ca_cert.pem -CAkey $TEST_DIR/rsa_key.pem \
         -out $TEST_DIR/ee_cert.der -outform DER -days 30 -CAcreateserial
 
     # Extended cert with SAN

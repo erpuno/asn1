@@ -34,7 +34,7 @@ EOF
     openssl req -x509 -key $TEST_DIR/rsa_key.pem -out $TEST_DIR/ca_cert.der -outform DER -days 365 -subj "/CN=CA" -config $TEST_DIR/min.cnf
     
     # EE Certificate
-    openssl x509 -req -in $TEST_DIR/csr.der -inform DER -CA $TEST_DIR/ca_cert.der -CAform DER -CAkey $TEST_DIR/rsa_key.pem \
+    openssl x509 -req -inform DER -in $TEST_DIR/csr.der -CA $TEST_DIR/ca_cert.der -CAform DER -CAkey $TEST_DIR/rsa_key.pem \
         -out $TEST_DIR/ee_cert.der -outform DER -days 30 -CAcreateserial
     
     # Extended cert with SAN

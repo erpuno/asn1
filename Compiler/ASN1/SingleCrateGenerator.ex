@@ -65,8 +65,7 @@ defmodule SingleCrateGenerator do
     //!
     //! Flat structure eliminates all circular dependency issues.
 
-    #![allow(unused_imports)]
-    #![allow(dead_code)]
+    #![allow(unused)]
     #![allow(non_snake_case)]
     #![allow(non_camel_case_types)]
 
