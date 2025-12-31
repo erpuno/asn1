@@ -135,6 +135,7 @@ defmodule ASN1.GoEmitter do
   defp go_lookup("X2009AttributeCertificate"), do: "asn1.RawValue"
   # Actual ASN.1 type names (before module prefix is added)
   defp go_lookup("AlgorithmIdentifier"), do: "asn1.RawValue"
+  defp go_lookup("AlgorithmInformation_2009_AlgorithmIdentifier"), do: "asn1.RawValue"
   defp go_lookup("Attribute"), do: "asn1.RawValue"
   defp go_lookup("GeneralNames"), do: "asn1.RawValue"
   defp go_lookup("MAPPING-BASED-MATCHING"), do: "asn1.RawValue"
@@ -149,7 +150,11 @@ defmodule ASN1.GoEmitter do
   defp go_lookup("AuthenticationFramework_IssuerSerial"), do: "asn1.RawValue"
   defp go_lookup("Certificate"), do: "asn1.RawValue"
   defp go_lookup("CertificateList"), do: "asn1.RawValue"
-  defp go_lookup("Time"), do: "time.Time"
+  defp go_lookup("Time"), do: "asn1.RawValue"  # Use RawValue to preserve exact encoding
+  defp go_lookup("AuthenticationFrameworkTime"), do: "asn1.RawValue"
+  defp go_lookup("AuthenticationFrameworkValidity"), do: "asn1.RawValue"
+  defp go_lookup("AuthenticationFrameworkExtensions"), do: "asn1.RawValue"
+  defp go_lookup("AuthenticationFrameworkExtension"), do: "asn1.RawValue"
   defp go_lookup("IssuerSerial"), do: "asn1.RawValue"
   defp go_lookup(_), do: nil
 
@@ -176,6 +181,7 @@ defmodule ASN1.GoEmitter do
 
     import (
         "encoding/asn1"
+        "math/big"
         "time"
     #{extra_imports}
     )
@@ -183,6 +189,7 @@ defmodule ASN1.GoEmitter do
     var _ = asn1.RawValue{}
     var _ = time.Time{}
     var _ = asn1.ObjectIdentifier{}
+    var _ = (*big.Int)(nil)
 
     """
   end
@@ -522,7 +529,7 @@ defmodule ASN1.GoEmitter do
   def mapBuiltin(:"OCTET STRING"), do: "[]byte"
   def mapBuiltin(:"BIT STRING"), do: "asn1.BitString"
   def mapBuiltin(:BOOLEAN), do: "bool"
-  def mapBuiltin(:INTEGER), do: "int64"
+  def mapBuiltin(:INTEGER), do: "*big.Int"
   def mapBuiltin(:ENUMERATED), do: "int"
   def mapBuiltin(:NULL), do: "asn1.RawValue"
   def mapBuiltin(:ANY), do: "asn1.RawValue"
@@ -712,22 +719,23 @@ defmodule ASN1.GoEmitter do
           acc = if class == :PRIVATE, do: ["private" | acc], else: acc
 
           # Check module default if mode is default
-          default_tagging = getEnv(:tag_default, :EXPLICIT) # Default to EXPLICIT if unknown, or IMPLICIT? standard is Explicit.
-          # Actually, we should set this when compiling module.
+          # NOTE: Go's encoding/asn1 treats context-specific tags as IMPLICIT by default
 
           # If mode is explicitly EXPLICIT, add it.
           # If mode is default, check module default.
+          # Mode can be :EXPLICIT, :IMPLICIT, nil, or {:default, :EXPLICIT/:IMPLICIT}
+          effective_mode = case mode do
+            {:default, inner} -> inner  # Extract inner value from tuple
+            other -> other
+          end
+
           acc =
-            case mode do
+            case effective_mode do
               :EXPLICIT -> ["explicit" | acc]
-              :IMPLICIT -> acc # Go handles implicit by default? Or do we need to strip it? Go is implicit by default for struct tags.
+              :IMPLICIT -> acc  # Go default is implicit for struct tags
               _ ->
-                 # If module default is EXPLICIT, we must add explicit.
-                 if getEnv(:current_module_tag_default, :EXPLICIT) == :EXPLICIT do
-                    ["explicit" | acc]
-                 else
-                    acc
-                 end
+                 # For truly unknown mode, use IMPLICIT (Go's default)
+                 acc
             end
           acc
 
@@ -871,7 +879,14 @@ defmodule ASN1.GoEmitter do
       end
 
     header = emitHeader(modname)
-    sep = if sanitized_target in ["asn1.RawValue", "asn1.BitString"], do: " = ", else: " "
+    # Use type alias (=) for types that Go's encoding/asn1 knows how to handle
+    # This allows asn1.Unmarshal to see through to the underlying type
+    needs_alias = sanitized_target in [
+      "asn1.RawValue", "asn1.BitString", "asn1.ObjectIdentifier",
+      "*big.Int", "int64", "int", "bool", "string", "[]byte",
+      "time.Time"
+    ]
+    sep = if needs_alias, do: " = ", else: " "
     body = "type #{goName}#{sep}#{sanitized_target}"
 
     save(saveFlag, modname, goName, header <> body)
@@ -892,12 +907,36 @@ defmodule ASN1.GoEmitter do
   def value(name, _type, val, modname, saveFlag) do
     clear_imports()
     goName = name(name, modname)
+    {keyword, goVal} = format_go_value(val)
 
     header = emitHeader(modname)
-    body = "const #{goName} = #{inspect(val)}"
+    body = "#{keyword} #{goName} = #{goVal}"
 
     save(saveFlag, modname, goName, header <> body <> "\n")
   end
+
+  defp format_go_value(val) when is_integer(val), do: {"const", "#{val}"}
+  defp format_go_value(val) when is_binary(val), do: {"const", inspect(val)}
+  defp format_go_value(val) when is_boolean(val), do: {"const", if(val, do: "true", else: "false")}
+  defp format_go_value(val) when is_atom(val), do: {"const", inspect(to_string(val))}
+  defp format_go_value(val) when is_list(val) do
+    # Try to see if it's an OID-like list
+    case extract_simple_oid(val) do
+      {:ok, oid} -> {"var", "asn1.ObjectIdentifier{#{Enum.join(oid, ", ")}}"}
+      :error -> {"var", "asn1.RawValue{} /* unsupported value */"}
+    end
+  end
+  defp format_go_value(_val), do: {"var", "asn1.RawValue{} /* unsupported value */"}
+
+  defp extract_simple_oid(list) when is_list(list) do
+    components = Enum.flat_map(list, &resolveOIDComponent/1)
+    if Enum.all?(components, fn c -> match?({:ok, _}, Integer.parse(c)) end) and length(components) > 0 do
+      {:ok, components}
+    else
+      :error
+    end
+  end
+  defp extract_simple_oid(_), do: :error
 
   defp extractOIDList(val) do
     list = if is_list(val), do: val, else: [val]
@@ -913,11 +952,16 @@ defmodule ASN1.GoEmitter do
     resolveOIDComponent(tag) ++ resolveOIDComponent(val)
   end
 
-  defp resolveOIDComponent({:seqtag, _, _mod, _name}) do
-    # For seqtag, we try to resolve it to its numeric value if possible
-    # but based on the error, it seems 'inspect' was used.
-    # We should avoid returning the raw tuple.
-    []
+  defp resolveOIDComponent({:seqtag, _, mod, name}) do
+    # Try to resolve the seqtag by looking up the value in env
+    # seqtag represents a reference to another OID value definition
+    resolved = getEnv({:oid_value, bin(mod), bin(name)}, nil)
+    if resolved do
+      resolveOIDComponent(resolved)
+    else
+      # Cannot resolve, skip this component
+      []
+    end
   end
 
   defp resolveOIDComponent({:Externalvaluereference, _, _, :"joint-iso-itu-t"}), do: ["2"]
