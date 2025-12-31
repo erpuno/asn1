@@ -198,6 +198,7 @@ public class Main {
             null
         );
 
+
         // --- Body: p10cr ---
         PKCS_10_CertificationRequest csr = createCSR(kp, "robot_java");
         ASN1Node csrNode = DERParser.parse(csr.serialize());
@@ -323,6 +324,8 @@ public class Main {
         }
         throw new RuntimeException("Node is not primitive");
     }
+
+
 
     private static byte[] readAllBytes(java.io.InputStream is) throws IOException {
         java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();

@@ -45,7 +45,7 @@ jobs:
 
     - name: Start CA server
       run: |
-        git clone https://github.com/chat-x509/ca.git 
+        git clone https://github.com/synrc/ca.git 
         cd ca
         mix deps.get > /dev/null 2>&1
         mix compile > /dev/null 2>&1
