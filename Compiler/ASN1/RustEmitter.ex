@@ -1554,19 +1554,26 @@ defmodule ASN1.RustEmitter do
               {number, cls_str}
 
             _ ->
-              # No explicit tag, use universal tag of the type
-              ut = universal_tag(type)
-              if ut do
-                {ut, "TagClass::Universal"}
-              else
-                # If we can't determine tag, and no explicit tag is given, we default to ContextSpecific(idx) to avoid compilation error?
-                # No, that caused the bug.
-                # If ut is nil (e.g. ANY), we generally can't generate a specific match arm for it (it would overlap or be 'any').
-                # But for CHOICE, we need distinguishing tags.
-                # Maybe we use idx as fallback ONLY if ut is nil.
-                IO.puts("Warning: Could not determine tag for CHOICE variant #{field_name} in #{rust_name}, falling back to ContextSpecific(#{idx})")
+              # If multiple variants, default to ContextSpecific(idx) to match encoder's forced implicit tagging
+              if length(cases) > 1 do
                 {idx, "TagClass::ContextSpecific"}
+              else
+                # Single variant - use universal tag if available
+                ut = universal_tag(type)
+                if ut do
+                  {ut, "TagClass::Universal"}
+                else
+                  {idx, "TagClass::ContextSpecific"}
+                end
               end
+          end
+
+          # Special case: if multiple variants, we ALWAYS use ContextSpecific(idx) to match encoder's forced logic
+          # and avoid collisions with types that might share the same universal tag (like multiple SEQUENCEs)
+          {expected_tag_no, expected_tag_class} = if length(cases) > 1 do
+             {idx, "TagClass::ContextSpecific"}
+          else
+             {expected_tag_no, expected_tag_class}
           end
 
           # Determine tagging method for peeling logic (only if explicit tag was present?)
@@ -1729,7 +1736,7 @@ defmodule ASN1.RustEmitter do
       cases
       |> Enum.with_index()
       |> Enum.map(fn
-        {{:ComponentType, _, field_name, {:type, _, type, _, _, _}, _optional, _, _}, idx} ->
+        {{:ComponentType, _, field_name, {:type, _type_tags, type, _, _, _}, _optional, _, _}, idx} ->
              variant = field_name |> raw_pascal() |> escape_reserved_variant()
 
              if use_context_tags do
