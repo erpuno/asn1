@@ -3,6 +3,9 @@ plugins {
     id 'application'
 }
 
+group = 'com.generated.asn1'
+version = '1.0.0'
+
 application {
     mainClass = 'com.generated.asn1.Main'
 }
@@ -12,6 +15,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
-    implementation 'org.bouncycastle:bcpkix-jdk15on:1.70'
+    implementation 'com.iho.asn1:der-java:1.0.0'
 }

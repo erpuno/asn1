@@ -1,2 +1,2 @@
 rootProject.name = 'generated-asn1'
-includeBuild './'
+includeBuild '../der-java'
