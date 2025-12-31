@@ -15,9 +15,14 @@ java_test_data/
 
 test_openssl/
 
-
+Languages/Rust/src/
 Languages/Rust/Cargo.lock
 Languages/Rust/target/
+
+Languages/AppleSwift/.build/
+Languages/AppleSwift/Generated/
+Languages/AppleSwift/Package.resolved
+
 
 *.txt
 *.log
