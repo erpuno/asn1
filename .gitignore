@@ -8,6 +8,7 @@ Languages/Go/chat
 
 Languages/der-java/
 Languages/Java/der.java/
+# Languages/Java/src/main/java/com/generated/asn1/Main.java
 Languages/Java/src/main/java/com/generated/asn1/
 Languages/Java/.gradle/
 Languages/Java/build
