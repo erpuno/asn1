@@ -355,7 +355,7 @@ public class #{javaName} implements DERSerializable {
       |> Enum.with_index()
       |> Enum.map(fn {field, _idx} ->
           case field do
-            {:ComponentType, _, fname, type, optional, tags, _} ->
+            {:ComponentType, _, fname, type, optional, _tags, _} ->
               is_optional = optional in [:OPTIONAL, 'OPTIONAL']
               java_type_name = to_java_type(type, modname)
               base_decoder = decoder_for(java_type_name, "child")
@@ -365,8 +365,35 @@ public class #{javaName} implements DERSerializable {
                   _ -> false
               end
 
+              # Extract tags from type definition if available
+              type_tags = case type do
+                  {:type, attrs, _inner, _params, _comments, _location} ->
+                      # Filter for tags
+                      Enum.filter(attrs, fn
+                          {:tag, _class, _num, _mode, _} -> true
+                          _ -> false
+                      end)
+                  _ -> []
+              end
+
+              # Helper to check for explicit context tagging
+              get_explicit_tag = fn tags ->
+                  Enum.find_value(tags, fn
+                      {:tag, :CONTEXT, num, mode, _} ->
+                          effective_mode = case mode do
+                              {:default, m} -> m
+                              m -> m
+                          end
+                          if effective_mode == :EXPLICIT, do: num, else: nil
+                      {:tag, :context, num, :explicit, _} -> num # Legacy/lowercase fallback
+                      _ -> nil
+                  end)
+              end
+
+              explicit_tag_num = get_explicit_tag.(type_tags)
+
               # Handle explicit tagging
-              decoder_call = if match?([{:tag, :context, _, :explicit} | _], tags) do
+              decoder_call = if explicit_tag_num do
                  # Extract inner
                  inner_expr = "((ASN1Node)((ASN1Node.Constructed)child.content).iterator().next())"
                  decoder_for(java_type_name, inner_expr)
@@ -380,7 +407,8 @@ public class #{javaName} implements DERSerializable {
                 optional: is_optional,
                 decoder: decoder_call,
                 is_set_of: is_set_of,
-                tags: tags
+                tags: type_tags,
+                explicit_tag_num: explicit_tag_num
               }
             {:"COMPONENTS OF", _type} -> nil
             _ -> nil
@@ -444,7 +472,7 @@ public class #{javaName} implements DERSerializable {
            base_write = cond do
                f.type == "ASN1Node" -> "ASN1Utilities.serializeNode(nested, #{f.name});"
                String.starts_with?(f.type, "List<") ->
-                   t = String.slice(f.type, 5..-2)
+                   t = String.slice(f.type, 5..-2//1)
                    method = if f.is_set_of, do: "writeSet", else: "writeSequence"
                    """
                    nested.#{method}(seqWriter -> {
@@ -457,43 +485,16 @@ public class #{javaName} implements DERSerializable {
            end
 
            # Apply tagging if present
-           tagged_write = case f.tags do
-               [{:tag, :context, num, :implicit} | _] ->
-                   # Implicit tagging: Override the tag.
-                   # For Lists (SEQUENCE/SET OF), this means replacing writeSequence/Set with writeConstructed([num])
-                   # For objects, we rely on them implementing separate implicit write? No, DERSerializable writes everything.
-                   # We need to capture the content and write it with new tag?
-                   # Easiest way for Lists: Use writeConstructed directly.
-                   if String.starts_with?(f.type, "List<") do
-                       t = String.slice(f.type, 5..-2)
-                       """
-                       nested.writeConstructed(new ASN1Identifier(#{num}, TagClass.ContextSpecific), seqWriter -> {
-                           for (#{t} item : #{f.name}) {
-                               #{if t == "ASN1Node", do: "ASN1Utilities.serializeNode(seqWriter, item);", else: "item.serialize(seqWriter);"}
-                           }
-                       });
-                       """
-                   else
-                       # For simple types, we can't easily re-tag without buffering.
-                       # But wait, DERWriter writePrimitive takes identifier.
-                       # If object provides 'serializeContent', we could use it.
-                       # As a fallback for simple types wrapped in standard classes:
-                       # We might need to write a helper or assume standard types.
-                       # For now, let's focus on List types (attributes in PrivateKeyInfo) which are the blocker.
-                       # Warning: Implicit tagging on objects is hard without API change.
-                       # But for PrivateKeyInfo 'attributes' is SET OF, so it hits the List branch above.
-                       base_write # Fallback for non-list implicit (potentially buggy if not handled)
-                   end
-
-               [{:tag, :context, num, :explicit} | _] ->
+           tagged_write = if f.explicit_tag_num do
                    # Explicit tagging: Wrap in ContextSpecific Constructed
                    """
-                   nested.writeConstructed(new ASN1Identifier(#{num}, TagClass.ContextSpecific), explicitWriter -> {
-                       #{base_write.replace("nested", "explicitWriter")}
+                   nested.writeConstructed(new ASN1Identifier(#{f.explicit_tag_num}L, TagClass.ContextSpecific), explicitWriter -> {
+                       #{String.replace(base_write, "nested", "explicitWriter")}
                    });
                    """
-
-               _ -> base_write
+           else
+                  # Implicit tagging not fully handled for all types yet, assuming Explicit for now as identified blocker
+                  base_write
            end
 
            if f.optional do

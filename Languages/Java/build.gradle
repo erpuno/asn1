@@ -10,6 +10,17 @@ application {
     mainClass = 'com.generated.asn1.Main'
 }
 
+tasks.register('runOpenSSLTest', JavaExec) {
+    group = 'verification'
+    description = 'Runs the OpenSSL compatibility tests'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.generated.asn1.OpenSSLTest'
+    // Pass command line args from gradle command if any
+    if (project.hasProperty('args')) {
+        args project.args.split('\\s+')
+    }
+}
+
 repositories {
     mavenCentral()
 }
