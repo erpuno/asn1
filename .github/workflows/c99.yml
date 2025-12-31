@@ -39,6 +39,6 @@ jobs:
           mix deps.get > /dev/null 2>&1
           mix compile > /dev/null 2>&1
           mix run --no-halt &
-          CA_PID=$!
-          sleep 5s
+          CA_PID=$! &&
+          sleep 5s &&
           ./Languages/C99/c99_client
