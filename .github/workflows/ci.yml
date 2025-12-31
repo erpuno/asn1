@@ -54,11 +54,11 @@ jobs:
     - name: Rebuild Java
       run: ./rebuild_java.sh
 
-    - name: Run Go OpenSSL Tests
-      run: ./run_go_openssl_tests.sh
-
     - name: Run TypeScript OpenSSL Tests
       run: ./run_ts_openssl_tests.sh
 
     - name: Run Java OpenSSL Tests
       run: ./run_java_openssl_tests.sh
+
+    - name: Run Go OpenSSL Tests
+      run: ./run_go_openssl_tests.sh
