@@ -131,7 +131,7 @@ LDAP.asn1
 Minimal
 -------
 
-Minimal profile contains vital viability testing. To regenerate Sources/Suite/Minimal folder use ./minimal.ex script. Suite profile contains minimal ASN.1 definition that should cover all compiler branches.
+Minimal profile contains vital viability testing. To regenerate Sources/Suite/Minimal folder use ./minimal.ex script. Suite profile contains minimal ASN.1 definition that should cover all compiler branches. Currently work in progress and lacks tensors.
 
 ```
 SUITE-EXPLICIT.asn1
