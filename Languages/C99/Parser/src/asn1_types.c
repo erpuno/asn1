@@ -297,24 +297,15 @@ asn1_error_t asn1_parse_bit_string(const asn1_node_t *node,
 
 asn1_error_t asn1_serialize_bit_string(asn1_serializer_t *s,
                                        const asn1_bit_string_t *bs) {
-  size_t total_len = 1 + bs->byte_count;
-
   asn1_error_t err;
-  err = asn1_serialize_primitive(s, ASN1_ID_BIT_STRING, NULL, 0);
-  if (!asn1_is_ok(err))
-    return err;
-
-  /* Rewind and do it properly with the data */
-  s->length -= 2; /* Remove the empty TL we just wrote */
+  size_t total_len = 1 + bs->byte_count;
 
   /* Write identifier */
   uint8_t id_buf[2];
   size_t id_len = asn1_encode_identifier(id_buf, ASN1_ID_BIT_STRING, false);
-  for (size_t i = 0; i < id_len; i++) {
-    err = asn1_serialize_raw(s, &id_buf[i], 1);
-    if (!asn1_is_ok(err))
-      return err;
-  }
+  err = asn1_serialize_raw(s, id_buf, id_len);
+  if (!asn1_is_ok(err))
+    return err;
 
   /* Write length */
   uint8_t len_buf[9];

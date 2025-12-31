@@ -1,0 +1,31 @@
+name: C99 OpenSSL Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install OpenSSL
+      run: brew install openssl
+
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1
+      with:
+        elixir-version: '1.15.7'
+        otp-version: '26.1.2'
+
+    - name: Set executable permissions
+      run: |
+        chmod +x rebuild_c99.sh
+        chmod +x run_c99_openssl_tests.sh
+
+    - name: Run C99 OpenSSL Tests
+      run: ./run_c99_openssl_tests.sh

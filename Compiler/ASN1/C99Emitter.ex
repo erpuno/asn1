@@ -21,18 +21,23 @@ defmodule ASN1.C99Emitter do
 
   typedef struct {
       size_t byte_count;
-      uint8_t bytes[256];
+      uint8_t bytes[4096];
       uint8_t unused_bits;
   } ASN1C_BitString;
 
   typedef struct {
       size_t length;
-      uint8_t bytes[256];
+      uint8_t bytes[4096];
   } ASN1C_OctetString;
 
   typedef struct {
       size_t length;
-      uint8_t bytes[512];
+      uint8_t bytes[4096];
+  } ASN1C_Integer;
+
+  typedef struct {
+      size_t length;
+      uint8_t bytes[4096];
   } ASN1C_Node;
 
   /* ASN.1 Tag class constants for implicit tagging */
@@ -91,12 +96,25 @@ defmodule ASN1.C99Emitter do
       self->length = len;
       return asn1_ok();
   }
+  static inline asn1_error_t ASN1C_Integer_encode(const ASN1C_Integer *self, asn1_serializer_t *s) {
+      return asn1_serialize_integer_bytes(s, self->bytes, self->length);
+  }
+  static inline asn1_error_t ASN1C_Integer_decode(ASN1C_Integer *self, const asn1_node_t *node, const asn1_parse_result_t *result) {
+      (void)result;
+      const uint8_t *data; size_t len; bool negative;
+      asn1_error_t err = asn1_parse_integer_bytes(node, &data, &len, &negative);
+      if (!asn1_is_ok(err)) return err;
+      if (len > sizeof(self->bytes)) len = sizeof(self->bytes);
+      memcpy(self->bytes, data, len);
+      self->length = len;
+      return asn1_ok();
+  }
   static inline asn1_error_t ASN1C_Node_encode(const ASN1C_Node *self, asn1_serializer_t *s) {
       return asn1_serialize_raw(s, self->bytes, self->length);
   }
   static inline asn1_error_t ASN1C_Node_decode(ASN1C_Node *self, const asn1_node_t *node, const asn1_parse_result_t *result) {
       (void)result;
-      if (node->encoded_length > sizeof(self->bytes)) return asn1_error(ASN1_ERROR_INVALID_OBJECT, \"too large\", 0);
+      if (node->encoded_length > sizeof(self->bytes)) return asn1_error(ASN1_ERROR_INVALID_OBJECT, "too large", 0);
       memcpy(self->bytes, node->encoded_bytes, node->encoded_length);
       self->length = node->encoded_length;
       return asn1_ok();
@@ -159,11 +177,7 @@ defmodule ASN1.C99Emitter do
     "uint16_t",
     "uint8_t",
     "size_t",
-    "bool",
-    "ASN1C_OID",
-    "ASN1C_BitString",
-    "ASN1C_OctetString",
-    "ASN1C_Node"
+    "bool"
   ])
 
   @impl true
@@ -542,7 +556,7 @@ defmodule ASN1.C99Emitter do
     setEnv(name, c_name)
     target_name =
       if String.ends_with?(c_name, "CERTIFICATESERIALNUMBER") do
-        "uint64_t"
+        "ASN1C_Integer"
       else
         substituteType(target)
       end
@@ -558,6 +572,7 @@ defmodule ASN1.C99Emitter do
           "ASN1C_OID" -> "ASN1C_OID"
           "ASN1C_BitString" -> "ASN1C_BitString"
           "ASN1C_OctetString" -> "ASN1C_OctetString"
+          "ASN1C_Integer" -> "ASN1C_Integer"
           "ASN1C_Node" -> "ASN1C_Node"
           "int64_t" -> :int64
           "uint64_t" -> :uint64
@@ -862,11 +877,11 @@ defmodule ASN1.C99Emitter do
 
           {:UNIVERSAL, _tag_number} ->
             # UNIVERSAL tag - use regular encoder
-            primitive_encoder_for_choice(type, "self->data.#{field}")
+            primitive_encoder(type_ast, "self->data.#{field}")
 
           nil ->
             # No tag - use regular encoder
-            primitive_encoder_for_choice(type, "self->data.#{field}")
+            primitive_encoder(type_ast, "self->data.#{field}")
         end
 
         "        case #{selector}: #{encoder_call} break;"
@@ -1379,12 +1394,38 @@ defmodule ASN1.C99Emitter do
         "{ asn1_oid_t oid; err = asn1_parse_oid(#{node_var}, &oid); if (!asn1_is_ok(err)) return err; #{var}.count = oid.count; for(size_t i=0; i<oid.count; i++) #{var}.components[i] = oid.components[i]; }"
       :"OCTET STRING" ->
         "{ const uint8_t *data; size_t len; err = asn1_parse_octet_string(#{node_var}, &data, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, data, len); #{var}.length = len; }"
+      :PrintableString ->
+        "{ const char *str; size_t len; err = asn1_parse_string(#{node_var}, &str, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, str, len); #{var}.length = len; }"
+      :IA5String ->
+        "{ const char *str; size_t len; err = asn1_parse_string(#{node_var}, &str, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, str, len); #{var}.length = len; }"
+      :UTF8String ->
+        "{ const char *str; size_t len; err = asn1_parse_string(#{node_var}, &str, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, str, len); #{var}.length = len; }"
+      :T61String ->
+        "{ const char *str; size_t len; err = asn1_parse_string(#{node_var}, &str, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, str, len); #{var}.length = len; }"
+      :VisibleString ->
+        "{ const char *str; size_t len; err = asn1_parse_string(#{node_var}, &str, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, str, len); #{var}.length = len; }"
+      :NumericString ->
+        "{ const char *str; size_t len; err = asn1_parse_string(#{node_var}, &str, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, str, len); #{var}.length = len; }"
+      :UTCTime ->
+        "{ const char *str; size_t len; err = asn1_parse_string(#{node_var}, &str, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, str, len); #{var}.length = len; }"
+      :GeneralizedTime ->
+        "{ const char *str; size_t len; err = asn1_parse_string(#{node_var}, &str, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, str, len); #{var}.length = len; }"
       :"BIT STRING" ->
         "{ asn1_bit_string_t bs; err = asn1_parse_bit_string(#{node_var}, &bs); if (!asn1_is_ok(err)) return err; if(bs.byte_count > sizeof(#{var}.bytes)) bs.byte_count = sizeof(#{var}.bytes); memcpy(#{var}.bytes, bs.bytes, bs.byte_count); #{var}.byte_count = bs.byte_count; #{var}.unused_bits = bs.unused_bits; }"
       {:"BIT STRING", _} ->
         "{ asn1_bit_string_t bs; err = asn1_parse_bit_string(#{node_var}, &bs); if (!asn1_is_ok(err)) return err; if(bs.byte_count > sizeof(#{var}.bytes)) bs.byte_count = sizeof(#{var}.bytes); memcpy(#{var}.bytes, bs.bytes, bs.byte_count); #{var}.byte_count = bs.byte_count; #{var}.unused_bits = bs.unused_bits; }"
       {:"OCTET STRING", _} ->
         "{ const uint8_t *data; size_t len; err = asn1_parse_octet_string(#{node_var}, &data, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, data, len); #{var}.length = len; }"
+      {:PrintableString, _} ->
+        "{ const char *str; size_t len; err = asn1_parse_string(#{node_var}, &str, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, str, len); #{var}.length = len; }"
+      {:IA5String, _} ->
+        "{ const char *str; size_t len; err = asn1_parse_string(#{node_var}, &str, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, str, len); #{var}.length = len; }"
+      {:UTF8String, _} ->
+        "{ const char *str; size_t len; err = asn1_parse_string(#{node_var}, &str, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, str, len); #{var}.length = len; }"
+      {:VisibleString, _} ->
+        "{ const char *str; size_t len; err = asn1_parse_string(#{node_var}, &str, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, str, len); #{var}.length = len; }"
+      {:NumericString, _} ->
+        "{ const char *str; size_t len; err = asn1_parse_string(#{node_var}, &str, &len); if (!asn1_is_ok(err)) return err; if(len > sizeof(#{var}.bytes)) len = sizeof(#{var}.bytes); memcpy(#{var}.bytes, str, len); #{var}.length = len; }"
       {:ENUMERATED, _} -> "{ int64_t val; err = asn1_parse_int64(#{node_var}, &val); if (!asn1_is_ok(err)) return err; #{var} = (int64_t)val; }"
       {:INTEGER, _} -> "{ int64_t val; err = asn1_parse_int64(#{node_var}, &val); if (!asn1_is_ok(err)) return err; #{var} = val; }"
       :ANY -> "err = ASN1C_Node_decode(&#{var}, #{node_var}, result); if (!asn1_is_ok(err)) return err;"

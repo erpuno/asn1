@@ -24,6 +24,13 @@ Languages/AppleSwift/Generated/
 Languages/AppleSwift/Package.resolved
 
 
+
+Languages/C99/c99_client
+Languages/C99/test_roundtrip
+Languages/C99/openssl_test
+Languages/C99/Generated/
+Languages/C99/Parser/build/
+
 *.txt
 *.log
 *.der 
