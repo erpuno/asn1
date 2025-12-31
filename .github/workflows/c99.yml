@@ -42,4 +42,5 @@ jobs:
         mix run --no-halt &
         CA_PID=$! &&
         sleep 5s &&
-        ./Languages/C99/c99_client
+        cd ../Languages/C99 &&
+        ./c99_client
