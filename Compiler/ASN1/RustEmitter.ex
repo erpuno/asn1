@@ -175,7 +175,19 @@ defmodule ASN1.RustEmitter do
     "AttributeCertificateVersion12009AttributeCertificateV1" => "ASN1Node",
     "KEPTime" => "x500::authentication_framework::AuthenticationFrameworkTime",
     "CryptographicMessageSyntax2009AlgorithmInformation2009AlgorithmIdentifier" =>
-      "algorithminformation2009::algorithm_information2009::AlgorithmInformation2009Algorithm"
+      "algorithminformation2009::algorithm_information2009::AlgorithmInformation2009Algorithm",
+    # Extension and Attributes types - use ASN1Node for byte preservation (avoid parsing issues)
+    "AuthenticationFrameworkExtension" => "ASN1Node",
+    "AuthenticationFrameworkExtensions" => "Vec<ASN1Node>",
+    "Extension" => "ASN1Node",
+    "Extensions" => "Vec<ASN1Node>",
+    "CertificateExtensionsExtension" => "ASN1Node",
+    "AuthenticationFrameworkVersion" => "ASN1Node",
+    "PKCS10Attributes" => "Vec<ASN1Node>",
+    "PKCS10Attribute" => "ASN1Node",
+    # ToBeSigned types - use ASN1Node as generated serialization loses structure
+    "AuthenticationFrameworkCertificateToBeSigned" => "ASN1Node",
+    "AuthenticationFrameworkTBSCertificate" => "ASN1Node"
   }
 
   # Region: behaviour callbacks ----------------------------------------------------

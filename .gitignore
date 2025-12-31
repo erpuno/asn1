@@ -15,6 +15,10 @@ java_test_data/
 
 test_openssl/
 
+
+Languages/Rust/Cargo.lock
+Languages/Rust/target/
+
 *.txt
 *.log
 *.der 

@@ -1,0 +1,39 @@
+name: Rust OpenSSL Tests
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test-rust:
+    name: Rust Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install OpenSSL
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openssl
+
+    - name: Set up Rust
+      uses: dtolnay/rust-action@stable
+
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1
+      with:
+        elixir-version: '1.17'
+        otp-version: '26'
+
+    - name: Make scripts executable
+      run: chmod +x rebuild_rust.sh run_rust_openssl_tests.sh
+
+    - name: Rebuild Rust
+      run: ./rebuild_rust.sh
+
+    - name: Run Rust OpenSSL Tests
+      run: ./run_rust_openssl_tests.sh
