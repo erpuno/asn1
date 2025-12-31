@@ -36,17 +36,29 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1
+      with:
+        elixir-version: '1.17'
+        otp-version: '26'
+
     - name: Make scripts executable
-      run: chmod +x run_go_openssl_tests.sh run_ts_openssl_tests.sh run_java_openssl_tests.sh
+      run: chmod +x rebuild_*.sh run_*_openssl_tests.sh
+
+    - name: Rebuild Go
+      run: ./rebuild_go.sh
+
+    - name: Rebuild TypeScript
+      run: ./rebuild_ts.sh
+
+    - name: Rebuild Java
+      run: ./rebuild_java.sh
 
     - name: Run Go OpenSSL Tests
       run: ./run_go_openssl_tests.sh
 
     - name: Run TypeScript OpenSSL Tests
       run: ./run_ts_openssl_tests.sh
-
-    - name: Run Java OpenSSL Tests
-      run: ./run_java_openssl_tests.sh
 
     - name: Run Java OpenSSL Tests
       run: ./run_java_openssl_tests.sh
