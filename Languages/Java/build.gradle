@@ -25,5 +25,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.iho.asn1:der.java:1.0.0'
+    implementation 'com.iho.asn1:der-java:1.0.0'
 }
