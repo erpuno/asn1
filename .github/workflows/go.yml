@@ -48,5 +48,5 @@ jobs:
           mix run --no-halt &
           CA_PID=$! &&
           sleep 5s &&
-          cd ../Languages/Go &&
+          cd ./Languages/Go &&
           go run main.go

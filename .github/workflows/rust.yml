@@ -56,5 +56,5 @@ jobs:
           mix run --no-halt &
           CA_PID=$! &&
           sleep 5s &&
-          cd ../Languages/Rust &&
+          cd ./Languages/Rust &&
           cargo run --example ca_client

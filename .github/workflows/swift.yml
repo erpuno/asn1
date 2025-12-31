@@ -41,5 +41,5 @@ jobs:
           mix run --no-halt &
           CA_PID=$! &&
           sleep 5s &&
-          cd ../Languages/AppleSwift &&
+          cd ./Languages/AppleSwift &&
           swift run -Xswiftc -suppress-warnings

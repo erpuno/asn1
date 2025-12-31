@@ -48,5 +48,5 @@ jobs:
           mix run --no-halt &
           CA_PID=$! &&
           sleep 5s &&
-          cd ../Languages/TypeScript &&
+          cd ./Languages/TypeScript &&
           bun run main.ts

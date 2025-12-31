@@ -49,5 +49,5 @@ jobs:
           mix run --no-halt &
           CA_PID=$! &&
           sleep 5s &&
-          cd ../Languages/Java &&
+          cd ./Languages/Java &&
           gradle run main.ts
