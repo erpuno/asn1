@@ -16,5 +16,3 @@ fi
 
 elixir basic.ex
 elixir x-series.ex
-
-echo "Java rebuild complete."
