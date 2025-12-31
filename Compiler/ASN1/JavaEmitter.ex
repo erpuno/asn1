@@ -280,7 +280,7 @@ import java.io.IOException;
   end
 
   @impl true
-  def array(name, element_type, _tag, level) when level == "top" do
+  def array(name, element_type, tag, level) when level == "top" do
     modname = getEnv(:current_module, "")
     javaName = name(name, modname)
     setEnv(name, javaName)
@@ -288,6 +288,10 @@ import java.io.IOException;
 
     elementType = to_java_type(element_type, modname)
     decoder_call = decoder_for(elementType, "child")
+
+    method_name = if tag == :set, do: "writeSet", else: "writeSequence"
+    constructor_check = if tag == :set, do: "17", else: "16"
+    expected_type = if tag == :set, do: "SET OF", else: "SEQUENCE OF"
 
     content = """
 package com.generated.asn1;
@@ -304,7 +308,7 @@ public class #{javaName} implements DERSerializable {
     public #{javaName}(ASN1Node node) throws ASN1Exception {
         this.elements = new ArrayList<>();
         if (!(node.content instanceof ASN1Node.Constructed)) {
-             throw new ASN1Exception(ErrorCode.UnexpectedFieldType, "Expected constructed type for SEQUENCE OF");
+             throw new ASN1Exception(ErrorCode.UnexpectedFieldType, "Expected constructed type for #{expected_type}");
         }
         for (ASN1Node child : (ASN1Node.Constructed) node.content) {
              this.elements.add(#{decoder_call});
@@ -317,7 +321,7 @@ public class #{javaName} implements DERSerializable {
 
     @Override
     public void serialize(DERWriter writer) throws ASN1Exception {
-        writer.writeSequence(nested -> {
+        writer.#{method_name}(nested -> {
             for (#{elementType} item : elements) {
                 #{if elementType == "ASN1Node", do: "ASN1Utilities.serializeNode(nested, item);", else: "item.serialize(nested);"}
             }
@@ -356,31 +360,12 @@ public class #{javaName} implements DERSerializable {
               java_type_name = to_java_type(type, modname)
               base_decoder = decoder_for(java_type_name, "child")
 
-              # Handle explicit tagging
-              decoder_call = case tags do
-                  [{:tag, :context, _, :explicit} | _] ->
-                      # Unwrap explicit tag
-                      # We assume child is the tagged node. We need its content.
-                      # Since we parsed using ASN1Node, explicit tag is a constructed node.
-                      """
-                      (child.content instanceof ASN1Node.Constructed && !((List<ASN1Node>)child.content).isEmpty()) ?
-                          #{decoder_for(java_type_name, "((Iterator<ASN1Node>)((ASN1Node.Constructed)child.content).iterator()).next()")} : #{base_decoder}
-                      """
-                      # Simplification: if tagged, assume constructed.
-                      # Ideally we check tag. Assuming valid DER.
-                      # Better logic:
-                      # If tagged, we pass 'child' which is the tagged wrapper.
-                      # We want to pass the inner.
-                      # But wait, decoder_for uses 'child' variable name.
-                      # We should redefine 'child' or use expression.
-
-                      # Let's use a helper method or inline expression
-                      "#{String.replace(base_decoder, "child", "((ASN1Node)((List)((ASN1Node.Constructed)child.content).getCollection().iterator()).next())")}"
-                      # Wait, accessing iterator().next() is cleaner.
-                      # ((ASN1Node.Constructed)child.content).iterator().next()
-                  _ -> base_decoder
+              is_set_of = case type do
+                  {:"SET OF", _} -> true
+                  _ -> false
               end
-              # Rewriting with cleaner logic:
+
+              # Handle explicit tagging
               decoder_call = if match?([{:tag, :context, _, :explicit} | _], tags) do
                  # Extract inner
                  inner_expr = "((ASN1Node)((ASN1Node.Constructed)child.content).iterator().next())"
@@ -393,7 +378,9 @@ public class #{javaName} implements DERSerializable {
                 name: fieldName(fname),
                 type: java_type_name,
                 optional: is_optional,
-                decoder: decoder_call
+                decoder: decoder_call,
+                is_set_of: is_set_of,
+                tags: tags
               }
             {:"COMPONENTS OF", _type} -> nil
             _ -> nil
@@ -453,12 +440,14 @@ public class #{javaName} implements DERSerializable {
 
       # Serialization Logic
       serialization_logic = parsed_fields |> Enum.map(fn f ->
-           serialize_statement = cond do
+           # Determine base serialization method for the field type
+           base_write = cond do
                f.type == "ASN1Node" -> "ASN1Utilities.serializeNode(nested, #{f.name});"
                String.starts_with?(f.type, "List<") ->
                    t = String.slice(f.type, 5..-2)
+                   method = if f.is_set_of, do: "writeSet", else: "writeSequence"
                    """
-                   nested.writeSequence(seqWriter -> {
+                   nested.#{method}(seqWriter -> {
                        for (#{t} item : #{f.name}) {
                            #{if t == "ASN1Node", do: "ASN1Utilities.serializeNode(seqWriter, item);", else: "item.serialize(seqWriter);"}
                        }
@@ -467,14 +456,54 @@ public class #{javaName} implements DERSerializable {
                true -> "#{f.name}.serialize(nested);"
            end
 
+           # Apply tagging if present
+           tagged_write = case f.tags do
+               [{:tag, :context, num, :implicit} | _] ->
+                   # Implicit tagging: Override the tag.
+                   # For Lists (SEQUENCE/SET OF), this means replacing writeSequence/Set with writeConstructed([num])
+                   # For objects, we rely on them implementing separate implicit write? No, DERSerializable writes everything.
+                   # We need to capture the content and write it with new tag?
+                   # Easiest way for Lists: Use writeConstructed directly.
+                   if String.starts_with?(f.type, "List<") do
+                       t = String.slice(f.type, 5..-2)
+                       """
+                       nested.writeConstructed(new ASN1Identifier(#{num}, TagClass.ContextSpecific), seqWriter -> {
+                           for (#{t} item : #{f.name}) {
+                               #{if t == "ASN1Node", do: "ASN1Utilities.serializeNode(seqWriter, item);", else: "item.serialize(seqWriter);"}
+                           }
+                       });
+                       """
+                   else
+                       # For simple types, we can't easily re-tag without buffering.
+                       # But wait, DERWriter writePrimitive takes identifier.
+                       # If object provides 'serializeContent', we could use it.
+                       # As a fallback for simple types wrapped in standard classes:
+                       # We might need to write a helper or assume standard types.
+                       # For now, let's focus on List types (attributes in PrivateKeyInfo) which are the blocker.
+                       # Warning: Implicit tagging on objects is hard without API change.
+                       # But for PrivateKeyInfo 'attributes' is SET OF, so it hits the List branch above.
+                       base_write # Fallback for non-list implicit (potentially buggy if not handled)
+                   end
+
+               [{:tag, :context, num, :explicit} | _] ->
+                   # Explicit tagging: Wrap in ContextSpecific Constructed
+                   """
+                   nested.writeConstructed(new ASN1Identifier(#{num}, TagClass.ContextSpecific), explicitWriter -> {
+                       #{base_write.replace("nested", "explicitWriter")}
+                   });
+                   """
+
+               _ -> base_write
+           end
+
            if f.optional do
                """
             if (#{f.name} != null) {
-                #{serialize_statement}
+                #{tagged_write}
             }
                """
            else
-               serialize_statement
+               tagged_write
            end
       end) |> Enum.join("\n")
 
@@ -680,14 +709,106 @@ public class #{javaName} implements DERSerializable {
     javaName
   end
 
-  # integerEnum handles INTEGER types with named numbers (constants).
-  # We should keep them as Enums or Constants?
-  # If treated as full type, wrapper is safer.
-  # But usually "integerEnum" just defines constants.
-  # Let's map integerEnum to same wrapper logic for consistency if generic type.
-
   @impl true
-  def integerEnum(name, cases, modname, saveFlag), do: enumeration(name, cases, modname, saveFlag)
+  def integerEnum(name, cases, modname, saveFlag) do
+    # INTEGER with named numbers - serialize as INTEGER (0x02) not ENUMERATED
+    javaName = name(name, modname)
+    setEnv(name, javaName)
+
+    entries = cases
+    |> Enum.filter(fn {:NamedNumber, _, _} -> true; _ -> false end)
+    |> Enum.map(fn {:NamedNumber, ident, val} ->
+       sanitized = ident
+       |> to_string()
+       |> String.replace("-", "_")
+       |> String.upcase()
+
+       val_str = if val > 2147483647 or val < -2147483648 do
+         "#{val}L"
+       else
+         "#{val}"
+       end
+       "#{sanitized}(#{val_str})"
+    end)
+    |> Enum.join(",\n        ")
+
+    has_long = Enum.any?(cases, fn
+      {:NamedNumber, _, val} -> val > 2147483647 or val < -2147483648
+      _ -> false
+    end)
+
+    type = if has_long, do: "long", else: "int"
+
+    content = """
+package com.generated.asn1;
+
+import com.iho.asn1.*;
+import java.util.Iterator;
+import java.math.BigInteger;
+
+public class #{javaName} implements DERSerializable {
+    public enum Value {
+        #{entries};
+
+        private final #{type} value;
+        Value(#{type} value) { this.value = value; }
+        public #{type} getValue() { return value; }
+
+        public static Value fromInt(#{type} val) {
+            for (Value v : values()) {
+                if (v.value == val) return v;
+            }
+            throw new IllegalArgumentException("Unknown value: " + val);
+        }
+    }
+
+    private final Value value;
+
+    public #{javaName}(Value value) {
+        this.value = value;
+    }
+
+    public #{javaName}(ASN1Node node) throws ASN1Exception {
+        ASN1Node effectiveNode = node;
+        if (node.identifier.tagClass == TagClass.ContextSpecific) {
+            if (node.isConstructed()) {
+                Iterator<ASN1Node> it = ((ASN1Node.Constructed)node.content).iterator();
+                if (it.hasNext()) {
+                    effectiveNode = it.next();
+                } else {
+                    throw new ASN1Exception(ErrorCode.TruncatedASN1Field, "Empty explicit tag");
+                }
+            } else {
+                effectiveNode = new ASN1Node(ASN1Identifier.INTEGER, node.content, node.encodedBytes);
+            }
+        }
+
+        if (!effectiveNode.identifier.equals(ASN1Identifier.INTEGER)) {
+             if (effectiveNode.content instanceof ASN1Node.Primitive) {
+                 effectiveNode = new ASN1Node(ASN1Identifier.INTEGER, effectiveNode.content, effectiveNode.encodedBytes);
+             } else {
+                 throw new ASN1Exception(ErrorCode.UnexpectedFieldType, "Expected Primitive for Integer value");
+             }
+        }
+        ASN1Integer val = new ASN1Integer(0L).fromDERNode(effectiveNode);
+        this.value = Value.fromInt(val.value.#{if has_long, do: "longValue", else: "intValue" }());
+    }
+
+    public Value getValue() {
+        return value;
+    }
+
+    @Override
+    public void serialize(DERWriter writer) throws ASN1Exception {
+         // INTEGER with named numbers is serialized as INTEGER (0x02)
+         BigInteger val = BigInteger.valueOf(value.value);
+         writer.writePrimitive(ASN1Identifier.INTEGER, val.toByteArray());
+    }
+}
+"""
+    save(saveFlag, modname, javaName, content)
+    javaName
+  end
 
   @impl true
   def substituteType(type) do

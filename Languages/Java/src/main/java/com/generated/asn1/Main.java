@@ -10,6 +10,11 @@ import java.util.Arrays;
 public class Main {
 
     public static void main(String[] args) {
+        if (args.length > 0) {
+            runOpenSSLTests(args);
+            return;
+        }
+
         System.out.println("Starting ASN.1 Demo (der.java migration)...");
 
         // Ensure clean state
@@ -20,7 +25,76 @@ public class Main {
         }
 
         demonstrateCertificateParsing();
-        // demonstrateCertificateCreation(); // Builders removed in migration, disabled for now
+    }
+
+    private static void runOpenSSLTests(String[] args) {
+        String command = args[0];
+        try {
+            switch (command) {
+                case "parse-csr":
+                    parseCSR(args[1]);
+                    break;
+                case "parse-crl":
+                    parseCRL(args[1]);
+                    break;
+                case "parse-key":
+                    parseKey(args[1]);
+                    break;
+                default:
+                     System.err.println("Unknown command: " + command);
+                     System.exit(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    private static void parseCSR(String file) throws Exception {
+        byte[] data = Files.readAllBytes(Path.of(file));
+        System.out.println("Reading CSR from " + file + " (" + data.length + " bytes)");
+        PKCS_10_CertificationRequest csr = PKCS_10_CertificationRequest.parse(data);
+        System.out.println("Parsed CSR: " + csr.getClass().getSimpleName());
+        
+        byte[] encoded = csr.serialize();
+        if (Arrays.equals(data, encoded)) {
+             System.out.println("SUCCESS: CRL Round-trip matches.");
+        } else {
+             System.out.println("FAILURE: CRL Round-trip mismatch!");
+             System.exit(1);
+        }
+    }
+
+    private static void parseCRL(String file) throws Exception {
+        byte[] data = Files.readAllBytes(Path.of(file));
+        System.out.println("Reading CRL from " + file + " (" + data.length + " bytes)");
+        AuthenticationFramework_CertificateList crl = AuthenticationFramework_CertificateList.parse(data);
+        System.out.println("Parsed CRL: " + crl.getClass().getSimpleName());
+        
+        byte[] encoded = crl.serialize();
+        if (Arrays.equals(data, encoded)) {
+             System.out.println("SUCCESS: CRL Round-trip matches.");
+        } else {
+             System.out.println("FAILURE: CRL Round-trip mismatch!");
+             System.exit(1);
+        }
+    }
+
+    private static void parseKey(String file) throws Exception {
+        byte[] data = Files.readAllBytes(Path.of(file));
+        System.out.println("Reading PrivateKey from " + file + " (" + data.length + " bytes)");
+        PKCS_8_PrivateKeyInfo key = PKCS_8_PrivateKeyInfo.parse(data);
+        System.out.println("Parsed PrivateKey: " + key.getClass().getSimpleName());
+        
+        byte[] encoded = key.serialize();
+        if (Arrays.equals(data, encoded)) {
+             System.out.println("SUCCESS: Key Round-trip matches.");
+        } else {
+             System.out.println("FAILURE: Key Round-trip mismatch!");
+             Files.write(Path.of("key_mismatch.der"), encoded);
+             System.out.println("Saved mismatch to key_mismatch.der");
+             System.exit(1);
+        }
     }
 
     private static void demonstrateCertificateParsing() {
