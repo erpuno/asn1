@@ -15,6 +15,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"math/big"
 	"net"
 	"net/url"
 	"strconv"
@@ -444,7 +445,7 @@ func testXSeries() {
 	// Test BasicAccessControlACIItem
 	aci := basicaccesscontrol.BasicAccessControlACIItem{
 		IdentificationTag:   asn1.RawValue{Tag: 4, Bytes: []byte("tag")},
-		Precedence:          10,
+		Precedence:          basicaccesscontrol.BasicAccessControlPrecedence(big.NewInt(10)),
 		AuthenticationLevel: basicaccesscontrol.BasicAccessControlAuthenticationLevel{Tag: 16, IsCompound: true}, // simplified
 		ItemOrUserFirst:     asn1.RawValue{Tag: 16, IsCompound: true},                                            // Sequence
 	}
@@ -457,8 +458,8 @@ func testXSeries() {
 	// Test AuthenticationFrameworkCertificate (partial)
 	cert := x500.AuthenticationFrameworkCertificate{
 		ToBeSigned: x500.AuthenticationFrameworkCertificateToBeSigned{
-			Version:      2,                                                        // v3
-			SerialNumber: x500.AuthenticationFrameworkCertificateSerialNumber(255), // Dummy
+			Version:      2,                                                                    // v3
+			SerialNumber: x500.AuthenticationFrameworkCertificateSerialNumber(big.NewInt(255)), // Dummy
 			Signature:    asn1.RawValue{Tag: 16, IsCompound: true},
 			// Issuer/Subject would need complex setup, using zero values for now (might panic on marshal if not careful, but struct creation is verified)
 		},
@@ -479,7 +480,7 @@ func testCHATMessage() {
 	fmt.Print("Testing CHATMessage... ")
 
 	msg := chat.CHATMessage{
-		No:      1,
+		No:      big.NewInt(1),
 		Headers: [][]byte{[]byte("Content-Type: text/plain")},
 		Body:    chat.CHATProtocol{},
 	}
@@ -498,7 +499,7 @@ func testCHATMessage() {
 	}
 
 	// Verify
-	if decoded.No != msg.No {
+	if decoded.No.Cmp(msg.No) != 0 {
 		log.Fatalf("CHATMessage.No mismatch: expected %d, got %d", msg.No, decoded.No)
 	}
 
@@ -515,8 +516,9 @@ func testCHATContact() {
 		Names:    [][]byte{[]byte("John")},
 		PhoneId:  []byte("+380123456789"),
 		Surnames: [][]byte{[]byte("Doe")},
-		Update:   1703100000,
-		Created:  1703000000,
+		LastMsg:  chat.CHATMessage{No: big.NewInt(1)},
+		Update:   big.NewInt(1703100000),
+		Created:  big.NewInt(1703000000),
 	}
 
 	// Test ASN.1 encoding
