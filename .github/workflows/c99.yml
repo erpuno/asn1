@@ -34,11 +34,12 @@ jobs:
       run: ./run_c99_openssl_tests.sh
     
     - name: Start CA server
-      run: git clone https://github.com/chat-x509/ca.git 
-          cd ca
-          mix deps.get > /dev/null 2>&1
-          mix compile > /dev/null 2>&1
-          mix run --no-halt &
-          CA_PID=$! &&
-          sleep 5s &&
-          ./Languages/C99/c99_client
+      run: |
+        git clone https://github.com/chat-x509/ca.git 
+        cd ca
+        mix deps.get > /dev/null 2>&1
+        mix compile > /dev/null 2>&1
+        mix run --no-halt &
+        CA_PID=$! &&
+        sleep 5s &&
+        ./Languages/C99/c99_client

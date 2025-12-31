@@ -66,11 +66,16 @@ echo "Building Java..."
 cd Languages/Java
 # Create wrapper if not exists or use gradle directly?
 # Check if gradle is in path
-if ! command -v gradle &> /dev/null; then
-    echo "gradle not found. using ./der.java/gradlew"
-    GRADLE_CMD="./der.java/gradlew"
-else
+if [ -f "./gradlew" ]; then
+    echo "Using wrapper: ./gradlew"
+    chmod +x ./gradlew
+    GRADLE_CMD="./gradlew"
+elif command -v gradle &> /dev/null; then
+    echo "Using system gradle"
     GRADLE_CMD="gradle"
+else
+    echo "No gradle found."
+    exit 1
 fi
 
 # Compile
