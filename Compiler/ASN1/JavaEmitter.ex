@@ -16,7 +16,7 @@ defmodule ASN1.JavaEmitter do
     # settings.gradle
     settings = """
 rootProject.name = 'generated-asn1'
-includeBuild '../der-java'
+includeBuild 'der.java'
 """
     File.write!(Path.join(project_root, "settings.gradle"), settings)
 
