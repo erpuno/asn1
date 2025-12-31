@@ -8,6 +8,8 @@ on:
 
 jobs:
   test-swift:
+    env:
+      ImageOS: ubuntu24
     name: Swift Tests
     runs-on: macos-latest
 
@@ -21,8 +23,8 @@ jobs:
     - name: Set up Elixir
       uses: erlef/setup-beam@v1
       with:
-        elixir-version: '1.17'
-        otp-version: '26'
+        elixir-version: '1.18'
+        otp-version: '28'
 
     - name: Make scripts executable
       run: chmod +x rebuild_swift.sh run_swift_openssl_tests.sh
@@ -34,12 +36,14 @@ jobs:
       run: ./run_swift_openssl_tests.sh
 
     - name: Start CA server
-      run: git clone https://github.com/chat-x509/ca.git 
-          cd ca
-          mix deps.get > /dev/null 2>&1
-          mix compile > /dev/null 2>&1
-          mix run --no-halt &
-          CA_PID=$! &&
-          sleep 5s &&
-          cd ../Languages/AppleSwift &&
-          swift run -Xswiftc -suppress-warnings
+      run: |
+        git clone https://github.com/chat-x509/ca.git 
+        cd ca
+        mix deps.get > /dev/null 2>&1
+        mix compile > /dev/null 2>&1
+        mix run --no-halt &
+        CA_PID=$! &&
+        sleep 5s &&
+        cd ../Languages/AppleSwift &&
+        swift run -Xswiftc -suppress-warnings &&
+        kill $CA_PID

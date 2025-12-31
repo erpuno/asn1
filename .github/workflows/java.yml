@@ -8,6 +8,8 @@ on:
 
 jobs:
   test-java:
+    env:
+      ImageOS: ubuntu24
     name: Java Tests
     runs-on: ubuntu-latest
 
@@ -29,8 +31,8 @@ jobs:
     - name: Set up Elixir
       uses: erlef/setup-beam@v1
       with:
-        elixir-version: '1.17'
-        otp-version: '26'
+        elixir-version: '1.18'
+        otp-version: '28'
 
     - name: Make scripts executable
       run: chmod +x rebuild_java.sh run_java_openssl_tests.sh
@@ -51,4 +53,5 @@ jobs:
         CA_PID=$! &&
         sleep 5s &&
         cd ../Languages/Java &&
-        gradle run main
+        ./gradlew run --args="request-ca" &&
+        kill $CA_PID

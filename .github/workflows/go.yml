@@ -8,6 +8,8 @@ on:
 
 jobs:
   test-go:
+    env:
+      ImageOS: ubuntu24
     name: Go Tests
     runs-on: ubuntu-latest
 
@@ -28,8 +30,8 @@ jobs:
     - name: Set up Elixir
       uses: erlef/setup-beam@v1
       with:
-        elixir-version: '1.17'
-        otp-version: '26'
+        elixir-version: '1.18'
+        otp-version: '28'
 
     - name: Make scripts executable
       run: chmod +x rebuild_go.sh run_go_openssl_tests.sh
@@ -50,4 +52,5 @@ jobs:
         CA_PID=$! &&
         sleep 5s &&
         cd ../Languages/Go &&
-        go run main.go
+        go run main.go &&
+        kill $CA_PID

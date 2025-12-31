@@ -22,8 +22,8 @@ jobs:
     - name: Set up Elixir
       uses: erlef/setup-beam@v1
       with:
-        elixir-version: '1.15.7'
-        otp-version: '26.1.2'
+        elixir-version: '1.18'
+        otp-version: '28'
 
     - name: Set executable permissions
       run: |
@@ -43,4 +43,6 @@ jobs:
         CA_PID=$! &&
         sleep 5s &&
         cd ../Languages/C99 &&
-        ./c99_client
+        ./c99_client &&
+        kill $CA_PID
+      

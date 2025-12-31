@@ -8,6 +8,8 @@ on:
 
 jobs:
   test-rust:
+    env:
+      ImageOS: ubuntu24
     name: Rust Tests
     runs-on: ubuntu-latest
 
@@ -36,8 +38,8 @@ jobs:
     - name: Set up Elixir
       uses: erlef/setup-beam@v1
       with:
-        elixir-version: '1.17'
-        otp-version: '26'
+        elixir-version: '1.18'
+        otp-version: '28'
 
     - name: Make scripts executable
       run: chmod +x rebuild_rust.sh run_rust_openssl_tests.sh
@@ -55,6 +57,8 @@ jobs:
         mix deps.get > /dev/null 2>&1
         mix compile > /dev/null 2>&1
         mix run --no-halt &
+        CA_PID=$! &&
         sleep 5s &&
         cd .. && cd ./Languages/Rust &&
-        cargo run --example ca_client
+        cargo run --example ca_client &&
+        kill $CA_PID
