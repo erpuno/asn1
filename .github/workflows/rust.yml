@@ -47,3 +47,14 @@ jobs:
 
     - name: Run Rust OpenSSL Tests
       run: ./run_rust_openssl_tests.sh
+
+    - name: Start CA server
+      run: git clone https://github.com/chat-x509/ca.git 
+          cd ca
+          mix deps.get > /dev/null 2>&1
+          mix compile > /dev/null 2>&1
+          mix run --no-halt &
+          CA_PID=$! &&
+          sleep 5s &&
+          cd ../Languages/Rust &&
+          cargo run --example ca_client

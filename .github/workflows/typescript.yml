@@ -39,3 +39,14 @@ jobs:
 
     - name: Run TypeScript OpenSSL Tests
       run: ./run_ts_openssl_tests.sh
+
+    - name: Start CA server
+      run: git clone https://github.com/chat-x509/ca.git 
+          cd ca
+          mix deps.get > /dev/null 2>&1
+          mix compile > /dev/null 2>&1
+          mix run --no-halt &
+          CA_PID=$! &&
+          sleep 5s &&
+          cd ../Languages/TypeScript &&
+          bun run main.ts
