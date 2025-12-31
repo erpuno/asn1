@@ -639,29 +639,17 @@ Application.put_env(:asn1scg, :ptypes, ptypes)
 # Manual boxing entries for known recursive types
 # These are kept as overrides/supplements to automatic detection
 manual_boxing = [
-  # "Layout_Descriptors_Layout_Class_Descriptor_Body.generator_for_subordinates",
-  # "Layout_Descriptors_Layout_Class_Descriptor_Body.content_generator",
-  # "Layout_Descriptors_Layout_Class_Descriptor_Body.bindings",
-  # "Layout_Descriptors_Layout_Object_Descriptor_Body.bindings",
-  # "Layout_Descriptors_Layout_Class_Descriptor.descriptor_body",
-  # "Layout_Descriptors_Layout_Object_Descriptor.descriptor_body",
-
-  # # Reducing Layout Body Size
-  # "Layout_Descriptors_Layout_Class_Descriptor_Body.presentation_attributes",
-  # "Layout_Descriptors_Layout_Class_Descriptor_Body.default_value_lists",
-  # "Layout_Descriptors_Layout_Object_Descriptor_Body.presentation_attributes",
-  # "Layout_Descriptors_Layout_Object_Descriptor_Body.default_value_lists",
-
-  # # Identifiers-and-Expressions Recursion
-  # "Identifiers_and_Expressions_Construction_Factor.construction_type",
-  # "Identifiers_and_Expressions_Object_Id_Expression.preceding_object_function",
-  # "Identifiers_and_Expressions_Object_Id_Expression.superior_object_function",
-  # "Identifiers_and_Expressions_Numeric_Expression.increment_application",
-  # "Identifiers_and_Expressions_Numeric_Expression.decrement_application",
-  # "Identifiers_and_Expressions_Numeric_Expression_ordinal_application.expression",
-  # "Identifiers_and_Expressions_Binding_Selection_Function.preceding_function",
-  # "Identifiers_and_Expressions_Binding_Selection_Function.superior_function",
-  # "Identifiers_and_Expressions_Current_Instance_Function.second_parameter_expression"
+  "LocationExpressionsConstituentLocator.Subprofile",
+  "LocationExpressionsSubprofileLocator.SubprofileOf",
+  "LocationExpressionsSubprofileLocator.SubprofileWith",
+  "LocationExpressionsObjectLocator.Subord",
+  "LocationExpressionsObjectLocator.ObjectWith",
+  "LocationExpressionsSubordArgument.Object",
+  "LocationExpressionsObjectWithArgument.Object",
+  "LocationExpressionsLocationExpression.Composite",
+  "LocationExpressionsCompositeLocationExpression.Complement",
+  "LocationExpressionsCompositeLocationExpression.Intersection",
+  "LocationExpressionsCompositeLocationExpression.Union"
 ]
 
 File.mkdir_p!("Languages/AppleSwift/Generated")

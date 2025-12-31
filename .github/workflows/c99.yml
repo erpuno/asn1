@@ -14,7 +14,10 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Install OpenSSL
-      run: brew install openssl
+      run: |
+        brew install openssl
+        echo "/opt/homebrew/opt/openssl@3/bin" >> $GITHUB_PATH
+        echo "/usr/local/opt/openssl@3/bin" >> $GITHUB_PATH
 
     - name: Set up Elixir
       uses: erlef/setup-beam@v1

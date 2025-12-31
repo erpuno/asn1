@@ -12,23 +12,30 @@ mkdir -p $TEST_DIR
 if [ ! -f "$TEST_DIR/rsa_key.der" ]; then
     echo "Generating test data..."
     
+    # Create a minimal openssl.cnf for commands that need it
+    cat > $TEST_DIR/min.cnf << EOF
+[req]
+distinguished_name = req_dn
+[req_dn]
+EOF
+
     # RSA Key
-    openssl genrsa -out $TEST_DIR/rsa_key.pem 2048 2>/dev/null
+    openssl genrsa -out $TEST_DIR/rsa_key.pem 2048
     openssl pkcs8 -topk8 -inform PEM -outform DER -in $TEST_DIR/rsa_key.pem -out $TEST_DIR/rsa_key.der -nocrypt
     
     # EC Key
-    openssl ecparam -name prime256v1 -genkey -noout -out $TEST_DIR/ec_key.pem 2>/dev/null
+    openssl ecparam -name prime256v1 -genkey -noout -out $TEST_DIR/ec_key.pem
     openssl pkcs8 -topk8 -inform PEM -outform DER -in $TEST_DIR/ec_key.pem -out $TEST_DIR/ec_key.der -nocrypt
     
     # CSR
-    openssl req -new -key $TEST_DIR/rsa_key.pem -out $TEST_DIR/csr.der -outform DER -subj "/CN=Test/O=Org" 2>/dev/null
+    openssl req -new -key $TEST_DIR/rsa_key.pem -out $TEST_DIR/csr.der -outform DER -subj "/CN=Test/O=Org" -config $TEST_DIR/min.cnf
     
     # CA Certificate
-    openssl req -x509 -key $TEST_DIR/rsa_key.pem -out $TEST_DIR/ca_cert.der -outform DER -days 365 -subj "/CN=CA" 2>/dev/null
+    openssl req -x509 -key $TEST_DIR/rsa_key.pem -out $TEST_DIR/ca_cert.der -outform DER -days 365 -subj "/CN=CA" -config $TEST_DIR/min.cnf
     
     # EE Certificate
     openssl x509 -req -in $TEST_DIR/csr.der -inform DER -CA $TEST_DIR/ca_cert.der -CAform DER -CAkey $TEST_DIR/rsa_key.pem \
-        -out $TEST_DIR/ee_cert.der -outform DER -days 30 -CAcreateserial 2>/dev/null
+        -out $TEST_DIR/ee_cert.der -outform DER -days 30 -CAcreateserial
     
     # Extended cert with SAN
     cat > $TEST_DIR/ext.cnf << EOF
@@ -43,7 +50,7 @@ keyUsage = digitalSignature
 subjectAltName = DNS:example.com
 EOF
     openssl req -x509 -key $TEST_DIR/rsa_key.pem -out $TEST_DIR/extended_cert.der -outform DER -days 30 \
-        -subj "/CN=Extended" -config $TEST_DIR/ext.cnf 2>/dev/null
+        -subj "/CN=Extended" -config $TEST_DIR/ext.cnf
 
     echo "Test data generated."
 else

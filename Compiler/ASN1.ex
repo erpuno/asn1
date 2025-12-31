@@ -217,8 +217,6 @@ defmodule ASN1 do
   end
 
   def compileType(pos, name, typeDefinition, modname, save \\ true) do
-    IO.puts("DEBUG: compileType name=#{inspect(name)} mod=#{modname}")
-
     res =
       case typeDefinition do
         {:type, _, {:INTEGER, cases}, _, _, :no} ->

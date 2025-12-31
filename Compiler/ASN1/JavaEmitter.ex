@@ -56,8 +56,9 @@ dependencies {
 
     # Generate ASN1Utilities helper
     utilities = """
-package com.iho.asn1;
+package com.generated.asn1;
 
+import com.iho.asn1.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +72,6 @@ public class ASN1Utilities {
              writer.writePrimitive(node.identifier, ((ASN1Node.Primitive) node.content).data);
         } else {
              writer.writeConstructed(node.identifier, nested -> {
-                 // Constructed implements Iterable<ASN1Node>
                  for (ASN1Node child : (ASN1Node.Constructed) node.content) {
                      serializeNode(nested, child);
                  }
@@ -88,6 +88,10 @@ public class ASN1Utilities {
              result.add(decoder.decode(child));
         }
         return result;
+    }
+
+    public static boolean isMatch(ASN1Node node, TagClass tagClass, long tagNumber) {
+        return node.identifier.tagClass == tagClass && node.identifier.tagNumber == tagNumber;
     }
 }
 """
@@ -366,7 +370,7 @@ public class #{javaName} implements DERSerializable {
       |> Enum.map(fn {field, _idx} ->
           case field do
             {:ComponentType, _, fname, type, optional, _tags, _} ->
-              is_optional = optional in [:OPTIONAL, 'OPTIONAL']
+              is_optional = (optional in [:OPTIONAL, 'OPTIONAL']) or (case optional do {:DEFAULT, _} -> true; _ -> false end)
               java_type_name = to_java_type(type, modname)
               base_decoder = decoder_for(java_type_name, "child")
 
@@ -400,26 +404,41 @@ public class #{javaName} implements DERSerializable {
                   end)
               end
 
-              explicit_tag_num = get_explicit_tag.(type_tags)
+               explicit_tag_num = get_explicit_tag.(type_tags)
 
-              # Handle explicit tagging
-              decoder_call = if explicit_tag_num do
-                 # Extract inner
-                 inner_expr = "((ASN1Node)((ASN1Node.Constructed)child.content).iterator().next())"
-                 decoder_for(java_type_name, inner_expr)
-              else
-                 base_decoder
-              end
+               # Determine expected tag for matching
+               # Prefer explicit tag if present, otherwise fallback to universal tag of the type
+               effective_tag = if explicit_tag_num do
+                   "{class: TagClass.ContextSpecific, number: #{explicit_tag_num}L}"
+               else
+                   # Attempt to find universal tag if possible
+                   t = universal_tag(type)
+                   if t do
+                       "{class: TagClass.Universal, number: #{t}L}"
+                   else
+                       "null" # Fallback to position-based if unknown
+                   end
+               end
 
-              %{
-                name: fieldName(fname),
-                type: java_type_name,
-                optional: is_optional,
-                decoder: decoder_call,
-                is_set_of: is_set_of,
-                tags: type_tags,
-                explicit_tag_num: explicit_tag_num
-              }
+               # Handle explicit tagging
+               decoder_call = if explicit_tag_num do
+                  # Extract inner
+                  inner_expr = "((ASN1Node)((ASN1Node.Constructed)child.content).iterator().next())"
+                  decoder_for(java_type_name, inner_expr)
+               else
+                  base_decoder
+               end
+
+               %{
+                 name: fieldName(fname),
+                 type: java_type_name,
+                 optional: is_optional,
+                 decoder: decoder_call,
+                 is_set_of: is_set_of,
+                 tags: type_tags,
+                 explicit_tag_num: explicit_tag_num,
+                 effective_tag: effective_tag
+               }
             {:"COMPONENTS OF", _type} -> nil
             _ -> nil
           end
@@ -441,40 +460,54 @@ public class #{javaName} implements DERSerializable {
       end) |> Enum.join("\n")
 
       # Generate Parsing Logic
-      parsing_logic =
-      """
-        List<ASN1Node> children = new ArrayList<>();
-        if (node.content instanceof ASN1Node.Constructed) {
-            for (ASN1Node child : (ASN1Node.Constructed) node.content) {
-                children.add(child);
-            }
-        }
-        int idx = 0;
-      """ <>
-      (parsed_fields |> Enum.map(fn f ->
-          if f.optional do
-             """
-        if (idx < children.size()) {
-             // Optional logic
+       parsing_logic =
+       """
+         List<ASN1Node> children = new ArrayList<>();
+         if (node.content instanceof ASN1Node.Constructed) {
+             for (ASN1Node child : (ASN1Node.Constructed) node.content) {
+                 children.add(child);
+             }
+         }
+         int idx = 0;
+       """ <>
+       (parsed_fields |> Enum.map(fn f ->
+           if f.optional do
+             match_expr = if f.effective_tag == "null" do
+                "true"
+             else
+                # We need to parse the effective_tag string to get class and number
+                {class, num} = if String.contains?(f.effective_tag, "ContextSpecific") do
+                    {"TagClass.ContextSpecific", String.replace(f.effective_tag, ~r/.*number: (\d+)L.*/, "\\1")}
+                else
+                    {"TagClass.Universal", String.replace(f.effective_tag, ~r/.*number: (\d+)L.*/, "\\1")}
+                end
+                "ASN1Utilities.isMatch(child, #{class}, #{num}L)"
+             end
+
+              """
+         if (idx < children.size()) {
+              ASN1Node child = children.get(idx);
+              if (#{match_expr}) {
+                  this.#{f.name} = #{f.decoder};
+                  idx++;
+              } else {
+                  this.#{f.name} = null;
+              }
+         } else {
+              this.#{f.name} = null;
+         }
+              """
+           else
+              """
+         if (idx >= children.size()) throw new ASN1Exception(ErrorCode.UnexpectedFieldType, "Missing required field #{f.name}");
+         {
              ASN1Node child = children.get(idx);
-             // Heuristic: assume match for now
              this.#{f.name} = #{f.decoder};
              idx++;
-        } else {
-             this.#{f.name} = null;
-        }
-             """
-          else
-             """
-        if (idx >= children.size()) throw new ASN1Exception(ErrorCode.UnexpectedFieldType, "Missing required field #{f.name}");
-        {
-            ASN1Node child = children.get(idx);
-            this.#{f.name} = #{f.decoder};
-            idx++;
-        }
-             """
-          end
-      end) |> Enum.join("\n"))
+         }
+              """
+           end
+       end) |> Enum.join("\n"))
 
       # Serialization Logic
       serialization_logic = parsed_fields |> Enum.map(fn f ->
@@ -1097,8 +1130,39 @@ public class #{javaName} {
     end
   end
 
+  defp universal_tag(type_ast) do
+    case type_ast do
+      :INTEGER -> 2
+      {:INTEGER, _} -> 2
+      :BOOLEAN -> 1
+      :"BIT STRING" -> 3
+      {:"BIT STRING", _} -> 3
+      :"OCTET STRING" -> 4
+      {:"OCTET STRING", _} -> 4
+      :NULL -> 5
+      :"OBJECT IDENTIFIER" -> 6
+      :UTF8String -> 12
+      :PrintableString -> 19
+      :TeletexString -> 20
+      :IA5String -> 22
+      :UTCTime -> 23
+      :GeneralizedTime -> 24
+      :VisibleString -> 26
+      {:VisibleString, _} -> 26
+      :NumericString -> 18
+      {:NumericString, _} -> 18
+      :UniversalString -> 28
+      :BMPString -> 30
+      {:SEQUENCE, _, _, _, _} -> 16
+      {:SET, _, _, _, _} -> 17
+      {:"SEQUENCE OF", _} -> 16
+      {:"SET OF", _} -> 17
+      {:Externaltypereference, _, _, _} -> 16 # Assume external refs are constructed (SEQUENCE) usually
+      _ -> nil
+    end
+  end
+
   defp capitalize(str) do
-      {head, tail} = String.split_at(str, 1)
-      String.upcase(head) <> tail
+    String.capitalize(str)
   end
 end
