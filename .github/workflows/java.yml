@@ -50,4 +50,4 @@ jobs:
           CA_PID=$! &&
           sleep 5s &&
           cd ./Languages/Java &&
-          gradle run main.ts
+          gradle run main
