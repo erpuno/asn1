@@ -102,7 +102,6 @@ func main() {
 		}
 	}
 
-	// PKCS#7/CMS ContentInfo
 	if _, err := os.Stat(filepath.Join(testDir, "bundle.p7b")); err == nil {
 		results = append(results, testGeneric[cryptographicmessagesyntax2010.X2010ContentInfo](filepath.Join(testDir, "bundle.p7b"), "PKCS#7 Bundle (cms.X2010ContentInfo)"))
 	}
