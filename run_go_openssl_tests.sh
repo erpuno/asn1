@@ -63,4 +63,4 @@ echo ""
 
 echo "Building and running Go tests with generated structures..."
 cd Languages/Go
-go run -buildvcs=false ./openssl_tests
+go run -buildvcs=false ./openssl_tests/main.go
