@@ -43,6 +43,7 @@ jobs:
         CA_PID=$! &&
         sleep 5s &&
         cd ../Languages/C99 &&
+        make c99_client &&
         ./c99_client &&
         kill $CA_PID
       

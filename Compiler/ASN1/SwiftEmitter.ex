@@ -86,14 +86,9 @@ defmodule ASN1.SwiftEmitter do
       nname = bin(normalizeName(name))
       nmod = bin(normalizeName(modname))
       cond do
+        # Already prefixed with Module_ (e.g., CHAT_Message)
         String.starts_with?(nname, nmod <> "_") -> nname
-        String.starts_with?(nname, nmod) ->
-           rest = String.slice(nname, String.length(nmod)..-1//1)
-           if rest == "" do
-               nname
-           else
-               nmod <> "_" <> rest
-           end
+        # All other cases: add Module_ prefix (including CHATMessage -> CHAT_CHATMessage)
         true -> nmod <> "_" <> nname
       end
   end

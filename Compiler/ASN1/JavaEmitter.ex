@@ -1054,21 +1054,22 @@ public class #{javaName} {
 
     nmod = bin(normalizeName(modname))
 
-    # Avoid double prefixing for known modules
-    if String.starts_with?(nname, nmod) or
+    # Avoid double prefixing only if type ALREADY has Module_ prefix with underscore
+    # This ensures CHATMessage -> CHAT_CHATMessage (not collision with Message -> CHAT_Message)
+    if String.starts_with?(nname, nmod <> "_") or
        String.starts_with?(nname, "AuthenticationFramework_") or
        String.starts_with?(nname, "InformationFramework_") or
        String.starts_with?(nname, "CertificateExtensions_") or
        String.starts_with?(nname, "SelectedAttributeTypes_") or
        String.starts_with?(nname, "CryptographicMessageSyntax_") or
        String.starts_with?(nname, "AlgorithmInformation_") or
-       String.starts_with?(nname, "AttributeCertificate") or
-       String.starts_with?(nname, "Extension") or
-       String.starts_with?(nname, "Tokenization") or
+       String.starts_with?(nname, "AttributeCertificate_") or
+       String.starts_with?(nname, "Extension_") or
+       String.starts_with?(nname, "Tokenization_") or
        String.starts_with?(nname, "ANSI_") or
        String.starts_with?(nname, "NIST_") or
        String.starts_with?(nname, "SEC_") or
-       String.starts_with?(nname, "PKIX") do
+       String.starts_with?(nname, "PKIX_") do
        nname
     else
        nmod <> "_" <> nname

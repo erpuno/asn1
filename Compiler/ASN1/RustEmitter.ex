@@ -339,11 +339,9 @@ defmodule ASN1.RustEmitter do
         end
       end
 
-    res =
-      cond do
-        String.starts_with?(pascal_type, pascal_mod) -> pascal_type
-        true -> pascal_mod <> pascal_type
-      end
+    # Always prefix with module name to avoid collisions
+    # e.g., CHAT module: Message -> CHATMessage, CHATMessage -> CHATCHATMessage
+    res = pascal_mod <> pascal_type
 
     # Ensure no :: in type names if they are being used for definitions
     res |> String.replace("::", "_") |> String.replace("/", "_")

@@ -284,11 +284,9 @@ defmodule ASN1.GoEmitter do
 
     n = bin(name) |> String.replace("-", "_")
 
-    if prefix != "" and String.starts_with?(n, prefix) do
-      pascal(n)
-    else
-      pascal(prefix <> "_" <> n)
-    end
+    # Always prefix with module to avoid collisions (e.g., CHAT module:
+    # Message -> CHATMessage, CHATMessage -> CHATCHATMessage)
+    pascal(prefix <> "_" <> n)
   end
 
   defp pascal(name) do

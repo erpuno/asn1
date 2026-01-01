@@ -525,7 +525,7 @@ public class Console {
   }
 
   public static func showCHATMessage(data: Array<UInt8>) throws {
-     let msg: CHAT_Message? = try CHAT_Message(derEncoded: data)
+     let msg: CHAT_CHATMessage? = try CHAT_CHATMessage(derEncoded: data)
      var serializer = DER.Serializer()
      try msg!.serialize(into: &serializer)
      print(": CHATMessage.DER \(data)")
