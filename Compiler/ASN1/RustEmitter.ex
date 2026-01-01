@@ -1550,38 +1550,27 @@ defmodule ASN1.RustEmitter do
                 :CONTEXT -> "TagClass::ContextSpecific"
                 :private -> "TagClass::Private"
                 :PRIVATE -> "TagClass::Private"
+                _ -> "TagClass::ContextSpecific"
               end
               {number, cls_str}
 
             _ ->
-              # If multiple variants, default to ContextSpecific(idx) to match encoder's forced implicit tagging
-              if length(cases) > 1 do
-                {idx, "TagClass::ContextSpecific"}
-              else
-                # Single variant - use universal tag if available
-                ut = universal_tag(type)
-                if ut do
-                  {ut, "TagClass::Universal"}
-                else
-                  {idx, "TagClass::ContextSpecific"}
-                end
-              end
+               # No explicit tags. Resolve universal tag.
+               ut = universal_tag(type)
+               if ut do
+                 {ut, "TagClass::Universal"}
+               else
+                 # Fallback for ANY or unknown (this might fail at runtime if not handled via ANY match)
+                 # But sticking to context-specific index fallback only if we can't resolve universal
+                 # and we need to distinguish (though this really implies invalid ASN.1 if untagged ambiguous choice)
+                 {idx, "TagClass::ContextSpecific"}
+               end
           end
 
-          # Special case: if multiple variants, we ALWAYS use ContextSpecific(idx) to match encoder's forced logic
-          # and avoid collisions with types that might share the same universal tag (like multiple SEQUENCEs)
-          {expected_tag_no, expected_tag_class} = if length(cases) > 1 do
-             {idx, "TagClass::ContextSpecific"}
-          else
-             {expected_tag_no, expected_tag_class}
-          end
-
-          # Determine tagging method for peeling logic (only if explicit tag was present?)
-          # If we used universal tag, we usually don't need peeling unless IMPLICIT was set?
-          # Actually, if type_tags is empty, tag_method is usually irrelevant (parse directly).
+          # Determine tagging method for peeling logic
           tag_method = case type_tags do
             [{:tag, _class, _number, method, _}] -> method
-            _ -> :IMPLICIT # Or :none
+            _ -> :IMPLICIT # Default assumption if no tags, we just read value?
           end
 
           tag_method = case tag_method do
@@ -1592,7 +1581,7 @@ defmodule ASN1.RustEmitter do
             other -> other
           end
 
-          # Determine innermost universal tag for tag swapping (if IMPLICIT)
+          # Determine innermost universal tag for tag swapping (if IMPLICIT and explicit tag was provided)
           universal_tag_no = universal_tag(type)
 
           # Generate the parsing call based on tagging method
@@ -1619,7 +1608,6 @@ defmodule ASN1.RustEmitter do
 
             tag_method in [:EXPLICIT, {:default, :EXPLICIT}] ->
               # EXPLICIT: Peel outer tag to get inner node
-              # Note: If we had an explicit tag, expected_tag_no matches it.
               """
               {
                   if let rust_asn1::asn1::Content::Constructed(collection) = node.content {
@@ -1642,16 +1630,11 @@ defmodule ASN1.RustEmitter do
               }
               """
 
-            universal_tag_no != nil and tag_method == :IMPLICIT ->
-              # IMPLICIT: Swap tag identifier before parsing
-              # Only if we actually HAVE an explicit tag definition that is IMPLICIT.
-              # If type_tags is empty, we don't swap, we just match and parse.
-              # My previous logic (lines 1598+) checked `universal_tag_no != nil`.
-              # But if we found the tag via universal_tag (i.e. type_tags empty), then expected_tag_no == universal_tag_no.
-              # Swapping is redundant.
-              # Swapping is only needed if expected_tag_no != universal_tag_no.
+            true ->
+              # IMPLICIT or No Tag:
+              should_swap = type_tags != [] and universal_tag_no != nil and expected_tag_no != universal_tag_no
 
-              if expected_tag_no != universal_tag_no do
+              if should_swap do
                   """
                   {
                       let mut node = node;
@@ -1659,12 +1642,9 @@ defmodule ASN1.RustEmitter do
                       #{type_fish}::from_der_node(node)?
                   }
                   """
-               else
-                   "#{type_fish}::from_der_node(node)?"
-               end
-
-            true ->
-              "#{type_fish}::from_der_node(node)?"
+              else
+                  "#{type_fish}::from_der_node(node)?"
+              end
           end
 
           ["            (#{expected_tag_no}, #{expected_tag_class}) => Ok(Self::#{variant}(#{call})),"]
@@ -1729,50 +1709,70 @@ defmodule ASN1.RustEmitter do
     """
   end
 
-  defp emit_choice_encoder_body(rust_name, cases) do
-    use_context_tags = length(cases) > 1
 
+
+  defp emit_choice_encoder_body(rust_name, cases) do
     match_arms =
       cases
       |> Enum.with_index()
       |> Enum.map(fn
-        {{:ComponentType, _, field_name, {:type, _type_tags, type, _, _, _}, _optional, _, _}, idx} ->
+        {{:ComponentType, _, field_name, {:type, type_tags, type, _, _, _}, _optional, _, _}, idx} ->
              variant = field_name |> raw_pascal() |> escape_reserved_variant()
 
-             if use_context_tags do
-                 if String.contains?(rust_name, "PKIBody") do
+             # Resolve tags
+             tag_info = case type_tags do
+                [{:tag, class, number, method, _}] ->
+                   cls_str = case class do
+                        :universal -> "TagClass::Universal"
+                        :UNIVERSAL -> "TagClass::Universal"
+                        :application -> "TagClass::Application"
+                        :APPLICATION -> "TagClass::Application"
+                        :context -> "TagClass::ContextSpecific"
+                        :CONTEXT -> "TagClass::ContextSpecific"
+                        :private -> "TagClass::Private"
+                        :PRIVATE -> "TagClass::Private"
+                        _ -> "TagClass::ContextSpecific"
+                   end
+                   {number, cls_str, method}
+                _ -> nil
+             end
+
+             case tag_info do
+                {num, cls, method} when method == :EXPLICIT or method == {:default, :EXPLICIT} ->
                    """
                                Self::#{variant}(val) => {
                                    serializer.append_constructed_node(
-                                       ASN1Identifier::new(#{idx}, TagClass::ContextSpecific),
+                                       ASN1Identifier::new(#{num}, #{cls}),
                                        &|s: &mut Serializer| val.serialize(s)
                                    )?;
                                },
                    """
-                 else
-                   # Implicit Tagging Logic
-                   """
+
+                {num, cls, method} when method == :IMPLICIT or method == {:default, :IMPLICIT} ->
+                    """
                                Self::#{variant}(val) => {
                                    let mut mh = Serializer::new();
                                    val.serialize(&mut mh)?;
                                    let mut bytes = mh.serialized_bytes().to_vec();
                                    if bytes.len() > 0 {
                                        let is_constructed = (bytes[0] & 0x20) != 0;
-                                       let tag_byte = 0x80 | (if is_constructed { 0x20 } else { 0 }) | (#{idx} as u8);
+                                       let tag_byte = 0x80 | (if is_constructed { 0x20 } else { 0 }) | (#{num} as u8);
                                        bytes[0] = tag_byte;
                                        let node = ASN1Node {
-                                           identifier: ASN1Identifier::new(#{idx}, TagClass::ContextSpecific),
+                                           identifier: ASN1Identifier::new(#{num}, #{cls}),
                                            encoded_bytes: bytes.into(),
                                            content: rust_asn1::asn1::Content::Primitive(bytes::Bytes::new()),
                                        };
                                        node.serialize(serializer)?;
                                    }
                                },
-                   """
-                 end
-             else
-                 "            Self::#{variant}(val) => val.serialize(serializer)?,"
+                    """
+
+                _ ->
+                   # No tags or unknown method - serialize directly
+                   "            Self::#{variant}(val) => val.serialize(serializer)?,"
              end
+
 
         _ -> ""
       end)
