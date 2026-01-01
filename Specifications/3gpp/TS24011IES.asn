@@ -1,0 +1,58 @@
+TS24011IES DEFINITIONS AUTOMATIC TAGS ::= BEGIN
+
+IMPORTS TBCDString FROM TS24008IES ;
+
+/* 8.1.3 Message type */
+
+/* 8.1.4.1 CP-User data element */
+
+CPUserData ::= OCTET STRING (SIZE (0..249));
+
+/* 8.1.4.2 CP-Cause element */
+
+CPCauseValue ::= SEQUENCE {
+   ext BOOLEAN DEFAULT FALSE, 
+   value INTEGER (0..127)
+}
+
+/* 8.2.2 Message type indicator (MTI) */
+
+/* 8.2.5.1 Originator address element */
+
+RPAddress ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..11), 
+   --<first3GExtElem/>
+   --<last3GExtElem/>
+   octet3 SEQUENCE {
+      typeOfNumber INTEGER (0..7),
+      numberingPlanID INTEGER (0..15)
+   },
+   --<length fixed-size="0"/>
+   number TBCDString
+}
+
+RPOriginatorAddress ::= RPAddress
+
+/* 8.2.5.2 Destination address element */
+
+RPDestinationAddress ::= RPAddress
+
+/* 8.2.5.3 RP-User data element */
+
+RPUserData ::= OCTET STRING (SIZE (0..233));
+
+/* 8.2.5.4 RP-Cause element */
+
+RPCauseElem ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (1..2) DEFAULT 1,
+   ext BOOLEAN DEFAULT FALSE, 
+   causeValue INTEGER (0..127),
+   --<is3GVarLenList lengthElem="length"/>
+   --<storage>array</storage>
+   diagField SEQUENCE (SIZE (0..1)) OF INTEGER (0..255)
+}
+
+END
+

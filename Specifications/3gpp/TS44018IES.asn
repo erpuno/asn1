@@ -1,0 +1,78 @@
+TS44018IES DEFINITIONS AUTOMATIC TAGS ::= BEGIN
+
+IMPORTS 
+   Channel-Request-Description-IE, EGPRS-Modulation-and-Coding-IE, 
+   EGPRS-Level-IE, EGPRS-Window-Size-IE, 
+   Enhanced-Cell-Reselection-Parameters-IE, Frequency-Parameters-IE,
+   GPRS-Cell-Options-IE, GPRS-Mobile-Allocation-IE,
+   GPRS-Power-Control-Parameters-IE, 
+   MBMS-Channel-Parameters-IE, MBMS-p-t-m-channel-description-IE,
+   MBMS-Session-List-IE, MBMS-Session-Parameters-List-IE, MPRACH-description-IE,
+   Packet-Timing-Advance-IE, PCID-Group-IE, PSC-Group-IE, 
+   Power-Control-Parameters-IE, Pulse-Format-IE, TMGI-IE,
+   UTRAN-CSG-Measurement-Report-IE 
+   FROM TS44060IES
+;
+
+/* 10.5.2 - Radio Resource management information elements */
+
+-------------------------------------
+--10.5.2.21aa MultiRate configuration
+-------------------------------------
+--<cDecFuncFname>TS44018Dec_Multirate_Configuration.c</cDecFuncFname>
+--<cEncFuncFname>TS44018Enc_Multirate_Configuration.c</cEncFuncFname>
+Multirate-Configuration ::= SEQUENCE {
+   multirate-speech-version ENUMERATED{ v1(1), v2(2), max(7) },
+   nscb INTEGER(0..1),
+   icmi INTEGER(0..1),
+   start-mode INTEGER(0..3),
+   amr-codec-modes INTEGER(0..255),
+   --<length fixed-size="0"/>
+   params SEQUENCE (SIZE (0..3)) OF SEQUENCE {
+      threshold INTEGER(0..63),
+      hysteresis INTEGER(0..15)
+   }
+}
+
+
+
+----------------------------------
+-- 10.5.2.21b Multislot Allocation
+----------------------------------
+Multislot-Allocation ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER(0..255),
+   --<first3GExtElem/>
+   da INTEGER(0..127),
+   --<last3GExtElem/>
+   ua INTEGER(0..127) OPTIONAL,
+   --<length fixed-size="0"/>
+   channel-sets SEQUENCE (SIZE(0..8)) OF INTEGER(0..255)
+}
+
+
+---------------------------------------
+-- 10.5.2.42b VGCS Ciphering Parameters
+---------------------------------------
+--<cDecFuncFname>TS44018Dec_VGCS_Ciphering_Parameters.c</cDecFuncFname>
+--<cEncFuncFname>TS44018Enc_VGCS_Ciphering_Parameters.c</cEncFuncFname>
+VGCS-Ciphering-Parameters ::= SEQUENCE {
+   b22-count INTEGER(0..1),
+   cell-global-count INTEGER(0..3),
+   cell-identity INTEGER(0..255) OPTIONAL,
+   location-area-identification OCTET STRING (SIZE(5)) OPTIONAL,
+   vstk_rand BIT STRING (SIZE(36)) OPTIONAL
+}
+
+-----------------------------
+-- 10.5.2.82 Extended TSC Set
+-----------------------------
+ExtendedTSCSet ::= SEQUENCE {
+   secondaryTSCValue INTEGER (0..7),
+   secondaryTSCSet BOOLEAN,
+   primaryTSCSet BOOLEAN,
+   secondTSCAssigned BOOLEAN,
+   csTSCSet INTEGER (0..3)
+}
+
+END

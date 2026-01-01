@@ -1,0 +1,136 @@
+/* 
+Module for 3GPP TS 24.011 Version 8-15 Messages.
+Each message, being a standard L3 Message (see TS 24.007), has a standard
+message header.  The header is factored out of each of the message types.
+Current versions:
+    v15.3.0
+    v16.0.0
+    v17.0.0
+*/
+TS24011Msgs DEFINITIONS AUTOMATIC TAGS ::=
+BEGIN
+
+IMPORTS 
+L3HdrOptions, NAS-PROTOCOL-CLASS, SecProtMsgHeader FROM TS24007L3
+
+CPCauseValue, CPUserData, RPCauseElem, RPDestinationAddress, 
+RPOriginatorAddress, RPOriginatorAddress, RPUserData  
+FROM TS24011IES
+;
+
+TS24011-OBJECTSET NAS-PROTOCOL-CLASS ::= {
+   obj-CP-DATA | obj-CP-ACK | obj-CP-ERROR
+}
+
+CP-PDU ::= SEQUENCE {
+   l3HdrOpts    L3HdrOptions,      -- L3 header, octet 1, bits 5 thru 8
+   protoDiscr   NAS-PROTOCOL-CLASS.&protoDiscr ({TS24011-OBJECTSET}), 
+   msgType      NAS-PROTOCOL-CLASS.&msgType ({TS24011-OBJECTSET}), 
+   data         NAS-PROTOCOL-CLASS.&Value 
+                   ({TS24011-OBJECTSET}{@protoDiscr,@msgType})
+}
+
+/* 7.2.1 CP-DATA */
+
+mt-CP-DATA INTEGER ::= 1
+
+obj-CP-DATA NAS-PROTOCOL-CLASS ::= { 
+   ID sms, mt-CP-DATA
+   TYPE CPDATA
+}
+
+CPDATA ::= SEQUENCE {
+   cpUserData CPUserData
+}
+
+/* 7.2.2 CP-ACK */
+
+mt-CP-ACK INTEGER ::= 4
+
+obj-CP-ACK NAS-PROTOCOL-CLASS ::= { 
+   ID sms, mt-CP-ACK
+   TYPE NULL
+}
+
+/* 7.2.3 CP-ERROR */
+
+mt-CP-ERROR INTEGER ::= 16
+
+obj-CP-ERROR NAS-PROTOCOL-CLASS ::= { 
+   ID sms, mt-CP-ERROR
+   TYPE CPERROR
+}
+
+CPERROR ::= SEQUENCE {
+   cpCause CPCauseValue
+}
+
+/* RP Message header */
+
+RPHeader ::= SEQUENCE {
+   spare INTEGER(0..31) DEFAULT 0, -- should be set to 0
+   rpMsgType INTEGER(0..7),
+   rpMsgRef INTEGER(0..255)
+}
+
+RP-PDU ::= SEQUENCE {
+   header RPHeader, 
+   --<inline/>
+   infoElem CHOICE {
+      --<selector element="header.rpMsgType" value="0"/>
+      dataToNet RPDataMSOriginating, 
+      --<selector element="header.rpMsgType" value="1"/>
+      dataToMS RPDataMSTerminated, 
+      --<selector element="header.rpMsgType" value="2"/>
+      ackToNet RP-ACK, 
+      --<selector element="header.rpMsgType" value="3"/>
+      ackToMS RP-ACK, 
+      --<selector element="header.rpMsgType" value="4"/>
+      errorToNet RP-ERROR, 
+      --<selector element="header.rpMsgType" value="5"/>
+      errorToMS RP-ERROR, 
+      --<selector element="header.rpMsgType" value="6"/>
+      smma NULL
+   }
+}
+
+/* 7.3.1.1 RP-DATA (Network to MS) */
+
+--<is3GMessage/>
+RPDataMSTerminated ::= SEQUENCE {
+   origAddress RPOriginatorAddress,
+   destAddrLen INTEGER(0..255) DEFAULT 0,
+   userData RPUserData
+}
+
+/* 7.3.1.2 RP-DATA (MS To Network) */
+
+--<is3GMessage/>
+RPDataMSOriginating ::= SEQUENCE {
+   origAddrLen INTEGER(0..255) DEFAULT 0,
+   destAddress RPDestinationAddress,
+   userData RPUserData
+}
+
+/* 7.3.2 RP-SMMA */
+
+/* 7.3.3 RP-ACK */
+
+--<is3GMessage/>
+RP-ACK ::= SEQUENCE {
+   --<iei format="tlv">41</iei>
+   userData RPUserData OPTIONAL
+}
+
+/* 7.3.4 RP-ERROR */
+
+--<is3GMessage/>
+RP-ERROR ::= SEQUENCE {
+   rpCause RPCauseElem,
+   --<iei format="tlv">41</iei>
+   userData RPUserData OPTIONAL
+}
+
+
+
+END

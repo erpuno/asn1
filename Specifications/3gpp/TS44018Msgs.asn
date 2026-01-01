@@ -1,0 +1,1509 @@
+/*
+Current versions:
+    v15.4.0
+*/
+TS44018Msgs DEFINITIONS AUTOMATIC TAGS ::= BEGIN
+
+-- Updated to Release 15.4.0
+
+IMPORTS 
+
+   AddnUpdateParams, CellIdentityValue, CiphKeySeqNum, 
+   DescrGroupOrBcastCallRef, LocAreaIdent, MobileIdentity, 
+   MobileStationClassmark2, MobileStationClassmark3, RoutingAreaIdent, TMGI 
+   FROM TS24008IES
+
+   A3G-Additional-Measurement-Parameters-Description-2-struct,
+   A3G-CSG-Description-struct, APDU-Data, APDU-Flags, APDU-ID, Application-Data,
+   BA-List-Pref, BA-Range, Carrier-Indication,
+   Cell-Channel-Description, Cell-Description, Cell-Options-BCCH, Cell-Options-SACCH,
+   Cell-Selection-Parameters,
+   Channel-Description, Channel-Description-2, Channel-Description-3,
+   Channel-Mode, Channel-Mode-2, Channel-Needed, Channel-Request-Description-2,
+   Cell-Sel-Ind-Post-Rel-TCH-SDCCH, Cipher-Mode-Setting, Cipher-Response,
+   Classmark-Enquiry-Mask, CN-to-MS-transparent-information, 
+   Control-Channel-Description, Data-Identity,
+   Dedicated-mode-or-TBF, Dedicated-Service-Information, DL-DCCH-Message, 
+   DTM-Information-Details,
+   Dynamic-ARFCN-Mapping,
+   E-UTRAN-Measurement-Parameters-Description-struct, 
+   Enhanced-DTM-CS-Release-Indication, Extended-Measurement-Results,
+   Extended-Measurement-Frequency-List,
+   Feature-Indicator, Frequency-Channel-Sequence,
+   Frequency-List, Frequency-Short-List, GERAN-Iu-Mode-Classmark, GPRS-broadcast-information, 
+   GPRS-Resumption,
+   Group-Call-information, Group-Channel-Description, Group-Channel-Description-2,
+   Handover-Reference, Handover-To-cdma2000-Command, Handover-To-UTRAN-Command,
+   IA-Rest-Octets, Individual-priorities, IPA-Rest-Octets, LLC-PDU-Container,
+   L2-Pseudo-Length, IAR-Rest-Octets, IAX-Rest-Octets, 
+   NT-N-Rest-Octets, P1-Rest-Octets, P2-Rest-Octets, P3-Rest-Octets,
+   MBMS-p-t-m-Channel-Description,
+   MBMS-Session-Identity, MBMS-Session-Parameters-List, Measurement-Results,
+   Mobile-Allocation, Mobile-Time-Difference, 
+   Mobile-Time-Difference-on-Hyperframe-level,
+   Multirate-Configuration, Multislot-Allocation,
+   Mobile-Allocation, MPRACH-description, NCC-Permitted, 
+   Neighbour-Cell-Description, Neighbour-Cell-Description-2,
+   Packet-Channel-Description, Page-Mode, PLMN-Index,
+   Power-Command, Power-Command-and-access-type, PS-Cause, 
+   RACH-Control-Parameters, Random-Reference-Establishment-Cause,
+   Reduced-group-or-broadcast-call-reference, Request-Reference,
+   Restriction-Timer,
+   RR-Packet-Downlink-Assignment, 
+   RR-Packet-Downlink-Assignment-Type-2, RR-Packet-Uplink-Assignment, 
+   Service-Support, SI1-Rest-Octets, SI10-Rest-Octets, SI10bis-Neighbour-Cell-Info,
+   SI10bis-Rest-Octets, SI10ter-Rest-Octets, SI2bis-Rest-Octets, 
+   SI2ter-Rest-Octets, SI2quater-Rest-Octets, SI2n-Rest-Octets, SI3-Rest-Octets,
+   SI3-Rest-Octets-Data,
+   SI4-Rest-Octets, SI6-Rest-Octets, SI7-Rest-Octets, SI7-Rest-Octets-Data,
+   SI8-Rest-Octets, SI8-Rest-Octets-Data,
+   SI9-Rest-Octets, SI13-Rest-Octets, SI16-Rest-Octets, SI17-Rest-Octets,
+   SI19-Rest-Octets, SI18-Rest-Octets, SI14-Rest-Octets, 
+   SI15-Rest-Octets, SI13alt-Rest-Octets, SI21-Rest-Octets, SI22-Rest-Octets,
+   SI23-Rest-Octets, Starting-Time, Suspension-Cause,
+   Synchronization-Indication,
+   Talker-Identity, Talker-Priority-Status, Time-Difference, Timing-Advance, 
+   TLLI, TMSI, Token, Uplink-Access-Indication, UTRAN-Classmark, 
+   UTRAN-Freq-List, UTRAN-TDD-Description-struct, VGCS-AMR-Configuration, 
+   VGCS-Ciphering-Parameters, VGCS-target-mode-Indication, Wait-Indication,
+   ExtendedTSCSet
+   FROM TS44018IES
+
+   PCID-Group-IE, PSC-Group-IE, UTRAN-CSG-Measurement-Report-IE FROM TS44060IES
+
+   -- Radio-Bearer-Reconfiguration FROM TS44118
+
+   L3HdrOptions, NAS-PROTOCOL-CLASS, ProtoDiscr FROM TS24007L3
+;
+
+RR-SHORT-CLASS ::= CLASS {
+   &msgType INTEGER(0..31),
+   &Value
+}
+
+   
+
+   
+RR-Short-PD-Messages RR-SHORT-CLASS ::= {
+   obj-notification-facch | obj-vbs-vgcs-reconfigure 
+   | obj-vbs-vgcs-reconfigure2 | obj-uplink-free | obj-vgcs-additional-info
+   | obj-vgcs-sms-information | obj-system-information-type-10
+   | obj-system-information-type-10bis | obj-system-information-type-10ter
+   | obj-measurement-information | obj-enhanced-measurement-report
+   | obj-vgcs-neighbour-cell-information | obj-notify-application-data
+}
+
+-- Messages sent on DCCH downlink, in unacknowledged mode
+--rr-short-PD is always 0 and short-layer-2-header is also always 0.  They
+--should be auxiliary fields, but I don't think have a way to make them that.
+RR-Short-PD-PDU ::= SEQUENCE {
+   rr-short-PD INTEGER (0..1) DEFAULT 0,
+   msgType RR-SHORT-CLASS.&msgType ({RR-Short-PD-Messages}),
+   short-layer-2-header INTEGER (0..3) DEFAULT 0,   
+   data RR-SHORT-CLASS.&Value ({RR-Short-PD-Messages}{@msgType})
+}
+
+mt-AdditionalAssignment INTEGER ::= 59
+mt-ImmediateAssignment INTEGER ::= 63
+mt-ImmediateAssignmentExtended INTEGER ::= 57
+mt-ImmediateAssignmentReject INTEGER ::= 58
+mt-ImmediatePacketAssignment INTEGER ::= 105
+mt-CipheringModeCommand INTEGER ::= 53
+mt-CipheringModeComplete INTEGER ::= 50
+mt-ConfigurationChangeCommand INTEGER ::= 48
+mt-ConfigurationChangeAck INTEGER ::= 49
+mt-ConfigurationChangeReject INTEGER ::= 51
+mt-AssignmentCommand INTEGER ::= 46
+mt-AssignmentComplete INTEGER ::= 41
+mt-AssignmentFailure INTEGER ::= 47
+mt-HandoverCommand INTEGER ::= 43
+mt-HandoverComplete INTEGER ::= 44
+mt-HandoverFailure INTEGER ::= 40
+mt-PhysicalInformation INTEGER ::= 45
+mt-ChannelRelease INTEGER ::= 13
+mt-PartialRelease INTEGER ::= 10
+mt-PartialReleaseComplete INTEGER ::= 15
+mt-PagingRequestType1 INTEGER ::= 33
+mt-PagingRequestType2 INTEGER ::= 34
+mt-PagingRequestType3 INTEGER ::= 36
+mt-PagingResponse INTEGER ::= 39
+mt-NotificationNch INTEGER ::= 32
+mt-NotificationResponse INTEGER ::= 38
+mt-SystemInformationType8 INTEGER ::= 24
+mt-SystemInformationType1 INTEGER ::= 25
+mt-SystemInformationType2 INTEGER ::= 26
+mt-SystemInformationType3 INTEGER ::= 27
+mt-SystemInformationType4 INTEGER ::= 28
+mt-SystemInformationType5 INTEGER ::= 29
+mt-SystemInformationType6 INTEGER ::= 30
+mt-SystemInformationType7 INTEGER ::= 31
+mt-SystemInformationType2bis INTEGER ::= 2
+mt-SystemInformationType2ter INTEGER ::= 3
+mt-SystemInformationType2quater INTEGER ::= 7
+mt-SystemInformationType5bis INTEGER ::= 5
+mt-SystemInformationType5ter INTEGER ::= 6
+mt-SystemInformationType9 INTEGER ::= 4
+mt-SystemInformationType13 INTEGER ::= 0
+mt-SystemInformationType16 INTEGER ::= 61
+mt-SystemInformationType17 INTEGER ::= 62
+mt-ChannelModeModify INTEGER ::= 16
+mt-RrStatus INTEGER ::= 18
+mt-ChannelModeModifyAck INTEGER ::= 23
+mt-FrequencyRedefinition INTEGER ::= 20
+mt-MeasurementReport INTEGER ::= 21
+mt-ClassmarkChange INTEGER ::= 22
+mt-ClassmarkEnquiry INTEGER ::= 19
+mt-ExtendedMeasurementReport INTEGER ::= 54
+mt-ExtendedMeasurementOrder INTEGER ::= 55
+mt-GprsSuspensionRequest INTEGER ::= 52
+mt-MbmsAnnouncement INTEGER ::= 22
+mt-ServiceInformation INTEGER ::= 54
+mt-VgcsUplinkGrant INTEGER ::= 9
+mt-UplinkRelease INTEGER ::= 14
+mt-UplinkBusy INTEGER ::= 42
+mt-TalkerIndication INTEGER ::= 17
+mt-PriorityUplinkRequest INTEGER ::= 102
+mt-DataIndication INTEGER ::= 103
+mt-DataIndication2 INTEGER ::= 104
+mt-ApplicationInformation INTEGER ::= 56
+mt-SystemInformationType14 INTEGER ::= 1
+mt-SystemInformationType15 INTEGER ::= 67
+mt-SystemInformationType18 INTEGER ::= 64
+mt-SystemInformationType19 INTEGER ::= 65
+mt-SystemInformationType20 INTEGER ::= 66
+mt-SystemInformationType13alt INTEGER ::= 68
+mt-SystemInformationType2n INTEGER ::= 69
+mt-SystemInformationType21 INTEGER ::= 70
+mt-SystemInformationType22 INTEGER ::= 71
+mt-SystemInformationType23 INTEGER ::= 79
+mt-DtmAssignmentFailure INTEGER ::= 72
+mt-DtmReject INTEGER ::= 73
+mt-DtmRequest INTEGER ::= 74
+mt-PacketAssignment INTEGER ::= 75
+mt-DtmAssignmentCommand INTEGER ::= 76
+mt-DtmInformation INTEGER ::= 77
+mt-PacketNotification INTEGER ::= 78
+mt-UtranClassmarkChange INTEGER ::= 96
+mt-Cdma2000ClassmarkChange INTEGER ::= 98
+mt-InterSystemToUtranHandoverCommand INTEGER ::= 99
+mt-InterSystemToCdma2000HandoverCommand INTEGER ::= 100
+mt-GeranIuModeClassmarkChange INTEGER ::= 101
+mt-InterSystemToEutranHandoverCommand INTEGER ::= 102
+
+mt-GprsInformation INTEGER ::= 0
+
+obj-AdditionalAssignment NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-AdditionalAssignment TYPE AdditionalAssignment}
+obj-CipheringModeCommand NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-CipheringModeCommand TYPE CipheringModeCommand}
+obj-CipheringModeComplete NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-CipheringModeComplete TYPE CipheringModeComplete}
+obj-ConfigurationChangeCommand NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-ConfigurationChangeCommand TYPE ConfigurationChangeCommand}
+obj-ConfigurationChangeAck NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-ConfigurationChangeAck TYPE ConfigurationChangeAck}
+obj-ConfigurationChangeReject NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-ConfigurationChangeReject TYPE ConfigurationChangeReject}
+obj-AssignmentCommand NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-AssignmentCommand TYPE AssignmentCommand}
+obj-AssignmentComplete NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-AssignmentComplete TYPE AssignmentComplete}
+obj-AssignmentFailure NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-AssignmentFailure TYPE AssignmentFailure}
+obj-HandoverCommand NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-HandoverCommand TYPE HandoverCommand}
+obj-HandoverComplete NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-HandoverComplete TYPE HandoverComplete}
+obj-HandoverFailure NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-HandoverFailure TYPE HandoverFailure}
+obj-ImmediateAssignment L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-ImmediateAssignment TYPE ImmediateAssignment REST IA-Rest-Octets}
+obj-ImmediateAssignmentExtended L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-ImmediateAssignmentExtended TYPE ImmediateAssignmentExtended REST IAX-Rest-Octets}
+obj-ImmediateAssignmentReject L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-ImmediateAssignmentReject TYPE ImmediateAssignmentReject REST IAR-Rest-Octets}
+obj-ImmediatePacketAssignment L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-ImmediatePacketAssignment TYPE ImmediatePacketAssignment REST IPA-Rest-Octets}
+obj-PhysicalInformation NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-PhysicalInformation TYPE PhysicalInformation}
+obj-ChannelRelease NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-ChannelRelease TYPE ChannelRelease}
+obj-PartialRelease NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-PartialRelease TYPE PartialRelease}
+obj-PartialReleaseComplete NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-PartialReleaseComplete TYPE PartialReleaseComplete}
+obj-PagingRequestType1 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-PagingRequestType1 TYPE PagingRequestType1 REST P1-Rest-Octets}
+obj-PagingRequestType2 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-PagingRequestType2 TYPE PagingRequestType2 REST P2-Rest-Octets}
+obj-PagingRequestType3 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-PagingRequestType3 TYPE PagingRequestType3 REST P3-Rest-Octets}
+obj-PagingResponse NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-PagingResponse TYPE PagingResponse}
+obj-NotificationNch L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-NotificationNch TYPE NotificationNch REST NT-N-Rest-Octets}
+obj-NotificationResponse NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-NotificationResponse TYPE NotificationResponse}
+obj-SystemInformationType1 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType1 TYPE SystemInformationType1 REST SI1-Rest-Octets}
+obj-SystemInformationType2 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType2 TYPE SystemInformationType2 REST NULL}
+obj-SystemInformationType2bis L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType2bis TYPE SystemInformationType2bis REST SI2bis-Rest-Octets}
+obj-SystemInformationType2ter L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType2ter TYPE SystemInformationType2ter REST SI2ter-Rest-Octets}
+obj-SystemInformationType2quater L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType2quater TYPE SystemInformationType2quater REST SI2quater-Rest-Octets}
+obj-SystemInformationType2n L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType2n TYPE SystemInformationType2n REST SI2n-Rest-Octets}
+obj-SystemInformationType3 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType3 TYPE SystemInformationType3 REST SI3-Rest-Octets-Data}
+obj-SystemInformationType4 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType4 TYPE SystemInformationType4 REST SI4-Rest-Octets}
+obj-SystemInformationType5 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType5 TYPE SystemInformationType5 REST NULL}
+obj-SystemInformationType5bis L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType5bis TYPE SystemInformationType5bis REST NULL}
+obj-SystemInformationType5ter L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType5ter TYPE SystemInformationType5ter REST NULL}
+obj-SystemInformationType6 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType6 TYPE SystemInformationType6 REST SI6-Rest-Octets}
+obj-SystemInformationType7 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType7 TYPE SystemInformationType7 REST SI7-Rest-Octets-Data}
+obj-SystemInformationType8 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType8 TYPE SystemInformationType8 REST SI8-Rest-Octets-Data}
+obj-SystemInformationType9 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType9 TYPE SystemInformationType9 REST SI9-Rest-Octets}
+obj-SystemInformationType13 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType13 TYPE SystemInformationType13 REST SI13-Rest-Octets}
+obj-SystemInformationType16 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType16 TYPE SystemInformationType16 REST SI16-Rest-Octets}
+obj-SystemInformationType17 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType17 TYPE SystemInformationType17 REST SI17-Rest-Octets}
+obj-SystemInformationType19 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType19 TYPE SystemInformationType19 REST SI19-Rest-Octets}
+obj-SystemInformationType18 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType18 TYPE SystemInformationType18 REST SI18-Rest-Octets}
+obj-SystemInformationType20 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType20 TYPE SystemInformationType20 REST SI18-Rest-Octets}
+obj-SystemInformationType14 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType14 TYPE SystemInformationType14 REST SI14-Rest-Octets}
+obj-SystemInformationType15 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType15 TYPE SystemInformationType15 REST SI15-Rest-Octets}
+obj-SystemInformationType13alt L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType13alt TYPE SystemInformationType13alt REST SI13alt-Rest-Octets}
+obj-SystemInformationType21 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType21 TYPE SystemInformationType21 REST SI21-Rest-Octets}
+obj-SystemInformationType22 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType22 TYPE SystemInformationType22 REST SI22-Rest-Octets}
+obj-SystemInformationType23 L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-SystemInformationType23 TYPE SystemInformationType23 REST SI23-Rest-Octets}
+obj-ChannelModeModify NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-ChannelModeModify TYPE ChannelModeModify}
+obj-RrStatus NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-RrStatus TYPE RrStatus}
+obj-ChannelModeModifyAck NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-ChannelModeModifyAck TYPE ChannelModeModifyAck}
+obj-FrequencyRedefinition NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-FrequencyRedefinition TYPE FrequencyRedefinition}
+obj-MeasurementReport NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-MeasurementReport TYPE MeasurementReport}
+obj-ClassmarkChange NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-ClassmarkChange TYPE ClassmarkChange}
+obj-ClassmarkEnquiry NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-ClassmarkEnquiry TYPE ClassmarkEnquiry}
+obj-ExtendedMeasurementReport NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-ExtendedMeasurementReport TYPE ExtendedMeasurementReport}
+obj-ExtendedMeasurementOrder L2-PSEUDO-LEN-CLASS ::= { ID rrMgmt, mt-ExtendedMeasurementOrder TYPE ExtendedMeasurementOrder REST NULL}
+obj-GprsSuspensionRequest NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-GprsSuspensionRequest TYPE GprsSuspensionRequest}
+obj-MbmsAnnouncement NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-MbmsAnnouncement TYPE MbmsAnnouncement}
+obj-ServiceInformation NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-ServiceInformation TYPE ServiceInformation}
+obj-VgcsUplinkGrant NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-VgcsUplinkGrant TYPE VgcsUplinkGrant}
+obj-UplinkRelease NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-UplinkRelease TYPE UplinkRelease}
+obj-UplinkBusy NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-UplinkBusy TYPE UplinkBusy}
+obj-TalkerIndication NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-TalkerIndication TYPE TalkerIndication}
+obj-PriorityUplinkRequest NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-PriorityUplinkRequest TYPE PriorityUplinkRequest}
+obj-DataIndication NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-DataIndication TYPE DataIndication}
+obj-DataIndication2 NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-DataIndication2 TYPE DataIndication2}
+obj-ApplicationInformation NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-ApplicationInformation TYPE ApplicationInformation}
+obj-DtmAssignmentFailure NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-DtmAssignmentFailure TYPE DtmAssignmentFailure}
+obj-DtmReject NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-DtmReject TYPE DtmReject}
+obj-DtmRequest NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-DtmRequest TYPE DtmRequest}
+obj-PacketAssignment NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-PacketAssignment TYPE PacketAssignment}
+obj-DtmAssignmentCommand NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-DtmAssignmentCommand TYPE DtmAssignmentCommand}
+obj-DtmInformation NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-DtmInformation TYPE DtmInformation}
+obj-PacketNotification NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-PacketNotification TYPE PacketNotification}
+obj-UtranClassmarkChange NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-UtranClassmarkChange TYPE UtranClassmarkChange}
+obj-Cdma2000ClassmarkChange NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-Cdma2000ClassmarkChange TYPE Cdma2000ClassmarkChange}
+obj-InterSystemToUtranHandoverCommand NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-InterSystemToUtranHandoverCommand TYPE InterSystemToUtranHandoverCommand}
+obj-InterSystemToCdma2000HandoverCommand NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-InterSystemToCdma2000HandoverCommand TYPE InterSystemToCdma2000HandoverCommand}
+obj-GeranIuModeClassmarkChange NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-GeranIuModeClassmarkChange TYPE GeranIuModeClassmarkChange}
+obj-InterSystemToEutranHandoverCommand NAS-PROTOCOL-CLASS ::= { ID rrMgmt, mt-InterSystemToEutranHandoverCommand TYPE InterSystemToEutranHandoverCommand}
+
+obj-GprsInformation NAS-PROTOCOL-CLASS ::= { ID gttp, mt-GprsInformation TYPE GprsInformation }
+
+DL-DCCH-Messages NAS-PROTOCOL-CLASS ::= {
+   obj-AdditionalAssignment |  obj-ApplicationInformation | 
+   obj-AssignmentCommand | obj-AssignmentComplete |
+   obj-ChannelModeModify | obj-ChannelRelease | obj-CipheringModeCommand |
+   obj-ClassmarkEnquiry | obj-ConfigurationChangeCommand | obj-DataIndication |
+   obj-DtmAssignmentCommand | obj-DtmInformation | obj-DtmReject |
+   obj-FrequencyRedefinition | obj-GprsInformation | obj-HandoverCommand |
+   obj-InterSystemToUtranHandoverCommand | 
+   obj-InterSystemToCdma2000HandoverCommand | 
+   obj-InterSystemToEutranHandoverCommand | obj-MbmsAnnouncement |
+   obj-PacketAssignment | obj-PacketNotification | obj-PartialRelease |
+   obj-PhysicalInformation | obj-RrStatus | obj-UplinkBusy | obj-UplinkRelease |
+   obj-VgcsUplinkGrant
+}
+
+
+DL-DCCH-PDU ::= SEQUENCE {
+   l3HdrOpts  L3HdrOptions, -- L3 header, octet 1, bits 5 thru 8
+   protoDiscr NAS-PROTOCOL-CLASS.&protoDiscr ({DL-DCCH-Messages}), 
+   msgType NAS-PROTOCOL-CLASS.&msgType ({DL-DCCH-Messages}), 
+   data    NAS-PROTOCOL-CLASS.&Value 
+              ({DL-DCCH-Messages}{@protoDiscr,@msgType})
+}
+
+
+UL-DCCH-Messages NAS-PROTOCOL-CLASS ::= {
+   obj-ApplicationInformation | obj-AssignmentComplete | obj-AssignmentFailure |
+   obj-Cdma2000ClassmarkChange | obj-ChannelModeModifyAck |
+   obj-CipheringModeComplete | obj-ClassmarkChange | obj-ConfigurationChangeAck
+   | obj-ConfigurationChangeReject | obj-DataIndication | obj-DataIndication2 |
+   obj-DtmAssignmentFailure | obj-DtmRequest |
+   obj-GeranIuModeClassmarkChange | obj-GprsInformation | 
+   obj-GprsSuspensionRequest | 
+   obj-HandoverComplete | obj-HandoverFailure | obj-NotificationResponse |
+   obj-PagingResponse | obj-PartialReleaseComplete | obj-PriorityUplinkRequest |
+   obj-RrStatus | obj-ServiceInformation | obj-TalkerIndication | 
+   obj-UplinkRelease | obj-UtranClassmarkChange
+}
+
+UL-DCCH-PDU ::= SEQUENCE {
+   l3HdrOpts  L3HdrOptions, -- L3 header, octet 1, bits 5 thru 8
+   protoDiscr NAS-PROTOCOL-CLASS.&protoDiscr ({UL-DCCH-Messages}), 
+   msgType NAS-PROTOCOL-CLASS.&msgType ({UL-DCCH-Messages}), 
+   data    NAS-PROTOCOL-CLASS.&Value 
+              ({UL-DCCH-Messages}{@protoDiscr,@msgType})
+}
+
+
+UL-SACCH-Messages NAS-PROTOCOL-CLASS ::= {
+   obj-MeasurementReport | obj-ExtendedMeasurementReport
+}
+
+UL-SACCH-PDU ::= SEQUENCE {
+   l3HdrOpts  L3HdrOptions, -- L3 header, octet 1, bits 5 thru 8
+   protoDiscr NAS-PROTOCOL-CLASS.&protoDiscr ({UL-SACCH-Messages}), 
+   msgType NAS-PROTOCOL-CLASS.&msgType ({UL-SACCH-Messages}), 
+   data    NAS-PROTOCOL-CLASS.&Value 
+              ({UL-SACCH-Messages}{@protoDiscr,@msgType})
+}
+
+
+L2-PSEUDO-LEN-CLASS ::= CLASS {
+   &protoDiscr ProtoDiscr, 
+   &msgType INTEGER (0..255), 
+   &Value,
+   &RestOctets
+}
+WITH SYNTAX {
+   ID &protoDiscr, &msgType
+   TYPE &Value
+   REST &RestOctets
+}
+
+
+L2-PSEUDO-LEN-PDU-Messages L2-PSEUDO-LEN-CLASS ::= { 
+   obj-ImmediateAssignment | obj-ImmediateAssignmentExtended | 
+   obj-ImmediateAssignmentReject | obj-ImmediatePacketAssignment |
+   obj-NotificationNch | obj-PagingRequestType1 | obj-PagingRequestType2 | 
+   obj-PagingRequestType3 | obj-SystemInformationType1 | 
+   obj-SystemInformationType2 | obj-SystemInformationType2bis |
+   obj-SystemInformationType2ter | obj-SystemInformationType2quater | 
+   obj-SystemInformationType2n | obj-SystemInformationType3 | 
+   obj-SystemInformationType4 | obj-SystemInformationType5 | 
+   obj-SystemInformationType5bis | obj-SystemInformationType5ter | 
+   obj-SystemInformationType6 | obj-SystemInformationType7 | 
+   obj-SystemInformationType8 | 
+   obj-SystemInformationType9 | 
+   obj-SystemInformationType13 | obj-SystemInformationType16 | 
+   obj-SystemInformationType17 | obj-SystemInformationType19 | 
+   obj-SystemInformationType18 | obj-SystemInformationType20 | 
+   obj-SystemInformationType14 | obj-SystemInformationType15 | 
+   obj-SystemInformationType13alt | obj-SystemInformationType21 | 
+   obj-SystemInformationType22 | obj-SystemInformationType23 | 
+   obj-ExtendedMeasurementOrder
+}
+
+--<isL2PseudoLenPdu/>
+L2-PSEUDO-LEN-PDU ::= SEQUENCE {
+   l2PseudoLen L2-Pseudo-Length,
+   l3HdrOpts  L3HdrOptions, -- L3 header, octet 1, bits 5 thru 8
+   protoDiscr L2-PSEUDO-LEN-CLASS.&protoDiscr ({L2-PSEUDO-LEN-PDU-Messages}), 
+   msgType L2-PSEUDO-LEN-CLASS.&msgType ({L2-PSEUDO-LEN-PDU-Messages}), 
+   data    L2-PSEUDO-LEN-CLASS.&Value
+              ({L2-PSEUDO-LEN-PDU-Messages}{@protoDiscr,@msgType}),
+   restOctets  L2-PSEUDO-LEN-CLASS.&RestOctets
+              ({L2-PSEUDO-LEN-PDU-Messages}{@protoDiscr,@msgType})
+}
+
+
+/*
+9.1.1 Additional assignment
+*/
+--<is3GMessage/>
+AdditionalAssignment ::= SEQUENCE {
+   channel-description Channel-Description,
+   --<iei format="tlv">72</iei>
+   mobile-allocation Mobile-Allocation OPTIONAL,
+   --<iei format="tv" length="3">7C</iei>
+   starting-time Starting-Time OPTIONAL,
+   ...,
+   [[ 12:
+   --<iei format="tv" length="2">6D</iei>
+   extTSCSet ExtendedTSCSet OPTIONAL
+   ]]
+}
+
+/* 9.1.2 Assignment Command */
+--<is3GMessage/>
+AssignmentCommand ::= SEQUENCE {
+   descFirstChannelAfterTime Channel-Description-2,
+   powerCommand Power-Command,
+   --<iei format="tlv">5</iei>
+   freqListAfterTime Frequency-List OPTIONAL,
+   --<iei format="tv" length="17">62</iei>
+   cellChannelDesc Cell-Channel-Description OPTIONAL,
+   --<iei format="tlv">10</iei>
+   descMultislotConfig Multislot-Allocation OPTIONAL,
+   --<iei format="tv" length="2">63</iei>
+   modeFirstChannel Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">11</iei>
+   modeChannelSet2 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">13</iei>
+   modeChannelSet3 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">14</iei>
+   modeChannelSet4 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">15</iei>
+   modeChannelSet5 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">16</iei>
+   modeChannelSet6 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">17</iei>
+   modeChannelSet7 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">18</iei>
+   modeChannelSet8 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="4">64</iei>
+   descSecondChannelAfterTime Channel-Description OPTIONAL,
+   --<iei format="tv" length="2">66</iei>
+   modeSecondChannel Channel-Mode-2 OPTIONAL,
+   --<iei format="tlv">72</iei>
+   mobileAllocationAfterTime Mobile-Allocation OPTIONAL,
+   --<iei format="tv" length="3">7C</iei>
+   startingTime Starting-Time OPTIONAL,
+   --<iei format="tlv">19</iei>
+   frequencyListBeforeTime Frequency-List OPTIONAL,
+   --<iei format="tv" length="4">1C</iei>
+   descFirstChannelBeforeTime Channel-Description-2 OPTIONAL,
+   --<iei format="tv" length="4">1D</iei>
+   descSecondChannelBeforeTime Channel-Description OPTIONAL,
+   --<iei format="tv" length="10">1E</iei>
+   frequencyChannelSequenceBeforeTime Frequency-Channel-Sequence OPTIONAL,
+   --<iei format="tlv">21</iei>
+   mobileAllocationBeforeTime Mobile-Allocation OPTIONAL,
+   --<iei format="tv" length="1">9</iei>
+   cipherModeSetting Cipher-Mode-Setting OPTIONAL,
+   --<iei format="tlv">1</iei>
+   vgcsTargetModeIndication VGCS-target-mode-Indication OPTIONAL,
+   --<iei format="tlv">3</iei>
+   multiRateConfig Multirate-Configuration OPTIONAL,
+   --<iei format="tlv">4</iei>
+   vgcsCipheringParameters VGCS-Ciphering-Parameters OPTIONAL,
+   ...,
+   [[ 12:
+   --<iei format="tv" length="2">6D</iei>
+   extTSCSetAfterTime ExtendedTSCSet OPTIONAL,
+   --<iei format="tv" length="2">6E</iei>
+   extTSCSetBeforeTime ExtendedTSCSet OPTIONAL
+   ]]
+}
+
+/* 9.1.3 Assignment Complete */
+--<is3GMessage/>
+AssignmentComplete ::= SEQUENCE {
+   rrCause INTEGER(0..255)
+}
+
+/* 9.1.4 Assignment Failure */
+AssignmentFailure ::= AssignmentComplete
+
+
+/* 9.1.5 Channel Mode Modify */
+--<is3GMessage/>
+ChannelModeModify ::= SEQUENCE {
+   channelDescription Channel-Description-2,
+   channelMode Channel-Mode,
+   --<iei format="tlv">1</iei>
+   vgcsTargetModeIndication VGCS-target-mode-Indication OPTIONAL,
+   --<iei format="tlv">3</iei>
+   multiRateConfig Multirate-Configuration OPTIONAL,
+   --<iei format="tlv">4</iei>
+   vgcsCipheringParams VGCS-Ciphering-Parameters OPTIONAL,
+   ...,
+   [[ 12:
+   --<iei format="tv" length="2">6D</iei>
+   extTSCSetAfterTime ExtendedTSCSet OPTIONAL
+   ]]
+}
+
+/* 9.1.6 Channel Mode Modify Acknowledge */
+--<is3GMessage/>
+ChannelModeModifyAck ::= SEQUENCE {
+   channelDesc Channel-Description,
+   channelMode INTEGER(0..255),
+   ...,
+   [[ 12:
+   --<iei format="tv" length="2">6D</iei>
+   extTSCSetAfterTime ExtendedTSCSet OPTIONAL
+   ]]
+}
+
+
+/* 9.1.7 Channel Release */
+--<is3GMessage/>
+ChannelRelease ::= SEQUENCE {
+   rrCause INTEGER(0..255),
+   --<iei format="tlv">73</iei>
+   baRange BA-Range OPTIONAL,
+   --<iei format="tlv">74</iei>
+   groupChannelDescription Group-Channel-Description OPTIONAL,
+   --<iei format="tv" length="1">8</iei>
+   groupCipherKeyNumber INTEGER(0..15) OPTIONAL,
+   --<iei format="tv" length="1">C</iei>
+   gprsResumption GPRS-Resumption OPTIONAL,
+   --<iei format="tlv">75</iei>
+   baListPref BA-List-Pref OPTIONAL,
+   --<iei format="tlv">76</iei>
+   utranFreqList UTRAN-Freq-List OPTIONAL,
+   --<iei format="tv" length="17">62</iei>
+   cellChannelDesc Cell-Channel-Description OPTIONAL,
+   --<iei format="tlv">77</iei>
+   cellSelIndAfterRelease Cell-Sel-Ind-Post-Rel-TCH-SDCCH OPTIONAL,
+   --<iei format="tv" length="1">A</iei>
+   enhancedDtmCsReleaseInd Enhanced-DTM-CS-Release-Indication OPTIONAL,
+   --<iei format="tlv">4</iei>
+   vgcsCipheringParams VGCS-Ciphering-Parameters OPTIONAL,
+   --<iei format="tlv">78</iei>
+   groupChannelDesc2 Group-Channel-Description-2 OPTIONAL,
+   --<iei format="tlv">79</iei>
+   talkerId Talker-Identity OPTIONAL,
+   --<iei format="tlv">7A</iei>
+   talkerPriorityStatus Talker-Priority-Status OPTIONAL,
+   --<iei format="tlv">7B</iei>
+   vgcsAmrConfig VGCS-AMR-Configuration OPTIONAL,
+   --<iei format="tlv">7C</iei>
+   individualPriorities Individual-priorities OPTIONAL
+}
+
+
+/* 9.1.9 Ciphering Mode Command */
+--<is3GMessage/>
+CipheringModeCommand ::= SEQUENCE {
+   cipherResponse Cipher-Response,
+   cipheringMOdeSetting Cipher-Mode-Setting
+}
+
+
+/* 9.1.10 Ciphering Mode Complete */
+--<is3GMessage/>
+CipheringModeComplete ::= SEQUENCE {
+   --<iei format="tlv">17</iei>
+   mobileEquipmentIdentity MobileIdentity OPTIONAL
+}
+
+
+/* 9.1.11 Classmark Change */
+--<is3GMessage/>
+ClassmarkChange ::= SEQUENCE {
+   mobileStationClassmark MobileStationClassmark2,
+   --<iei format="tlv">20</iei>
+   addlMobileStationClassmarkInfo MobileStationClassmark3 OPTIONAL
+}
+
+
+/* 9.1.11a UTRAN Classmark Change */
+--<is3GMessage/>
+UtranClassmarkChange ::= SEQUENCE {
+   utranClassmark UTRAN-Classmark
+}
+
+/* 9.1.11b cdma2000 Classmark Change */
+--<is3GMessage/>
+Cdma2000ClassmarkChange ::= SEQUENCE {
+   terminalInfo OCTET STRING,
+   securityStatus OCTET STRING,
+   bandClassInfo OCTET STRING,
+   powerClassInfo OCTET STRING,
+   operatingModeInfo OCTET STRING,
+   serviceOptionInfo OCTET STRING,
+   multiplexOptionInfo OCTET STRING,
+   powerControlInfo OCTET STRING,
+   capabilityInfo OCTET STRING,
+   channelConfigCapabilityInfo OCTET STRING,
+   extendedMultiplexOptionInfo OCTET STRING,
+   bandSubclassInfo OCTET STRING,
+   encryptionCapability OCTET STRING
+}
+
+
+/* 9.1.11d GERAN IU Mode Classmark Change */
+--<is3GMessage/>
+GeranIuModeClassmarkChange ::= SEQUENCE {
+   geranIuModeClassmark GERAN-Iu-Mode-Classmark
+}
+
+
+/* 9.1.12 Classmark Enquiry */
+--<is3GMessage/>
+ClassmarkEnquiry ::= SEQUENCE {
+   --<iei format="tlv">10</iei>
+   classmarkEnquiryMask Classmark-Enquiry-Mask OPTIONAL
+}
+
+
+/* 9.1.12b Configuration Change Command */
+--<is3GMessage/>
+ConfigurationChangeCommand ::= SEQUENCE {
+   descriptionMultislotConfig Multislot-Allocation,
+   --<iei format="tv" length="2">63</iei>
+   modeChannelSet1 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">11</iei>
+   modeChannelSet2 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">13</iei>
+   modeChannelSet3 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">14</iei>
+   modeChannelSet4 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">15</iei>
+   modeChannelSet5 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">16</iei>
+   modeChannelSet6 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">17</iei>
+   modeChannelSet7 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">18</iei>
+   modeChannelSet8 Channel-Mode OPTIONAL
+}
+
+
+/* 9.1.12c Configuration Change Acknowledge */
+--<is3GMessage/>
+ConfigurationChangeAck ::= NULL; -- message type only
+
+
+/* 9.1.12d Configuration Change Reject */
+--<is3GMessage/>
+ConfigurationChangeReject ::= SEQUENCE {
+   rrCause INTEGER(0..255)
+}
+
+
+/* 9.1.12e DtmAssignmentCommand */
+--<is3GMessage/>
+DtmAssignmentCommand ::= SEQUENCE {
+   csPowerCommand Power-Command,
+   descrCsChannel Channel-Description,
+   gprsBroadcastInfo GPRS-broadcast-information,
+   --<iei format="tv" length="17">10</iei>
+   cellChannelDescription Cell-Channel-Description OPTIONAL,
+   --<iei format="tv" length="2">11</iei>
+   channelMode Channel-Mode OPTIONAL,
+   --<iei format="tlv">12</iei>
+   frequencyList Frequency-List OPTIONAL,
+   --<iei format="tlv">13</iei>
+   mobileAllocation Mobile-Allocation OPTIONAL,
+   --<iei format="tlv">15</iei>
+   descrUplinkPacketChannelAssignment RR-Packet-Uplink-Assignment OPTIONAL,
+   --<iei format="tlv">16</iei>
+   descrDownlinkPacketChannelAssignment RR-Packet-Downlink-Assignment OPTIONAL,
+   --<iei format="tlv">17</iei>
+   multiRateConfig Multirate-Configuration OPTIONAL,
+   --<iei format="tv" length="1">9</iei>
+   cipheringMOdeSetting Cipher-Mode-Setting OPTIONAL,
+   --<iei format="tlv">18</iei>
+   mobileAllocationC2 Mobile-Allocation OPTIONAL,
+   --<iei format="tlv">19</iei>
+   frequencyListC2 Frequency-List OPTIONAL,
+   --<iei format="tlv">20</iei>
+   descrDownlinkPacketChannelAssignmentType2 RR-Packet-Downlink-Assignment-Type-2 OPTIONAL,
+   --<iei format="tlv">21</iei>
+   channelDescrC2 Channel-Description-3 OPTIONAL,
+   ...,
+   [[ 12:
+   --<iei format="tv" length="2">6D</iei>
+   extTSCSetAfterTime ExtendedTSCSet OPTIONAL
+   ]]
+}
+
+
+/* 9.1.12f DTM Assignment Failure */
+--<is3GMessage/>
+DtmAssignmentFailure ::= SEQUENCE {
+   rrCause INTEGER(0..255)
+}
+
+
+/* 9.1.12g DTM Information */
+--<is3GMessage/>
+DtmInformation ::= SEQUENCE {
+   routingAreaIdentification RoutingAreaIdent,
+   dtmInfoDetails DTM-Information-Details
+}
+
+
+/* 9.1.12h DTM Reject */
+--<is3GMessage/>
+DtmReject ::= SEQUENCE {
+   dtmWaitIndication Wait-Indication
+}
+
+
+/* 9.1.12i DTM Request */
+--<is3GMessage/>
+DtmRequest ::= SEQUENCE {
+   tlli TLLI,
+   channelRequestDescr2 Channel-Request-Description-2
+}
+
+
+/* 9.1.13 Frequency Redefinition */
+--<is3GMessage/>
+FrequencyRedefinition ::= SEQUENCE {
+   channelDescr Channel-Description,
+   mobileAllocation Mobile-Allocation,
+   startingTime Starting-Time,
+   --<iei format="tv" length="17">62</iei>
+   cellChannelDescr Cell-Channel-Description OPTIONAL,
+   --<iei format="tv" length="1">9</iei>
+   carrierIndication Carrier-Indication OPTIONAL,
+   --<iei format="tlv">11</iei>
+   mobileAllocationC2 Mobile-Allocation OPTIONAL,
+   --<iei format="tv" length="3">12</iei>
+   channelDescriptionC2 Channel-Description-3 OPTIONAL,
+   ...,
+   [[ 12:
+   --<iei format="tv" length="2">6D</iei>
+   extTSCSetAfterTime ExtendedTSCSet OPTIONAL
+   ]]
+}
+
+
+/* 9.1.13b GPRS Suspension Request */
+--<is3GMessage/>
+GprsSuspensionRequest ::= SEQUENCE {
+   tlli TLLI,
+   routingAreaIdentification RoutingAreaIdent,
+   suspensionCause Suspension-Cause,
+   --<iei format="tv" length="2">1</iei>
+   serviceSupport Service-Support OPTIONAL
+}
+
+
+/* 9.1.15 Handover Command */
+--<is3GMessage/>
+HandoverCommand ::= SEQUENCE {
+   cellDescr Cell-Description,
+   descrFirstChannelAfterTime Channel-Description-2,
+   handoverReference Handover-Reference,
+   powerCommandAndAccessType Power-Command-and-access-type,
+   --<iei format="tv" length="1">D</iei>
+   synchronizationIndication Synchronization-Indication OPTIONAL,
+   --<iei format="tv" length="10">2</iei>
+   freqShortListAfterTime Frequency-Short-List OPTIONAL,
+   --<iei format="tlv">5</iei>
+   freqListAfterTime Frequency-List OPTIONAL,
+   --<iei format="tv" length="17">62</iei>
+   cellChannelDescr Cell-Channel-Description OPTIONAL,
+   --<iei format="tlv">10</iei>
+   descrMultislotConfig Multislot-Allocation OPTIONAL,
+   --<iei format="tv" length="2">63</iei>
+   modeFirstChannel Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">11</iei>
+   modeChannelSet2 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">13</iei>
+   modeChannelSet3 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">14</iei>
+   modeChannelSet4 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">15</iei>
+   modeChannelSet5 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">16</iei>
+   modeChannelSet6 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">17</iei>
+   modeChannelSet7 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="2">18</iei>
+   modeChannelSet8 Channel-Mode OPTIONAL,
+   --<iei format="tv" length="4">64</iei>
+   descrSecondChannelAfterTime Channel-Description OPTIONAL,
+   --<iei format="tv" length="2">66</iei>
+   modeSecondChannel Channel-Mode-2 OPTIONAL,
+   --<iei format="tv" length="10">69</iei>
+   freqChannelSequenceAfterTime Frequency-Channel-Sequence OPTIONAL,
+   --<iei format="tlv">72</iei>
+   mobileAllocationAfterTime Mobile-Allocation OPTIONAL,
+   --<iei format="tv" length="3">7C</iei>
+   startingTime Starting-Time OPTIONAL,
+   --<iei format="tlv">7B</iei>
+   realTimeDifference Time-Difference OPTIONAL,
+   --<iei format="tv" length="2">7D</iei>
+   timingAdvance Timing-Advance OPTIONAL,
+   --<iei format="tv" length="10">12</iei>
+   freqShortListBeforeTime Frequency-Short-List OPTIONAL,
+   --<iei format="tlv">19</iei>
+   freqListBeforeTime Frequency-List OPTIONAL,
+   --<iei format="tv" length="4">1C</iei>
+   descrFirstChannelBeforeTime Channel-Description-2 OPTIONAL,
+   --<iei format="tv" length="4">1D</iei>
+   descrSecondChannelBeforeTime Channel-Description OPTIONAL,
+   --<iei format="tv" length="10">1E</iei>
+   freqChannelSequneceBeforeTime Frequency-Channel-Sequence OPTIONAL,
+   --<iei format="tlv">21</iei>
+   mobileAllocationBeforeTime Mobile-Allocation OPTIONAL,
+   --<iei format="tv" length="1">9</iei>
+   cipherModeSetting Cipher-Mode-Setting OPTIONAL,
+   --<iei format="tlv">1</iei>
+   vgcsTargetModeIndication VGCS-target-mode-Indication OPTIONAL,
+   --<iei format="tlv">3</iei>
+   multirateConfig Multirate-Configuration OPTIONAL,
+   --<iei format="tlv">76</iei>
+   dynamicArfcnMapping Dynamic-ARFCN-Mapping OPTIONAL,
+   --<iei format="tlv">4</iei>
+   vgcsCipheringParameters VGCS-Ciphering-Parameters OPTIONAL,
+   --<iei format="tv" length="2">51</iei>
+   dedicatedServiceInformation Dedicated-Service-Information OPTIONAL,
+   --<iei format="tv" length="1">A</iei>
+   plmnIndex PLMN-Index OPTIONAL,
+   ...,
+   [[ 12:
+   --<iei format="tv" length="2">6D</iei>
+   extTSCSetAfterTime ExtendedTSCSet OPTIONAL,
+   --<iei format="tv" length="2">6E</iei>
+   extTSCSetBeforeTime ExtendedTSCSet OPTIONAL
+   ]]
+}
+
+
+/* 9.1.15a Inter System To UTRAN Handover Command */
+--<is3GMessage/>
+InterSystemToUtranHandoverCommand ::= SEQUENCE {
+   handoverToUtranCommand Handover-To-UTRAN-Command
+
+   -- CN to MS transparent information is left as an unknown IE.  As of Release
+   -- 15, the specification does not provide the IEI to be used with it.
+}
+
+
+/* 9.1.15b Inter System To cdma2000 Handover Command */
+--<is3GMessage/>
+InterSystemToCdma2000HandoverCommand ::= SEQUENCE {
+   handoverToCdma2000Command Handover-To-cdma2000-Command
+}
+
+
+/* 9.1.15c Handover To GERAN Iu Mode Command 
+   No message type value is defined for this message, preventing its
+   implementation.
+
+--<is3GMessage/>
+HandoverToGeranIuModeCommand ::= SEQUENCE {
+   radioBearerReconfig Radio-Bearer-Reconfiguration
+}
+*/
+
+
+/* 9.1.15d Inter System To E-UTRAN Handover Command */
+--<is3GMessage/>
+InterSystemToEutranHandoverCommand ::= SEQUENCE {
+   dlDcchMessage DL-DCCH-Message,
+   cnsToMsTransparentInfo CN-to-MS-transparent-information
+}
+
+
+/* 9.1.16 Handover Complete */
+--<is3GMessage/>
+HandoverComplete ::= SEQUENCE {
+   rrCause INTEGER(0..255),
+   --<iei format="tlv">77</iei>
+   mobileObservedTimeDiff Mobile-Time-Difference OPTIONAL,
+   --<iei format="tlv">67</iei>
+   mobileObservedTimeDiffOnHyperframeLevel Mobile-Time-Difference-on-Hyperframe-level OPTIONAL
+}
+
+
+/* 9.1.17 Handover Failure */
+--<is3GMessage/>
+HandoverFailure ::= SEQUENCE {
+   rrCause INTEGER(0..255),
+   --<iei format="tv" length="1">9</iei>
+   psCause PS-Cause OPTIONAL
+}
+
+
+/* 9.1.18 Immediate Assignment  */
+--<is3GMessage checkContainer="true"/>
+--<cEncFuncFname>TS44018Enc_Immediate_Assignment.c</cEncFuncFname>
+--<cDecFuncFname>TS44018Dec_Immediate_Assignment.c</cDecFuncFname>
+ImmediateAssignment ::= SEQUENCE {
+   dedicatedModeOrTBF Dedicated-mode-or-TBF,
+   pageMode Page-Mode,
+   channelDescr Channel-Description OPTIONAL,
+   packetChannelDescr Packet-Channel-Description OPTIONAL,
+   requestReference Request-Reference,
+   timingAdvance Timing-Advance,
+   mobileAllocation Mobile-Allocation,
+   --<iei format="tv" length="3">7C</iei>
+   startingTime Starting-Time OPTIONAL,
+   ...,
+   [[ 12:
+   --<iei format="tv" length="2">6D</iei>
+   extTSCSet ExtendedTSCSet OPTIONAL
+   ]]
+}
+
+
+/* 9.1.18b Immediate Packet Assignment */
+--<is3GMessage checkContainer="true"/>
+ImmediatePacketAssignment ::= SEQUENCE {
+   featureIndicator Feature-Indicator,
+   pageMode Page-Mode
+}
+
+
+/* 9.1.19 Immediate Assignment Extended */
+--<is3GMessage checkContainer="true"/>
+ImmediateAssignmentExtended ::= SEQUENCE {
+   featureIndicator Feature-Indicator,
+   pageMode Page-Mode,
+   channelDescr1 Channel-Description,
+   requestReference1 Request-Reference,
+   timingAdvance1 Timing-Advance,
+   channelDescr2 Channel-Description,
+   requestReference2 Request-Reference,
+   timingAdvance2 Timing-Advance,
+   mobileAllocation Mobile-Allocation,
+   --<iei format="tv" length="3">7C</iei>
+   startingTime Starting-Time OPTIONAL
+}
+
+
+/* 9.1.20 Immediate Assignment Reject */
+--<is3GMessage checkContainer="true"/>
+ImmediateAssignmentReject ::= SEQUENCE {
+   featureIndicator Feature-Indicator,
+   pageMode Page-Mode,
+   requestReference1 Request-Reference,
+   waitIndication1 Wait-Indication,
+   requestReference2 Request-Reference,
+   waitIndication2 Wait-Indication,
+   requestReference3 Request-Reference,
+   waitIndication3 Wait-Indication,
+   requestReference4 Request-Reference,
+   waitIndication4 Wait-Indication
+}
+
+
+/* 9.1.21 Measurement Report */
+--<is3GMessage/>
+MeasurementReport ::= SEQUENCE {
+   measurementResults Measurement-Results
+}
+
+
+/* 
+9.1.21.a NOTIFICATION FACCH
+   Defined in CSN.1
+*/
+mt-notification-facch INTEGER ::= 1
+
+obj-notification-facch RR-SHORT-CLASS ::= { &msgType mt-notification-facch, &Value NOTIFICATION-FACCH }
+
+
+/* 9.1.21b Notification/NCH */
+--<is3GMessage checkContainer="true"/>
+NotificationNch ::= NULL; -- L2 pseudo length and message type only
+
+
+/* 9.1.21d Notification Response */
+--<is3GMessage/>
+NotificationResponse ::= SEQUENCE {
+   mobileStationClassmark MobileStationClassmark2,
+   mobileIdentity MobileIdentity,
+   groupOrBroadcastCallReference DescrGroupOrBcastCallRef
+}
+
+
+/* 9.1.21f Packet Assignment */
+--<is3GMessage/>
+PacketAssignment ::= SEQUENCE {
+   gprsBroadcastInfo GPRS-broadcast-information,
+   --<iei format="tlv">22</iei>
+   descrUplinkPacketChannelAssignment RR-Packet-Uplink-Assignment OPTIONAL,
+   --<iei format="tlv">23</iei>
+   descrDownlinkPacketChannelAssignment RR-Packet-Downlink-Assignment OPTIONAL,
+   --<iei format="tlv">12</iei>
+   freqListC2 Frequency-List OPTIONAL,
+   --<iei format="tlv">13</iei>
+   mobileAllocationC2 Mobile-Allocation OPTIONAL,
+   --<iei format="tv" length="3">14</iei>
+   channelDescrC2 Channel-Description-3 OPTIONAL,
+   --<iei format="tlv">24</iei>
+   descrDownlinkPacketChannelAssignmentType2 RR-Packet-Downlink-Assignment-Type-2 OPTIONAL,
+   ...,
+   [[ 12:
+   --<iei format="tv" length="2">6D</iei>
+   extTSCSet ExtendedTSCSet OPTIONAL
+   ]]
+}
+
+
+/* 9.1.21g Packet Notification */
+--<is3GMessage/>
+PacketNotification ::= SEQUENCE {
+   --<iei format="tv" length="5">10</iei>
+   packetTMSI TMSI OPTIONAL,
+   --<iei format="tlv">11</iei>
+   mobileIdentity MobileIdentity OPTIONAL
+}
+
+
+/* 
+9.1.21.h VBS/VGCS RECONFIGURE
+   Defined in CSN.1
+*/
+mt-vbs-vgcs-reconfigure INTEGER ::= 6
+
+obj-vbs-vgcs-reconfigure RR-SHORT-CLASS ::= { &msgType mt-vbs-vgcs-reconfigure, &Value VBS-VGCS-RECONFIGURE }
+
+
+/* 
+9.1.21.h VBS/VGCS RECONFIGURE2
+   Defined in CSN.1
+*/
+mt-vbs-vgcs-reconfigure2 INTEGER ::= 7
+
+obj-vbs-vgcs-reconfigure2 RR-SHORT-CLASS ::= { &msgType mt-vbs-vgcs-reconfigure2, &Value VBS-VGCS-RECONFIGURE2 }
+   
+
+/* 9.1.21j MBMS Announcement */
+--<is3GMessage/>
+MbmsAnnouncement ::= SEQUENCE {
+   tempMobileGroupId TMGI,
+   --<iei format="tv" length="2">1</iei>
+   mbmsSessionIdentity MBMS-Session-Identity OPTIONAL,
+   --<iei format="tlv">2</iei>
+   mbmsCountingChannelDescr MPRACH-description OPTIONAL,
+   --<iei format="tlv">3</iei>
+   mbmsPtmChannelDescr MBMS-p-t-m-Channel-Description OPTIONAL,
+   --<iei format="tlv">4</iei>
+   mbmsSessionParametersList MBMS-Session-Parameters-List OPTIONAL,
+   --<iei format="tv" length="2">5</iei>
+   restrictionTimer Restriction-Timer OPTIONAL
+}
+
+
+/* 9.1.22 Paging Request Type 1 */
+--<is3GMessage checkContainer="true"/>
+PagingRequestType1 ::= SEQUENCE {
+   channelsNeededForMobiles1And2 Channel-Needed,
+   pageMode Page-Mode,
+   mobileIdentity1 MobileIdentity,
+   --<iei format="tlv">17</iei>
+   mobileIdentity2 MobileIdentity OPTIONAL
+}
+
+
+/* 9.1.23 Paging Request Type 2 */
+--<is3GMessage checkContainer="true"/>
+PagingRequestType2 ::= SEQUENCE {
+   channelsNeededForMobiles1And2 Channel-Needed,
+   pageMode Page-Mode,
+   mobileIdentity1 MobileIdentity,
+   mobileIdentity2 MobileIdentity,
+   --<iei format="tlv">17</iei>
+   mobileIdentity3 MobileIdentity OPTIONAL
+}
+
+
+/* 9.1.24 Paging Request Type 3 */
+--<is3GMessage checkContainer="true"/>
+PagingRequestType3 ::= SEQUENCE {
+   channelsNeededForMobiles1And2 Channel-Needed,
+   pageMode Page-Mode,
+   mobileIdentity1 MobileIdentity,
+   mobileIdentity2 MobileIdentity,
+   mobileIdentity3 MobileIdentity,
+   mobileIdentity4 MobileIdentity
+}
+
+
+/* 9.1.25 Paging Response */
+--<is3GMessage/>
+PagingResponse ::= SEQUENCE {
+   spare INTEGER(0..15) DEFAULT 0,
+   cipheringKeySequence INTEGER(0..15),
+   mobileStationClassmark MobileStationClassmark2,
+   mobileIdentity MobileIdentity,
+   --<iei format="tv" length="1">C</iei>
+   additionalUpdateParameters AddnUpdateParams OPTIONAL
+}
+
+
+/* 9.1.26 Partial Release */
+--<is3GMessage/>
+PartialRelease ::= SEQUENCE {
+   channelDescription Channel-Description
+}
+
+
+/* 9.1.27 Partial Release Complete */
+--<is3GMessage/>
+PartialReleaseComplete ::= NULL; -- message type only
+
+
+/* 9.1.28 Physical Information */
+--<is3GMessage/>
+PhysicalInformation ::= SEQUENCE {
+   timingAdvance Timing-Advance
+}
+
+
+/* 9.1.29 RR Status */
+--<is3GMessage/>
+RrStatus ::= SEQUENCE {
+   rrCause INTEGER(0..255)
+}
+
+
+/* 9.1.30a Synchronization Channel Information */
+SynchChannelInfo ::= SEQUENCE {
+   bsic INTEGER(0..63), -- 6 bits
+   t1 INTEGER(0..2047), -- 11 bits
+   t2 INTEGER(0..31),   -- 5 bits
+   t3 INTEGER(0..7)     -- 3 bits
+}
+
+/* 9.1.30b COMPACT Synchronization Channel Information */
+CompactSynchChannelInfo ::= SEQUENCE {
+   bsic INTEGER(0..63),             -- 6 bits
+   r1 INTEGER(0..1023),             -- 10 bits
+   r2 INTEGER(0..63),               -- 6 bits
+   tg INTEGER(0..3),                -- 2 bits
+   spare INTEGER(0..1) DEFAULT 0    -- 1 bit
+}
+
+/* 9.1.31 System Information Type 1 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType1 ::= SEQUENCE {
+   cellChannelDescription Cell-Channel-Description,
+   rachControlParameter RACH-Control-Parameters
+}
+
+
+/* 9.1.32 System Information Type 2 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType2 ::= SEQUENCE {
+   bcchFrequencyList Neighbour-Cell-Description,
+   nccPermitted NCC-Permitted,
+   rachControlParameter RACH-Control-Parameters
+}
+
+
+/* 9.1.33 System Information Type 2bis */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType2bis ::= SEQUENCE {
+   extendedBCCHFrequencyList Neighbour-Cell-Description,
+   rachControlParameter RACH-Control-Parameters
+}
+
+
+/* 9.1.34 System Information Type 2ter */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType2ter ::= SEQUENCE {
+   extendedBCCHFrequencyList Neighbour-Cell-Description-2
+}
+
+
+/* 9.1.34a System Information Type 2quater */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType2quater ::= NULL; -- L2 pseudo length and message type only
+
+
+/* 9.1.34b System Information Type 2n */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType2n ::= NULL; -- L2 pseudo length and message type only
+
+
+/* 9.1.35 System Information Type 3 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType3 ::= SEQUENCE {
+   cellIdentity CellIdentityValue,
+   locationAreaIdentification LocAreaIdent,
+   controlChannelDescription Control-Channel-Description,
+   cellOptions Cell-Options-BCCH,
+   cellSelectionParameters Cell-Selection-Parameters,
+   rachControlParameters RACH-Control-Parameters
+}
+
+
+/* 9.1.36 System Information Type 4 */
+--<is3GMessage checkContainer="true"/>
+SystemInformationType4 ::= SEQUENCE {
+   locationAreaIdentification LocAreaIdent,
+   cellSelectionParameters Cell-Selection-Parameters,
+   rachControlParameters RACH-Control-Parameters,
+   --<iei format="tv" length="4">64</iei>
+   cbchChannelDescription Channel-Description OPTIONAL,
+   --<iei format="tlv">72</iei>
+   cbchMobileAllocation Mobile-Allocation OPTIONAL
+}
+
+
+/* 9.1.37 System Information Type 5 */
+--<is3GMessage checkContainer="true"/>
+SystemInformationType5 ::= SEQUENCE {
+   bcchFrequencyList Neighbour-Cell-Description
+}
+
+
+/* 9.1.38 System Information Type 5bis */
+--<is3GMessage checkContainer="true"/>
+SystemInformationType5bis ::= SEQUENCE {
+   extensionBCCHFrequencyListDescription Neighbour-Cell-Description
+}
+
+
+/* 9.1.39 System Information Type 5ter */
+--<is3GMessage checkContainer="true"/>
+SystemInformationType5ter ::= SEQUENCE {
+   extendedBCCHFrequencyList Neighbour-Cell-Description-2
+}
+
+
+/* 9.1.40 System Information Type 6 */
+--<is3GMessage checkContainer="true"/>
+SystemInformationType6 ::= SEQUENCE {
+   cellIdentity CellIdentityValue,
+   locationAreaIdentification LocAreaIdent,
+   cellOptions Cell-Options-SACCH,
+   nccPermitted NCC-Permitted
+}
+
+
+/* 9.1.41 System Information Type 7 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType7 ::= NULL -- L2 pseudo length and message type only
+
+
+/* 9.1.42 System Information Type 8 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType8 ::= NULL -- L2 pseudo length and message type only
+
+
+/* 9.1.43 System Information Type 9 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType9 ::= SEQUENCE {
+   rachControlParameter RACH-Control-Parameters
+}
+
+
+/* 9.1.43a System Information Type 13 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType13 ::= NULL -- L2 pseudo length and message type only
+
+
+/* 9.1.43d System Information Type 16 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType16 ::= NULL -- L2 pseudo length and message type only
+
+
+/* 9.1.43e System Information Type 17 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType17 ::= NULL -- L2 pseudo length and message type only
+
+
+/* 9.1.43f System Information Type 19 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType19 ::= NULL -- L2 pseudo length and message type only
+
+
+/* 9.1.43g System Information Type 18 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType18 ::= NULL -- L2 pseudo length and message type only
+
+
+/* 9.1.43h System Information Type 20 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType20 ::= NULL -- L2 pseudo length and message type only
+
+
+/* 9.1.43i System Information Type 14 */
+--<is3GMessage checkContainer="true">
+SystemInformationType14 ::= NULL -- L2 pseudo length and message type only
+
+
+/* 9.1.43j System Information Type 15 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType15 ::= NULL -- L2 pseudo length and message type only
+
+
+/* 9.1.43k System Information Type 13alt */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType13alt ::= NULL -- L2 pseudo length and message type only
+
+
+/* 9.1.43m System Information Type 21 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType21 ::= NULL -- L2 pseudo length and message type only
+
+
+/* 9.1.43n System Information Type 22 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType22 ::= NULL -- L2 pseudo length and message type only
+
+
+/* 9.1.43o System Information Type 23 */
+--<is3GMessage imperativeOnly="true"/>
+SystemInformationType23 ::= NULL -- L2 pseudo length and message type only
+
+
+/* 9.1.44 Talker Indication */
+--<is3GMessage/>
+TalkerIndication ::= SEQUENCE {
+   mobileStationClassmark MobileStationClassmark2,
+   mobileIdentity MobileIdentity,
+   --<iei format="tv" length="1">B</iei>
+   cipheringKeySequenceNumber CiphKeySeqNum OPTIONAL
+}
+
+
+/* 9.1.44a Priority Uplink Request */
+--<is3GMessage/>
+PriorityUplinkRequest ::= SEQUENCE {
+   establishmentCauseRandomRef Random-Reference-Establishment-Cause,
+   token Token,
+   reducedGroupCallRef Reduced-group-or-broadcast-call-reference,
+   mobileIdentity MobileIdentity
+}
+
+
+/* 9.1.44b Data Indication */
+--<is3GMessage/>
+DataIndication ::= SEQUENCE {
+   mobileIdentity TMSI,
+   applicationData Application-Data,
+   dataIdentity Data-Identity
+}
+
+
+/* 9.1.44c Data Indication 2 */
+--<is3GMessage/>
+DataIndication2 ::= SEQUENCE {
+   mobileIdentity TMSI,
+   reducedGroupCallRef Reduced-group-or-broadcast-call-reference,
+   applicationData Application-Data,
+   dataIdentity Data-Identity
+}
+
+
+/* 9.1.46 Uplink Busy */
+--<is3GMessage/>
+UplinkBusy ::= SEQUENCE {
+   --<iei format="tlv">31</iei>
+   talkerPriorityEmergencyInd Talker-Priority-Status OPTIONAL,
+   --<iei format="tv" length="5">32</iei>
+   token Token OPTIONAL,
+   --<iei format="tlv">33</iei>
+   talkerIdentity Talker-Identity OPTIONAL,
+   --<iei format="tv" length="1">8</iei>
+   uplinkAccessIndication Uplink-Access-Indication OPTIONAL
+}
+
+
+/* 
+9.1.47 UPLINK FREE
+   Defined in CSN.1
+*/
+mt-uplink-free INTEGER ::= 2
+
+obj-uplink-free RR-SHORT-CLASS ::= { &msgType mt-uplink-free, &Value UPLINK-FREE }   
+   
+
+/* 9.1.48 Uplink Release */
+--<is3GMessage/>
+UplinkRelease ::= SEQUENCE {
+   rrCause INTEGER(0..255)
+}
+
+
+/* 9.1.49 VGCS Uplink Grant */
+--<is3GMessage/>
+VgcsUplinkGrant ::= SEQUENCE {
+   requestReference Request-Reference,
+   timingAdvance Timing-Advance
+}
+
+
+/*
+9.1.49a VGCS Additional Information
+   Defined in CSN.1
+*/
+mt-vgcs-additional-info INTEGER ::= 8
+
+obj-vgcs-additional-info RR-SHORT-CLASS ::= { &msgType mt-vgcs-additional-info, &Value VGCS-ADDITIONAL-INFO } 
+   
+
+/*
+9.1.49b VGCS SMS Information
+   Defined in CSN.1
+*/
+mt-vgcs-sms-information INTEGER ::= 9
+
+obj-vgcs-sms-information RR-SHORT-CLASS ::= { &msgType mt-vgcs-sms-information, &Value VGCS-SMS-INFORMATION } 
+
+/*
+9.1.50 System Information Type 10
+   Defined in CSN.1
+*/
+mt-system-information-type-10 INTEGER ::= 0
+
+obj-system-information-type-10 RR-SHORT-CLASS ::= { &msgType mt-system-information-type-10, &Value SYSTEM-INFORMATION-TYPE-10 } 
+
+/*
+9.1.50a System Information Type 10bis
+   Defined in CSN.1
+*/
+mt-system-information-type-10bis INTEGER ::= 10
+
+obj-system-information-type-10bis RR-SHORT-CLASS ::= { &msgType mt-system-information-type-10bis,  &Value SYSTEM-INFORMATION-TYPE-10bis } 
+
+/*
+9.1.50b System Information Type 10ter
+   Defined in CSN.1
+*/
+mt-system-information-type-10ter INTEGER ::= 11
+
+obj-system-information-type-10ter RR-SHORT-CLASS ::= { &msgType mt-system-information-type-10ter,  &Value SYSTEM-INFORMATION-TYPE-10ter } 
+
+
+/* 9.1.51 Extended Measurement Order */
+--<is3GMessage checkContainer="true"/>
+ExtendedMeasurementOrder ::= SEQUENCE {
+   extendedMeasurementFrequencyList Extended-Measurement-Frequency-List
+}
+
+
+/* 9.1.52 Extended Measurement Report */
+--<is3GMessage/>
+ExtendedMeasurementReport ::= SEQUENCE {
+   extendedMeasurementResults Extended-Measurement-Results
+}
+
+
+/* 9.1.53 Application Information */
+--<is3GMessage/>
+ApplicationInformation ::= SEQUENCE {
+   apduFlags APDU-Flags,
+   apduId APDU-ID,
+   apduData APDU-Data
+}
+
+
+/*
+9.1.54 Measurement Information
+   Defined in CSN.1
+*/
+mt-measurement-information INTEGER ::= 5
+
+obj-measurement-information RR-SHORT-CLASS ::= { &msgType mt-measurement-information, &Value Measurement-information }
+
+/*
+9.1.55 EnhanceFd Measurement Report
+   Defined in CSN.1
+*/
+mt-enhanced-measurement-report INTEGER ::= 4
+
+obj-enhanced-measurement-report RR-SHORT-CLASS ::= { &msgType mt-enhanced-measurement-report, &Value Enhanced-Measurement-report }
+
+/* 9.1.56 Service Information */
+--<is3GMessage/>
+ServiceInformation ::= SEQUENCE {
+   tlli TLLI,
+   routingAreaIdent RoutingAreaIdent,
+   serviceSupport Service-Support
+}
+
+
+/*
+9.1.57 VGCS Neighbour Cell Information
+   Defined in CSN.1
+*/
+mt-vgcs-neighbour-cell-information INTEGER ::= 12
+
+obj-vgcs-neighbour-cell-information RR-SHORT-CLASS ::= { &msgType mt-vgcs-neighbour-cell-information, &Value VGCS-Neighbour-Cell-Information }
+
+
+/*
+9.1.58 Notify Application Data
+   Defined in CSN.1
+*/
+mt-notify-application-data INTEGER ::= 13
+
+obj-notify-application-data RR-SHORT-CLASS ::= { &msgType mt-notify-application-data, &Value NOTIFY-APPLICATION-DATA }
+
+
+/* 9.6.1 GPRS Information */
+--<is3GMessage/>
+GprsInformation ::= SEQUENCE {
+   tlli TLLI,
+   llcPDU LLC-PDU-Container
+}
+
+END
