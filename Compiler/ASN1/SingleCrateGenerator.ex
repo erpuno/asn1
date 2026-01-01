@@ -25,7 +25,7 @@ defmodule SingleCrateGenerator do
     [package]
     name = "asn1_suite"
     version = "0.1.0"
-    edition = "2021"
+    edition = "2024"
 
     [dependencies]
     rust-asn1 = { git = "https://github.com/iho/rust-asn1.git" }
@@ -65,9 +65,10 @@ defmodule SingleCrateGenerator do
     //!
     //! Flat structure eliminates all circular dependency issues.
 
-    #![allow(unused)]
     #![allow(non_snake_case)]
     #![allow(non_camel_case_types)]
+
+    pub const PKCS9_UBNAME: i64 = 32768; // UB-name default value
 
     #{mod_declarations}
     """

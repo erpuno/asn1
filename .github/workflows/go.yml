@@ -49,11 +49,13 @@ jobs:
         mix deps.get > /dev/null 2>&1
         mix compile > /dev/null 2>&1
         mix run --no-halt &
-        CA_PID=$! &&
-        sleep 5s &&
-        cd .. &&
-        ./verify_go.sh &&
-        cd Languages/Go &&
-        go run main.go &&
-        go test &&
-        kill $CA_PID
+        CA_PID=$!
+        
+        trap "kill $CA_PID" EXIT
+        
+        sleep 5s
+        cd ..
+        ./verify_go.sh
+        cd Languages/Go
+        go run main.go
+        go test

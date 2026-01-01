@@ -50,10 +50,12 @@ jobs:
         mix deps.get > /dev/null 2>&1
         mix compile > /dev/null 2>&1
         mix run --no-halt &
-        CA_PID=$! &&
-        sleep 5s &&
-        cd .. &&
-        ./verify_java.sh &&
-        cd Languages/Java &&
-        ./gradlew run --args="request-ca" &&
-        kill $CA_PID
+        CA_PID=$!
+        
+        trap "kill $CA_PID" EXIT
+        
+        sleep 5s
+        cd ..
+        ./verify_java.sh
+        cd Languages/Java
+        ./gradlew run --args="request-ca"

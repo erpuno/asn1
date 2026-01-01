@@ -15,7 +15,7 @@ use std::env;
 use std::fs;
 use std::process::Command;
 
-use asn1_suite::PKIX1Explicit2009Certificate;
+use asn1_suite::PKIX1Explicit2009_Certificate;
 use rust_asn1::asn1::{ASN1Node, Content};
 use rust_asn1::asn1_types::*;
 use rust_asn1::der::{self, DERParseable, DERSerializable, Serializer};
@@ -71,16 +71,16 @@ fn main() {
     println!("\n--- High-Level Certificate Parsing ---");
     let bytes2 = bytes::Bytes::from(der_bytes.clone());
     let node2 = der::parse(&bytes2).unwrap();
-    match PKIX1Explicit2009Certificate::from_der_node(node2) {
+    match PKIX1Explicit2009_Certificate::from_der_node(node2) {
         Ok(cert) => {
             println!("✓ High-level parsing SUCCEEDED!");
             println!("  Version: {:?}", cert.to_be_signed.version);
             println!("  Serial Number: {:?}", cert.to_be_signed.serial_number);
             println!("  Issuer: {} RDNs", match &cert.to_be_signed.issuer {
-                asn1_suite::PKIX1Explicit2009Name::RdnSequence(rdns) => rdns.len(),
+                asn1_suite::PKIX1Explicit2009_Name::RdnSequence(rdns) => rdns.len(),
             });
             println!("  Subject: {} RDNs", match &cert.to_be_signed.subject {
-                asn1_suite::PKIX1Explicit2009Name::RdnSequence(rdns) => rdns.len(),
+                asn1_suite::PKIX1Explicit2009_Name::RdnSequence(rdns) => rdns.len(),
             });
             if let Some(ref exts) = cert.to_be_signed.extensions {
                 // Extensions is likely a tuple struct wrapping a Vec

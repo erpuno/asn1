@@ -1,6 +1,14 @@
 #!/usr/bin/env elixir
 
-Code.require_file("asn1.ex", ".")
+Code.require_file("Compiler/ASN1/Emitter.ex", ".")
+Code.require_file("Compiler/ASN1.ex", ".")
+Code.require_file("Compiler/ASN1/SwiftEmitter.ex", ".")
+Code.require_file("Compiler/ASN1/GoEmitter.ex", ".")
+Code.require_file("Compiler/ASN1/RustEmitter.ex", ".")
+Code.require_file("Compiler/ASN1/C99Emitter.ex", ".")
+Code.require_file("Compiler/ASN1/TSEmitter.ex", ".")
+Code.require_file("Compiler/ASN1/JavaEmitter.ex", ".")
+Code.require_file("Compiler/ASN1/SingleCrateGenerator.ex", ".")
 
 # Config helper to allow language/output overrides when rerunning the script with different emitters
 defmodule XSeries.Config do
@@ -11,7 +19,7 @@ defmodule XSeries.Config do
 
     if output do
       normalized = if String.ends_with?(output, "/"), do: output, else: output <> "/"
-      Application.put_env(:asn1scg, "output", normalized)
+      Application.put_env(:asn1scg, :output, normalized)
     end
   end
 end
@@ -370,6 +378,7 @@ defmodule DependencyAnalyzer do
   end
 
   defp dfs_visit(node, graph, all_types, colors, path, found_cycles) do
+    # IO.puts("Visiting #{node}")
     colors = Map.put(colors, node, :gray)
     neighbors = Map.get(graph, node, [])
 
@@ -655,9 +664,9 @@ manual_boxing = [
   "LocationExpressionsCompositeLocationExpression.Union"
 ]
 
-File.mkdir_p!("Languages/AppleSwift/Generated")
-base_output = System.get_env("ASN1_OUTPUT") || "Languages/AppleSwift/Generated/"
-Application.put_env(:asn1scg, "output", base_output)
+# File.mkdir_p!("Languages/AppleSwift/Generated")
+base_output = System.get_env("ASN1_OUTPUT") || "Generated/"
+Application.put_env(:asn1scg, :output, base_output)
 base_dir = "Specifications/x-series"
 
 # Get list of files
@@ -671,6 +680,7 @@ raw_files =
       base_dir
       |> File.ls!()
       |> Enum.filter(&String.ends_with?(&1, ".asn1"))
+      |> Enum.reject(&(&1 == "Location-Expressions.asn1"))
       |> Enum.sort()
   end
 
@@ -713,7 +723,7 @@ IO.puts("\n=== Compilation ===")
 
 # Pass 1: Collect types (save=false)
 IO.puts("Pass 1: Collecting types...")
-Application.put_env(:asn1scg, "save", false)
+Application.put_env(:asn1scg, :save, false)
 
 Enum.each(files, fn filename ->
   path = Path.join(base_dir, filename)
@@ -729,7 +739,7 @@ end)
 
 # Pass 2: Resolve references (save=false)
 IO.puts("Pass 2: Resolving references...")
-Application.put_env(:asn1scg, "save", false)
+Application.put_env(:asn1scg, :save, false)
 
 Enum.each(files, fn filename ->
   path = Path.join(base_dir, filename)
@@ -739,7 +749,7 @@ end)
 
 # Pass 3: Generate code (save=true)
 IO.puts("Pass 3: Generating code...")
-Application.put_env(:asn1scg, "save", true)
+Application.put_env(:asn1scg, :save, true)
 
 Enum.each(files, fn filename ->
   path = Path.join(base_dir, filename)

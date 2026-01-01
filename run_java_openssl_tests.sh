@@ -1,10 +1,6 @@
 #!/bin/bash
-set -eo pipefail
+set -e
 
-# Reuse the TS generation script for data if not present?
-# Or we can just call openssl commands directly here.
-# Let's rely on run_ts_openssl_tests.sh having run, OR generate our own.
-# To be self-contained:
 
 DATA_DIR="java_test_data"
 mkdir -p "$DATA_DIR"

@@ -2,7 +2,7 @@
 // Tests parsing X.509 certificates from DER-encoded bytes
 
 use rust_asn1::der::{self, DERParseable};
-use asn1_suite::authenticationframeworkcertificate::AuthenticationFrameworkCertificate;
+use asn1_suite::AuthenticationFramework_Certificate;
 
 /// Test parsing a minimal X.509 certificate structure
 /// This uses the same DER bytes from Swift's main.swift:showCertificateData test
@@ -31,7 +31,7 @@ fn test_parse_certificate() {
     let root_node = der::parse(cert_der).expect("Failed to parse DER bytes");
 
     // Parse into Certificate structure
-    let cert = AuthenticationFrameworkCertificate::from_der_node(root_node)
+    let cert = AuthenticationFramework_Certificate::from_der_node(root_node)
         .expect("Failed to parse certificate");
 
     println!("Certificate parsed successfully!");
@@ -54,7 +54,7 @@ fn test_import_x500_crate() {
     println!("X500 crate types are accessible!");
 
     // Just verify we can reference the type (compile-time check)
-    fn _type_check() -> Option<AuthenticationFrameworkCertificate> {
+    fn _type_check() -> Option<AuthenticationFramework_Certificate> {
         None
     }
 }

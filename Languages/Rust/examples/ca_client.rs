@@ -46,13 +46,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
          content: Content::Primitive(common_name.as_bytes().to_vec().into()),
     };
 
-    let atav = PKIXCommonTypes2009SingleAttribute::new(
+    let atav = PKIXCommonTypes2009_SingleAttribute::new(
         ASN1ObjectIdentifier::new(&[2, 5, 4, 3]).unwrap(), // commonName
         attr_val_node,
     );
 
-    let rdn = PKIX1Explicit2009RelativeDistinguishedName(vec![atav]);
-    let subject_name = PKIX1Explicit2009Name::RdnSequence(PKIX1Explicit2009RDNSequence(vec![rdn]));
+    let rdn = PKIX1Explicit2009_RelativeDistinguishedName(vec![atav]);
+    let subject_name = PKIX1Explicit2009_Name::RdnSequence(PKIX1Explicit2009_RDNSequence(vec![rdn]));
 
     // Parameters need to be ASN1Node (generic ANY)
     // OID secp384r1: 1.3.132.0.34
@@ -66,21 +66,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
          content: rust_asn1::asn1::Content::Primitive(curve_oid_bytes[2..].to_vec().into()),
     };
 
-    let alg_id = AuthenticationFrameworkAlgorithmIdentifier::new(
+    let alg_id = AuthenticationFramework_AlgorithmIdentifier::new(
         ASN1ObjectIdentifier::new(&[1, 2, 840, 10045, 2, 1]).unwrap(),
         Some(params_node),
     );
 
-    let spki = PKIX1Explicit88SubjectPublicKeyInfo::new(
+    let spki = PKIX1Explicit88_SubjectPublicKeyInfo::new(
         alg_id,
         ASN1BitString::new(pub_key_bytes.to_vec().into(), 0).unwrap(),
     );
 
-    let csr_info = PKCS10CertificationRequestInfo::new(
+    let csr_info = PKCS10_CertificationRequestInfo::new(
         ASN1Integer::from(0),
         subject_name,
         spki,
-        PKCS10Attributes(vec![]).0,
+        vec![],  // Empty attributes
     );
 
     // Serialize CSR Info for signing (Generated)
@@ -92,7 +92,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let sig_bytes = signature.to_der();
 
     // Signature Algorithm: ecdsa-with-SHA384 (1.2.840.10045.4.3.3)
-    let sig_alg_id = AlgorithmInformation2009Algorithm {
+    let sig_alg_id = AlgorithmInformation2009_Algorithm {
         algorithm: ASN1ObjectIdentifier::new(&[1, 2, 840, 10045, 4, 3, 3]).unwrap(),
         parameters: Some(ASN1Node {
              identifier: ASN1Identifier::new(5, TagClass::Universal),
@@ -101,7 +101,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }),
     };
 
-    let csr = PKCS10CertificationRequest::new(
+    let csr = PKCS10_CertificationRequest::new(
         csr_info,
         sig_alg_id,
         ASN1BitString::new(sig_bytes.as_ref().to_vec().into(), 0).unwrap(),
@@ -110,12 +110,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 3. Build PKIMessage (p10cr)
     println!("Constructing PKIMessage...");
 
-    let p10cr_body = PKIXCMP2009PKIBody::P10cr(csr);
+    let p10cr_body = PKIXCMP2009_PKIBody::P10cr(csr);
 
     // Header
     // Sender: robot_c99
-    let sender_gn = PKIX1Implicit2009GeneralName::DNSName(ASN1IA5String("robot_c99".to_string()));
-    let recipient_gn = PKIX1Implicit2009GeneralName::DNSName(ASN1IA5String("localhost".to_string()));
+    let sender_gn = PKIX1Implicit2009_GeneralName::DNSName(ASN1IA5String("robot_c99".to_string()));
+    let recipient_gn = PKIX1Implicit2009_GeneralName::DNSName(ASN1IA5String("localhost".to_string()));
 
     let mut salt = [0u8; 16];
     OsRng.fill_bytes(&mut salt);
@@ -129,12 +129,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Parse the constructed PBM params bytes to get a valid ASN1Node tree for serialization
     let pbm_params_node = rust_asn1::der::parse(&pbm_params_bytes).expect("Generated PBM params should be valid BER");
 
-    let protection_alg = AlgorithmInformation2009Algorithm {
+    let protection_alg = AlgorithmInformation2009_Algorithm {
         algorithm: ASN1ObjectIdentifier::new(&[1, 2, 840, 113533, 7, 66, 13]).unwrap(),
         parameters: Some(pbm_params_node),
     };
 
-    let header = PKIXCMP2009PKIHeader::new(
+    let header = PKIXCMP2009_PKIHeader::new(
         ASN1Integer::from(2), // pvno
         sender_gn,
         recipient_gn,
@@ -174,7 +174,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     let protection = ASN1BitString::new(mac.into(), 0).unwrap(); // Type Alias
 
-    let pkix_msg = PKIXCMP2009PKIMessage::new(
+    let pkix_msg = PKIXCMP2009_PKIMessage::new(
         header,
         p10cr_body,
         Some(protection),
@@ -214,12 +214,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("Parsing response body ({} bytes)...", body_bytes.len());
         
         let node = rust_asn1::der::parse(body_bytes)?;
-        let resp_msg = PKIXCMP2009PKIMessage::from_der_node(node)?;
+        let resp_msg = PKIXCMP2009_PKIMessage::from_der_node(node)?;
         println!("Successfully decoded response!");
         println!("Response PVNO: {:?}", resp_msg.header.pvno);
         match resp_msg.body {
-             PKIXCMP2009PKIBody::Cp(_) => println!("Body is CP (Certification Response)"),
-             PKIXCMP2009PKIBody::Error(_) => println!("Body is Error Message"),
+             PKIXCMP2009_PKIBody::Cp(_) => println!("Body is CP (Certification Response)"),
+             PKIXCMP2009_PKIBody::Error(_) => println!("Body is Error Message"),
              _ => println!("Body is {:?}", resp_msg.body),
         }
     } else {
