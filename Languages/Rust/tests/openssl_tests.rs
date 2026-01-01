@@ -7,9 +7,9 @@ use std::path::Path;
 use rust_asn1::der::{DERParseable, DERSerializable, Serializer, parse};
 
 // Import generated types
-use asn1_suite::pkcs8privatekeyinfo::PKCS8PrivateKeyInfo;
-use asn1_suite::pkcs10certificationrequest::PKCS10CertificationRequest;
-use asn1_suite::authenticationframeworkcertificate::AuthenticationFrameworkCertificate;
+use asn1_suite::PKCS8_PrivateKeyInfo;
+use asn1_suite::PKCS10_CertificationRequest;
+use asn1_suite::AuthenticationFramework_Certificate;
 
 struct TestResult {
     name: String,
@@ -46,7 +46,7 @@ fn test_pkcs8(file_path: &str, name: &str) -> TestResult {
         }
     };
 
-    let parsed: PKCS8PrivateKeyInfo = match PKCS8PrivateKeyInfo::from_der_node(node) {
+    let parsed: PKCS8_PrivateKeyInfo = match PKCS8_PrivateKeyInfo::from_der_node(node) {
         Ok(p) => {
             result.parse_ok = true;
             p
@@ -102,7 +102,7 @@ fn test_pkcs10(file_path: &str, name: &str) -> TestResult {
         }
     };
 
-    let parsed: PKCS10CertificationRequest = match PKCS10CertificationRequest::from_der_node(node) {
+    let parsed: PKCS10_CertificationRequest = match PKCS10_CertificationRequest::from_der_node(node) {
         Ok(p) => {
             result.parse_ok = true;
             p
@@ -157,7 +157,7 @@ fn test_cert(file_path: &str, name: &str) -> TestResult {
         }
     };
 
-    let parsed: AuthenticationFrameworkCertificate = match AuthenticationFrameworkCertificate::from_der_node(node) {
+    let parsed: AuthenticationFramework_Certificate = match AuthenticationFramework_Certificate::from_der_node(node) {
         Ok(p) => {
             result.parse_ok = true;
             p

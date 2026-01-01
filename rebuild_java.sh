@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -e
 
 export ASN1_LANG=java
 export ASN1_OUTPUT=Languages/Java/src/main/java/com/generated/asn1/

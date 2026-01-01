@@ -168,6 +168,7 @@ defmodule ASN1 do
         {:typedef, _, pos, name, type} ->
           # Check if there's a ptype definition for this type (e.g. Context)
           sname = to_string(name)
+          setEnv({:definition, sname}, type)
           ptypes = Application.get_env(:asn1scg, :ptypes, %{})
 
           case Map.get(ptypes, sname) do
@@ -180,6 +181,8 @@ defmodule ASN1 do
           end
 
         {:ptypedef, _, pos, name, args, type} ->
+          sname = to_string(name)
+          setEnv({:definition, sname}, type)
           compilePType(pos, name, args, type)
 
         {:classdef, _, pos, name, mod, type} ->
@@ -792,9 +795,9 @@ defmodule ASN1 do
 
   defp substitute_params(other, _subs), do: other
 
-  def inputDir(), do: :application.get_env(:asn1scg, "input", "priv/apple/")
-  def outputDir(), do: :application.get_env(:asn1scg, "output", "Sources/ASN1SCG/Suite/")
-  def exceptions(), do: :application.get_env(:asn1scg, "exceptions", ["Name"])
+  def inputDir(), do: :application.get_env(:asn1scg, :input, "priv/apple/")
+  def outputDir(), do: :application.get_env(:asn1scg, :output, "Sources/ASN1SCG/Suite/")
+  def exceptions(), do: :application.get_env(:asn1scg, :exceptions, ["Name"])
 
   def save(true, modname, name, res) do
     dir = outputDir()
@@ -1014,7 +1017,9 @@ defmodule ASN1 do
     end
   end
 
-  def getEnv(x, y), do: :application.get_env(:asn1scg, bin(x), y)
+  def getEnv(x, y), do: :application.get_env(:asn1scg, x, y)
+
+  def setEnv(x, y), do: :application.put_env(:asn1scg, x, y)
 
   def bin(x) when is_atom(x), do: :erlang.atom_to_binary(x)
   def bin(x) when is_list(x), do: :erlang.list_to_binary(x)

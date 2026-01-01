@@ -13,6 +13,9 @@ test_suite: test_suite.c
 openssl_test: openssl_test.c
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ $< $(LDFLAGS)
 
+c99_client: c99_client.c
+	$(CC) $(CFLAGS) $(INCLUDES) -o $@ $< $(LDFLAGS)
+
 # Run tests
 test: test_suite
 	./test_suite

@@ -479,10 +479,10 @@ func testXSeries() {
 func testCHATMessage() {
 	fmt.Print("Testing CHATMessage... ")
 
-	msg := chat.CHATMessage{
+	msg := chat.CHATCHATMessage{
 		No:      1,
 		Headers: [][]byte{[]byte("Content-Type: text/plain")},
-		Body:    chat.CHATProtocol{},
+		Body:    chat.CHATCHATProtocol{},
 	}
 
 	// Test ASN.1 encoding
@@ -492,7 +492,7 @@ func testCHATMessage() {
 	}
 
 	// Test ASN.1 decoding
-	var decoded chat.CHATMessage
+	var decoded chat.CHATCHATMessage
 	_, err = asn1.Unmarshal(encoded, &decoded)
 	if err != nil {
 		log.Fatalf("Failed to decode CHATMessage: %v", err)
@@ -516,7 +516,7 @@ func testCHATContact() {
 		Names:    [][]byte{[]byte("John")},
 		PhoneId:  []byte("+380123456789"),
 		Surnames: [][]byte{[]byte("Doe")},
-		LastMsg:  chat.CHATMessage{No: 1},
+		LastMsg:  chat.CHATCHATMessage{No: 1},
 		Update:   1703100000,
 		Created:  1703000000,
 	}

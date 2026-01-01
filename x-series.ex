@@ -1,6 +1,14 @@
 #!/usr/bin/env elixir
 
-Code.require_file("asn1.ex", ".")
+Code.require_file("Compiler/ASN1/Emitter.ex", ".")
+Code.require_file("Compiler/ASN1.ex", ".")
+Code.require_file("Compiler/ASN1/SwiftEmitter.ex", ".")
+Code.require_file("Compiler/ASN1/GoEmitter.ex", ".")
+Code.require_file("Compiler/ASN1/RustEmitter.ex", ".")
+Code.require_file("Compiler/ASN1/C99Emitter.ex", ".")
+Code.require_file("Compiler/ASN1/TSEmitter.ex", ".")
+Code.require_file("Compiler/ASN1/JavaEmitter.ex", ".")
+Code.require_file("Compiler/ASN1/SingleCrateGenerator.ex", ".")
 
 # Config helper to allow language/output overrides when rerunning the script with different emitters
 defmodule XSeries.Config do
@@ -11,7 +19,7 @@ defmodule XSeries.Config do
 
     if output do
       normalized = if String.ends_with?(output, "/"), do: output, else: output <> "/"
-      Application.put_env(:asn1scg, "output", normalized)
+      Application.put_env(:asn1scg, :output, normalized)
     end
   end
 end
@@ -272,6 +280,19 @@ defmodule DependencyAnalyzer do
     |> Enum.uniq()
   end
 
+  defp full_type_name(nil, name), do: name
+  defp full_type_name(mod, name) do
+    if System.get_env("ASN1_LANG") == "rust" do
+      pascal_mod = raw_pascal(mod)
+      pascal_type = raw_pascal(name)
+      # Match RustEmitter.name/2 logic: always prefix with module name + _
+      pascal_mod <> "_" <> pascal_type
+    else
+      normalized_mod = normalize_name(mod)
+      "#{normalized_mod}_#{normalize_name(name)}"
+    end
+  end
+
   defp extract_type_refs_acc(
          {:type, _, {:Externaltypereference, _, ref_mod, ref_type}, _, _, _},
          current_mod,
@@ -357,6 +378,7 @@ defmodule DependencyAnalyzer do
   end
 
   defp dfs_visit(node, graph, all_types, colors, path, found_cycles) do
+    # IO.puts("Visiting #{node}")
     colors = Map.put(colors, node, :gray)
     neighbors = Map.get(graph, node, [])
 
@@ -428,23 +450,13 @@ defmodule DependencyAnalyzer do
   defp normalize_name(name) when is_binary(name), do: String.replace(name, "-", "_")
   defp normalize_name(name), do: to_string(name) |> String.replace("-", "_")
 
-  defp full_type_name(mod, name) do
-    if System.get_env("ASN1_LANG") == "rust" do
-      pascal_mod = raw_pascal(mod)
-      pascal_type = raw_pascal(name)
-      if String.starts_with?(pascal_type, pascal_mod), do: pascal_type, else: pascal_mod <> pascal_type
-    else
-      normalized_mod = normalize_name(mod)
-      "#{normalized_mod}_#{normalize_name(name)}"
-    end
-  end
-
   defp raw_pascal(value) do
     value
     |> to_string()
     |> String.replace("-", "_")
+    |> String.replace(".", "_")
     |> String.split(["_", "-", " ", "::", "/"], trim: true)
-    |> Enum.map(&String.capitalize/1)
+    |> Enum.map(&Macro.camelize/1)
     |> Enum.join("")
   end
 end
@@ -638,23 +650,24 @@ Application.put_env(:asn1scg, :ptypes, ptypes)
 
 # Manual boxing entries for known recursive types
 # These are kept as overrides/supplements to automatic detection
+# Format: "TypeName.FieldName" where TypeName uses underscore separator
 manual_boxing = [
-  "LocationExpressionsConstituentLocator.Subprofile",
-  "LocationExpressionsSubprofileLocator.SubprofileOf",
-  "LocationExpressionsSubprofileLocator.SubprofileWith",
-  "LocationExpressionsObjectLocator.Subord",
-  "LocationExpressionsObjectLocator.ObjectWith",
-  "LocationExpressionsSubordArgument.Object",
-  "LocationExpressionsObjectWithArgument.Object",
-  "LocationExpressionsLocationExpression.Composite",
-  "LocationExpressionsCompositeLocationExpression.Complement",
-  "LocationExpressionsCompositeLocationExpression.Intersection",
-  "LocationExpressionsCompositeLocationExpression.Union"
+  "LocationExpressions_ConstituentLocator.Subprofile",
+  "LocationExpressions_SubprofileLocator.SubprofileOf",
+  "LocationExpressions_SubprofileLocator.SubprofileWith",
+  "LocationExpressions_ObjectLocator.Subord",
+  "LocationExpressions_ObjectLocator.ObjectWith",
+  "LocationExpressions_SubordArgument.Object",
+  "LocationExpressions_ObjectWithArgument.Object",
+  "LocationExpressions_LocationExpression.Composite",
+  "LocationExpressions_CompositeLocationExpression.Complement",
+  "LocationExpressions_CompositeLocationExpression.Intersection",
+  "LocationExpressions_CompositeLocationExpression.Union"
 ]
 
-File.mkdir_p!("Languages/AppleSwift/Generated")
-base_output = System.get_env("ASN1_OUTPUT") || "Languages/AppleSwift/Generated/"
-Application.put_env(:asn1scg, "output", base_output)
+# File.mkdir_p!("Languages/AppleSwift/Generated")
+base_output = System.get_env("ASN1_OUTPUT") || "Generated/"
+Application.put_env(:asn1scg, :output, base_output)
 base_dir = "Specifications/x-series"
 
 # Get list of files
@@ -668,6 +681,7 @@ raw_files =
       base_dir
       |> File.ls!()
       |> Enum.filter(&String.ends_with?(&1, ".asn1"))
+      # |> Enum.reject(&(&1 == "Location-Expressions.asn1"))
       |> Enum.sort()
   end
 
@@ -710,7 +724,7 @@ IO.puts("\n=== Compilation ===")
 
 # Pass 1: Collect types (save=false)
 IO.puts("Pass 1: Collecting types...")
-Application.put_env(:asn1scg, "save", false)
+Application.put_env(:asn1scg, :save, false)
 
 Enum.each(files, fn filename ->
   path = Path.join(base_dir, filename)
@@ -726,7 +740,7 @@ end)
 
 # Pass 2: Resolve references (save=false)
 IO.puts("Pass 2: Resolving references...")
-Application.put_env(:asn1scg, "save", false)
+Application.put_env(:asn1scg, :save, false)
 
 Enum.each(files, fn filename ->
   path = Path.join(base_dir, filename)
@@ -736,7 +750,7 @@ end)
 
 # Pass 3: Generate code (save=true)
 IO.puts("Pass 3: Generating code...")
-Application.put_env(:asn1scg, "save", true)
+Application.put_env(:asn1scg, :save, true)
 
 Enum.each(files, fn filename ->
   path = Path.join(base_dir, filename)

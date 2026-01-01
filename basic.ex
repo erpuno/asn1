@@ -423,11 +423,13 @@ defmodule DependencyAnalyzer do
   defp normalize_name(name) when is_binary(name), do: String.replace(name, "-", "_")
   defp normalize_name(name), do: to_string(name) |> String.replace("-", "_")
 
+  defp full_type_name(nil, name), do: name
   defp full_type_name(mod, name) do
     if System.get_env("ASN1_LANG") == "rust" do
       pascal_mod = raw_pascal(mod)
       pascal_type = raw_pascal(name)
-      if String.starts_with?(pascal_type, pascal_mod), do: pascal_type, else: pascal_mod <> pascal_type
+      # Match RustEmitter.name/2 logic: always prefix with module name + _
+      pascal_mod <> "_" <> pascal_type
     else
       normalized_mod = normalize_name(mod)
       "#{normalized_mod}_#{normalize_name(name)}"
@@ -438,8 +440,9 @@ defmodule DependencyAnalyzer do
     value
     |> to_string()
     |> String.replace("-", "_")
+    |> String.replace(".", "_")
     |> String.split(["_", "-", " ", "::", "/"], trim: true)
-    |> Enum.map(&String.capitalize/1)
+    |> Enum.map(&Macro.camelize/1)
     |> Enum.join("")
   end
 end
@@ -587,16 +590,9 @@ manual_boxing = [
 lang = System.get_env("ASN1_LANG") || "swift"
 Application.put_env(:asn1scg, :lang, lang)
 
-default_output =
-  case lang do
-    "rust" -> "asn1_suite"
-    _ -> "Languages/AppleSwift/Basic"
-  end
-
-output_dir = System.get_env("ASN1_OUTPUT") || default_output
-File.mkdir_p!(output_dir)
-output_env = if String.ends_with?(output_dir, "/"), do: output_dir, else: output_dir <> "/"
-Application.put_env(:asn1scg, "output", output_env)
+# File.mkdir_p!("Languages/AppleSwift/Generated")
+base_output = System.get_env("ASN1_OUTPUT") || "Generated/"
+Application.put_env(:asn1scg, :output, base_output)
 
 base_dir = "Specifications/basic"
 
@@ -667,7 +663,7 @@ end)
 
 # Pass 2: Resolve references (save=false)
 IO.puts("Pass 2: Resolving references...")
-Application.put_env(:asn1scg, "save", false)
+Application.put_env(:asn1scg, :save, false)
 
 Enum.each(files, fn filename ->
   path = Path.join(base_dir, filename)
@@ -676,7 +672,7 @@ end)
 
 # Pass 3: Generate code (save=true)
 IO.puts("Pass 3: Generating code...")
-Application.put_env(:asn1scg, "save", true)
+Application.put_env(:asn1scg, :save, true)
 
 Enum.each(files, fn filename ->
   path = Path.join(base_dir, filename)

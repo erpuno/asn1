@@ -79,78 +79,98 @@ defmodule ASN1.RustEmitter do
     :AttributeType => "ASN1ObjectIdentifier",
     # Map AlgorithmIdentifier to the canonical version in algorithminformation2009
     "AlgorithmIdentifier" =>
-      "crate::algorithm_information2009::algorithminformation2009algorithm::AlgorithmInformation2009Algorithm",
+      "crate::algorithm_information2009__algorithm::AlgorithmInformation2009_Algorithm",
     :AlgorithmIdentifier =>
-      "crate::algorithm_information2009::algorithminformation2009algorithm::AlgorithmInformation2009Algorithm",
+      "crate::algorithm_information2009__algorithm::AlgorithmInformation2009_Algorithm",
     "PKIX1Explicit2009AlgorithmIdentifier" =>
-      "crate::algorithm_information2009::algorithminformation2009algorithm::AlgorithmInformation2009Algorithm",
+      "crate::algorithm_information2009__algorithm::AlgorithmInformation2009_Algorithm",
     "PKIX1Explicit2009Algorithm" =>
-      "crate::algorithm_information2009::algorithminformation2009algorithm::AlgorithmInformation2009Algorithm",
+      "crate::algorithm_information2009__algorithm::AlgorithmInformation2009_Algorithm",
     "AlgorithmInformation2009AlgorithmIdentifier" =>
-      "crate::algorithm_information2009::algorithminformation2009algorithm::AlgorithmInformation2009Algorithm",
+      "crate::algorithm_information2009__algorithm::AlgorithmInformation2009_Algorithm",
     "AlgorithmInformation2009Algorithm" =>
-      "crate::algorithm_information2009::algorithminformation2009algorithm::AlgorithmInformation2009Algorithm",
+      "crate::algorithm_information2009__algorithm::AlgorithmInformation2009_Algorithm",
     # SubjectPublicKeyInfo mappings
     "SubjectPublicKeyInfo" =>
-      "pkix1explicit88::pkix1_explicit88::PKIX1Explicit88SubjectPublicKeyInfo",
+      "crate::pkix1_explicit88__subject_public_key_info::PKIX1Explicit88_SubjectPublicKeyInfo",
     "PKCS10SubjectPublicKeyInfo" =>
-      "pkix1explicit88::pkix1_explicit88::PKIX1Explicit88SubjectPublicKeyInfo",
+      "crate::pkix1_explicit88__subject_public_key_info::PKIX1Explicit88_SubjectPublicKeyInfo",
     "InformationFrameworkATTRIBUTE" => "ASN1ObjectIdentifier",
     "ANSIX942AuthenticationFrameworkAlgorithmIdentifier" =>
-      "crate::authentication_framework::AuthenticationFrameworkAlgorithmIdentifier",
+      "crate::authentication_framework__algorithm_identifier::AuthenticationFramework_AlgorithmIdentifier",
     "ANSIX942AlgorithmIdentifier" =>
-      "crate::authentication_framework::AuthenticationFrameworkAlgorithmIdentifier",
+      "crate::authentication_framework__algorithm_identifier::AuthenticationFramework_AlgorithmIdentifier",
+    "ANSIX942_AlgorithmIdentifier" =>
+      "crate::authentication_framework__algorithm_identifier::AuthenticationFramework_AlgorithmIdentifier",
     "ANSIX962AlgorithmIdentifier" =>
-      "crate::authentication_framework::AuthenticationFrameworkAlgorithmIdentifier",
+      "crate::authentication_framework__algorithm_identifier::AuthenticationFramework_AlgorithmIdentifier",
+    "ANSIX962_AlgorithmIdentifier" =>
+      "crate::authentication_framework__algorithm_identifier::AuthenticationFramework_AlgorithmIdentifier",
     "ANSIX962AuthenticationFrameworkAlgorithmIdentifier" =>
-      "crate::authentication_framework::AuthenticationFrameworkAlgorithmIdentifier",
+      "crate::authentication_framework__algorithm_identifier::AuthenticationFramework_AlgorithmIdentifier",
     "AttributeCertificateVersion12009AlgorithmIdentifier" =>
-      "crate::authentication_framework::AuthenticationFrameworkAlgorithmIdentifier",
+      "crate::authentication_framework__algorithm_identifier::AuthenticationFramework_AlgorithmIdentifier",
     "CryptographicMessageSyntax2009Attribute" =>
-      "crate::pkix_common_types2009::pkixcommontypes2009attribute::PKIXCommonTypes2009Attribute",
+      "crate::pkix_common_types2009__attribute::PKIXCommonTypes2009_Attribute",
     "CharacterPresentationAttributesCharacterAttributes" => "ASN1Node",
     "PKIXAttributeCertificate2009AttributeCertificate" =>
-      "crate::attribute_certificate_version12009::attributecertificateversion12009attributecertificatev1::AttributeCertificateVersion12009AttributeCertificateV1",
+      "crate::attribute_certificate_version12009__attribute_certificate_v1::AttributeCertificateVersion12009_AttributeCertificateV1",
     "CryptographicMessageSyntax2010AlgorithmInformation2009AlgorithmIdentifier" =>
-      "crate::algorithm_information2009::algorithminformation2009algorithm::AlgorithmInformation2009Algorithm",
-    "TextUnitsTextUnit" => "crate::text_units::textunitstextunit::TextUnitsTextUnit",
+      "crate::algorithm_information2009__algorithm::AlgorithmInformation2009_Algorithm",
+    "TextUnitsTextUnit" => "crate::text_units__text_unit::TextUnits_TextUnit",
     "StyleDescriptorsLayoutStyleDescriptor" =>
-      "crate::style_descriptors::styledescriptorslayoutstyledescriptor::StyleDescriptorsLayoutStyleDescriptor",
+      "crate::style_descriptors__layout_style_descriptor::StyleDescriptors_LayoutStyleDescriptor",
     "StyleDescriptorsPresentationStyleDescriptor" =>
-      "crate::style_descriptors::styledescriptorspresentationstyledescriptor::StyleDescriptorsPresentationStyleDescriptor",
+      "crate::style_descriptors__presentation_style_descriptor::StyleDescriptors_PresentationStyleDescriptor",
     "SubprofilesSubprofileDescriptor" =>
-      "crate::subprofiles::subprofilessubprofiledescriptor::SubprofilesSubprofileDescriptor",
+      "crate::subprofiles__subprofile_descriptor::Subprofiles_SubprofileDescriptor",
     "PKCS10AuthenticationFrameworkAlgorithmIdentifier" =>
-      "crate::authentication_framework::AuthenticationFrameworkAlgorithmIdentifier",
+      "crate::authentication_framework__algorithm_identifier::AuthenticationFramework_AlgorithmIdentifier",
     "CryptographicMessageSyntax2010ContentInfo" =>
-      "crate::cryptographic_message_syntax2010::cryptographicmessagesyntax2010contentinfo::CryptographicMessageSyntax2010ContentInfo",
+      "crate::cryptographic_message_syntax2010__content_info::CryptographicMessageSyntax2010_ContentInfo",
     "PKIXCRMF2009PrivateKeyInfo" =>
-      "crate::pkixcrmf2009::pkixcrmf2009privatekeyinfo::PKIXCRMF2009PrivateKeyInfo",
+      "crate::pkixcrmf2009__private_key_info::PKIXCRMF2009_PrivateKeyInfo",
     "PKCS8EncryptedPrivateKeyInfo" =>
-      "crate::pkcs8::pkcs8encryptedprivatekeyinfo::PKCS8EncryptedPrivateKeyInfo",
+      "crate::pkcs8__encrypted_private_key_info::PKCS8_EncryptedPrivateKeyInfo",
     "PKCS7AlgorithmIdentifier" =>
-      "crate::authentication_framework::AuthenticationFrameworkAlgorithmIdentifier",
+      "crate::authentication_framework__algorithm_identifier::AuthenticationFramework_AlgorithmIdentifier",
     "PKCS7AlgorithmInformation2009AlgorithmIdentifier" =>
-      "crate::algorithm_information2009::algorithminformation2009algorithm::AlgorithmInformation2009Algorithm",
+      "crate::algorithm_information2009__algorithm::AlgorithmInformation2009_Algorithm",
     "PKCS9DirectoryString" =>
-      "crate::selected_attribute_types::selectedattributetypesdirectorystring::SelectedAttributeTypesDirectoryString",
+      "crate::selected_attribute_types__directory_string::SelectedAttributeTypes_DirectoryString",
     "PKIX1Explicit2009AuthenticationFrameworkAlgorithmIdentifier" =>
-      "crate::authentication_framework::AuthenticationFrameworkAlgorithmIdentifier",
+      "crate::authentication_framework__algorithm_identifier::AuthenticationFramework_AlgorithmIdentifier",
     "PKIX1Explicit88AuthenticationFrameworkAlgorithmIdentifier" =>
-      "crate::authentication_framework::AuthenticationFrameworkAlgorithmIdentifier",
+      "crate::authentication_framework__algorithm_identifier::AuthenticationFramework_AlgorithmIdentifier",
     "PKCS5AlgorithmIdentifier" =>
-      "crate::authentication_framework::AuthenticationFrameworkAlgorithmIdentifier",
+      "crate::authentication_framework__algorithm_identifier::AuthenticationFramework_AlgorithmIdentifier",
     "CryptographicMessageSyntax2010Attribute" =>
-      "crate::pkix_common_types2009::pkixcommontypes2009attribute::PKIXCommonTypes2009Attribute",
+      "crate::pkix_common_types2009__attribute::PKIXCommonTypes2009_Attribute",
+    "PKCS7_AlgorithmIdentifier" =>
+      "crate::authentication_framework__algorithm_identifier::AuthenticationFramework_AlgorithmIdentifier",
     "PKIXAttributeCertificate2009AlgorithmIdentifier" =>
-      "crate::authentication_framework::AuthenticationFrameworkAlgorithmIdentifier",
+      "crate::authentication_framework__algorithm_identifier::AuthenticationFramework_AlgorithmIdentifier",
     "AttributeType" => "ASN1ObjectIdentifier",
+    "InformationFramework_AttributeType" => "ASN1ObjectIdentifier",
     "ContentType" => "ASN1ObjectIdentifier",
     "PKCS7ContentType" => "ASN1ObjectIdentifier",
     "PKCS9ContentType" => "ASN1ObjectIdentifier",
     "CryptographicMessageSyntax2009ContentType" => "ASN1ObjectIdentifier",
     "ExtendedSecurityServices2009ContentType" => "ASN1ObjectIdentifier",
-    "StyleDescriptorsContentType" => "crate::StyleDescriptorsContentType",
+    "StyleDescriptorsContentType" =>
+      "crate::style_descriptors__content_type::StyleDescriptors_ContentType",
+    "PKIX1Explicit2009ORAddress" => "crate::pkix1_explicit88__or_address::PKIX1Explicit88_ORAddress",
+
+    # Fix for PKIX1Implicit naming mismatch
+    "PKIX1Implicit2009GeneralNames" => "crate::pkix1_implicit2009__general_names::PKIX1Implicit2009_GeneralNames",
+    "AlgorithmInformation2009_Algorithm" => "crate::algorithm_information2009__algorithm::AlgorithmInformation2009_Algorithm",
+    "AlgorithmInformation2009AlgorithmIdentifier" => "crate::algorithm_information2009__algorithm::AlgorithmInformation2009_Algorithm",
+    "AlgorithmInformation2009_AlgorithmIdentifier" => "crate::algorithm_information2009__algorithm::AlgorithmInformation2009_Algorithm",
+    "PKIX1Implicit_2009_GeneralNames" => "crate::pkix1_implicit2009__general_names::PKIX1Implicit2009_GeneralNames",
+    "PKIX1Implicit_2009GeneralNames" => "crate::pkix1_implicit2009__general_names::PKIX1Implicit2009_GeneralNames",
+
+    # Fix for AuthenticationFramework double-prefixing
+    "AuthenticationFrameworkAlgorithmIdentifier" => "crate::authentication_framework__algorithm_identifier::AuthenticationFramework_AlgorithmIdentifier",
     "AP-title" => "ASN1Node",
     "AE-qualifier" => "ASN1Node",
     "DORDefinitionAPTitle" => "ASN1Node",
@@ -159,13 +179,13 @@ defmodule ASN1.RustEmitter do
     "RasterGrProfileAttributesRasterGrContentDefaults" => "ASN1Node",
     "GeoGrProfileAttributesGeoGrContentDefaults" => "ASN1Node",
     "DocumentProfileDescriptorDateAndTime" =>
-      "crate::document_profile_descriptor::documentprofiledescriptordateandtime::DocumentProfileDescriptorDateAndTime",
+      "crate::DocumentProfileDescriptor_DateAndTime",
     "CryptographicMessageSyntax2010IssuerAndSerialNumber" =>
-      "crate::cryptographic_message_syntax2010::cryptographicmessagesyntax2010issuerandserialnumber::CryptographicMessageSyntax2010IssuerAndSerialNumber",
+      "crate::CryptographicMessageSyntax2010_IssuerAndSerialNumber",
     "LinkDescriptorsLinkClassDescriptor" =>
-      "crate::link_descriptors::linkdescriptorslinkclassdescriptor::LinkDescriptorsLinkClassDescriptor",
+      "crate::LinkDescriptors_LinkClassDescriptor",
     "LinkDescriptorsLinkDescriptor" =>
-      "crate::link_descriptors::linkdescriptorslinkdescriptor::LinkDescriptorsLinkDescriptor",
+      "crate::LinkDescriptors_LinkDescriptor",
     # ORAddress mappings
     "ORAddress" => "ASN1Node",
     "PKIX1Explicit2009ORAddress" => "ASN1Node",
@@ -173,9 +193,9 @@ defmodule ASN1.RustEmitter do
     "EXTERNAL" => "ASN1Node",
     :EXTERNAL => "ASN1Node",
     "AttributeCertificateVersion12009AttributeCertificateV1" => "ASN1Node",
-    "KEPTime" => "x500::authentication_framework::AuthenticationFrameworkTime",
+    "KEPTime" => "crate::AuthenticationFramework_Time",
     "CryptographicMessageSyntax2009AlgorithmInformation2009AlgorithmIdentifier" =>
-      "algorithminformation2009::algorithm_information2009::AlgorithmInformation2009Algorithm",
+      "crate::AlgorithmInformation2009_Algorithm",
     # Extension and Attributes types - use ASN1Node for byte preservation (avoid parsing issues)
     "AuthenticationFrameworkExtension" => "ASN1Node",
     "AuthenticationFrameworkExtensions" => "Vec<ASN1Node>",
@@ -339,10 +359,32 @@ defmodule ASN1.RustEmitter do
         end
       end
 
+    # Always prefix with module name to avoid collisions, but avoid double prefixing
+    # e.g., CHAT module: Message -> CHAT_Message
+    # But AuthenticationFramework: AuthenticationFrameworkAlgorithmIdentifier -> AuthenticationFramework_AlgorithmIdentifier
     res =
-      cond do
-        String.starts_with?(pascal_type, pascal_mod) -> pascal_type
-        true -> pascal_mod <> pascal_type
+      if String.starts_with?(pascal_type, pascal_mod) do
+        # Extract the suffix
+        suffix = String.replace_prefix(pascal_type, pascal_mod, "")
+
+        # If suffix is empty (exact match), fallback to Mod_Mod? Or just Mod_ModName?
+        # Based on previous logic for collision, if Type == Mod, we want Mod_Mod.
+        if suffix == "" do
+          pascal_mod <> "_" <> pascal_type
+        else
+           # If suffix starts with something that will make valid pascal (e.g. AlgorithmIdentifier), use it.
+           # But we want to enforce the prefix.
+           # So we just use the original type, but formatted as Mod_Suffix?
+           # actually, generated files use Mod_Type. struct Name is Mod_Type.
+           # If pascal_type IS ModType, then it IS Mod_Suffix (without underscore).
+           # We want Mod_Suffix (with underscore? or just ModType?)
+           # Wait. AuthenticationFrameworkAlgorithmIdentifier.
+           # We want AuthenticationFramework_AlgorithmIdentifier.
+           # So we need to insert the underscore.
+           pascal_mod <> "_" <> suffix
+        end
+      else
+        pascal_mod <> "_" <> pascal_type
       end
 
     # Ensure no :: in type names if they are being used for definitions
@@ -393,12 +435,12 @@ defmodule ASN1.RustEmitter do
     end
   end
 
-  def fieldType(_struct_name, _field, {:"SEQUENCE OF", inner}) do
-    "Vec<" <> (fieldType("", "", inner) |> substituteType()) <> ">"
+  def fieldType(struct_name, field, {:"SEQUENCE OF", inner}) do
+    "Vec<" <> (fieldType(struct_name, field, inner) |> substituteType()) <> ">"
   end
 
-  def fieldType(_struct_name, _field, {:"SET OF", inner}) do
-    "Vec<" <> (fieldType("", "", inner) |> substituteType()) <> ">"
+  def fieldType(struct_name, field, {:"SET OF", inner}) do
+    "Vec<" <> (fieldType(struct_name, field, inner) |> substituteType()) <> ">"
   end
 
   def fieldType(struct_name, field, {:"Sequence Of", inner}) do
@@ -434,6 +476,9 @@ defmodule ASN1.RustEmitter do
         name("#{field}_enum", struct_name)
 
       {:ANY_DEFINED_BY, _} ->
+        "ASN1Node"
+
+      {:ANY, _} ->
         "ASN1Node"
 
       {:INTEGER, _} ->
@@ -605,7 +650,7 @@ defmodule ASN1.RustEmitter do
                 #{tag_identifier},
                 &|serializer: &mut Serializer| {
                     for item in &self.0 {
-                        item.serialize(serializer)?;
+                        DERSerializable::serialize(item, serializer)?;
                     }
                     Ok(())
                 }
@@ -621,10 +666,9 @@ defmodule ASN1.RustEmitter do
 
   @impl true
   defp flatten_target(modname) do
-    case module_crate(modname) do
-      "algorithminformation2009" -> ""
-      _ -> modname
-    end
+    # For single-crate model, we flatten everything into src/
+    # The modname is used to construct the filename module__type.rs
+    ""
   end
 
   @impl true
@@ -1114,8 +1158,7 @@ defmodule ASN1.RustEmitter do
 
   defp snake_case(value) do
     value
-    |> String.replace("-", "")
-    |> String.replace("_", "")
+    |> String.replace("-", "_")
     |> Macro.underscore()
     |> String.replace("::", "_")
     |> String.replace("/", "_")
@@ -1176,7 +1219,9 @@ defmodule ASN1.RustEmitter do
     val =
       case maybe_existing_atom(key) do
         {:ok, atom} -> Map.get(@builtin_type_map, atom) || Map.get(@builtin_type_map, key)
-        :error -> Map.get(@builtin_type_map, key)
+        :error ->
+          if String.contains?(key, "AlgorithmInformation"), do: IO.puts("DEBUG builtin_map_lookup string: #{key} -> #{inspect(Map.get(@builtin_type_map, key))}")
+          Map.get(@builtin_type_map, key)
       end
 
     if val && String.contains?(val, "::") do
@@ -1223,11 +1268,25 @@ defmodule ASN1.RustEmitter do
   end
 
   defp lookup_external(_struct_name, _field, {:Externaltypereference, _, mod, type}) do
-    mod_name = mod |> bin() |> normalizeName()
+    mod_name = mod |> bin() |> raw_pascal()
     type_name = name(type, mod)
+    raw_type_name = type |> bin() |> raw_pascal()
+    concat_key = mod_name <> raw_type_name
 
     # Check for global overrides first (highest precedence)
-    case builtin_map_lookup(type_name) do
+    # Check both the type_name (Mod_Type) and concat_key (ModType)
+
+    # Hardcoded fix for AlgorithmInformation2009_Algorithm to bypass mapping issues
+    match_val =
+      if type_name == "AlgorithmInformation2009_Algorithm" or concat_key == "AlgorithmInformation2009AlgorithmIdentifier" do
+         "crate::algorithm_information2009__algorithm::AlgorithmInformation2009_Algorithm"
+      else
+         builtin_map_lookup(concat_key) || builtin_map_lookup(type_name)
+      end
+
+    case match_val do
+
+
       val when not is_nil(val) ->
         # Track cross-crate dependency (multi-crate only)
         if String.contains?(val, "::") do
@@ -1268,7 +1327,8 @@ defmodule ASN1.RustEmitter do
 
 
   defp maybe_box(type, struct_name, field_name) do
-    if is_boxed(struct_name, field_name) || type == struct_name do
+    if is_boxed(struct_name, field_name) || type == struct_name or
+       struct_name in ["CHAT_Message", "CHAT_Protocol"] do
       "Box<#{type}>"
     else
       type
@@ -1348,16 +1408,23 @@ defmodule ASN1.RustEmitter do
        end
 
     # Define the serialization call for the value
+    boxed_type = field_type_for(rust_name, field_name, type, [])
+    is_boxed = String.starts_with?(boxed_type, "Box<")
+    val_ref = if is_boxed, do: "&**val", else: "val"
+    simple_serialize = "DERSerializable::serialize(#{val_ref}, serializer)?;"
+    closure_serialize = "DERSerializable::serialize(#{val_ref}, s)"
+    implicit_serialize = "DERSerializable::serialize(#{val_ref}, &mut mh)?;"
+
     serialize_call =
         case tag_logic do
             nil ->
-                "val.serialize(serializer)?;"
+                simple_serialize
 
             {cls, num, method} when method == :EXPLICIT or method == {:default, :EXPLICIT} ->
                 """
                 serializer.append_constructed_node(
                     ASN1Identifier::new(#{num}, #{cls}),
-                    &|s: &mut Serializer| val.serialize(s)
+                    &|s: &mut Serializer| #{closure_serialize}
                 )?;
                 """
 
@@ -1365,7 +1432,7 @@ defmodule ASN1.RustEmitter do
                 """
                 {
                     let mut mh = Serializer::new();
-                    val.serialize(&mut mh)?;
+                    #{implicit_serialize}
                     let mut bytes = mh.serialized_bytes().to_vec();
                     if bytes.len() > 0 {
                         let is_constructed = (bytes[0] & 0x20) != 0;
@@ -1394,25 +1461,23 @@ defmodule ASN1.RustEmitter do
          # Handle DEFAULT
          """
                      // Default handling omitted for brevity, always serialize
-                     #{String.replace(serialize_call, "val.", field_access <> ".")}
+                     {
+                         let val = &#{field_access};
+                         #{serialize_call}
+                     }
          """
          # Wait, if serialize_call uses 'val', we need to bind val, or replace usage.
          # For DEFAULT, the field is NOT Option (usually), so we access it directly.
          # For simplicity, if not Optional, we just serialize.
 
-       true ->
-         # Mandatory field
-         # We need to wrap it in "let val = &self.field;" if we use serialize_call that assumes 'val'
-         if tag_logic do
-             """
-             {
-                 let val = &#{field_access};
-                 #{serialize_call}
-             }
-             """
-         else
-             "#{field_access}.serialize(serializer)?;"
-         end
+      true ->
+        # Mandatory field
+        """
+                    {
+                        let val = &#{field_access};
+                        #{serialize_call}
+                    }
+        """
     end
   end
 
@@ -1538,7 +1603,6 @@ defmodule ASN1.RustEmitter do
           type_name = field_type_for(rust_name, field_name, type, [])
           type_fish = String.replace(type_name, "<", "::<")
 
-          # Determine expected tag from type_tags or fallback to universal
           {expected_tag_no, expected_tag_class} = case type_tags do
             [{:tag, class, number, _method, _}] ->
               cls_str = case class do
@@ -1555,15 +1619,20 @@ defmodule ASN1.RustEmitter do
               {number, cls_str}
 
             _ ->
-               # No explicit tags. Resolve universal tag.
-               ut = universal_tag(type)
-               if ut do
-                 {ut, "TagClass::Universal"}
-               else
-                 # Fallback for ANY or unknown (this might fail at runtime if not handled via ANY match)
-                 # But sticking to context-specific index fallback only if we can't resolve universal
-                 # and we need to distinguish (though this really implies invalid ASN.1 if untagged ambiguous choice)
-                 {idx, "TagClass::ContextSpecific"}
+               # No explicit component tags.
+               # Try to resolve tag from the type definition if it's an external reference
+               resolved_tag = resolve_reference_tag(type)
+
+               case resolved_tag do
+                 {tag, cls} -> {tag, cls}
+                 nil ->
+                   # Fallback to universal tag logic
+                   ut = universal_tag(type)
+                   if ut do
+                     {ut, "TagClass::Universal"}
+                   else
+                     {idx, "TagClass::ContextSpecific"}
+                   end
                end
           end
 
@@ -1586,6 +1655,8 @@ defmodule ASN1.RustEmitter do
 
           # Generate the parsing call based on tagging method
           call = cond do
+            type_name == "ASN1Node" ->
+               "node.clone()"
             is_raw_node?(type_name) ->
               "node"
 
@@ -1737,13 +1808,18 @@ defmodule ASN1.RustEmitter do
                 _ -> nil
              end
 
+             # Determine if the type is boxed to adjust serialization
+             boxed_type = field_type_for(rust_name, field_name, type, [])
+             is_boxed = String.starts_with?(boxed_type, "Box<")
+             val_ref = if is_boxed, do: "&**val", else: "val"
+
              case tag_info do
                 {num, cls, method} when method == :EXPLICIT or method == {:default, :EXPLICIT} ->
                    """
                                Self::#{variant}(val) => {
                                    serializer.append_constructed_node(
                                        ASN1Identifier::new(#{num}, #{cls}),
-                                       &|s: &mut Serializer| val.serialize(s)
+                                       &|s: &mut Serializer| DERSerializable::serialize(#{val_ref}, s)
                                    )?;
                                },
                    """
@@ -1752,7 +1828,7 @@ defmodule ASN1.RustEmitter do
                     """
                                Self::#{variant}(val) => {
                                    let mut mh = Serializer::new();
-                                   val.serialize(&mut mh)?;
+                                   DERSerializable::serialize(#{val_ref}, &mut mh)?;
                                    let mut bytes = mh.serialized_bytes().to_vec();
                                    if bytes.len() > 0 {
                                        let is_constructed = (bytes[0] & 0x20) != 0;
@@ -1768,9 +1844,12 @@ defmodule ASN1.RustEmitter do
                                },
                     """
 
-                _ ->
-                   # No tags or unknown method - serialize directly
-                   "            Self::#{variant}(val) => val.serialize(serializer)?,"
+                nil ->
+                   """
+                               Self::#{variant}(val) => {
+                                   DERSerializable::serialize(#{val_ref}, serializer)?;
+                               },
+                   """
              end
 
 
@@ -2150,11 +2229,12 @@ defmodule ASN1.RustEmitter do
                       if String.starts_with?(field_type, "Box<") do
                         inner = strip_generic(field_type, "Box<")
 
+                        inner_fish = String.replace(inner, "<", "::<")
                         call =
                           if is_raw_node?(inner) do
                             "Ok(nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?)"
                           else
-                            "#{inner}::from_der_node(nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?)"
+                            "#{inner_fish}::from_der_node(nodes.next().ok_or(ASN1Error::new(rust_asn1::errors::ErrorCode::TruncatedASN1Field, \"Premature end of data\".to_string(), file!().to_string(), line!()))?)"
                           end
 
                         "            let #{rust_field} = Box::new(#{call}?);"
@@ -2237,13 +2317,76 @@ defmodule ASN1.RustEmitter do
     end
   end
 
+  defp resolve_reference_tag({:Externaltypereference, _, mod, type_name} = ref) do
+     try do
+       norm_name = normalizeName(type_name)
+       # Use global definition store instead of generic lookup (which returns strings)
+       res = getEnv({:definition, "#{type_name}"}, nil) || getEnv({:definition, norm_name}, nil)
+
+       case res do
+         {:type, tags, _, _, _, _} ->
+            ret = case tags do
+               [{:tag, class, number, _, _}] ->
+                   cls_str = case class do
+                        :universal -> "TagClass::Universal"
+                        :UNIVERSAL -> "TagClass::Universal"
+                        :application -> "TagClass::Application"
+                        :APPLICATION -> "TagClass::Application"
+                        :context -> "TagClass::ContextSpecific"
+                        :CONTEXT -> "TagClass::ContextSpecific"
+                        :private -> "TagClass::Private"
+                        :PRIVATE -> "TagClass::Private"
+                        _ -> "TagClass::ContextSpecific"
+                   end
+                   {number, cls_str}
+               _ -> nil
+            end
+            ret
+
+         # Fallback for full assignment if needed (though we only store type)
+         {:TypeAssignment, _, _, {:type, tags, _, _, _, _}, _} ->
+            # Same logic
+             case tags do
+               [{:tag, class, number, _, _}] ->
+                   cls_str = case class do
+                        :universal -> "TagClass::Universal"
+                        :UNIVERSAL -> "TagClass::Universal"
+                        :application -> "TagClass::Application"
+                        :APPLICATION -> "TagClass::Application"
+                        :context -> "TagClass::ContextSpecific"
+                        :CONTEXT -> "TagClass::ContextSpecific"
+                        :private -> "TagClass::Private"
+                        :PRIVATE -> "TagClass::Private"
+                        _ -> "TagClass::ContextSpecific"
+                   end
+                   {number, cls_str}
+               _ -> nil
+            end
+
+         _ -> nil
+       end
+     rescue
+       _ -> nil
+     end
+  end
+
+  defp resolve_reference_tag(_), do: nil
+
+
   @impl true
   def finalize() do
     SingleCrateGenerator.generate_single_crate(@modules, outputDir())
     :ok
   end
   def algorithmIdentifierClass(className, modname, saveFlag) do
-    rust_name = name(className, modname)
+    # ASN1.compileClass already prepends modname if needed.
+    # Check if it already contains the separator.
+    rust_name =
+      if String.contains?(className, "_") do
+        className
+      else
+        name(className, modname)
+      end
 
     body = """
     #{@generated_header}#{rust_use_block()}

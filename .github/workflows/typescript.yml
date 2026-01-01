@@ -49,9 +49,14 @@ jobs:
         mix deps.get > /dev/null 2>&1
         mix compile > /dev/null 2>&1
         mix run --no-halt &
-        CA_PID=$! &&
-        sleep 5s &&
-        cd .. && cd ./Languages/TypeScript &&
-        bun run main.ts &&
-        kill $CA_PID
+        CA_PID=$!
+        
+        # Ensure cleanup happens on exit (success or failure)
+        trap "kill $CA_PID" EXIT
+        
+        sleep 5s
+        cd ..
+        ./verify_ts.sh
+        cd Languages/TypeScript
+        bun run main.ts
         
