@@ -375,6 +375,45 @@ import Foundation
                  {:CHOICE, fds} -> choice(fieldType(swiftName,fieldName,type), fds, modname, true)
                  {:INTEGER, fds} -> integerEnum(fieldType(swiftName,fieldName,type), fds, modname, true)
                  {:ENUMERATED, fds} -> enumeration(fieldType(swiftName,fieldName,type), fds, modname, true)
+                 # Handle SEQUENCE OF / SET OF containing inline SEQUENCE/SET types
+                 {:"SEQUENCE OF", {:type, _, {:SEQUENCE, _, _, _, fds}, _, _, _}} ->
+                   element_name = bin(swiftName) <> "_" <> bin(normalizeName(fieldName)) <> "_Sequence"
+                   sequence(element_name, fds, modname, true)
+                 {:"SEQUENCE OF", {:type, _, {:SET, _, _, _, fds}, _, _, _}} ->
+                   element_name = bin(swiftName) <> "_" <> bin(normalizeName(fieldName)) <> "_Set"
+                   set(element_name, fds, modname, true)
+                 {:"SET OF", {:type, _, {:SEQUENCE, _, _, _, fds}, _, _, _}} ->
+                   element_name = bin(swiftName) <> "_" <> bin(normalizeName(fieldName)) <> "_Sequence"
+                   sequence(element_name, fds, modname, true)
+                 {:"SET OF", {:type, _, {:SET, _, _, _, fds}, _, _, _}} ->
+                   element_name = bin(swiftName) <> "_" <> bin(normalizeName(fieldName)) <> "_Set"
+                   set(element_name, fds, modname, true)
+                 # Also handle Sequence Of / Set Of variants (lowercase)
+                 {:"Sequence Of", {:type, _, {:SEQUENCE, _, _, _, fds}, _, _, _}} ->
+                   element_name = bin(swiftName) <> "_" <> bin(normalizeName(fieldName)) <> "_Sequence"
+                   sequence(element_name, fds, modname, true)
+                 {:"Sequence Of", {:type, _, {:SET, _, _, _, fds}, _, _, _}} ->
+                   element_name = bin(swiftName) <> "_" <> bin(normalizeName(fieldName)) <> "_Set"
+                   set(element_name, fds, modname, true)
+                 {:"Set Of", {:type, _, {:SEQUENCE, _, _, _, fds}, _, _, _}} ->
+                   element_name = bin(swiftName) <> "_" <> bin(normalizeName(fieldName)) <> "_Sequence"
+                   sequence(element_name, fds, modname, true)
+                 {:"Set Of", {:type, _, {:SET, _, _, _, fds}, _, _, _}} ->
+                   element_name = bin(swiftName) <> "_" <> bin(normalizeName(fieldName)) <> "_Set"
+                   set(element_name, fds, modname, true)
+                 # Handle CHOICE types within SEQUENCE OF / SET OF
+                 {:"SEQUENCE OF", {:type, _, {:CHOICE, fds}, _, _, _}} ->
+                   element_name = bin(swiftName) <> "_" <> bin(normalizeName(fieldName)) <> "_Choice"
+                   choice(element_name, fds, modname, true)
+                 {:"SET OF", {:type, _, {:CHOICE, fds}, _, _, _}} ->
+                   element_name = bin(swiftName) <> "_" <> bin(normalizeName(fieldName)) <> "_Choice"
+                   choice(element_name, fds, modname, true)
+                 {:"Sequence Of", {:type, _, {:CHOICE, fds}, _, _, _}} ->
+                   element_name = bin(swiftName) <> "_" <> bin(normalizeName(fieldName)) <> "_Choice"
+                   choice(element_name, fds, modname, true)
+                 {:"Set Of", {:type, _, {:CHOICE, fds}, _, _, _}} ->
+                   element_name = bin(swiftName) <> "_" <> bin(normalizeName(fieldName)) <> "_Choice"
+                   choice(element_name, fds, modname, true)
                  _ -> :skip
               end
               pad(indent) <> emitSequenceElementOptional(fieldName, field, opt(optional))

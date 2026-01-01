@@ -516,7 +516,7 @@ public class Console {
   }
 
   public static func showLDAPMessage(data: Array<UInt8>) throws {
-     let msg: LDAP_Message? = try LDAP_Message(derEncoded: data)
+     let msg: LDAP_LDAPMessage? = try LDAP_LDAPMessage(derEncoded: data)
      var serializer = DER.Serializer()
      try msg!.serialize(into: &serializer)
      print(": LDAPMessage.DER \(data)")

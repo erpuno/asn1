@@ -650,18 +650,19 @@ Application.put_env(:asn1scg, :ptypes, ptypes)
 
 # Manual boxing entries for known recursive types
 # These are kept as overrides/supplements to automatic detection
+# Format: "TypeName.FieldName" where TypeName uses underscore separator
 manual_boxing = [
-  "LocationExpressionsConstituentLocator.Subprofile",
-  "LocationExpressionsSubprofileLocator.SubprofileOf",
-  "LocationExpressionsSubprofileLocator.SubprofileWith",
-  "LocationExpressionsObjectLocator.Subord",
-  "LocationExpressionsObjectLocator.ObjectWith",
-  "LocationExpressionsSubordArgument.Object",
-  "LocationExpressionsObjectWithArgument.Object",
-  "LocationExpressionsLocationExpression.Composite",
-  "LocationExpressionsCompositeLocationExpression.Complement",
-  "LocationExpressionsCompositeLocationExpression.Intersection",
-  "LocationExpressionsCompositeLocationExpression.Union"
+  "LocationExpressions_ConstituentLocator.Subprofile",
+  "LocationExpressions_SubprofileLocator.SubprofileOf",
+  "LocationExpressions_SubprofileLocator.SubprofileWith",
+  "LocationExpressions_ObjectLocator.Subord",
+  "LocationExpressions_ObjectLocator.ObjectWith",
+  "LocationExpressions_SubordArgument.Object",
+  "LocationExpressions_ObjectWithArgument.Object",
+  "LocationExpressions_LocationExpression.Composite",
+  "LocationExpressions_CompositeLocationExpression.Complement",
+  "LocationExpressions_CompositeLocationExpression.Intersection",
+  "LocationExpressions_CompositeLocationExpression.Union"
 ]
 
 # File.mkdir_p!("Languages/AppleSwift/Generated")
@@ -680,7 +681,7 @@ raw_files =
       base_dir
       |> File.ls!()
       |> Enum.filter(&String.ends_with?(&1, ".asn1"))
-      |> Enum.reject(&(&1 == "Location-Expressions.asn1"))
+      # |> Enum.reject(&(&1 == "Location-Expressions.asn1"))
       |> Enum.sort()
   end
 

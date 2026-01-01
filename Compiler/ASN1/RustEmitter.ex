@@ -194,7 +194,6 @@ defmodule ASN1.RustEmitter do
     :EXTERNAL => "ASN1Node",
     "AttributeCertificateVersion12009AttributeCertificateV1" => "ASN1Node",
     "KEPTime" => "crate::AuthenticationFramework_Time",
-    "LocationExpressionsLocationExpression" => "ASN1Node",
     "CryptographicMessageSyntax2009AlgorithmInformation2009AlgorithmIdentifier" =>
       "crate::AlgorithmInformation2009_Algorithm",
     # Extension and Attributes types - use ASN1Node for byte preservation (avoid parsing issues)
