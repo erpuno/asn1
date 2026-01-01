@@ -51,6 +51,9 @@ jobs:
         mix run --no-halt &
         CA_PID=$! &&
         sleep 5s &&
-        cd ../Languages/Go &&
+        cd .. &&
+        ./verify_go.sh &&
+        cd Languages/Go &&
         go run main.go &&
+        go test &&
         kill $CA_PID

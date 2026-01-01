@@ -44,6 +44,8 @@ jobs:
         mix run --no-halt &
         CA_PID=$! &&
         sleep 5s &&
-        cd ../Languages/AppleSwift &&
+        cd .. &&
+        ./verify_swift.sh &&
+        cd Languages/AppleSwift &&
         swift run -Xswiftc -suppress-warnings &&
         kill $CA_PID

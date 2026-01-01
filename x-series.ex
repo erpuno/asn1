@@ -272,6 +272,19 @@ defmodule DependencyAnalyzer do
     |> Enum.uniq()
   end
 
+  defp full_type_name(nil, name), do: name
+  defp full_type_name(mod, name) do
+    if System.get_env("ASN1_LANG") == "rust" do
+      pascal_mod = raw_pascal(mod)
+      pascal_type = raw_pascal(name)
+      # Match RustEmitter.name/2 logic: always prefix with module name + _
+      pascal_mod <> "_" <> pascal_type
+    else
+      normalized_mod = normalize_name(mod)
+      "#{normalized_mod}_#{normalize_name(name)}"
+    end
+  end
+
   defp extract_type_refs_acc(
          {:type, _, {:Externaltypereference, _, ref_mod, ref_type}, _, _, _},
          current_mod,
@@ -428,23 +441,13 @@ defmodule DependencyAnalyzer do
   defp normalize_name(name) when is_binary(name), do: String.replace(name, "-", "_")
   defp normalize_name(name), do: to_string(name) |> String.replace("-", "_")
 
-  defp full_type_name(mod, name) do
-    if System.get_env("ASN1_LANG") == "rust" do
-      pascal_mod = raw_pascal(mod)
-      pascal_type = raw_pascal(name)
-      if String.starts_with?(pascal_type, pascal_mod), do: pascal_type, else: pascal_mod <> pascal_type
-    else
-      normalized_mod = normalize_name(mod)
-      "#{normalized_mod}_#{normalize_name(name)}"
-    end
-  end
-
   defp raw_pascal(value) do
     value
     |> to_string()
     |> String.replace("-", "_")
+    |> String.replace(".", "_")
     |> String.split(["_", "-", " ", "::", "/"], trim: true)
-    |> Enum.map(&String.capitalize/1)
+    |> Enum.map(&Macro.camelize/1)
     |> Enum.join("")
   end
 end

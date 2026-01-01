@@ -52,6 +52,8 @@ jobs:
         mix run --no-halt &
         CA_PID=$! &&
         sleep 5s &&
-        cd ../Languages/Java &&
+        cd .. &&
+        ./verify_java.sh &&
+        cd Languages/Java &&
         ./gradlew run --args="request-ca" &&
         kill $CA_PID
