@@ -16,12 +16,15 @@ openssl_test: openssl_test.c
 c99_client: c99_client.c
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ $< $(LDFLAGS)
 
+dumpasn1: dumpasn1.c
+	$(CC) $(CFLAGS) $(INCLUDES) -o $@ $< $(LDFLAGS)
+
 # Run tests
-test: test_suite
+test: test_suite dumpasn1 openssl_test c99_client
 	./test_suite
 
 # Clean
 clean:
 	rm -f test_suite openssl_test
 
-.PHONY: test clean test_suite openssl_test
+.PHONY: test clean test_suite openssl_test dumpasn1

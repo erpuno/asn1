@@ -1,0 +1,62 @@
+/* Module for 3GPP TS 24.007 Version 8 */
+TS24007L3 DEFINITIONS AUTOMATIC TAGS ::=
+BEGIN
+
+/* 11.2.3.1.5 EPS Bearer Identity */
+EPSBearerIdentity ::= ENUMERATED {
+   noIdent, id5(5), id6(6), id7(7), id8(8), id9(9), id10(10), id11(11), 
+   id12(12), id13(13), id14(14), id15(15)
+}
+
+/* 11.2.3.1 Standard L3 Message Header */
+L3HdrOptions ::= CHOICE {
+   skipInd INTEGER(0..15),
+   --<inline/>
+   transId SEQUENCE {
+      flag BOOLEAN, 
+      value INTEGER (0..255)
+   },
+   epsBearerIdent EPSBearerIdentity,
+   secHdr INTEGER(0..15)
+}
+
+ProtoDiscr ::= ENUMERATED {
+   gcc(0), bcc(1), epsSessMgmt(2), callCtrl(3), gttp(4), mobMgmt(5), 
+   rrMgmt(6), epsMobMgmt(7), gprsMobMgmt(8), sms(9), sessMgmt(10), 
+   nonCallSS(11), locnSvcs(12), extPduInd(14), testProc(15)
+} 
+
+Header ::= SEQUENCE {
+   l3HdrOpts    L3HdrOptions,      -- L3 header, octet 1, bits 5 thru 8
+   protoDiscr   ProtoDiscr, 
+   msgType      INTEGER (0..255)
+}
+
+MsgType-MM-CC-SS ::= SEQUENCE {
+   sendSeqNum   INTEGER (0..3), 
+   value        INTEGER (0..63)
+}
+
+SecHdrType ::= ENUMERATED {
+   noSec, integProt, integProtAndCipher, integProtAndSecCtxt, 
+   integProtAndCipherAndSecCtxt, integProtAndPartCipher, secHdrForSvcReq(12)
+} 
+
+SecProtMsgHeader ::= SEQUENCE {
+   secHdrType SecHdrType,        -- Security header type
+   protoDiscr INTEGER(0..15),    -- Protocol discriminator
+   msgAuthCode INTEGER(0..4294967295), -- Message authentication code (MAC)
+   seqNumber   INTEGER(0..255)   -- Sequence number
+}
+
+NAS-PROTOCOL-CLASS ::= CLASS {
+   &protoDiscr ProtoDiscr, 
+   &msgType INTEGER (0..255), 
+   &Value
+}
+WITH SYNTAX {
+   ID &protoDiscr, &msgType
+   TYPE &Value
+}
+
+END

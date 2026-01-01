@@ -1,0 +1,1258 @@
+TS24301IES DEFINITIONS AUTOMATIC TAGS ::= BEGIN
+
+IMPORTS IMEI, IMSI, MCCMNCPair, TBCDString, TimeZoneAndTime FROM TS24008IES ;
+
+-- Common types
+
+/* 9.9.2.1 - EPS bearer context status */
+
+EPSBearerContextStatus ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (2), 
+
+   -- first octet
+   ebi7  BOOLEAN, 
+   ebi6  BOOLEAN, 
+   ebi5  BOOLEAN, 
+   ebi4  BOOLEAN, 
+   ebi3  BOOLEAN, 
+   ebi2  BOOLEAN, 
+   ebi1  BOOLEAN, 
+   ebi0  BOOLEAN DEFAULT FALSE, 
+
+   -- 2nd octet
+   ebi15 BOOLEAN, 
+   ebi14 BOOLEAN, 
+   ebi13 BOOLEAN, 
+   ebi12 BOOLEAN, 
+   ebi11 BOOLEAN, 
+   ebi10 BOOLEAN, 
+   ebi9  BOOLEAN, 
+   ebi8  BOOLEAN 
+}
+
+/* 9.9.2.6 - NAS security parameters from E-UTRA */
+
+NASSecParamsFromEUTRA ::= SEQUENCE {
+   spare INTEGER (0..15) DEFAULT 0, 
+   dlNASCount INTEGER (0..15)
+}
+
+/* 9.9.2.7 - NAS security parameters to E-UTRA */
+
+NASSecParamsToEUTRA ::= SEQUENCE {
+   nonceMMEValue OCTET STRING (SIZE (4)),
+   spare1 BOOLEAN DEFAULT FALSE, 
+   typeOfCiphAlg INTEGER (0..7), 
+   spare2 BOOLEAN DEFAULT FALSE, 
+   typeOfProtAlg INTEGER (0..7), 
+   spare3 INTEGER (0..15) DEFAULT 0, 
+   tsc BOOLEAN, 
+   nasKeySetIdent INTEGER (0..7)
+}
+
+/* 9.9.3 - EPS Mobility Management (EMM) information elements */
+
+/* 9.9.3.0A - Additional update result */
+
+AddnUpdateResult ::= SEQUENCE {
+   spare INTEGER (0..3) DEFAULT 0,
+   value ENUMERATED { noInfo(0), csFbNotPref(1), smsOnly(2), reserved(3) }
+}
+
+/* 9.9.3.0B - Additional update type */
+
+AddnUpdateType ::= SEQUENCE {
+   pnb_CIoT ENUMERATED { 
+      noAddInfo(0), cpCIotEpsPref(1), upCIotEpsPref(2), reserved(3) 
+   },
+   saf  BOOLEAN,
+   autv BOOLEAN
+}
+
+/* 9.9.3.4 - Authentication response parameter */
+
+AuthRespParam ::= OCTET STRING (SIZE (4..16))
+
+/* 9.9.3.4B - SMS services status */
+
+SMSServicesStatus ::= SEQUENCE {
+   spare BOOLEAN DEFAULT FALSE,
+   value SMSStatusValues
+}
+
+SMSStatusValues ::= ENUMERATED {
+   notAvail(0), notAvailThisPlmn(1), netFailure(2), congestion(3),
+   smsValueMAX(7)
+}
+
+/* 9.9.3.5 - CSFB response */
+
+CSFBResponse ::= SEQUENCE {
+   spare BOOLEAN DEFAULT FALSE, 
+   value CSFBRespValues 
+}
+
+CSFBRespValues ::= ENUMERATED {
+   rejected(0), accepted(1), respValMAX(7)
+}
+
+/* 9.9.3.7 - Detach type */
+
+DetachType ::= SEQUENCE {
+   switchOff BOOLEAN, 
+   typeOfDetach INTEGER (0..7)
+}
+
+/* 9.9.3.9 - EMM cause */
+
+EMMCause ::= ENUMERATED { 
+   imsiUnkInHSS(2), illegalUE(3), imeiNotAccept(5), illegalME(6), 
+   epsSvcNotAllowed(7), epsAndNonEPSSvcNotAllowed(8), ueIdentNotDeriv(9), 
+   implDetach(10), plmnNotAllowed(11), trkAreaNotAllowed(12), 
+   roamNotAllowed(13), epsSvcNotAllowInPLMN(14), noCellsInTrkArea(15), 
+   mscTempNotReach(16), networkFailure(17), csDomainNotAvail(18), 
+   esmFailure(19), macFailure(20), synchFailure(21), congestion(22), 
+   ueSecCapMismat(23), secModeReject(24), notAuthForCSG(25), 
+   nonEPSAuthUnaccept(26), redirTo5GRequired(31), reqSvcOptNotAuth(35),
+   csSvcTempUnavail(39), noEPSBearerCtxtAct(40), severeNetFailure(42),
+   semIncorrectMsg(95), invMandInfo(96), msgTypeNotExist(97),
+   msgTypeNotCompat(98), infoElemNotExist(99), condIEError(100),
+   msgNotCompat(101), unspecProtoErr(111), eMMCauseMAX(255)
+}
+
+/* 9.9.3.10 - EPS attach result */
+
+EPSAttachResult ::= SEQUENCE {
+   spare BOOLEAN DEFAULT FALSE, 
+   result EPSAttachResultValues
+}
+
+EPSAttachResultValues ::= ENUMERATED {
+   epsOnly(1), combinedAttach(2), resultValMAX(7)
+}
+
+/* 9.9.3.11 - EPS attach type */
+
+EPSAttachType ::= SEQUENCE {
+   spare BOOLEAN DEFAULT FALSE, 
+   value INTEGER (0..7)
+}
+
+/* 9.9.3.12 - EPS mobile identity */
+
+EPSMobileIdentity-GUTI ::= SEQUENCE {
+   mcc-mnc MCCMNCPair, 
+   mmeGroupID OCTET STRING (SIZE (2)),
+   mmeCode INTEGER (0..255),
+   tmsi OCTET STRING (SIZE (4))
+}
+
+EPSMobileIdentity ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255), 
+   filler INTEGER (0..15) DEFAULT 15, 
+   oddEvenInd BOOLEAN, 
+   typeOfIdent ENUMERATED { imsi(1), imei(3), guti(6) }, 
+   --<inline/>
+   content CHOICE {
+      --<selector element="typeOfIdent" value="6"/>
+      guti EPSMobileIdentity-GUTI, 
+      --<selector element="typeOfIdent" value="1"/>
+      imsi IMSI, 
+      --<selector element="typeOfIdent" value="3"/>
+      imei IMEI
+   }
+}
+
+/* 9.9.3.12A - EPS network feature support */
+
+EPSNetworkFeatureSupport ::= SEQUENCE {
+   --<is3GLength/>
+   length   INTEGER (1..3) DEFAULT 1,
+   cpCIoT   BOOLEAN,
+   erNoPDN  BOOLEAN,
+   esr      BOOLEAN,
+   csLCS    INTEGER (0..3),
+   epcLCS   BOOLEAN,
+   emcBS    BOOLEAN,
+   imsVoPS  BOOLEAN,
+
+   --<noPresentBit/>
+   --<inline/>
+   octet4 SEQUENCE {
+      sigEPSBC BOOLEAN,
+      iwkN26   BOOLEAN,
+      rDCNR    BOOLEAN,
+      rEC      BOOLEAN,
+      ePCO     BOOLEAN,
+      hcCpCIoT BOOLEAN,
+      s1DT     BOOLEAN,
+      upCIot   BOOLEAN
+   } OPTIONAL,
+
+   --<noPresentBit/>
+   --<inline/>
+   octet5 SEQUENCE {
+      spare  INTEGER (0..3) DEFAULT 0,
+      edc   BOOLEAN, -- Added in v18.5.0
+      ptcc   BOOLEAN, -- Added in v17.5.0
+      pr     BOOLEAN,
+      rpr    BOOLEAN,
+      piv    BOOLEAN,
+      ncr    BOOLEAN
+   } OPTIONAL
+}
+
+/* 9.9.3.13 - EPS update result */
+
+EPSUpdateResult ::= SEQUENCE {
+   spare BOOLEAN DEFAULT FALSE,
+   result EPSUpdateResultValues
+}
+
+EPSUpdateResultValues ::= ENUMERATED {
+   taUpdated(0), taLaUpdated(1), taUpdatedIsrActive(4),
+   taLaUpdatedIsrActive(5), updateValMAX(7)
+}
+
+/* 9.9.3.14 - EPS update type */
+
+EPSUpdateType ::= SEQUENCE {
+   active BOOLEAN, 
+   value  INTEGER (0..7)
+}
+
+/* 9.9.3.15 - ESM message container
+
+Defined in TS24301Msgs.asn
+
+*/
+
+/* 9.9.3.19 - KSI and sequence number */
+
+KSIAndSequenceNumber ::= SEQUENCE {
+   ksi   INTEGER (0..7), 
+   seqNo INTEGER (0..31)
+}
+
+/* 9.9.3.21 - NAS key set identifier */
+
+NASKeySetIdentifier ::= SEQUENCE {
+   tsc   BOOLEAN, 
+   ident INTEGER (0..7)
+}
+
+/* 9.9.3.22 - NAS message container */
+
+NASMessageContainer ::= OCTET STRING (SIZE (2..251))
+
+/* 9.9.3.23 - NAS security algorithms */
+
+NASSecurityAlgorithms ::= SEQUENCE {
+   spare1 BOOLEAN DEFAULT FALSE, 
+   typeOfCiph ENUMERATED {
+      eea0(0), x128-eea1(1), x128-eea2(2), eea3(3), eea4(4), 
+      eea5(5), eea6(6), eea7(7)
+   },
+   spare2 BOOLEAN DEFAULT FALSE, 
+   typeOfProt ENUMERATED {
+      eia0(0), x128-eia1(1), x128-eia2(2), eia3(3), eia4(4), 
+      eia5(5), eia6(6), eia7(7)
+   }
+}
+
+/* 9.9.3.25 - Nonce */
+
+Nonce ::= OCTET STRING (SIZE (4))
+
+/* 9.9.3.25A - Paging identity */
+
+PagingIdentity ::= SEQUENCE {
+   spare INTEGER (0..127) DEFAULT 0, 
+   ident ENUMERATED { imsi(0), tmsi(1) }
+}
+
+/* 9.9.3.26A - Extended EMM cause */
+
+ExtEMMCause ::= SEQUENCE {
+   spare BOOLEAN DEFAULT FALSE,
+   nbiotAllowed BOOLEAN,
+   epsOptInfo BOOLEAN,
+   e-UTRAN-NotAllowed BOOLEAN
+}
+
+/* 9.9.3.27 - Service type */
+
+ServiceType ::= INTEGER { 
+   moCSFallback(0), mtCSFallBack(1), moCSFBEmergCall(2), pktSvcsViaS1(8)
+} (0..15)
+
+/* 9.9.3.28 - Short MAC */
+
+ShortMAC ::= OCTET STRING (SIZE (2))
+
+/* 9.9.3.32 - Tracking area identity */
+
+TrackingAreaIdent ::= SEQUENCE {
+   mcc-mnc MCCMNCPair, 
+   tac TrackingAreaCode
+}
+
+TrackingAreaCode ::= OCTET STRING (SIZE (2))
+
+/* 9.9.3.33 - Tracking area identity list */
+
+TrackingAreaIdentList ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (6..96), 
+   --<is3GVarLenList lengthElem="length"/>
+   idents SEQUENCE (SIZE (1..16)) OF TrackingAreaIdentListItem
+}
+
+TrackingAreaIdentListItem ::= SEQUENCE {
+   spare BOOLEAN DEFAULT FALSE, 
+   typeOfList INTEGER (0..2), 
+   numElements INTEGER (0..31), 
+   --<inline/>
+   elements CHOICE {
+      --<selector element="typeOfList" value="0"/>
+      --<asn1typename>PartialTrkAreaIdent0</asn1typename>
+      partTrkIdentList0 SEQUENCE {
+         mcc-mnc MCCMNCPair, 
+         --<inline/>
+         --<length expr="@...numElements+1"/>
+         tacs SEQUENCE (SIZE (1..32)) OF TrackingAreaCode
+      }, 
+      --<selector element="typeOfList" value="1"/>
+      --<asn1typename>PartialTrkAreaIdent1</asn1typename>
+      partTrkIdentList1 SEQUENCE {
+         mcc-mnc MCCMNCPair, 
+         tac TrackingAreaCode
+      }, 
+      --<selector element="typeOfList" value="2"/>
+      --<asn1typename>PartialTrkAreaIdent2</asn1typename>
+      --<length expr="@.numElements+1"/>
+      partTrkIdentList2 SEQUENCE (SIZE (1..32)) OF TrackingAreaIdent 
+   }
+}
+
+
+/* 9.9.3.34 - UE network capability */
+
+UENetworkCapability ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (1..255), 
+
+   -- EPS encryption algorithms supported
+   epsEncryptAlgs EPSEncryptAlgsSupported, 
+
+   -- EPS integrity algorithms supported 
+   epsIntegAlgs EPSIntegAlgsSupported, 
+
+   -- UMTS encryption algorithms supported
+   --<noPresentBit/>
+   umtsEncryptAlgs UMTSEncryptAlgsSupported OPTIONAL, 
+
+   --<noPresentBit/>
+   --<inline/>
+   octet6 SEQUENCE {
+      -- UCS2 character string support
+      ucs2 BOOLEAN, 
+
+      -- UMTS integrity algorithms supported 
+      umtsIntegAlgs UMTSIntegAlgsSupported 
+   } OPTIONAL,
+
+   --<noPresentBit/>
+   --<inline/>
+   octet7 SEQUENCE {
+      proSedd BOOLEAN, 
+      proSe BOOLEAN,
+      h245-ash BOOLEAN, 
+      acc-csfb BOOLEAN, 
+      lpp BOOLEAN, 
+      lcs BOOLEAN, 
+      x1xSR-VCC BOOLEAN, 
+      nf BOOLEAN
+   } OPTIONAL, 
+
+   --<noPresentBit/>
+   --<inline/>
+   octet8 SEQUENCE {
+      ePCO BOOLEAN, 
+      hc-CP-CIoT BOOLEAN, 
+      erwoPDN BOOLEAN, 
+      s1-Udata BOOLEAN, 
+      upCIoT BOOLEAN, 
+      cpCIoT BOOLEAN, 
+      prose-relay BOOLEAN, 
+      proSedc BOOLEAN
+   } OPTIONAL, 
+
+   --<noPresentBit/>
+   --<inline/>
+   octet9 SEQUENCE {
+      bearers BOOLEAN,
+      sgc BOOLEAN,
+      n1Mode BOOLEAN,
+      dcnr BOOLEAN,
+      cpBackoff BOOLEAN,
+      restrictEC BOOLEAN,
+      v2xPC5 BOOLEAN,
+      multDRB BOOLEAN
+   } OPTIONAL,
+
+   --<noPresentBit/>
+   --<inline/>
+   octet10 SEQUENCE {
+      rpr BOOLEAN, -- Added in v17.5.0
+      piv BOOLEAN, -- Added in v17.5.0
+      ncr BOOLEAN, -- Added in v17.5.0
+      v2x-nr-pc5 BOOLEAN, -- Added in v16.5
+      up-mt-edt BOOLEAN,
+      cp-mt-edt BOOLEAN,
+      wusa BOOLEAN,
+      racs BOOLEAN
+   } OPTIONAL,
+
+   --<noPresentBit/>
+   --<inline/>
+   octet11 SEQUENCE { -- Added in v17.5.0
+      spare INTEGER (0..15) DEFAULT 0, 
+      rclin BOOLEAN, -- Added in v18.7.0
+      edc BOOLEAN, -- Added in v18.5.0
+      ptcc BOOLEAN,
+      pr BOOLEAN
+   } OPTIONAL,
+
+   --<length fixed-size="0"/>
+   --<noPresentBit/>
+   spare4 OCTET STRING OPTIONAL
+}
+
+EPSEncryptAlgsSupported ::= SEQUENCE {
+   eea0 BOOLEAN, 
+   x128-eea1 BOOLEAN, 
+   x128-eea2 BOOLEAN, 
+   eea3 BOOLEAN, 
+   eea4 BOOLEAN, 
+   eea5 BOOLEAN, 
+   eea6 BOOLEAN, 
+   eea7 BOOLEAN
+}
+
+EPSIntegAlgsSupported ::= SEQUENCE {
+   eia0 BOOLEAN, 
+   eia1 BOOLEAN, 
+   eia2 BOOLEAN, 
+   eia3 BOOLEAN, 
+   eia4 BOOLEAN, 
+   eia5 BOOLEAN, 
+   eia6 BOOLEAN, 
+   eia7 BOOLEAN
+}
+
+UMTSEncryptAlgsSupported ::= SEQUENCE {
+   uea0 BOOLEAN, 
+   uea1 BOOLEAN, 
+   uea2 BOOLEAN, 
+   uea3 BOOLEAN, 
+   uea4 BOOLEAN, 
+   uea5 BOOLEAN, 
+   uea6 BOOLEAN, 
+   uea7 BOOLEAN
+}
+
+UMTSIntegAlgsSupported ::= SEQUENCE {
+   uia1 BOOLEAN, 
+   uia2 BOOLEAN, 
+   uia3 BOOLEAN, 
+   uia4 BOOLEAN, 
+   uia5 BOOLEAN, 
+   uia6 BOOLEAN, 
+   uia7 BOOLEAN
+}
+
+GPRSIntegAlgsSupported ::= SEQUENCE {
+   gea1 BOOLEAN, 
+   gea2 BOOLEAN, 
+   gea3 BOOLEAN, 
+   gea4 BOOLEAN, 
+   gea5 BOOLEAN, 
+   gea6 BOOLEAN, 
+   gea7 BOOLEAN
+}
+
+/* 9.9.3.35 - UE radio capability information update needed */
+
+UERadioCapInfoUpdateNeeded ::= SEQUENCE {
+   spare INTEGER (0..7), 
+   value BOOLEAN
+}
+
+/* 9.9.3.36 - UE security capability */
+
+UESecurityCapability ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (2..13), 
+
+   -- EPS encryption algorithms supported
+   epsEncryptAlgs EPSEncryptAlgsSupported, 
+
+   -- EPS integrity algorithms supported 
+   epsIntegAlgs EPSIntegAlgsSupported, 
+
+   -- UMTS encryption algorithms supported
+   --<noPresentBit/>
+   umtsEncryptAlgs UMTSEncryptAlgsSupported OPTIONAL, 
+
+   -- EPS integrity algorithms supported 
+   --<noPresentBit/>
+   --<inline/>
+   octet6 SEQUENCE {
+      spare BOOLEAN DEFAULT FALSE, 
+      umtsIntegAlgs UMTSIntegAlgsSupported
+   } OPTIONAL,
+
+   -- GPRS integrity algorithms supported 
+   --<noPresentBit/>
+   --<inline/>
+   octet7 SEQUENCE {
+      spare BOOLEAN DEFAULT FALSE, 
+      gprsIntegAlgs GPRSIntegAlgsSupported
+   } OPTIONAL
+}
+
+/* 9.9.3.37a - Extended emergency number list */
+
+ExtEmergencyNumberInfo ::= SEQUENCE {
+   number SEQUENCE {
+      --<is3GLength/>
+      length INTEGER(0..255), 
+      --<length fixed-size="0"/>
+      digits TBCDString
+   },
+   subservices SEQUENCE {
+      --<is3GLength/>
+      subservicesLen INTEGER(0..255),
+      --<length fixed-size="0"/>
+      subservices OCTET STRING
+   }
+}
+
+ExtEmergencyNumberList ::=  SEQUENCE {
+   --<is3GLength bitFieldSize="16"/>
+   length INTEGER (0..65535), 
+   spare INTEGER(0..127) DEFAULT 0,
+   catValue BOOLEAN,
+   --<is3GVarLenList lengthElem="length"/>
+   --<storage>array</storage>
+   numberInfo SEQUENCE OF ExtEmergencyNumberInfo
+}
+
+/* 9.9.3.38 - CLI */
+
+CLI ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255),
+   --<length fixed-size="0"/>
+   value TBCDString
+}
+
+/* 9.9.3.39 - SS Code */
+
+SSCode ::= INTEGER (0..255)
+
+/* 9.9.3.40 - LCS indicator */
+
+LCSIndicator ::= INTEGER (0..255)
+
+/* 9.9.3.41 - LCS client identity */
+
+LCSClientIdentity ::= OCTET STRING (SIZE (1..255))
+
+/* 9.9.3.42 - Generic message container type */
+
+GenMsgContainerType ::= ENUMERATED { 
+   lppMsgCont(1), lcsMsgCont(2), genMsgContainerTypeMAX(255) 
+}
+
+/* 9.9.3.43 - Generic message container */
+
+--<length fixed-size="2"/>
+GenMessageContainer ::= OCTET STRING (SIZE (0..65535))
+
+/* 9.9.3.45 - GUTI type */
+
+GUTIType ::= SEQUENCE {
+   spare INTEGER (0..7) DEFAULT 0, 
+   mapped BOOLEAN -- FALSE = native
+}
+
+/* 9.9.3.47 - Control Plane Service Type */
+
+CtrlPlaneSvcType ::= SEQUENCE {
+   activeFlag BOOLEAN, 
+   svcTypeValue INTEGER (0..7)
+      -- 0 = mobile originating request
+      -- 1 = mobile terminating request
+      -- 2 thru 7 - not used
+}
+
+/* 9.9.3.50 - Hash MME */
+
+HashMME ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255), 
+   hashValue OCTET STRING (SIZE (8))
+}
+
+/* 9.9.3.51 - Replayed NAS message container */
+
+ReplayedNASMsgContainer ::= SEQUENCE {
+   --<is3GLength bitFieldSize="16"/>
+   length INTEGER (0..65535),
+   contents OCTET STRING (SIZE (1..65535))
+}
+
+/* 9.9.3.52 - Network policy */
+
+NetworkPolicy ::= SEQUENCE {
+   spare INTEGER (0..7) DEFAULT 0, 
+   redirPolicy BOOLEAN
+}
+
+/* 9.9.3.53 - UE additional security capability */
+
+UEAddlSecurityCapability ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255),
+   -- octet 3
+   ea0-5g BOOLEAN,
+   ea1-128-5g BOOLEAN,
+   ea2-128-5g BOOLEAN,
+   ea3-128-5g BOOLEAN,
+   ea4-5g BOOLEAN,
+   ea5-5g BOOLEAN,
+   ea6-5g BOOLEAN,
+   ea7-5g BOOLEAN,
+   -- octet 4
+   ea8-5g BOOLEAN,
+   ea9-5g BOOLEAN,
+   ea10-5g BOOLEAN,
+   ea11-5g BOOLEAN,
+   ea12-5g BOOLEAN,
+   ea13-5g BOOLEAN,
+   ea14-5g BOOLEAN,
+   ea15-5g BOOLEAN,
+   -- octet 5
+   ia0-5g BOOLEAN,
+   ia1-128-5g BOOLEAN,
+   ia2-128-5g BOOLEAN,
+   ia3-128-5g BOOLEAN,
+   ia4-5g BOOLEAN,
+   ia5-5g BOOLEAN,
+   ia6-5g BOOLEAN,
+   ia7-5g BOOLEAN,
+   -- octet 6
+   ia8-5g BOOLEAN,
+   ia9-5g BOOLEAN,
+   ia10-5g BOOLEAN,
+   ia11-5g BOOLEAN,
+   ia12-5g BOOLEAN,
+   ia13-5g BOOLEAN,
+   ia14-5g BOOLEAN,
+   ia15-5g BOOLEAN
+}
+
+/* 9.9.3.54 - UE status */
+
+UEStatus ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255) DEFAULT 1,
+   spare INTEGER (0..63) DEFAULT 0,
+   n1RegStatus BOOLEAN,
+   s1RegStatus BOOLEAN
+}
+
+/* 9.9.3.55 - Additional information requested */
+
+AdditionalInfoReq ::= SEQUENCE {
+   spare INTEGER (0..127) DEFAULT 0,
+   dataRequested BOOLEAN
+}
+
+/* 9.9.3.56 - Ciphering key data */
+
+CipherDataSet ::= SEQUENCE {
+   cipherId INTEGER (0..65535),
+   cipherKey OCTET STRING (SIZE (16)),
+   spare INTEGER (0..7) DEFAULT 0,
+   c0Len INTEGER (0..31),
+   --<length expr="@c0Len"/>
+   c0 OCTET STRING,
+   -- octet k+1
+   posSIBType1-1 BOOLEAN,
+   posSIBType1-2 BOOLEAN,
+   posSIBType1-3 BOOLEAN,
+   posSIBType1-4 BOOLEAN,
+   posSIBType1-5 BOOLEAN,
+   posSIBType1-6 BOOLEAN,
+   posSIBType1-7 BOOLEAN,
+   posSIBType2-1 BOOLEAN,
+   -- octet k+2
+   posSIBType2-2 BOOLEAN,
+   posSIBType2-3 BOOLEAN,
+   posSIBType2-4 BOOLEAN,
+   posSIBType2-5 BOOLEAN,
+   posSIBType2-6 BOOLEAN,
+   posSIBType2-7 BOOLEAN,
+   posSIBType2-8 BOOLEAN,
+   posSIBType2-9 BOOLEAN,
+   -- octet k+3
+   posSIBType2-10 BOOLEAN,
+   posSIBType2-11 BOOLEAN,
+   posSIBType2-12 BOOLEAN,
+   posSIBType2-13 BOOLEAN,
+   posSIBType2-14 BOOLEAN,
+   posSIBType2-15 BOOLEAN,
+   posSIBType2-16 BOOLEAN,
+   posSIBType2-17 BOOLEAN,
+   -- octet k+4
+   posSIBType2-18 BOOLEAN,
+   posSIBType2-19 BOOLEAN,
+   posSIBType3-1 BOOLEAN,
+   spare2 INTEGER (0..31) DEFAULT 0,
+   --octet k+5
+   validityStartTime TimeZoneAndTime,
+   validityDuration INTEGER (0..65535),
+   taiList TrackingAreaIdentList
+}
+
+CipherKeyData ::= SEQUENCE {
+   --<is3GLength bitFieldSize="16"/>
+   length INTEGER (0..65535), 
+   --<is3GVarLenList lengthElem="length"/>
+   dataSet SEQUENCE OF CipherDataSet
+}
+
+/* 9.9.3.57 - N1 UE network capability */
+N1UENetCapability ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255),
+   spare BOOLEAN DEFAULT FALSE,
+   ehcCpCIoT BOOLEAN, -- Added in v17.4.0
+   pnbCIoT INTEGER (0..3),
+   upCIoT BOOLEAN,
+   hcCpCIoT BOOLEAN,
+   n3Data BOOLEAN,
+   cpCIoT BOOLEAN
+}
+
+/* 9.9.3.58 - UE radio capability ID availability */
+UERadioCapIdAvailability ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255),
+   spare INTEGER (0..31) DEFAULT 0,
+   value INTEGER (0..7)
+}
+
+/* 9.9.3.59 - UE radio capability ID request */
+UERadioCapIdRequest ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255),
+   spare INTEGER (0..127) DEFAULT 0,
+   urcid-A BOOLEAN
+}
+
+/* 9.9.3.60 - UE radio capability ID */
+UERadioCapId ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (1..255),
+   capId OCTET STRING
+}
+
+/* 9.9.3.61 - UE radio capability ID deletion indication */
+UERadioCapIdDeletionInd ::= SEQUENCE {
+   spare BOOLEAN DEFAULT FALSE,
+   deletionReq INTEGER (0..7)
+}
+
+/* 9.9.3.62 - WUS assistance information - Fully defined in v16.5 */
+WUSAssistanceInfo ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER(0..255),
+   --<is3GVarLenList lengthElem="length"/>
+   types SEQUENCE (SIZE (1..255)) OF WUSAssistInfoType
+}
+
+WUSAssistInfoType ::= SEQUENCE {
+   infoType InformationType,
+   infoValue INTEGER (0..31)
+}
+
+InformationType ::= ENUMERATED {
+   itUEPagingProbInfo(0), itMAX(7)
+}
+
+/* 9.9.3.63 - NB-S1 DRX parameter - Added in v16.5 */
+NBS1DRXParameter ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER(0..255),
+   spare INTEGER (0..15) DEFAULT 0,
+   drxValue INTEGER (0..15)
+}
+
+/* 9.9.3.64 - IMSI offset - Added in v17.3 */
+IMSIOffset ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255),
+   value OCTET STRING (SIZE (2))
+}
+
+/* 9.9.3.65 - UE request type - Added in v17.3 */
+UERequestType ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255),
+   spare INTEGER (0..15) DEFAULT 0,
+   type UERequestTypes
+}
+
+UERequestTypes ::= ENUMERATED {
+   ueReserved(0), ueNASRelease(1), uePagingReject(2), ueMAX(15)
+}
+
+/* 9.9.3.66 - Paging restriction - Added in v17.3 */
+PagingRestriction ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255),
+   spare INTEGER (0..15) DEFAULT 0,
+   type RestrictionTypes,
+   --<noPresentBit/>
+   --<inline/>
+   octet4 SEQUENCE {
+      ebi7 BOOLEAN,
+      ebi6 BOOLEAN,
+      ebi5 BOOLEAN,
+      ebi4 BOOLEAN,
+      ebi3 BOOLEAN,
+      ebi2 BOOLEAN,
+      ebi1 BOOLEAN,
+      ebi0 BOOLEAN
+   } OPTIONAL,
+   --<noPresentBit/>
+   --<inline/>
+   octet5 SEQUENCE {
+      ebi15 BOOLEAN,
+      ebi14 BOOLEAN,
+      ebi13 BOOLEAN,
+      ebi12 BOOLEAN,
+      ebi11 BOOLEAN,
+      ebi10 BOOLEAN,
+      ebi9 BOOLEAN,
+      ebi8 BOOLEAN
+   } OPTIONAL
+}
+
+RestrictionTypes ::= ENUMERATED {
+   rtReserved(0), rtAll(1), rtExceptVoice(2), rtExceptPDN(3),
+   rtExceptVoicePDN(4), rtMAX(15)
+}
+
+/* 9.9.3.67 - EPS additional request result - Added in v17.5.0 */
+EPSAddlReqResult ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255),
+   spare INTEGER (0..63) DEFAULT 0,
+   prd INTEGER (0..3)
+}
+
+/* 9.9.3.68 - Time duration - Added in v18.6.0 */
+/* Not used by any message directly.  The Unavailability Info and Config
+   IEs make use of octets 3-5, which is just an integer value.  As such,
+   the IEI and Length are not defined here for now... */
+TimeDuration ::= INTEGER (0..16777215)
+
+/* 9.9.3.69 - Unavailability information - Added in v18.6.0 */
+UnavailabilityInfo ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255),
+   spare INTEGER (0..7) DEFAULT 0,
+   suppi INTEGER (0..1),
+   updpi INTEGER (0..1),
+   unavailabilityType INTEGER (0..7),
+   --<inline/>
+   periodDuration CHOICE {
+      --<selector element="updpi" value="0"/>
+      absent NULL,
+      --<selector element="updpi" value="1"/>
+      present TimeDuration
+   },
+   --<inline/>
+   periodStart CHOICE {
+      --<selector element="suppi" value="0"/>
+      absent NULL,
+      --<selector element="suppi" value="1"/>
+      present TimeDuration
+   }
+}
+
+/* 9.9.3.70 - Unavailability configuration - Added in v18.6.0 */
+UnavailabilityConfig ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255),
+   spare INTEGER (0..31) DEFAULT 0,
+   suppi INTEGER (0..1),
+   updpi INTEGER (0..1),
+   eupr BOOLEAN,
+   --<inline/>
+   periodDuration CHOICE {
+      --<selector element="updpi" value="0"/>
+      absent NULL,
+      --<selector element="updpi" value="1"/>
+      present TimeDuration
+   },
+   --<inline/>
+   periodStart CHOICE {
+      --<selector element="suppi" value="0"/>
+      absent NULL,
+      --<selector element="suppi" value="1"/>
+      present TimeDuration
+   }
+}
+
+/* 9.9.3.71 - UE information request - Added in v18.7.0 */
+UEInfoRequest ::= SEQUENCE {
+   spare INTEGER (0..7) DEFAULT 0,
+   uclir BOOLEAN
+}
+
+/* 9.9.3.72 - UE coarse location information - Added in v18.7.0 */
+UECoarseLocationInfo ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255),
+   ellipsoidPoint EllipsoidPoint
+}
+
+EllipsoidPoint ::= SEQUENCE {  -- Defined in TS 37.355, Section 6.4.1
+   latitudeSign ENUMERATED {north, south, signMAX(7)},
+   degreesLatitude INTEGER (0..16777215),
+   degreesLongitude INTEGER (0..16777215)
+}
+
+
+/* 9.9.4 - EPS Session Management (ESM) information elements */
+
+/* 9.9.4.2 - APN aggregate maximum bit rate */
+
+APNAggMaxBitRate ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (2..6), 
+   apnAmbrforDL INTEGER (0..255), 
+   apnAmbrforUL INTEGER (0..255), 
+   --<is3GVarLenList lengthElem="length"/>
+   --<noPresentBit/>
+   ext SEQUENCE (SIZE (0..2)) OF APNAggMaxBitRateExt OPTIONAL
+}
+
+APNAggMaxBitRateExt ::= SEQUENCE {
+   apnAmbrforDL INTEGER (0..255), 
+   apnAmbrforUL INTEGER (0..255)
+}
+
+/* 9.9.4.3 - EPS quality of service */
+
+EPSQualityOfService ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (1|5|9|13), 
+   qci INTEGER (0..255), 
+   --<is3GVarLenList lengthElem="length"/>
+   --<noPresentBit/>
+   bitRates SEQUENCE (SIZE (0..3)) OF EPSQoSBitRates OPTIONAL
+}
+
+EPSQoSBitRates ::= SEQUENCE {
+   maxBitRateforUL INTEGER (0..255), 
+   maxBitRateforDL INTEGER (0..255), 
+   guarBitRateforUL INTEGER (0..255), 
+   guarBitRateforDL INTEGER (0..255)
+}
+
+/* 9.9.4.4 - ESM cause */
+
+ESMCause ::= ENUMERATED {
+ operDeterBarring(8), 
+ insuffResources(26), 
+ unkOrMissAPN(27),
+ unknownPDNType(28),
+ userAutheFailed(29),
+ reqRejectByServingGW(30),
+ reqRejectUnspecified(31),
+ svcOptNotSupp(32),
+ reqSvcOptNotSubscr(33),
+ svcOptTempOutOfOrder(34),
+ ptiAlreadyInUse(35),
+ regularDeactivation(36),
+ epsQoSNotAccepted(37),
+ networkFailure(38),
+ reactivateRequest(39), 
+ semErrorInTFTOp(41),
+ synErrorInTFTOp(42),
+ invEPSBearerIdent(43),
+ semErrorsInPktFilt(44),
+ synErrorsInPktFilt(45),
+ ptiMismatch(47),
+ lastPDNDisconnNotAllow(49),
+ pdnTypeIPv4OnlyAllow(50),
+ pdnTypeIPv6OnlyAllow(51),
+ singleAddrBearersOnlyAllow(52),
+ esmInfoNotRcvd(53),
+ pdnConnNotExist(54),
+ multPDNConnsForAPNNotAllow(55),
+ collWithNetwInitReq(56),
+ pdnTypeIPv4v6OnlyAllow(57),
+ pdnTypeNonIPOnlyAllow(58),
+ unsuppQCIValue(59),
+ bearerHandlingNotSupp(60), 
+ pdnTypeEthOnlyAllow(61), 
+ maxNumEPSBearersReached(65), 
+ reqAPNNotSupp(66), 
+ invPTIValue(81),
+ semIncorrectMessage(95),
+ invMandatoryInfo(96),
+ msgTypeNonExistOrNotImpl(97),
+ msgTypeNotCompatWithProtoState(98),
+ ieNonExistOrNotImpl(99),
+ condIEError(100),
+ msgNotCompatWithProtoState(101),
+ protocolErrorUnspecified(111),
+ apnRestrValIncompWithBearerCtxt(112),
+ multAccToPdnNotAllowed(113),
+ eSMCauseMAX(255)
+}
+
+/* 9.9.4.5 - ESM information transfer flag */
+
+ESMInfoXferFlag ::= SEQUENCE {
+   spare INTEGER (0..7) DEFAULT 0, 
+   eitValue BOOLEAN
+}
+
+/* 9.9.4.6 - Linked EPS bearer identity */
+
+LinkedEPSBearerIdent ::= INTEGER (0..15)
+
+/* 9.9.4.7a - Notification indicator */
+NotificationIndicator ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255), 
+   value INTEGER (0..255)
+}
+
+/* 9.9.4.9 - PDN address */
+
+PDNAddress ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (5..13), 
+   spare INTEGER (0..31) DEFAULT 0, 
+   pdnTypeValue PDNTypeValue, 
+   --<inline/>
+   --<length fixed-size="0"/>
+   pdnAddrInfo OCTET STRING (SIZE (4..12))
+}
+
+PDNTypeValue ::= ENUMERATED { ipv4(1), ipv6(2), ipv4v6(3), nonip(5), eth(6),
+                              pdnMAX(7) }
+
+/* 9.9.4.10 - PDN type */
+
+PDNType ::= SEQUENCE {
+   spare BOOLEAN DEFAULT FALSE, 
+   pdnTypeValue PDNTypeValue
+}
+
+/* 9.9.4.13A - Reattempt indicator */
+
+ReattemptInd ::= SEQUENCE {
+   spare INTEGER (0..63) DEFAULT 0,
+   eplmNcValue BOOLEAN, 
+   ratcValue BOOLEAN
+}
+
+/* 9.9.4.20 - Remote UE context list */
+
+RemoteUECtxtList ::= SEQUENCE {
+   --<is3GLength bitFieldSize="16"/>
+   length INTEGER (5..65535), 
+   numRemUECtxts INTEGER (1..255), 
+   --<inline/>
+   --<length expr="@numRemUECtxts"/>
+   remUECtxts SEQUENCE OF RemoteUECtxt
+}
+
+RemoteUECtxt ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255), 
+   numUserIdents INTEGER (0..255),
+   --<inline/>
+   --<length expr="@numUserIdents"/>
+   userIdents SEQUENCE OF UserIdentity,
+   spare INTEGER (0..7) DEFAULT 0,
+   upri4 INTEGER (0..1), -- Added in v18.1.0
+   tpri4 INTEGER (0..1), -- Added in v18.1.0
+   addrType RemoteUEAddrType,
+   --<inline/>
+   addrInfo CHOICE {
+      --<selector element="addrType" value="0"/>
+      noIp NULL,
+      --<selector element="addrType" value="1"/>
+      ipv4 OCTET STRING (SIZE (6)),
+      --<selector element="addrType" value="2"/>
+      ipv6 OCTET STRING (SIZE (8))
+   },
+   --<inline/>
+   udpPortRange CHOICE { -- Added in v18.1.0
+      --<selector element="upri4" value="0"/>
+      absent NULL,
+      --<selector element="upri4" value="1"/>
+      present OCTET STRING (SIZE (4))
+   },
+   --<inline/>
+   tcpPortRange CHOICE { -- Added in v18.1.0
+      --<selector element="tpri4" value="0"/>
+      absent NULL,
+      --<selector element="tpri4" value="1"/>
+      present OCTET STRING (SIZE (4))
+   }
+}
+
+UserIdentity ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255), 
+   userDigit1 INTEGER (0..15),
+   oddEvenInd BOOLEAN,
+   userType1 UserIdentityType,
+   userDigits OCTET STRING
+}
+
+RemoteUEAddrType ::= ENUMERATED { remUENoIp(0), remUEIpv4(1),
+   remUEIpv6(2), remUEMAX(7)
+}
+
+UserIdentityType ::= ENUMERATED { encryptImsi(1), imsi(2), msisdn(3), imei(4),
+   imeisv(5), userIdTypeMAX(7)
+}
+
+/* 9.9.4.21 - PKMF address IE */
+
+PKMFAddress ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255), 
+   spare INTEGER (0..31) DEFAULT 0, 
+   addrType ENUMERATED {
+      ipv4(1), ipv6(2), atMAX(7)
+   },
+   --<length fixed-size="0"/>
+   addrInfo OCTET STRING (SIZE (0..16))
+}
+
+/* 9.9.4.22 - Header compression configuration */
+
+HdrCompressConfig ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (3..255), 
+   spare1 BOOLEAN DEFAULT FALSE,
+   profile104 BOOLEAN,
+   profile103 BOOLEAN,
+   profile102 BOOLEAN,
+   profile006 BOOLEAN,
+   profile004 BOOLEAN,
+   profile003 BOOLEAN,
+   profile002 BOOLEAN,
+   maxCID OCTET STRING (SIZE (2)),
+   --<noPresentBit/>
+   --<length fixed-size="0"/>
+   addlSetupType HdrCompressCtxtParams OPTIONAL,
+   --<noPresentBit/>
+   --<length fixed-size="0"/>
+   addlSetupContainer OCTET STRING OPTIONAL
+}
+
+HdrCompressCtxtParams ::= ENUMERATED { noCompress(0), udp-ip-2(1),
+   esp-ip-3(2), ip-4(3), tcp-ip-6(4), udp-ip-102(5), udp-ip-103(6), ip-104(7),
+   other(8), ipMAX(255)
+}
+
+/* 9.9.4.23 - Control Plane Only Indication */
+
+CtrlPlaneOnlyInd ::= SEQUENCE {
+   spare4 BOOLEAN DEFAULT FALSE,
+   spare3 BOOLEAN DEFAULT FALSE,
+   spare2 BOOLEAN DEFAULT FALSE,
+   cpoiValue BOOLEAN
+}
+
+/* 9.9.4.24 - User data container */
+UserDataContainer ::= SEQUENCE {
+   --<is3GLength bitFieldSize="16"/>
+   length INTEGER (0..65535), 
+   --<length fixed-size="0"/>
+   contents OCTET STRING
+}
+
+/* 9.9.4.25 - Release assistance indication */
+
+ReleaseAssistInd ::= SEQUENCE {
+   spare4 BOOLEAN DEFAULT FALSE, 
+   spare3 BOOLEAN DEFAULT FALSE, 
+   ddx ENUMERATED { ddxNoInfo, ddxNoTrans, ddxSingleDLTrans, ddxReserved }
+}
+
+/* 9.9.4.27 - Header compression configuration status */
+
+HdrCompressConfigStat ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (2),
+
+   -- Octet 3
+   ebi7 BOOLEAN,
+   ebi6 BOOLEAN,
+   ebi5 BOOLEAN,
+   ebi4 BOOLEAN,
+   ebi3 BOOLEAN,
+   ebi2 BOOLEAN,
+   ebi1 BOOLEAN,
+   ebi0 BOOLEAN DEFAULT FALSE,
+
+   -- Octet 4
+   ebi15 BOOLEAN,
+   ebi14 BOOLEAN,
+   ebi13 BOOLEAN,
+   ebi12 BOOLEAN,
+   ebi11 BOOLEAN,
+   ebi10 BOOLEAN,
+   ebi9 BOOLEAN,
+   ebi8 BOOLEAN
+}
+
+/* 9.9.4.28 - Serving PLMN rate control */
+
+ServPLMNRateCtrl ::= OCTET STRING (SIZE (2))
+
+/* 9.9.4.29 - Extended APN aggregate maximum bit rate */
+
+ExtAPNAggMaxBitRate ::= SEQUENCE {
+   --<is3GLength/>
+   length INTEGER (0..255), 
+   extApnAmbrUnitForDL INTEGER (0..255),
+   extApnAmbrForDL OCTET STRING (SIZE (2)),
+   extApnAmbrUnitForUL INTEGER (0..255),
+   extApnAmbrForUL OCTET STRING (SIZE (2))
+}
+
+/* 9.9.4.30 - Extended quality of service */
+/* Defined in TS24008IEs.asn */
+
+END
+
