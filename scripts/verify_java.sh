@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-sh clean.sh
-sh rebuild_java.sh
+sh scripts/clean.sh
+sh scripts/rebuild_java.sh
 
 cd Languages/Java
 gradle run
