@@ -41,8 +41,6 @@ jobs:
         
         sleep 5s
         cd ..
-        sleep 5s
-        cd ..
         make verify-c99
         cd Languages/C99
         make c99_client

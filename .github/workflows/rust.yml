@@ -58,8 +58,6 @@ jobs:
         
         sleep 5s
         cd .. 
-        sleep 5s
-        cd .. 
         make verify-rust
         cd Languages/Rust
         cargo run --example ca_client

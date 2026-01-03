@@ -52,8 +52,6 @@ jobs:
         
         sleep 5s
         cd ..
-        sleep 5s
-        cd ..
         make verify-go
         cd Languages/Go
         go run main.go

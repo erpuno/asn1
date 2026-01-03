@@ -45,8 +45,6 @@ jobs:
         
         sleep 5s
         cd ..
-        sleep 5s
-        cd ..
         make verify-swift
         cd Languages/AppleSwift
         swift run -Xswiftc -suppress-warnings

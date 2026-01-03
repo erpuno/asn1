@@ -51,8 +51,6 @@ jobs:
         
         sleep 5s
         cd ..
-        sleep 5s
-        cd ..
         make verify-ts
         cd Languages/TypeScript
         bun run main.ts

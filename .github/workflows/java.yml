@@ -51,8 +51,6 @@ jobs:
         
         sleep 5s
         cd ..
-        sleep 5s
-        cd ..
         make verify-java
         cd Languages/Java
         ./gradlew run --args="request-ca"
