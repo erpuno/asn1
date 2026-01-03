@@ -26,14 +26,11 @@ jobs:
         elixir-version: '1.18'
         otp-version: '28'
 
-    - name: Make scripts executable
-      run: chmod +x rebuild_swift.sh run_swift_openssl_tests.sh
-
     - name: Rebuild Swift
-      run: ./rebuild_swift.sh
+      run: make rebuild-swift
 
     - name: Run Swift OpenSSL Tests
-      run: ./run_swift_openssl_tests.sh
+      run: make test-swift
 
     - name: Start CA server
       run: |
@@ -48,6 +45,6 @@ jobs:
         
         sleep 5s
         cd ..
-        ./verify_swift.sh
+        make verify-swift
         cd Languages/AppleSwift
         swift run -Xswiftc -suppress-warnings
