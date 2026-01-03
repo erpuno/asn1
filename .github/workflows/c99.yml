@@ -25,13 +25,8 @@ jobs:
         elixir-version: '1.18'
         otp-version: '28'
 
-    - name: Set executable permissions
-      run: |
-        chmod +x rebuild_c99.sh
-        chmod +x run_c99_openssl_tests.sh
-
     - name: Run C99 OpenSSL Tests
-      run: ./run_c99_openssl_tests.sh
+      run: make test-c99
     
     - name: Start CA server
       run: |
@@ -46,7 +41,9 @@ jobs:
         
         sleep 5s
         cd ..
-        ./verify_c99.sh
+        sleep 5s
+        cd ..
+        make verify-c99
         cd Languages/C99
         make c99_client
         ./c99_client

@@ -33,14 +33,11 @@ jobs:
         elixir-version: '1.18'
         otp-version: '28'
 
-    - name: Make scripts executable
-      run: chmod +x rebuild_go.sh run_go_openssl_tests.sh
-
     - name: Rebuild Go
-      run: ./rebuild_go.sh
+      run: make rebuild-go
 
     - name: Run Go OpenSSL Tests
-      run: ./run_go_openssl_tests.sh
+      run: make test-go
 
     - name: Start CA server
       run: |
@@ -55,7 +52,9 @@ jobs:
         
         sleep 5s
         cd ..
-        ./verify_go.sh
+        sleep 5s
+        cd ..
+        make verify-go
         cd Languages/Go
         go run main.go
         go test
